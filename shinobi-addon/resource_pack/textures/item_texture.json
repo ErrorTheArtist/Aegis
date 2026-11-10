@@ -67,6 +67,15 @@
     },
     "aegis_mind_transfer": {
       "textures": "textures/items/aegis/mind_transfer"
+    },
+    "aegis_chidori_scroll": {
+      "textures": "textures/items/aegis/chidori_scroll"
+    },
+    "aegis_mangekyo": {
+      "textures": "textures/items/aegis/mangekyo"
+    },
+    "aegis_reroll_scroll": {
+      "textures": "textures/items/aegis/reroll_scroll"
     }
   }
 }

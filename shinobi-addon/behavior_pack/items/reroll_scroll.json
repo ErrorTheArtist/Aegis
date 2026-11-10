@@ -1,0 +1,21 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:item": {
+    "description": {
+      "identifier": "aegis:reroll_scroll",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "texture": "aegis_reroll_scroll"
+      },
+      "minecraft:display_name": {
+        "value": "Bloodline Reroll Scroll"
+      },
+      "minecraft:max_stack_size": 16,
+      "minecraft:glint": true
+    }
+  }
+}

@@ -76,7 +76,7 @@ Clan odds, stats and abilities are all in `behavior_pack/scripts/clans.js`.
 | Jutsu scrolls | Blank Scroll + lapis lazuli + catalyst (shapeless) |
 
 Catalysts: Fireball = blaze powder · Rasengan = ender pearl · Substitution = oak log ·
-Shadow Clone = armor stand · Body Flicker = sugar · Wind Style: Great Breakthrough = feather.
+Shadow Clone = armor stand · Body Flicker = sugar · Wind Style: Great Breakthrough = feather · Chidori = lightning rod.
 
 All items are also in the creative inventory.
 

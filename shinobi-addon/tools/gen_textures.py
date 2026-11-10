@@ -272,3 +272,18 @@ for name, color in CLAN_SCROLLS.items():
     save(draw(canvas(), scroll, pal), ITEMS / f"{name}.png")
 
 print("Clan textures generated.")
+
+# --- Chidori, Mangekyō, Reroll ------------------------------------------------
+save(draw(canvas(), scroll, {"P": PAPER, "p": PAPER_D, "R": ROD, "r": ROD_D, "C": (150, 220, 255, 255)}), ITEMS / "chidori_scroll.png")
+save(draw(canvas(), scroll, {"P": PAPER, "p": PAPER_D, "R": (120, 50, 170, 255), "r": (80, 30, 120, 255), "C": GOLD}), ITEMS / "reroll_scroll.png")
+
+ms = eye((200, 20, 20, 255), (90, 0, 0, 255), (10, 10, 10, 255))
+# three-bladed pinwheel pattern over the iris
+for k in range(3):
+    base = k * 2 * math.pi / 3
+    for step in range(9):
+        r = 0.8 + step * 0.42
+        a = base + step * 0.22
+        ms.putpixel((round(7.5 + math.cos(a) * r), round(7.5 + math.sin(a) * r)), (10, 10, 10, 255))
+save(ms, ITEMS / "mangekyo.png")
+print("Extra textures generated.")

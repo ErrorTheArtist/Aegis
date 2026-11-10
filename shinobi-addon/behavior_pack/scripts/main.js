@@ -2,7 +2,7 @@
 // Chakra system, jutsu scrolls and ninja tools, driven by @minecraft/server.
 
 import { world, system, ItemStack } from "@minecraft/server";
-import { initClans, clanMaxChakra, clanRegenMultiplier, handleClanItemUse } from "./clans.js";
+import { initClans, clanMaxChakra, clanRegenMultiplier, handleClanItemUse, clanJutsuCostMultiplier } from "./clans.js";
 
 // ---------------------------------------------------------------------------
 // Config
@@ -28,6 +28,7 @@ const JUTSU = {
   "aegis:clone_scroll": { name: "Shadow Clone Jutsu", cost: 40, cooldown: 200, cast: castClones },
   "aegis:flash_scroll": { name: "Body Flicker", cost: 10, cooldown: 15, cast: castFlashStep },
   "aegis:wind_scroll": { name: "Wind Style: Great Breakthrough", cost: 15, cooldown: 30, cast: castGalePalm },
+  "aegis:chidori_scroll": { name: "Chidori", cost: 35, cooldown: 80, cast: castChidori },
 };
 
 // ---------------------------------------------------------------------------
@@ -172,9 +173,10 @@ world.afterEvents.itemUse.subscribe(({ source: player, itemStack }) => {
     player.onScreenDisplay.setActionBar(`§7${jutsu.name} ready in §f${(left / 20).toFixed(1)}s`);
     return;
   }
+  const cost = Math.round(jutsu.cost * clanJutsuCostMultiplier(player, itemStack.typeId));
   const chakra = getChakra(player);
-  if (chakra < jutsu.cost) {
-    player.onScreenDisplay.setActionBar(`§cNot enough chakra! §7(${Math.floor(chakra)}/${jutsu.cost})`);
+  if (chakra < cost) {
+    player.onScreenDisplay.setActionBar(`§cNot enough chakra! §7(${Math.floor(chakra)}/${cost})`);
     sound(player.dimension, "note.bass", player.location, 0.6, 0.6);
     return;
   }
@@ -183,7 +185,7 @@ world.afterEvents.itemUse.subscribe(({ source: player, itemStack }) => {
   const ok = jutsu.cast(player);
   if (ok === false) return;
 
-  setChakra(player, chakra - jutsu.cost);
+  setChakra(player, chakra - cost);
   startCooldown(player, itemStack.typeId, jutsu.cooldown);
   player.onScreenDisplay.setActionBar(`§6${jutsu.name}!`);
 });
@@ -436,6 +438,45 @@ function castGalePalm(player) {
     knockback(e, h.x, h.z, 2.6, 0.55);
     hurt(e, 3, player);
   }
+}
+
+// --- Chidori: charge forward wrapped in lightning; the first thing you hit takes it all. ---
+function castChidori(player) {
+  const dim = player.dimension;
+  const dir = player.getViewDirection();
+  const h = norm({ x: dir.x, y: 0, z: dir.z });
+  sound(dim, "ambient.weather.thunder", player.location, 0.5, 1.8);
+  sound(dim, "mob.bee.loop", player.location, 1, 2); // the "thousand birds" chirp
+  // short charge-up, then the lunge
+  for (let i = 0; i < 8; i++) {
+    system.runTimeout(() => {
+      if (!isValid(player)) return;
+      const hand = add(player.getHeadLocation(), add(scale(player.getViewDirection(), 0.8), { x: 0, y: -0.6, z: 0 }));
+      particle(dim, "minecraft:electric_spark_particle", hand);
+      particle(dim, "minecraft:electric_spark_particle", add(hand, { x: (Math.random() - 0.5) * 0.4, y: (Math.random() - 0.5) * 0.4, z: (Math.random() - 0.5) * 0.4 }));
+    }, i);
+  }
+  system.runTimeout(() => {
+    if (!isValid(player)) return;
+    knockback(player, h.x, h.z, 3.6, 0.2);
+    let done = false;
+    for (let t = 1; t <= 14; t++) {
+      system.runTimeout(() => {
+        if (done || !isValid(player)) return;
+        particle(dim, "minecraft:electric_spark_particle", add(player.location, { x: 0, y: 1, z: 0 }));
+        const target = dim.getEntities({ location: player.location, maxDistance: 2.6 }).find((e) => canBeHit(e, player));
+        if (!target) return;
+        done = true;
+        hurt(target, 13, player);
+        const kb = norm({ x: target.location.x - player.location.x, y: 0, z: target.location.z - player.location.z });
+        knockback(target, kb.x, kb.z, 1.5, 0.4);
+        for (let k = 0; k < 10; k++) {
+          particle(dim, "minecraft:electric_spark_particle", add(target.location, { x: Math.random() - 0.5, y: Math.random() * 2, z: Math.random() - 0.5 }));
+        }
+        sound(dim, "ambient.weather.lightning.impact", target.location, 0.8, 1.4);
+      }, t);
+    }
+  }, 8);
 }
 
 // ---------------------------------------------------------------------------

@@ -5,10 +5,15 @@
 //   /scriptevent aegis:clan reroll          — reroll your clan (with the animation)
 //   /scriptevent aegis:clan set uchiha      — set your clan directly
 //   /scriptevent aegis:clan info            — show your clan
+//   /scriptevent aegis:clan mangekyo        — instantly awaken the Mangekyō (Uchiha only)
 
 import { world, system, ItemStack, ItemLockMode } from "@minecraft/server";
 
 const CLAN_PROP = "aegis:clan";
+const MS_XP_PROP = "aegis:sharingan_xp";
+const MS_PROP = "aegis:mangekyo";
+const MANGEKYO_XP = 100; // mob kill = 1, player kill = 10 (with Sharingan active)
+const REROLL_ITEM = "aegis:reroll_scroll";
 
 export const RARITY = {
   common: { label: "COMMON", color: "§f" },
@@ -35,13 +40,13 @@ export const CLANS = {
     name: "Uchiha", color: "§c", rarity: "epic", weight: 6,
     maxChakra: 140, regen: 1.2, effects: [["fire_resistance", 0]],
     item: "aegis:sharingan",
-    perks: "Sharingan (toggle: night vision + 30% dodge / sneak: Amaterasu), 140 chakra, Fire Resistance",
+    perks: "Sharingan (toggle: night vision + 30% dodge / sneak: Amaterasu), awakens the Mangekyō with kills, cheaper Fireball & Chidori, 140 chakra",
   },
   uzumaki: {
     name: "Uzumaki", color: "§6", rarity: "epic", weight: 7,
     maxChakra: 200, regen: 1.5, effects: [["health_boost", 0]],
     item: "aegis:sealing_chains",
-    perks: "Adamantine Sealing Chains, 200 chakra, fast regen, +2 hearts",
+    perks: "Adamantine Sealing Chains, cheaper Rasengan & Shadow Clones, 200 chakra, fast regen, +2 hearts",
   },
   hyuga: {
     name: "Hyuga", color: "§7", rarity: "epic", weight: 8,
@@ -53,7 +58,7 @@ export const CLANS = {
     name: "Sarutobi", color: "§4", rarity: "rare", weight: 9,
     maxChakra: 120, regen: 1.2, effects: [["fire_resistance", 0]],
     item: "aegis:flame_bullet",
-    perks: "Fire Style: Flame Bullet (triple fireball), 120 chakra, Fire Resistance",
+    perks: "Fire Style: Flame Bullet (triple fireball), cheaper Fireball, 120 chakra, Fire Resistance",
   },
   nara: {
     name: "Nara", color: "§8", rarity: "rare", weight: 11,
@@ -89,6 +94,25 @@ export const CLANS = {
 
 let api; // helpers from main.js
 
+// Clan discounts on the normal jutsu scrolls (multiplier on chakra cost).
+const JUTSU_DISCOUNTS = {
+  uchiha: { "aegis:fireball_scroll": 0.6, "aegis:chidori_scroll": 0.7 },
+  uzumaki: { "aegis:sphere_scroll": 0.7, "aegis:clone_scroll": 0.6 },
+  sarutobi: { "aegis:fireball_scroll": 0.7 },
+};
+
+export function clanJutsuCostMultiplier(player, itemId) {
+  return JUTSU_DISCOUNTS[getClanId(player)]?.[itemId] ?? 1;
+}
+
+const hasMangekyo = (player) => getClanId(player) === "uchiha" && player.getDynamicProperty(MS_PROP) === true;
+
+function clanItemFor(player) {
+  const clan = getClan(player);
+  if (!clan) return undefined;
+  return hasMangekyo(player) ? "aegis:mangekyo" : clan.item;
+}
+
 // ---------------------------------------------------------------------------
 // Clan data
 // ---------------------------------------------------------------------------
@@ -111,8 +135,8 @@ export function clanRegenMultiplier(player) {
   return getClan(player)?.regen ?? 1;
 }
 
-function rollClanId() {
-  const entries = Object.entries(CLANS);
+function rollClanId(exclude) {
+  const entries = Object.entries(CLANS).filter(([id]) => id !== exclude);
   const total = entries.reduce((s, [, c]) => s + c.weight, 0);
   let r = Math.random() * total;
   for (const [id, c] of entries) {
@@ -150,9 +174,10 @@ function hasItem(player, typeId) {
 
 function giveClanItem(player) {
   const clan = getClan(player);
-  if (!clan || hasItem(player, clan.item)) return;
+  const itemId = clanItemFor(player);
+  if (!clan || hasItem(player, itemId)) return;
   try {
-    const stack = new ItemStack(clan.item, 1);
+    const stack = new ItemStack(itemId, 1);
     stack.lockMode = ItemLockMode.inventory; // can't drop it / give it away
     stack.keepOnDeath = true;
     player.getComponent("minecraft:inventory").container.addItem(stack);
@@ -164,7 +189,7 @@ function giveClanItem(player) {
 function removeClanItems(player) {
   const inv = player.getComponent("minecraft:inventory")?.container;
   if (!inv) return;
-  const ids = new Set(Object.values(CLANS).map((c) => c.item));
+  const ids = new Set([...Object.values(CLANS).map((c) => c.item), "aegis:mangekyo"]);
   for (let i = 0; i < inv.size; i++) {
     const it = inv.getItem(i);
     if (it && ids.has(it.typeId)) inv.setItem(i, undefined);
@@ -173,7 +198,12 @@ function removeClanItems(player) {
 
 function setClan(player, id) {
   removeClanItems(player);
-  activeDojutsu.delete(player.id);
+  deactivateDojutsu(player);
+  if (getClanId(player) !== id) {
+    // a new bloodline starts from scratch
+    player.setDynamicProperty(MS_XP_PROP, 0);
+    player.setDynamicProperty(MS_PROP, false);
+  }
   player.setDynamicProperty(CLAN_PROP, id);
   api.setChakra(player, CLANS[id].maxChakra);
   applyNameTag(player);
@@ -184,8 +214,8 @@ function setClan(player, id) {
 // ---------------------------------------------------------------------------
 // The roll — a slot-machine style animation, then the reveal.
 // ---------------------------------------------------------------------------
-function rollClan(player) {
-  const finalId = rollClanId();
+function rollClan(player, exclude) {
+  const finalId = rollClanId(exclude);
   const names = Object.values(CLANS);
   const steps = 24;
   for (let i = 0; i < steps; i++) {
@@ -229,6 +259,7 @@ function refreshEffects(player, force = false) {
   const effects = [...clan.effects];
   const dojutsu = activeDojutsu.get(player.id);
   if (dojutsu) effects.push(["night_vision", 0]);
+  if (dojutsu === "mangekyo") effects.push(["strength", 0]);
   for (const [id, amp] of effects) {
     try {
       const cur = player.getEffect(id);
@@ -281,14 +312,52 @@ function line(player, from, to, particleId) {
   for (let i = 0; i <= steps; i++) api.particle(player.dimension, particleId, api.add(from, api.scale(d, i / steps)));
 }
 
-function toggleDojutsu(player, kind, label) {
-  if (activeDojutsu.get(player.id) === kind) {
-    activeDojutsu.delete(player.id);
+// Turns off any active eye and removes the effects it gave (unless the clan has them passively).
+function deactivateDojutsu(player) {
+  const kind = activeDojutsu.get(player.id);
+  if (!kind) return;
+  activeDojutsu.delete(player.id);
+  const passive = new Set((getClan(player)?.effects ?? []).map(([id]) => id));
+  for (const id of ["night_vision", "strength"]) {
+    if (passive.has(id)) continue;
     try {
-      player.removeEffect("night_vision");
+      player.removeEffect(id);
     } catch {
       /* ignore */
     }
+  }
+}
+
+const isSharinganActive = (p) => ["sharingan", "mangekyo"].includes(activeDojutsu.get(p.id));
+
+function amaterasu(p, pulses, dmg) {
+  if (!isSharinganActive(p)) {
+    p.onScreenDisplay.setActionBar("§7Activate your Sharingan first.");
+    return false;
+  }
+  const t = targetInView(p, 24);
+  if (!t) return noTarget(p);
+  api.sound(p.dimension, "mob.wither.shoot", p.location, 0.7, 0.6);
+  for (let i = 0; i < pulses; i++) {
+    system.runTimeout(() => {
+      if (!api.isValid(t)) return;
+      for (let k = 0; k < 6; k++) {
+        api.particle(t.dimension, "minecraft:dragon_breath_trail", api.add(t.location, { x: Math.random() - 0.5, y: Math.random() * 1.8, z: Math.random() - 0.5 }));
+      }
+      api.hurt(t, dmg, p, "fire");
+      try {
+        t.setOnFire(8, true);
+      } catch {
+        /* ignore */
+      }
+    }, i * 20);
+  }
+  return true;
+}
+
+function toggleDojutsu(player, kind, label) {
+  if (activeDojutsu.get(player.id) === kind) {
+    deactivateDojutsu(player);
     player.onScreenDisplay.setActionBar(`§7${label} deactivated.`);
     return false; // no chakra cost for turning off
   }
@@ -309,33 +378,12 @@ const ABILITIES = {
   "aegis:sharingan": {
     clan: "uchiha",
     use: { name: "Sharingan", cost: 0, cd: 10, cast: (p) => toggleDojutsu(p, "sharingan", "Sharingan") },
-    sneak: {
-      name: "Amaterasu", cost: 50, cd: 300,
-      cast: (p) => {
-        if (activeDojutsu.get(p.id) !== "sharingan") {
-          p.onScreenDisplay.setActionBar("§7Activate your Sharingan first.");
-          return false;
-        }
-        const t = targetInView(p, 24);
-        if (!t) return noTarget(p);
-        api.sound(p.dimension, "mob.wither.shoot", p.location, 0.7, 0.6);
-        for (let i = 0; i < 6; i++) {
-          system.runTimeout(() => {
-            if (!api.isValid(t)) return;
-            for (let k = 0; k < 6; k++) {
-              api.particle(t.dimension, "minecraft:dragon_breath_trail", api.add(t.location, { x: Math.random() - 0.5, y: Math.random() * 1.8, z: Math.random() - 0.5 }));
-            }
-            api.hurt(t, 3, p, "fire");
-            try {
-              t.setOnFire(8, true);
-            } catch {
-              /* ignore */
-            }
-          }, i * 20);
-        }
-        return true;
-      },
-    },
+    sneak: { name: "Amaterasu", cost: 50, cd: 300, cast: (p) => amaterasu(p, 6, 3) },
+  },
+  "aegis:mangekyo": {
+    clan: "uchiha",
+    use: { name: "Mangekyō Sharingan", cost: 0, cd: 10, cast: (p) => toggleDojutsu(p, "mangekyo", "Mangekyō Sharingan") },
+    sneak: { name: "Amaterasu", cost: 40, cd: 200, cast: (p) => amaterasu(p, 8, 4) },
   },
   // ---- Hyuga ----
   "aegis:byakugan": {
@@ -603,7 +651,36 @@ function woodWall(p) {
   return true;
 }
 
+const rerollConfirm = new Map(); // playerId -> tick the confirmation expires
+
+function useRerollScroll(player) {
+  const now = system.currentTick;
+  const confirmBy = rerollConfirm.get(player.id);
+  if (confirmBy === undefined || confirmBy < now) {
+    rerollConfirm.set(player.id, now + 100);
+    const clan = getClan(player);
+    player.sendMessage(
+      `§eThis will replace your ${clan ? clanLabel(clan) + " Clan" : "clan"}§e (and any Mangekyō progress). Use the scroll again within 5s to confirm.`
+    );
+    return;
+  }
+  rerollConfirm.delete(player.id);
+  const inv = player.getComponent("minecraft:inventory")?.container;
+  const slot = player.selectedSlotIndex;
+  const it = inv?.getItem(slot);
+  if (!it || it.typeId !== REROLL_ITEM) return;
+  if (it.amount > 1) {
+    it.amount -= 1;
+    inv.setItem(slot, it);
+  } else inv.setItem(slot, undefined);
+  rollClan(player, getClanId(player)); // always a different clan
+}
+
 export function handleClanItemUse(player, itemStack) {
+  if (itemStack.typeId === REROLL_ITEM) {
+    useRerollScroll(player);
+    return true;
+  }
   const ability = ABILITIES[itemStack.typeId];
   if (!ability) return false;
 
@@ -648,10 +725,13 @@ export function initClans(helpers) {
     refreshEffects(player, true);
   });
 
-  // Sharingan: 30% chance to read and dodge an attack.
+  // Sharingan: 30% (Mangekyō: 40%) chance to read and dodge an attack.
+  // Mangekyō: Susanoo manifests when you drop below 30% health.
   world.afterEvents.entityHurt.subscribe(({ hurtEntity, damage }) => {
     if (hurtEntity.typeId !== "minecraft:player") return;
-    if (activeDojutsu.get(hurtEntity.id) !== "sharingan" || Math.random() > 0.3) return;
+    const kind = activeDojutsu.get(hurtEntity.id);
+    if (kind === "mangekyo") trySusanoo(hurtEntity);
+    if (!isSharinganActive(hurtEntity) || Math.random() > (kind === "mangekyo" ? 0.4 : 0.3)) return;
     try {
       const health = hurtEntity.getComponent("minecraft:health");
       health.setCurrentValue(Math.min(health.effectiveMax, health.currentValue + damage));
@@ -659,6 +739,20 @@ export function initClans(helpers) {
       api.particle(hurtEntity.dimension, "minecraft:large_explosion", api.add(hurtEntity.location, { x: 0, y: 1, z: 0 }));
     } catch {
       /* ignore */
+    }
+  });
+
+  // Sharingan growth: kills with the Sharingan active build toward the Mangekyō.
+  world.afterEvents.entityDie.subscribe(({ deadEntity, damageSource }) => {
+    const killer = damageSource?.damagingEntity;
+    if (killer?.typeId !== "minecraft:player" || killer.id === deadEntity.id) return;
+    if (activeDojutsu.get(killer.id) !== "sharingan" || hasMangekyo(killer)) return;
+    const gain = deadEntity.typeId === "minecraft:player" ? 10 : 1;
+    const xp = (killer.getDynamicProperty(MS_XP_PROP) ?? 0) + gain;
+    killer.setDynamicProperty(MS_XP_PROP, xp);
+    if (xp >= MANGEKYO_XP) awakenMangekyo(killer);
+    else if (Math.floor(xp / 10) > Math.floor((xp - gain) / 10)) {
+      killer.onScreenDisplay.setActionBar(`§cYour Sharingan grows stronger... §7(${xp}/${MANGEKYO_XP})`);
     }
   });
 
@@ -680,16 +774,11 @@ export function initClans(helpers) {
       if (!getClanId(player)) continue;
       const kind = activeDojutsu.get(player.id);
       if (kind) {
-        const drain = kind === "sharingan" ? 2 : 1.5; // per second
+        const drain = { sharingan: 2, mangekyo: 3, byakugan: 1.5 }[kind] ?? 2; // per second
         const c = api.getChakra(player) - drain * 0.25;
         api.setChakra(player, c);
         if (c <= 0) {
-          activeDojutsu.delete(player.id);
-          try {
-            player.removeEffect("night_vision");
-          } catch {
-            /* ignore */
-          }
+          deactivateDojutsu(player);
           player.onScreenDisplay.setActionBar("§7Out of chakra — your eyes return to normal.");
         }
         if (kind === "byakugan" && tick % 4 === 0) {
@@ -710,18 +799,83 @@ export function initClans(helpers) {
     const player = sourceEntity;
     const [cmd, arg] = message.trim().toLowerCase().split(/\s+/);
     if (cmd === "reroll") {
-      player.setDynamicProperty(CLAN_PROP, undefined);
+      const old = getClanId(player);
       removeClanItems(player);
-      activeDojutsu.delete(player.id);
+      deactivateDojutsu(player);
+      player.setDynamicProperty(CLAN_PROP, undefined);
+      if (old) {
+        player.setDynamicProperty(MS_XP_PROP, 0);
+        player.setDynamicProperty(MS_PROP, false);
+      }
       rollClan(player);
+    } else if (cmd === "mangekyo") {
+      if (getClanId(player) !== "uchiha") player.sendMessage("§7Only the Uchiha can awaken the Mangekyō.");
+      else awakenMangekyo(player);
     } else if (cmd === "set" && CLANS[arg]) {
       setClan(player, arg);
       player.sendMessage(`§7Clan set to ${clanLabel(CLANS[arg])}§7.`);
     } else if (cmd === "info") {
       const clan = getClan(player);
-      player.sendMessage(clan ? `§7Clan: ${clanLabel(clan)} §7(${RARITY[clan.rarity].color}${RARITY[clan.rarity].label}§7)\n§7Perks: §f${clan.perks}` : "§7No clan yet.");
+      let text = clan ? `§7Clan: ${clanLabel(clan)} §7(${RARITY[clan.rarity].color}${RARITY[clan.rarity].label}§7)\n§7Perks: §f${clan.perks}` : "§7No clan yet.";
+      if (getClanId(player) === "uchiha") {
+        text += hasMangekyo(player)
+          ? "\n§cMangekyō Sharingan: §fawakened"
+          : `\n§cMangekyō progress: §f${player.getDynamicProperty(MS_XP_PROP) ?? 0}/${MANGEKYO_XP}`;
+      }
+      player.sendMessage(text);
     } else {
-      player.sendMessage(`§7Usage: /scriptevent aegis:clan <reroll | info | set <${Object.keys(CLANS).join("|")}>>`);
+      player.sendMessage(`§7Usage: /scriptevent aegis:clan <reroll | info | mangekyo | set <${Object.keys(CLANS).join("|")}>>`);
     }
   });
+}
+
+// ---------------------------------------------------------------------------
+// Mangekyō Sharingan
+// ---------------------------------------------------------------------------
+function awakenMangekyo(player) {
+  if (hasMangekyo(player)) return;
+  player.setDynamicProperty(MS_PROP, true);
+  deactivateDojutsu(player);
+  removeClanItems(player);
+  giveClanItem(player);
+  player.onScreenDisplay.setTitle("§4Mangekyō Sharingan", {
+    subtitle: "§7Your eyes have awakened...",
+    fadeInDuration: 10, stayDuration: 70, fadeOutDuration: 20,
+  });
+  api.sound(player.dimension, "mob.wither.spawn", player.location, 0.6, 1.2);
+  for (let i = 0; i < 20; i++) {
+    const a = (i / 20) * Math.PI * 2;
+    api.particle(player.dimension, "minecraft:dragon_breath_trail", api.add(player.location, { x: Math.cos(a) * 1.5, y: 1, z: Math.sin(a) * 1.5 }));
+  }
+  player.sendMessage("§cYou awakened the §4Mangekyō Sharingan§c! §7Stronger dodge, Strength, cheaper Amaterasu, and §5Susanoo§7 protects you at low health.");
+  world.sendMessage(`§e${player.name} has awakened the §4Mangekyō Sharingan§e!`);
+}
+
+function trySusanoo(player) {
+  try {
+    const h = player.getComponent("minecraft:health");
+    if (h.currentValue > h.effectiveMax * 0.3) return;
+  } catch {
+    return;
+  }
+  if (api.cooldownLeft(player, "susanoo") > 0 || api.getChakra(player) < 30) return;
+  api.setChakra(player, api.getChakra(player) - 30);
+  api.startCooldown(player, "susanoo", 1200); // 60s
+  eff(player, "resistance", 120, 3);
+  eff(player, "absorption", 300, 4);
+  eff(player, "strength", 300, 1);
+  eff(player, "regeneration", 100, 1);
+  for (let t = 0; t < 6; t++) {
+    system.runTimeout(() => {
+      if (!api.isValid(player)) return;
+      for (let i = 0; i < 16; i++) {
+        const a = (i / 16) * Math.PI * 2;
+        for (const y of [0.5, 1.5, 2.5]) {
+          api.particle(player.dimension, "minecraft:dragon_breath_trail", api.add(player.location, { x: Math.cos(a) * 1.6, y, z: Math.sin(a) * 1.6 }));
+        }
+      }
+    }, t * 20);
+  }
+  api.sound(player.dimension, "mob.warden.emerge", player.location, 0.8, 0.8);
+  player.onScreenDisplay.setTitle("§5Susanoo", { subtitle: "§7protects you", fadeInDuration: 2, stayDuration: 30, fadeOutDuration: 10 });
 }

@@ -106,6 +106,30 @@
     },
     "aegis_cloak_kurama": {
       "textures": "textures/items/aegis/cloak_kurama"
+    },
+    "aegis_kusanagi": {
+      "textures": "textures/items/aegis/kusanagi"
+    },
+    "aegis_samehada": {
+      "textures": "textures/items/aegis/samehada"
+    },
+    "aegis_kubikiribocho": {
+      "textures": "textures/items/aegis/kubikiribocho"
+    },
+    "aegis_hiramekarei": {
+      "textures": "textures/items/aegis/hiramekarei"
+    },
+    "aegis_kiba": {
+      "textures": "textures/items/aegis/kiba"
+    },
+    "aegis_nuibari": {
+      "textures": "textures/items/aegis/nuibari"
+    },
+    "aegis_shibuki": {
+      "textures": "textures/items/aegis/shibuki"
+    },
+    "aegis_chakra_blades": {
+      "textures": "textures/items/aegis/chakra_blades"
     }
   }
 }

@@ -4,6 +4,7 @@
 import { world, system, ItemStack, MolangVariableMap } from "@minecraft/server";
 import { initClans, clanMaxChakra, clanRegenMultiplier, handleClanItemUse, clanJutsuCostMultiplier } from "./clans.js";
 import { initBijuu, bijuuChakraBonus, bijuuRegenMultiplier, handleBijuuItemUse, isTransformed } from "./bijuu.js";
+import { initSwords, handleSwordUse } from "./swords.js";
 
 // ---------------------------------------------------------------------------
 // Config
@@ -255,6 +256,7 @@ world.afterEvents.itemUse.subscribe(({ source: player, itemStack }) => {
   if (!itemStack || player.typeId !== "minecraft:player") return;
   if (handleClanItemUse(player, itemStack)) return;
   if (handleBijuuItemUse(player, itemStack)) return;
+  if (handleSwordUse(player, itemStack)) return;
   const jutsu = JUTSU[itemStack.typeId];
   if (!jutsu) return;
 
@@ -291,7 +293,7 @@ const FIREBALL = {
 // Launches a projectile from `start` along `dir`. opts override FIREBALL's defaults.
 function launchProjectile(caster, start, dir, opts = {}) {
   const o = { ...FIREBALL, ...opts };
-  const orb = spawnFx(caster.dimension, "aegis:jutsu_orb", o.orbEvent, sub(start, { x: 0, y: o.orbOffset ?? 0.25, z: 0 }));
+  const orb = o.noOrb ? undefined : spawnFx(caster.dimension, "aegis:jutsu_orb", o.orbEvent, sub(start, { x: 0, y: o.orbOffset ?? 0.25, z: 0 }));
   projectiles.push({ caster, dim: caster.dimension, pos: start, dir: norm(dir), age: 0, orb, o });
 }
 
@@ -354,7 +356,7 @@ function explodeProjectile(pr) {
   const o = pr.o;
   sound(pr.dim, o.sound, pr.pos, 1, o.radius > 4 ? 0.6 : 1.2);
   particle(pr.dim, o.burst, pr.pos, o.color);
-  particle(pr.dim, "minecraft:huge_explosion_emitter", pr.pos);
+  if (!o.noOrb) particle(pr.dim, "minecraft:huge_explosion_emitter", pr.pos);
   if (!isValid(pr.caster)) return;
   for (const e of pr.dim.getEntities({ location: pr.pos, maxDistance: o.radius })) {
     if (!canBeHit(e, pr.caster)) continue;
@@ -710,4 +712,9 @@ initBijuu({
   add, sub, scale, norm, dot, particle, sound, knockback, hurt, isValid, canBeHit, isSafeSpot,
   getChakra, setChakra, getMaxChakra, cooldownLeft, startCooldown, anim, handPos, spawnFx, removeFx,
   follow, launchProjectile,
+});
+
+initSwords({
+  add, sub, scale, norm, dot, particle, sound, knockback, hurt, isValid, canBeHit,
+  getChakra, setChakra, cooldownLeft, startCooldown, anim, handPos, launchProjectile,
 });

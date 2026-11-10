@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
-"""Generates the legendary swords: detailed 32x32 icons (rendered from a voxel design),
-items and recipes. Swords are held like normal hand-held items.
+"""Generates the legendary swords: 3D held models (attachables), detailed 32x32 icons
+(rendered from the same voxel design), items and recipes.
+
+Held-model placement copies Mojang's vanilla trident: the item is modelled as a pole along +y
+around x=0/z=0 with the bone pivot at [0, 24, 0] and bound to the hand slot; the trident grips
+its pole at y=13.5. Our swords put the grip there too, so the hand ends up on the handle.
 Run from the shinobi-addon folder:  python3 tools/gen_swords.py
 """
 import json
@@ -215,6 +219,28 @@ def icon(cubes, colors):
 
 
 # ---------------------------------------------------------------------------
+GRIP_Y = 13.5  # where the vanilla trident is gripped along its pole
+
+
+def held_cube(cu):
+    """Design space (blade along -z from the grip, width along +y) -> trident pole space
+    (blade along +y from the grip at y=13.5, width along +z, thickness along x)."""
+    ox, oy, oz = (cu["origin"][i] - G[i] for i in range(3))
+    sx, sy, sz = cu["size"]
+    face = cu["uv"]["north"]
+    return {"origin": [round(ox, 3), round(GRIP_Y - oz - sz, 3), round(oy, 3)], "size": [sx, sz, sy],
+            "uv": {f: dict(face) for f in ("north", "south", "east", "west", "up", "down")}}
+
+
+# Third person: the trident's grip position, without its roll, tip tilted ~25° up.
+# First person: the vanilla trident pose.
+w(RP / "animations" / "swords.animation.json", {"format_version": "1.10.0", "animations": {
+    "animation.aegis.sword.hold_third_person": {"loop": True, "bones": {"sword": {
+        "position": [0.71, 2.98, -9.6], "rotation": [65.0, 0.0, 0.0]}}},
+    "animation.aegis.sword.hold_first_person": {"loop": True, "bones": {"sword": {
+        "position": [-7.0, -3.0, -2.0], "rotation": [152.0, -9.0, 25.0]}}},
+}})
+
 atlas_path = RP / "textures" / "item_texture.json"
 atlas = json.loads(atlas_path.read_text())
 
@@ -223,6 +249,21 @@ for sid, sd in SWORDS.items():
     cols = {k: tuple(v) for k, v in sd["colors"].items()}
     (RP / "textures" / "models" / "swords").mkdir(parents=True, exist_ok=True)
     icon(cubes, cols).save(RP / "textures" / "items" / "aegis" / f"{sid}.png")
+    (RP / "textures" / "models" / "swords").mkdir(parents=True, exist_ok=True)
+    palette(cols).save(RP / "textures" / "models" / "swords" / f"{sid}.png")
+    w(RP / "models" / "entity" / f"sword_{sid}.geo.json", {"format_version": "1.16.0", "minecraft:geometry": [{
+        "description": {"identifier": f"geometry.aegis.sword_{sid}", "texture_width": 64, "texture_height": 64,
+                        "visible_bounds_width": 5, "visible_bounds_height": 5, "visible_bounds_offset": [0, 1.5, 0]},
+        "bones": [{"name": "sword", "pivot": [0, 24, 0], "binding": "q.item_slot_to_bone_name(c.item_slot)",
+                   "cubes": [held_cube(cu) for cu in cubes]}]}]})
+    w(RP / "attachables" / f"sword_{sid}.json", {"format_version": "1.10.0", "minecraft:attachable": {"description": {
+        "identifier": f"aegis:{sid}",
+        "materials": {"default": "entity_alphatest", "enchanted": "entity_alphatest_glint"},
+        "textures": {"default": f"textures/models/swords/{sid}", "enchanted": "textures/misc/enchanted_item_glint"},
+        "geometry": {"default": f"geometry.aegis.sword_{sid}"},
+        "animations": {"third": "animation.aegis.sword.hold_third_person", "first": "animation.aegis.sword.hold_first_person"},
+        "scripts": {"animate": [{"third": "!c.is_first_person"}, {"first": "c.is_first_person"}]},
+        "render_controllers": ["controller.render.item_default"]}}})
 
     w(BP / "items" / f"{sid}.json", {"format_version": "1.21.60", "minecraft:item": {
         "description": {"identifier": f"aegis:{sid}", "menu_category": {"category": "equipment", "group": "minecraft:itemGroup.name.sword"}},

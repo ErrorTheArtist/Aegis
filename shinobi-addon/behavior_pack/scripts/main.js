@@ -2,6 +2,7 @@
 // Chakra system, jutsu scrolls and ninja tools, driven by @minecraft/server.
 
 import { world, system, ItemStack } from "@minecraft/server";
+import { initClans, clanMaxChakra, clanRegenMultiplier, handleClanItemUse } from "./clans.js";
 
 // ---------------------------------------------------------------------------
 // Config
@@ -10,7 +11,8 @@ const CHAKRA_PROP = "aegis:chakra";
 const WELCOME_PROP = "aegis:welcomed";
 const OWNER_PROP = "aegis:owner";
 
-const MAX_CHAKRA = 100;
+const BASE_MAX_CHAKRA = 100;
+const getMaxChakra = (player) => clanMaxChakra(player, BASE_MAX_CHAKRA);
 const REGEN_PER_SECOND = 4; // base regen
 const HEADBAND_REGEN_BONUS = 1.5; // multiplier while wearing the headband
 const FOCUS_REGEN_BONUS = 3; // multiplier while sneaking and standing still
@@ -112,11 +114,11 @@ function canBeHit(e, caster) {
 // ---------------------------------------------------------------------------
 function getChakra(player) {
   const v = player.getDynamicProperty(CHAKRA_PROP);
-  return typeof v === "number" ? v : MAX_CHAKRA;
+  return typeof v === "number" ? v : getMaxChakra(player);
 }
 
 function setChakra(player, value) {
-  player.setDynamicProperty(CHAKRA_PROP, Math.max(0, Math.min(MAX_CHAKRA, value)));
+  player.setDynamicProperty(CHAKRA_PROP, Math.max(0, Math.min(getMaxChakra(player), value)));
 }
 
 function wearingHeadband(player) {
@@ -128,9 +130,9 @@ function wearingHeadband(player) {
   }
 }
 
-function chakraBar(value) {
+function chakraBar(value, max) {
   const segments = 20;
-  const filled = Math.round((value / MAX_CHAKRA) * segments);
+  const filled = Math.round((value / max) * segments);
   return "§b" + "|".repeat(filled) + "§8" + "|".repeat(segments - filled);
 }
 
@@ -161,6 +163,7 @@ function startCooldown(player, itemId, ticks) {
 // ---------------------------------------------------------------------------
 world.afterEvents.itemUse.subscribe(({ source: player, itemStack }) => {
   if (!itemStack || player.typeId !== "minecraft:player") return;
+  if (handleClanItemUse(player, itemStack)) return;
   const jutsu = JUTSU[itemStack.typeId];
   if (!jutsu) return;
 
@@ -188,8 +191,7 @@ world.afterEvents.itemUse.subscribe(({ source: player, itemStack }) => {
 // --- Fire Style: Fireball Jutsu: a scripted fireball that flies forward and bursts. ---
 const fireballs = [];
 
-function castFireball(player) {
-  const dir = player.getViewDirection();
+function castFireball(player, dir = player.getViewDirection()) {
   const start = add(player.getHeadLocation(), scale(dir, 1.5));
   fireballs.push({ caster: player, dim: player.dimension, pos: start, dir, age: 0 });
   sound(player.dimension, "mob.ghast.fireball", start, 1, 0.8);
@@ -476,30 +478,31 @@ system.runInterval(() => {
 
   for (const player of world.getAllPlayers()) {
     const chakra = getChakra(player);
+    const max = getMaxChakra(player);
 
     // Regeneration
-    let rate = REGEN_PER_SECOND;
+    let rate = REGEN_PER_SECOND * clanRegenMultiplier(player);
     if (wearingHeadband(player)) rate *= HEADBAND_REGEN_BONUS;
 
     const prev = lastPos.get(player.id);
     const loc = player.location;
     lastPos.set(player.id, loc);
     const still = prev && Math.abs(prev.x - loc.x) < 0.05 && Math.abs(prev.z - loc.z) < 0.05;
-    const focusing = player.isSneaking && still && chakra < MAX_CHAKRA;
+    const focusing = player.isSneaking && still && chakra < max;
+    const held = heldTypeId(player);
     if (focusing) {
       rate *= FOCUS_REGEN_BONUS;
       particle(player.dimension, "minecraft:soul_particle", add(loc, { x: (Math.random() - 0.5) * 1.2, y: 0.2, z: (Math.random() - 0.5) * 1.2 }));
     }
 
-    const next = Math.min(MAX_CHAKRA, chakra + rate * (HUD_INTERVAL / 20));
+    const next = Math.min(max, chakra + rate * (HUD_INTERVAL / 20));
     if (next !== chakra) setChakra(player, next);
 
     // HUD — only while holding ninja gear or while recovering chakra.
-    const held = heldTypeId(player);
     const showHud = (held && held.startsWith("aegis:")) || focusing;
     if (showHud) {
       const label = focusing ? "§3Focusing chakra... " : "§3Chakra ";
-      player.onScreenDisplay.setActionBar(`${label}${chakraBar(next)} §f${Math.floor(next)}/${MAX_CHAKRA}`);
+      player.onScreenDisplay.setActionBar(`${label}${chakraBar(next, max)} §f${Math.floor(next)}/${max}`);
     }
   }
 }, HUD_INTERVAL);
@@ -517,6 +520,15 @@ world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
       "§7Right-click a jutsu scroll to cast it. Each jutsu costs §bchakra§7.",
       "§7Sneak and stand still to §3focus§7 and regenerate chakra faster.",
       "§7Wear a §fHidden Leaf Headband§7 for faster regen. Eat §aSoldier Pills§7 for a boost.",
+      "§eYour clan is about to be decided... good luck!",
     ].join("\n")
   );
+});
+
+// ---------------------------------------------------------------------------
+// Clans (see clans.js)
+// ---------------------------------------------------------------------------
+initClans({
+  add, sub, scale, norm, dot, particle, sound, knockback, hurt, isValid, canBeHit, isSafeSpot,
+  getChakra, setChakra, getMaxChakra, cooldownLeft, startCooldown, castFireball,
 });

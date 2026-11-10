@@ -13,9 +13,40 @@ Uses the real Naruto names (Rasengan, Shadow Clone Jutsu, etc.) — personal use
 
 ## Chakra
 
-- You have **100 chakra**, shown on the action bar while holding ninja gear.
+- You have **100 chakra** (more depending on your clan), shown on the action bar while holding ninja gear.
 - Regenerates 4/sec. **Sneak and stand still** to *focus* (3× regen).
 - Wearing the **Hidden Leaf Headband** gives 1.5× regen. **Soldier Pills** restore 50 instantly.
+
+## Clans
+
+The first time a player joins, they **roll a clan** (slot-machine animation, then a big reveal).
+Each clan has a rarity, bonus chakra, permanent passives and a **clan-only ability item**
+(can't be dropped, kept on death, re-given if lost). Epic/Legendary rolls are announced to everyone.
+Your clan shows above your head, e.g. `[Uchiha] Steve`.
+
+| Clan | Rarity | Chance | Max chakra | Passives | Ability item (right-click / **sneak** + right-click) |
+|---|---|---|---|---|---|
+| Otsutsuki | Legendary | 1% | 250 | Strength, Speed, Resistance, 2× regen | **Rinnegan**: Almighty Push / **Universal Pull** |
+| Senju | Legendary | 3% | 180 | Regeneration, +4 hearts | **Wood Style**: Wood Wall (10s) / **Healing Jutsu** (you + nearby players) |
+| Uchiha | Epic | 6% | 140 | Fire Resistance | **Sharingan**: toggle (night vision, 30% dodge, drains chakra) / **Amaterasu** (needs Sharingan on) |
+| Uzumaki | Epic | 7% | 200 | +2 hearts, 1.5× regen | Adamantine Sealing Chains (freeze everything nearby) |
+| Hyuga | Epic | 8% | 130 | — | **Byakugan**: toggle (see all life within 40 blocks, Gentle Fist bonus damage) / **Palm Rotation** |
+| Sarutobi | Rare | 9% | 120 | Fire Resistance | Fire Style: Flame Bullet (3 fireballs) |
+| Nara | Rare | 11% | 110 | — | Shadow Possession Jutsu (freeze a target for 6s) |
+| Akimichi | Rare | 11% | 120 | +2 hearts | Expansion Jutsu (Strength II, Resistance II, extra hearts) |
+| Aburame | Rare | 10% | 110 | — | Parasitic Insect Swarm (poison, steals chakra) |
+| Inuzuka | Common | 17% | 100 | Speed, Night Vision | Fang Over Fang dash / **Summon Ninja Hound** (tamed wolf) |
+| Yamanaka | Common | 17% | 100 | — | Mind Body Disturbance (nausea, blindness, slow) |
+
+Commands (cheats on) — handy for testing:
+
+```
+/scriptevent aegis:clan reroll
+/scriptevent aegis:clan set uchiha
+/scriptevent aegis:clan info
+```
+
+Clan odds, stats and abilities are all in `behavior_pack/scripts/clans.js`.
 
 ## Jutsu (right-click the scroll to cast)
 
@@ -52,7 +83,7 @@ All items are also in the creative inventory.
 ## Project layout
 
 ```
-behavior_pack/   items, entities, recipes, scripts/main.js (all jutsu logic)
+behavior_pack/   items, entities, recipes, scripts/main.js (jutsu) + scripts/clans.js (clans)
 resource_pack/   textures, client entities, headband attachable
 tools/gen_textures.py   regenerates the placeholder pixel art (needs Pillow)
 build.sh         packages dist/ShinobiWay.mcaddon

@@ -220,3 +220,55 @@ save(bg, RP / "pack_icon.png")
 save(bg, ROOT / "behavior_pack" / "pack_icon.png")
 
 print("Textures generated.")
+
+# --- Clan items --------------------------------------------------------------
+import math
+
+
+def eye(iris, ring, pupil, tomoe=None, rings=False):
+    img = canvas()
+    cx, cy = 7.5, 7.5
+    for x in range(16):
+        for y in range(16):
+            dx, dy = (x - cx), (y - cy) * 1.6  # almond shape
+            r = math.hypot(dx, dy)
+            if r < 7.6:
+                img.putpixel((x, y), (240, 235, 235, 255))  # white of the eye
+            r2 = math.hypot(x - cx, y - cy)
+            if r2 < 4.6 and r < 7.6:
+                img.putpixel((x, y), iris)
+                if rings and int(r2) in (1, 3):
+                    img.putpixel((x, y), ring)
+                if not rings and 3.6 <= r2:
+                    img.putpixel((x, y), ring)
+            if r2 < 1.2 and pupil:
+                img.putpixel((x, y), pupil)
+            if 7.0 <= r < 7.9:
+                img.putpixel((x, y), DARK)
+    if tomoe:
+        for k in range(3):
+            a = k * 2 * math.pi / 3 - math.pi / 2
+            img.putpixel((round(cx + math.cos(a) * 2.6), round(cy + math.sin(a) * 2.6)), tomoe)
+    return img
+
+
+save(eye((200, 20, 20, 255), (90, 0, 0, 255), (10, 10, 10, 255), tomoe=(10, 10, 10, 255)), ITEMS / "sharingan.png")
+save(eye((215, 210, 235, 255), (170, 165, 200, 255), None), ITEMS / "byakugan.png")
+save(eye((170, 140, 220, 255), (70, 40, 110, 255), (70, 40, 110, 255), rings=True), ITEMS / "rinnegan.png")
+
+GOLD, GOLD_D = (230, 180, 40, 255), (160, 110, 20, 255)
+CLAN_SCROLLS = {
+    "wood_style": (60, 140, 50, 255),
+    "sealing_chains": (230, 120, 30, 255),
+    "flame_bullet": (200, 30, 30, 255),
+    "shadow_possession": (40, 40, 50, 255),
+    "expansion": (240, 210, 60, 255),
+    "insect_swarm": (90, 160, 60, 255),
+    "fang_over_fang": (120, 110, 100, 255),
+    "mind_transfer": (60, 160, 200, 255),
+}
+for name, color in CLAN_SCROLLS.items():
+    pal = {"P": PAPER, "p": PAPER_D, "R": GOLD, "r": GOLD_D, "C": color}
+    save(draw(canvas(), scroll, pal), ITEMS / f"{name}.png")
+
+print("Clan textures generated.")

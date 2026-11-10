@@ -34,6 +34,39 @@
     },
     "aegis_wind_scroll": {
       "textures": "textures/items/aegis/wind_scroll"
+    },
+    "aegis_sharingan": {
+      "textures": "textures/items/aegis/sharingan"
+    },
+    "aegis_byakugan": {
+      "textures": "textures/items/aegis/byakugan"
+    },
+    "aegis_rinnegan": {
+      "textures": "textures/items/aegis/rinnegan"
+    },
+    "aegis_wood_style": {
+      "textures": "textures/items/aegis/wood_style"
+    },
+    "aegis_sealing_chains": {
+      "textures": "textures/items/aegis/sealing_chains"
+    },
+    "aegis_flame_bullet": {
+      "textures": "textures/items/aegis/flame_bullet"
+    },
+    "aegis_shadow_possession": {
+      "textures": "textures/items/aegis/shadow_possession"
+    },
+    "aegis_expansion": {
+      "textures": "textures/items/aegis/expansion"
+    },
+    "aegis_insect_swarm": {
+      "textures": "textures/items/aegis/insect_swarm"
+    },
+    "aegis_fang_over_fang": {
+      "textures": "textures/items/aegis/fang_over_fang"
+    },
+    "aegis_mind_transfer": {
+      "textures": "textures/items/aegis/mind_transfer"
     }
   }
 }

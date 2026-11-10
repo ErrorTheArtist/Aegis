@@ -1,0 +1,24 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Shinobi Way (Behavior)",
+    "description": "Ninja add-on: chakra, jutsu scrolls, kunai, shuriken and more.",
+    "uuid": "23a31107-035a-4102-bc35-0d5fb16df98a",
+    "version": [1, 0, 0],
+    "min_engine_version": [1, 21, 60]
+  },
+  "modules": [
+    { "type": "data", "uuid": "fde786aa-3bfa-4179-903b-d0046bd1065d", "version": [1, 0, 0] },
+    {
+      "type": "script",
+      "language": "javascript",
+      "uuid": "63f914c7-7cde-48d2-9761-1a86c3a28760",
+      "version": [1, 0, 0],
+      "entry": "scripts/main.js"
+    }
+  ],
+  "dependencies": [
+    { "uuid": "021eff9f-c0fb-4765-9c0b-08387d62edb5", "version": [1, 0, 0] },
+    { "module_name": "@minecraft/server", "version": "1.16.0" }
+  ]
+}

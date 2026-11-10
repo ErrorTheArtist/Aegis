@@ -1,0 +1,39 @@
+{
+  "resource_pack_name": "shinobi_way",
+  "texture_name": "atlas.items",
+  "texture_data": {
+    "aegis_kunai": {
+      "textures": "textures/items/aegis/kunai"
+    },
+    "aegis_shuriken": {
+      "textures": "textures/items/aegis/shuriken"
+    },
+    "aegis_headband": {
+      "textures": "textures/items/aegis/headband"
+    },
+    "aegis_chakra_pill": {
+      "textures": "textures/items/aegis/chakra_pill"
+    },
+    "aegis_blank_scroll": {
+      "textures": "textures/items/aegis/blank_scroll"
+    },
+    "aegis_fireball_scroll": {
+      "textures": "textures/items/aegis/fireball_scroll"
+    },
+    "aegis_sphere_scroll": {
+      "textures": "textures/items/aegis/sphere_scroll"
+    },
+    "aegis_substitution_scroll": {
+      "textures": "textures/items/aegis/substitution_scroll"
+    },
+    "aegis_clone_scroll": {
+      "textures": "textures/items/aegis/clone_scroll"
+    },
+    "aegis_flash_scroll": {
+      "textures": "textures/items/aegis/flash_scroll"
+    },
+    "aegis_wind_scroll": {
+      "textures": "textures/items/aegis/wind_scroll"
+    }
+  }
+}

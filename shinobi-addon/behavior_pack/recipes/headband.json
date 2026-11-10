@@ -1,0 +1,26 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "aegis:headband"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "WIW"
+    ],
+    "key": {
+      "W": {
+        "item": "minecraft:blue_wool"
+      },
+      "I": {
+        "item": "minecraft:iron_ingot"
+      }
+    },
+    "result": {
+      "item": "aegis:headband",
+      "count": 1
+    }
+  }
+}

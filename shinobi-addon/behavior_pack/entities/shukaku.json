@@ -16,8 +16,8 @@
         ]
       },
       "minecraft:health": {
-        "value": 300,
-        "max": 300
+        "value": 750,
+        "max": 750
       },
       "minecraft:boss": {
         "hud_range": 60,
@@ -29,7 +29,7 @@
         "height": 3.48
       },
       "minecraft:movement": {
-        "value": 0.27
+        "value": 0.31
       },
       "minecraft:movement.basic": {},
       "minecraft:navigation.walk": {
@@ -48,11 +48,11 @@
         "value": 1.0
       },
       "minecraft:attack": {
-        "damage": 9
+        "damage": 12
       },
       "minecraft:follow_range": {
-        "value": 48,
-        "max": 48
+        "value": 64,
+        "max": 64
       },
       "minecraft:persistent": {},
       "minecraft:nameable": {},
@@ -89,8 +89,9 @@
       },
       "minecraft:behavior.melee_attack": {
         "priority": 2,
-        "speed_multiplier": 1.2,
-        "track_target": true
+        "speed_multiplier": 1.35,
+        "track_target": true,
+        "reach_multiplier": 1.4
       },
       "minecraft:behavior.hurt_by_target": {
         "priority": 1
@@ -99,7 +100,7 @@
         "priority": 3,
         "must_see": false,
         "reselect_targets": true,
-        "within_radius": 40,
+        "within_radius": 48,
         "entity_types": [
           {
             "filters": {
@@ -116,7 +117,7 @@
                 }
               ]
             },
-            "max_dist": 40
+            "max_dist": 48
           }
         ]
       },

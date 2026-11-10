@@ -1,0 +1,30 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:attachable": {
+    "description": {
+      "identifier": "aegis:cloak_isobu",
+      "materials": {
+        "default": "entity_alphablend",
+        "enchanted": "armor_enchanted"
+      },
+      "textures": {
+        "default": "textures/models/armor/cloak_isobu",
+        "enchanted": "textures/misc/enchanted_item_glint"
+      },
+      "geometry": {
+        "default": "geometry.aegis.cloak_3"
+      },
+      "animations": {
+        "sway": "animation.aegis.cloak_3"
+      },
+      "scripts": {
+        "animate": [
+          "sway"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.armor"
+      ]
+    }
+  }
+}

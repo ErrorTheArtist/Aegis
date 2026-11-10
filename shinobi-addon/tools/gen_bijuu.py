@@ -224,7 +224,7 @@ for bid, b in BEASTS.items():
         "spawn_egg": {"base_color": b["egg"][0], "overlay_color": b["egg"][1]}}}})
 
     tails = b["tails"] if bid != "chomei" else 7
-    hp = 200 + tails * 100
+    hp = 500 + tails * 250
     width = round(max(b["W"], 24) / 16 + 0.6, 2)
     height = round((b["legH"] + b["H"]) / 16 + 0.6, 2)
     comps = {
@@ -232,7 +232,7 @@ for bid, b in BEASTS.items():
         "minecraft:health": {"value": hp, "max": hp},
         "minecraft:boss": {"hud_range": 60, "name": b["name"], "should_darken_sky": True},
         "minecraft:collision_box": {"width": width, "height": height},
-        "minecraft:movement": {"value": 0.27},
+        "minecraft:movement": {"value": 0.31},
         "minecraft:movement.basic": {},
         "minecraft:navigation.walk": {"can_path_over_water": True, "avoid_water": False, "can_swim": True,
                                       "can_break_doors": True},
@@ -240,8 +240,8 @@ for bid, b in BEASTS.items():
         "minecraft:physics": {},
         "minecraft:pushable": {"is_pushable": False, "is_pushable_by_piston": False},
         "minecraft:knockback_resistance": {"value": 1.0},
-        "minecraft:attack": {"damage": int(8 + tails * 1.5)},
-        "minecraft:follow_range": {"value": 48, "max": 48},
+        "minecraft:attack": {"damage": int(10 + tails * 2)},
+        "minecraft:follow_range": {"value": 64, "max": 64},
         "minecraft:persistent": {},
         "minecraft:nameable": {},
         "minecraft:fire_immune": {},
@@ -252,13 +252,13 @@ for bid, b in BEASTS.items():
         "minecraft:experience_reward": {"on_death": "q.last_hit_by_player ? 200 + 50 * " + str(tails) + " : 0"},
         "minecraft:loot": {"table": "loot_tables/entities/aegis_bijuu.json"},
         "minecraft:behavior.float": {"priority": 0},
-        "minecraft:behavior.melee_attack": {"priority": 2, "speed_multiplier": 1.2, "track_target": True},
+        "minecraft:behavior.melee_attack": {"priority": 2, "speed_multiplier": 1.35, "track_target": True, "reach_multiplier": 1.4},
         "minecraft:behavior.hurt_by_target": {"priority": 1},
         "minecraft:behavior.nearest_attackable_target": {"priority": 3, "must_see": False, "reselect_targets": True,
-            "within_radius": 40, "entity_types": [
+            "within_radius": 48, "entity_types": [
                 {"filters": {"any_of": [{"test": "is_family", "subject": "other", "value": "player"},
                                         {"test": "is_family", "subject": "other", "value": "chakra_clone"}]},
-                 "max_dist": 40}]},
+                 "max_dist": 48}]},
         "minecraft:behavior.random_stroll": {"priority": 6, "speed_multiplier": 0.8},
         "minecraft:behavior.look_at_player": {"priority": 7, "look_distance": 16},
         "minecraft:behavior.random_look_around": {"priority": 8},
@@ -287,3 +287,91 @@ lang_path = RP / "texts" / "en_US.lang"
 existing = [l for l in lang_path.read_text().splitlines() if "aegis:" not in l or not any(b in l for b in BEASTS)]
 lang_path.write_text("\n".join(existing + lang) + "\n")
 print("Generated", len(BEASTS), "tailed beasts.")
+
+
+# ---------------------------------------------------------------------------
+# Tailed Beast Cloaks: a wearable (chest slot) chakra shell with ears and tails
+# ---------------------------------------------------------------------------
+def cloak_geometry(n_tails):
+    bones = [
+        {"name": "body", "pivot": [0, 24, 0], "cubes": [cube([-4, 12, -2], [8, 12, 4], [16, 16], 1.1)]},
+        {"name": "head", "pivot": [0, 24, 0], "cubes": [
+            cube([-4, 24, -4], [8, 8, 8], [0, 0], 1.1),
+            cube([-4.5, 32.5, -1], [3, 5, 2], [32, 0], 0.3),
+            cube([1.5, 32.5, -1], [3, 5, 2], [32, 0], 0.3)]},
+        {"name": "rightArm", "pivot": [-5, 22, 0], "cubes": [cube([-8, 12, -2], [4, 12, 4], [40, 16], 1.1)]},
+        {"name": "leftArm", "pivot": [5, 22, 0], "cubes": [cube([4, 12, -2], [4, 12, 4], [40, 16], 1.1)]},
+        {"name": "rightLeg", "pivot": [-1.9, 12, 0], "cubes": [cube([-3.9, 0, -2], [4, 12, 4], [0, 16], 1.1)]},
+        {"name": "leftLeg", "pivot": [1.9, 12, 0], "cubes": [cube([-0.1, 0, -2], [4, 12, 4], [0, 16], 1.1)]},
+    ]
+    for i in range(n_tails):
+        spread = 0 if n_tails == 1 else (i / (n_tails - 1) - 0.5) * (120 if n_tails > 4 else 70)
+        bones.append({"name": f"tail{i}", "parent": "body", "pivot": [0, 13, 2.5], "rotation": [50 + (6 if i % 2 else 0), spread, 0],
+                      "cubes": [cube([-1, 12, 2.5], [2, 2, 14], [0, 32], 0.4),
+                                cube([-1.5, 11.5, 13.5], [3, 3, 4], [32, 32], 0.4)]})
+    return {"format_version": "1.12.0", "minecraft:geometry": [{
+        "description": {"identifier": f"geometry.aegis.cloak_{n_tails}", "texture_width": 64, "texture_height": 64,
+                        "visible_bounds_width": 4, "visible_bounds_height": 4, "visible_bounds_offset": [0, 1.5, 0]},
+        "bones": bones}]}
+
+
+def cloak_texture(rgb):
+    img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
+    random.seed(sum(rgb))
+    for x in range(64):
+        for y in range(64):
+            bright = 1.25 if (y >= 32 and x >= 32) or (y < 6 and 32 <= x < 42) else 1.0  # tail tips & ears
+            k = random.uniform(0.85, 1.1) * bright
+            a = random.randint(110, 170) if (x + y) % 3 else random.randint(170, 210)
+            img.putpixel((x, y), tuple(min(255, int(c * k)) for c in rgb) + (a,))
+    return img
+
+
+cloak_anim = {}
+cloak_items = {}
+for bid, b in BEASTS.items():
+    n = b["tails"] if bid != "chomei" else 7
+    w(RP / "models" / "entity" / f"cloak_{n}.geo.json", cloak_geometry(n))
+    rgb = b["main"] if bid not in ("kokuo", "saiken") else b["accent"]
+    cloak_texture(rgb).save(RP / "textures" / "models" / "armor" / f"cloak_{bid}.png")
+    bones = {f"tail{i}": {"rotation": [f"math.sin(q.life_time * 90 + {i * 40}) * 8", f"math.cos(q.life_time * 70 + {i * 55}) * 10", 0]}
+             for i in range(n)}
+    bones["head"] = {"scale": "1.0 + math.sin(q.life_time * 400) * 0.015"}
+    cloak_anim[f"animation.aegis.cloak_{n}"] = {"loop": True, "bones": bones}
+    w(RP / "attachables" / f"cloak_{bid}.json", {"format_version": "1.10.0", "minecraft:attachable": {"description": {
+        "identifier": f"aegis:cloak_{bid}",
+        "materials": {"default": "entity_alphablend", "enchanted": "armor_enchanted"},
+        "textures": {"default": f"textures/models/armor/cloak_{bid}", "enchanted": "textures/misc/enchanted_item_glint"},
+        "geometry": {"default": f"geometry.aegis.cloak_{n}"},
+        "animations": {"sway": f"animation.aegis.cloak_{n}"}, "scripts": {"animate": ["sway"]},
+        "render_controllers": ["controller.render.armor"]}}})
+    w(BP / "items" / f"cloak_{bid}.json", {"format_version": "1.21.60", "minecraft:item": {
+        "description": {"identifier": f"aegis:cloak_{bid}", "menu_category": {"category": "equipment"}},
+        "components": {
+            "minecraft:icon": {"textures": {"default": f"aegis_cloak_{bid}"}},
+            "minecraft:display_name": {"value": f"Tailed Beast Cloak ({b['name'].split(',')[0]})"},
+            "minecraft:max_stack_size": 1, "minecraft:glint": True,
+            "minecraft:wearable": {"slot": "slot.armor.chest", "protection": 8},
+            "minecraft:enchantable": {"slot": "armor_torso", "value": 15}}}})
+    cloak_items[bid] = b["main"]
+
+w(RP / "animations" / "cloak.animation.json", {"format_version": "1.8.0", "animations": cloak_anim})
+
+# cloak item icons + atlas entries
+flame = ["................", ".......O........", "......OO........", "......OYO.......", ".....OYYO...O...",
+         "....OOYYOO.OO...", "...OOYYWYOOO....", "...OYYWWWYYO....", "..OOYWWWWWYOO...", "..OYYWWWWWYYO...",
+         "..OYYWWWWWYYO...", "..OOYYWWWYYOO...", "...OOYYYYYOO....", "....OOOOOOO.....", "................", "................"]
+atlas_path = RP / "textures" / "item_texture.json"
+atlas = json.loads(atlas_path.read_text())
+atlas["texture_data"].pop("aegis_bijuu_cloak", None)
+for bid, rgb in cloak_items.items():
+    icon = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    pal = {"O": tuple(int(c * 0.8) for c in rgb) + (255,), "Y": tuple(min(255, int(c * 1.15) + 20) for c in rgb) + (255,), "W": (255, 250, 235, 255)}
+    for y, row in enumerate(flame):
+        for x, ch in enumerate(row):
+            if ch in pal:
+                icon.putpixel((x, y), pal[ch])
+    icon.save(RP / "textures" / "items" / "aegis" / f"cloak_{bid}.png")
+    atlas["texture_data"][f"aegis_cloak_{bid}"] = {"textures": f"textures/items/aegis/cloak_{bid}"}
+w(atlas_path, atlas)
+print("Generated cloaks.")

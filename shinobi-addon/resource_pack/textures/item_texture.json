@@ -80,8 +80,32 @@
     "aegis_bijuu_scroll": {
       "textures": "textures/items/aegis/bijuu_scroll"
     },
-    "aegis_bijuu_cloak": {
-      "textures": "textures/items/aegis/bijuu_cloak"
+    "aegis_cloak_shukaku": {
+      "textures": "textures/items/aegis/cloak_shukaku"
+    },
+    "aegis_cloak_matatabi": {
+      "textures": "textures/items/aegis/cloak_matatabi"
+    },
+    "aegis_cloak_isobu": {
+      "textures": "textures/items/aegis/cloak_isobu"
+    },
+    "aegis_cloak_son_goku": {
+      "textures": "textures/items/aegis/cloak_son_goku"
+    },
+    "aegis_cloak_kokuo": {
+      "textures": "textures/items/aegis/cloak_kokuo"
+    },
+    "aegis_cloak_saiken": {
+      "textures": "textures/items/aegis/cloak_saiken"
+    },
+    "aegis_cloak_chomei": {
+      "textures": "textures/items/aegis/cloak_chomei"
+    },
+    "aegis_cloak_gyuki": {
+      "textures": "textures/items/aegis/cloak_gyuki"
+    },
+    "aegis_cloak_kurama": {
+      "textures": "textures/items/aegis/cloak_kurama"
     }
   }
 }

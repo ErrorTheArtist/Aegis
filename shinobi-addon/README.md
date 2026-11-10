@@ -89,21 +89,29 @@ Clan odds, stats and abilities are all in `behavior_pack/scripts/clans.js`.
 
 ## Tailed Beasts (bosses)
 
-Nine boss mobs with a boss bar, their own models and animations, a chakra aura, and special attacks.
-Every beast can fire a **Tailed Beast Bomb** (charged orb from the mouth) and has its own elemental move.
-At **half health** it becomes **enraged**: Strength, Speed and faster attacks.
+Nine boss mobs with a boss bar, their own models and animations, a chakra aura, and a full move set:
 
-| Beast | Health | Special |
-|---|---|---|
-| Shukaku (1) | 300 | Sand Coffin: traps you in sand, then crushes |
-| Matatabi (2) | 400 | Blue fire breath (cone) |
-| Isobu (3) | 500 | Coral shockwave rings, slows |
-| Son Goku (4) | 600 | Lava rain around you |
-| Kokuo (5) | 700 | Steam-powered charge |
-| Saiken (6) | 800 | Acid mist: poison + weakness |
-| Chomei (7) | 900 | Flies up and showers blinding scale powder |
-| Gyuki (8) | 1000 | Ink spray: blindness + slowness |
-| Kurama (9) | 1100 | Chakra roar: huge knockback, fire, weakness |
+- **Tailed Beast Bomb**: a charged orb fired from the mouth
+- **Elemental special** (see table)
+- **Tail Swipe** when you get close, **Leap Slam** when you run away, and a knock-back **Roar**
+- Natural Resistance; at **half health** they become **enraged**: Strength III, Speed II, Resistance II,
+  a burst of regeneration and much faster attacks
+
+Attacks come every ~2–4.5 seconds (faster with more tails, ~40% faster when enraged), and damage scales with tails.
+
+| Beast | Health | Melee | Special |
+|---|---|---|---|
+| Shukaku (1) | 750 | 12 | Sand Coffin: traps you in sand, then crushes |
+| Matatabi (2) | 1000 | 14 | Blue fire breath (cone) |
+| Isobu (3) | 1250 | 16 | Coral shockwave rings, slows |
+| Son Goku (4) | 1500 | 18 | Lava rain around you |
+| Kokuo (5) | 1750 | 20 | Steam-powered charge |
+| Saiken (6) | 2000 | 22 | Acid mist: poison + weakness |
+| Chomei (7) | 2250 | 24 | Flies up and showers blinding scale powder |
+| Gyuki (8) | 2500 | 26 | Ink spray: blindness + slowness |
+| Kurama (9) | 2750 | 28 | Chakra roar: huge knockback, fire, weakness |
+
+Bring good armor, Soldier Pills and friends.
 
 **Summon:** craft a **Tailed Beast Summoning Scroll** (`E D E` / `D S D` / `E D E`: E = eye of ender,
 D = diamond, S = Blank Scroll) and use it. A random beast is released 8 blocks in front of you after a short ritual
@@ -112,14 +120,21 @@ creative inventory too.
 
 **Drops:** diamonds, golden apples, Soldier Pills, a chance at a Bloodline Reroll Scroll, and lots of XP.
 
-### Jinchūriki
+### Jinchūriki & Tailed Beast Mode
 
 Land the **killing blow** and the beast is sealed inside you (a new one replaces the old):
 
 - +50 max chakra, plus 10 per tail (Kurama: +140), and 1.3× chakra regen
-- **Tailed Beast Cloak** item (can't be dropped, kept on death):
-  - right-click: cloak mode — Strength II, Speed II, Resistance, Jump Boost and a coloured chakra aura (drains 3 chakra/sec; Uzumaki only 1.5)
-  - sneak + right-click while cloaked: your own **Tailed Beast Bomb** (80 chakra, 30s cooldown)
+- You get that beast's **Tailed Beast Cloak**, a wearable (chest slot) item. **Wear it to transform**:
+  your body is wrapped in a glowing chakra shell in the beast's colour, with chakra ears and the
+  beast's tails swaying behind you.
+- While transformed: Strength II, Speed II, Resistance II, Jump Boost II, plus a beast perk
+  (e.g. Kurama: Regeneration II + Strength III; Shukaku: Resistance III; Chomei: high jumps + slow falling;
+  Matatabi/Son Goku: fire resistance; Isobu/Saiken/Gyuki: water breathing).
+  Drains 3 chakra/sec (Uzumaki: 1.5) and natural chakra regen stops. When chakra runs out the cloak
+  comes off by itself.
+- **Hold sneak for 1.5s** while transformed to charge and fire a **Tailed Beast Bomb** (80 chakra, 20s cooldown).
+- Only the beast's own Jinchūriki can wear its cloak.
 
 ```
 /scriptevent aegis:bijuu summon kurama

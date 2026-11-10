@@ -3,7 +3,7 @@
 
 import { world, system, ItemStack, MolangVariableMap } from "@minecraft/server";
 import { initClans, clanMaxChakra, clanRegenMultiplier, handleClanItemUse, clanJutsuCostMultiplier } from "./clans.js";
-import { initBijuu, bijuuChakraBonus, bijuuRegenMultiplier, handleBijuuItemUse } from "./bijuu.js";
+import { initBijuu, bijuuChakraBonus, bijuuRegenMultiplier, handleBijuuItemUse, isTransformed } from "./bijuu.js";
 
 // ---------------------------------------------------------------------------
 // Config
@@ -646,14 +646,14 @@ system.runInterval(() => {
     const max = getMaxChakra(player);
 
     // Regeneration
-    let rate = REGEN_PER_SECOND * clanRegenMultiplier(player) * bijuuRegenMultiplier(player);
+    let rate = isTransformed(player) ? 0 : REGEN_PER_SECOND * clanRegenMultiplier(player) * bijuuRegenMultiplier(player);
     if (wearingHeadband(player)) rate *= HEADBAND_REGEN_BONUS;
 
     const prev = lastPos.get(player.id);
     const loc = player.location;
     lastPos.set(player.id, loc);
     const still = prev && Math.abs(prev.x - loc.x) < 0.05 && Math.abs(prev.z - loc.z) < 0.05;
-    const focusing = player.isSneaking && still && chakra < max;
+    const focusing = player.isSneaking && still && chakra < max && !isTransformed(player);
     const held = heldTypeId(player);
 
     // Ninja run: arms swept back while sprinting.

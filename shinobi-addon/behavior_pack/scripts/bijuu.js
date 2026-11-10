@@ -6,11 +6,16 @@
 //   /scriptevent aegis:bijuu seal kurama     — become that beast's Jinchūriki directly
 //   /scriptevent aegis:bijuu release         — release your sealed beast
 //   /scriptevent aegis:bijuu info            — show your sealed beast
+//
+// Jinchūriki get a wearable Tailed Beast Cloak (chest slot). Wearing it = Tailed Beast Mode.
+// Hold sneak for 1.5s while transformed to charge and fire a Tailed Beast Bomb.
 
 import { world, system, ItemStack, ItemLockMode } from "@minecraft/server";
 
 const BIJUU_PROP = "aegis:bijuu";
-const CLOAK_ITEM = "aegis:bijuu_cloak";
+const OLD_CLOAK_ITEM = "aegis:bijuu_cloak";
+const cloakItemOf = (id) => `aegis:cloak_${id}`;
+const isCloakItem = (typeId) => typeof typeId === "string" && (typeId.startsWith("aegis:cloak_") || typeId === OLD_CLOAK_ITEM);
 const SCROLL_ITEM = "aegis:bijuu_scroll";
 const DIMENSIONS = ["overworld", "nether", "the_end"];
 
@@ -27,9 +32,26 @@ export const BEASTS = {
   kurama: { name: "Kurama", title: "the Nine-Tailed Fox", tails: 9, text: "§6", color: [1.0, 0.45, 0.05], element: kuramaRoar },
 };
 
+// Extra effects while in Tailed Beast Mode, on top of the shared ones.
+const CLOAK_PERKS = {
+  shukaku: [["resistance", 2]],
+  matatabi: [["fire_resistance", 0]],
+  isobu: [["water_breathing", 0], ["resistance", 2]],
+  son_goku: [["fire_resistance", 0], ["strength", 2]],
+  kokuo: [["speed", 2]],
+  saiken: [["water_breathing", 0], ["regeneration", 0]],
+  chomei: [["jump_boost", 3], ["slow_falling", 0]],
+  gyuki: [["strength", 2], ["water_breathing", 0]],
+  kurama: [["regeneration", 1], ["strength", 2]],
+};
+
+// Boss damage scales with tail count.
+const pw = (b, base) => Math.round(base * (1.3 + b.tails * 0.09));
+
 let api;
 const bossState = new Map(); // entity id -> { next, enraged }
-const cloakActive = new Set(); // player ids
+const cloakActive = new Set(); // player ids currently transformed
+const bombCharge = new Map(); // player id -> { ticks, orb, done }
 
 const beastIdOf = (entity) => entity?.typeId?.startsWith("aegis:") && BEASTS[entity.typeId.slice(6)] ? entity.typeId.slice(6) : undefined;
 const fullName = (b) => `${b.text}${b.name}, ${b.title}§r`;
@@ -49,6 +71,11 @@ function sealedBeastId(player) {
 export function bijuuChakraBonus(player) {
   const b = BEASTS[sealedBeastId(player)];
   return b ? 50 + b.tails * 10 : 0;
+}
+
+// No natural chakra regen while in Tailed Beast Mode (and sneaking charges a bomb, not focus).
+export function isTransformed(player) {
+  return cloakActive.has(player.id);
 }
 
 export function bijuuRegenMultiplier(player) {
@@ -140,7 +167,7 @@ function tailedBeastBomb(boss, b, target) {
   const dim = boss.dimension;
   roarAnim(boss);
   api.sound(dim, "mob.warden.sonic_charge", boss.location, 2, 0.6);
-  const CHARGE = 40;
+  const CHARGE = 28;
   const orb = api.spawnFx(dim, "aegis:jutsu_orb", "aegis:as_bijuudama", mouthPos(boss));
   api.follow(orb, () => (api.isValid(boss) ? api.sub(mouthPos(boss), { x: 0, y: 0.25, z: 0 }) : undefined), CHARGE);
   for (let i = 0; i < CHARGE; i += 4) {
@@ -151,7 +178,7 @@ function tailedBeastBomb(boss, b, target) {
     const start = mouthPos(boss);
     const aim = api.isValid(target) ? api.add(target.location, { x: 0, y: 1, z: 0 }) : api.add(start, boss.getViewDirection());
     api.launchProjectile(boss, start, api.sub(aim, start), {
-      speed: 1.1, maxAge: 60, damage: 12 + b.tails * 1.5, radius: 5.5, knock: 2.5, fire: 0,
+      speed: 1.3, maxAge: 60, damage: pw(b, 14), radius: 6, knock: 2.8, fire: 0,
       orbEvent: "aegis:as_bijuudama", trail: "aegis:beast_aura", burst: "aegis:beast_burst", color: b.color,
       hitRadius: 2, sound: "random.explode", ignoreFamily: "tailed_beast",
     });
@@ -164,7 +191,7 @@ function roar(boss, b) {
   api.sound(boss.dimension, "mob.enderdragon.growl", boss.location, 3, 0.7);
   api.particle(boss.dimension, "aegis:beast_burst", api.add(boss.location, { x: 0, y: 2, z: 0 }), b.color);
   ring(boss.dimension, boss.location, 5, "aegis:beast_aura", b.color);
-  blast(boss, boss.location, 7, 4, 2.2);
+  blast(boss, boss.location, 8, pw(b, 5), 2.4);
 }
 
 // 1 — Shukaku: Sand Coffin. Locks the target in sand, then crushes them.
@@ -177,7 +204,7 @@ function sandCoffin(boss, b, t) {
   system.runTimeout(() => {
     api.particle(dim, "aegis:beast_burst", api.add(spot, { x: 0, y: 1, z: 0 }), b.color);
     api.sound(dim, "random.explode", spot, 1, 0.8);
-    blast(boss, spot, 3, 12, 0.5);
+    blast(boss, spot, 3.5, pw(b, 12), 0.5);
   }, 40);
 }
 
@@ -190,7 +217,7 @@ function blueFireBreath(boss, b) {
   for (let d = 1; d <= 14; d += 1.5) api.particle(dim, "aegis:beast_aura", api.add(m, api.scale(dir, d)), b.color);
   api.sound(dim, "mob.blaze.shoot", m, 2, 0.6);
   for (const e of cone(boss, 14, 0.6)) {
-    api.hurt(e, 10, boss, "fire");
+    api.hurt(e, pw(b, 10), boss, "fire");
     try {
       e.setOnFire(6, true);
     } catch {
@@ -209,7 +236,7 @@ function coralShockwave(boss, b) {
       if (k === 0) api.sound(dim, "random.splash", boss.location, 3, 0.5);
     }, k * 5);
   }
-  blast(boss, boss.location, 12, 8, 2.0, (e) => eff(e, "slowness", 80, 2));
+  blast(boss, boss.location, 13, pw(b, 9), 2.2, (e) => eff(e, "slowness", 80, 2));
 }
 
 // 4 — Son Goku: lava rain around the target.
@@ -223,7 +250,7 @@ function lavaRain(boss, b, t) {
       api.particle(dim, "aegis:beast_burst", spot, b.color);
       api.sound(dim, "bucket.empty_lava", spot, 1.5, 0.8);
       if (api.isValid(boss)) {
-        blast(boss, spot, 2.5, 7, 0.5, (e) => {
+        blast(boss, spot, 3, pw(b, 7), 0.5, (e) => {
           try {
             e.setOnFire(5, true);
           } catch {
@@ -250,7 +277,7 @@ function steamCharge(boss, b, t) {
       for (const e of dim.getEntities({ location: boss.location, maxDistance: 4 })) {
         if (hit.has(e.id) || !api.canBeHit(e, boss) || beastIdOf(e)) continue;
         hit.add(e.id);
-        api.hurt(e, 14, boss);
+        api.hurt(e, pw(b, 14), boss);
         api.knockback(e, to.x, to.z, 2.5, 0.6);
       }
     }, i);
@@ -266,7 +293,7 @@ function acidMist(boss, b) {
       for (let i = 0; i < 6; i++) {
         api.particle(dim, "aegis:beast_mist", api.add(boss.location, { x: (Math.random() - 0.5) * 12, y: 0.5, z: (Math.random() - 0.5) * 12 }), b.color);
       }
-      blast(boss, boss.location, 8, 3, 0, (e) => {
+      blast(boss, boss.location, 9, pw(b, 3), 0, (e) => {
         eff(e, "poison", 100, 1);
         eff(e, "weakness", 100, 1);
       });
@@ -287,7 +314,7 @@ function scalePowder(boss, b) {
       api.particle(dim, "aegis:beast_mist", api.add(boss.location, { x: (Math.random() - 0.5) * 16, y: -1 - Math.random() * 3, z: (Math.random() - 0.5) * 16 }), b.color);
     }
     for (const p of playersNear(dim, boss.location, 14)) {
-      api.hurt(p, 6, boss);
+      api.hurt(p, pw(b, 6), boss);
       eff(p, "blindness", 80, 0);
       eff(p, "nausea", 120, 0);
     }
@@ -303,7 +330,7 @@ function inkSpray(boss, b) {
   for (let d = 1; d <= 14; d += 1.5) api.particle(dim, "aegis:beast_mist", api.add(m, api.scale(dir, d)), [0.05, 0.02, 0.08]);
   api.sound(dim, "mob.squid.ink_squirt", m, 3, 0.5);
   for (const e of cone(boss, 14, 0.55)) {
-    api.hurt(e, 8, boss);
+    api.hurt(e, pw(b, 8), boss);
     eff(e, "blindness", 100, 0);
     eff(e, "slowness", 100, 2);
   }
@@ -318,7 +345,7 @@ function kuramaRoar(boss, b) {
     system.runTimeout(() => api.isValid(boss) && ring(dim, boss.location, 2 + k * 3, "aegis:beast_aura", b.color, 28), k * 3);
   }
   api.particle(dim, "aegis:beast_burst", api.add(boss.location, { x: 0, y: 2, z: 0 }), b.color);
-  blast(boss, boss.location, 15, 10, 3.5, (e) => {
+  blast(boss, boss.location, 16, pw(b, 10), 3.5, (e) => {
     eff(e, "weakness", 160, 1);
     try {
       e.setOnFire(4, true);
@@ -328,28 +355,60 @@ function kuramaRoar(boss, b) {
   });
 }
 
+// Close range: a spinning tail sweep around the beast.
+function tailSwipe(boss, b) {
+  const dim = boss.dimension;
+  api.sound(dim, "mob.ravager.attack", boss.location, 2, 0.6);
+  ring(dim, boss.location, 3, "aegis:beast_aura", b.color, 18);
+  ring(dim, boss.location, 5, "aegis:wind_gust", undefined, 18);
+  blast(boss, boss.location, 6.5, pw(b, 7), 2.4);
+}
+
+// Long range: leaps at a fleeing target and slams down.
+function leapSlam(boss, b, t) {
+  const dim = boss.dimension;
+  const d = api.sub(t.location, boss.location);
+  const dist = Math.sqrt(d.x * d.x + d.z * d.z);
+  const to = api.norm({ x: d.x, y: 0, z: d.z });
+  roarAnim(boss);
+  api.sound(dim, "mob.ravager.roar", boss.location, 2, 0.7);
+  api.knockback(boss, to.x, to.z, Math.min(5, 1.2 + dist * 0.18), 1.0);
+  system.runTimeout(() => {
+    if (!api.isValid(boss)) return;
+    api.particle(dim, "aegis:beast_burst", boss.location, b.color);
+    api.particle(dim, "minecraft:huge_explosion_emitter", boss.location);
+    ring(dim, boss.location, 4, "aegis:smoke_puff", undefined, 12);
+    api.sound(dim, "random.explode", boss.location, 2, 0.6);
+    blast(boss, boss.location, 7, pw(b, 10), 2.6);
+  }, 22);
+}
+
 // ---------------------------------------------------------------------------
-// Boss brain
+// Boss brain (runs every 10 ticks)
 // ---------------------------------------------------------------------------
 function updateBoss(boss, now) {
   const id = beastIdOf(boss);
   const b = BEASTS[id];
   let st = bossState.get(boss.id);
   if (!st) {
-    st = { next: now + 60, enraged: false };
+    st = { next: now + 40, nextSwipe: now, nextLeap: now + 60, enraged: false };
     bossState.set(boss.id, st);
   }
-  // Chakra aura
+  // Chakra aura + natural toughness
   api.particle(boss.dimension, "aegis:beast_aura", boss.location, b.color);
+  if (!boss.getEffect?.("resistance")) eff(boss, "resistance", 999999, st.enraged ? 1 : 0, false);
 
   // Phase 2 at half health
   try {
     const h = boss.getComponent("minecraft:health");
     if (!st.enraged && h.currentValue <= h.effectiveMax * 0.5) {
       st.enraged = true;
-      eff(boss, "strength", 999999, 1, false);
-      eff(boss, "speed", 999999, 0, false);
+      eff(boss, "strength", 999999, 2, false);
+      eff(boss, "speed", 999999, 1, false);
+      eff(boss, "resistance", 999999, 1, false);
+      eff(boss, "regeneration", 200, 2, false);
       roar(boss, b);
+      st.next = now; // attacks right away
       for (const p of playersNear(boss.dimension, boss.location, 48)) {
         p.onScreenDisplay.setTitle(`${b.text}${b.name}`, { subtitle: "§cis enraged!", fadeInDuration: 2, stayDuration: 40, fadeOutDuration: 10 });
       }
@@ -358,16 +417,27 @@ function updateBoss(boss, now) {
     /* ignore */
   }
 
-  if (now < st.next) return;
   const target = nearestTarget(boss);
   if (!target) return;
+  const d = api.sub(target.location, boss.location);
+  const dist = Math.sqrt(d.x * d.x + d.z * d.z);
 
+  // Reactive moves on their own cooldowns
+  if (dist < 6 && now >= st.nextSwipe) {
+    tailSwipe(boss, b);
+    st.nextSwipe = now + (st.enraged ? 30 : 50);
+  } else if (dist > 14 && now >= st.nextLeap) {
+    leapSlam(boss, b, target);
+    st.nextLeap = now + (st.enraged ? 80 : 130);
+  }
+
+  if (now < st.next) return;
   const roll = Math.random();
-  if (roll < 0.35) tailedBeastBomb(boss, b, target);
-  else if (roll < 0.85) b.element(boss, b, target);
+  if (roll < 0.4) tailedBeastBomb(boss, b, target);
+  else if (roll < 0.9) b.element(boss, b, target);
   else roar(boss, b);
 
-  const base = Math.max(90, 200 - b.tails * 10);
+  const base = Math.max(40, 90 - b.tails * 5);
   st.next = now + Math.floor(base * (st.enraged ? 0.6 : 1) * (0.8 + Math.random() * 0.4));
 }
 
@@ -453,14 +523,22 @@ function hasItem(player, typeId) {
   const inv = player.getComponent("minecraft:inventory")?.container;
   if (!inv) return true;
   for (let i = 0; i < inv.size; i++) if (inv.getItem(i)?.typeId === typeId) return true;
-  return false;
+  return chestItem(player)?.typeId === typeId;
+}
+
+function chestItem(player) {
+  try {
+    return player.getComponent("minecraft:equippable")?.getEquipment("Chest");
+  } catch {
+    return undefined;
+  }
 }
 
 function giveCloak(player) {
-  if (!sealedBeastId(player) || hasItem(player, CLOAK_ITEM)) return;
+  const id = sealedBeastId(player);
+  if (!id || hasItem(player, cloakItemOf(id))) return;
   try {
-    const stack = new ItemStack(CLOAK_ITEM, 1);
-    stack.lockMode = ItemLockMode.inventory;
+    const stack = new ItemStack(cloakItemOf(id), 1);
     stack.keepOnDeath = true;
     player.getComponent("minecraft:inventory").container.addItem(stack);
   } catch {
@@ -470,13 +548,32 @@ function giveCloak(player) {
 
 function removeCloak(player) {
   const inv = player.getComponent("minecraft:inventory")?.container;
-  if (!inv) return;
-  for (let i = 0; i < inv.size; i++) if (inv.getItem(i)?.typeId === CLOAK_ITEM) inv.setItem(i, undefined);
+  if (inv) for (let i = 0; i < inv.size; i++) if (isCloakItem(inv.getItem(i)?.typeId)) inv.setItem(i, undefined);
+  if (isCloakItem(chestItem(player)?.typeId)) {
+    try {
+      player.getComponent("minecraft:equippable").setEquipment("Chest", undefined);
+    } catch {
+      /* ignore */
+    }
+  }
+}
+
+// Takes the cloak off and puts it back in the inventory (or drops it if full).
+function unequipCloak(player) {
+  const item = chestItem(player);
+  if (!item) return;
+  try {
+    player.getComponent("minecraft:equippable").setEquipment("Chest", undefined);
+    const left = player.getComponent("minecraft:inventory").container.addItem(item);
+    if (left) player.dimension.spawnItem(left, player.location);
+  } catch {
+    /* ignore */
+  }
 }
 
 function sealInto(player, id) {
   const b = BEASTS[id];
-  cloakActive.delete(player.id);
+  endTransformation(player);
   removeCloak(player);
   player.setDynamicProperty(BIJUU_PROP, id);
   giveCloak(player);
@@ -484,70 +581,122 @@ function sealInto(player, id) {
   api.sound(player.dimension, "ui.toast.challenge_complete", player.location, 1, 0.8);
   api.particle(player.dimension, "aegis:beast_burst", api.add(player.location, { x: 0, y: 1, z: 0 }), b.color);
   player.sendMessage(
-    `§6You are now the Jinchūriki of ${fullName(b)}§6!\n§7+${bijuuChakraBonus(player)} max chakra, faster regen.\n§7Use the §fTailed Beast Cloak§7 to enter cloak mode (Strength, Speed, Resistance). Sneak + use while cloaked for a §5Tailed Beast Bomb§7.`
+    `§6You are now the Jinchūriki of ${fullName(b)}§6!\n§7+${bijuuChakraBonus(player)} max chakra, faster regen.\n§7Wear the §fTailed Beast Cloak§7 (chest slot) to enter §6Tailed Beast Mode§7. While transformed, §fhold sneak§7 to charge a §5Tailed Beast Bomb§7.`
   );
   world.sendMessage(`§e${player.name} sealed ${fullName(b)}§e and became its Jinchūriki!`);
 }
 
 function release(player) {
-  cloakActive.delete(player.id);
+  endTransformation(player);
   removeCloak(player);
   player.setDynamicProperty(BIJUU_PROP, undefined);
 }
 
-function toggleCloak(player) {
-  const b = BEASTS[sealedBeastId(player)];
-  if (cloakActive.has(player.id)) {
-    cloakActive.delete(player.id);
-    player.onScreenDisplay.setActionBar("§7Cloak released.");
-    return;
-  }
-  if (api.getChakra(player) < 20) {
-    player.onScreenDisplay.setActionBar("§cNot enough chakra!");
-    return;
-  }
+function startTransformation(player, b) {
   cloakActive.add(player.id);
   api.particle(player.dimension, "aegis:beast_burst", api.add(player.location, { x: 0, y: 1, z: 0 }), b.color);
-  api.sound(player.dimension, "mob.enderdragon.growl", player.location, 0.6, 1.4);
-  player.onScreenDisplay.setActionBar(`${b.text}${b.name}'s Chakra Cloak!`);
+  api.particle(player.dimension, "aegis:smoke_puff", player.location);
+  api.sound(player.dimension, "mob.enderdragon.growl", player.location, 0.8, 1.3);
+  player.onScreenDisplay.setTitle(`${b.text}Tailed Beast Mode`, { subtitle: `§7${b.name}'s chakra surges`, fadeInDuration: 2, stayDuration: 30, fadeOutDuration: 10 });
 }
 
-function playerBeastBomb(player) {
-  const b = BEASTS[sealedBeastId(player)];
-  if (!cloakActive.has(player.id)) {
-    player.onScreenDisplay.setActionBar("§7Enter cloak mode first.");
+function endTransformation(player) {
+  cloakActive.delete(player.id);
+  const ch = bombCharge.get(player.id);
+  if (ch) api.removeFx(ch.orb);
+  bombCharge.delete(player.id);
+}
+
+// Hold sneak while transformed: charge for 1.5s, then fire.
+const BOMB_CHARGE = 30;
+function updateBombCharge(player, b) {
+  let ch = bombCharge.get(player.id);
+  if (!player.isSneaking) {
+    if (ch) api.removeFx(ch.orb);
+    bombCharge.delete(player.id);
     return;
   }
-  const left = api.cooldownLeft(player, "bijuudama");
-  if (left > 0) {
-    player.onScreenDisplay.setActionBar(`§7Tailed Beast Bomb ready in §f${(left / 20).toFixed(1)}s`);
-    return;
-  }
-  if (api.getChakra(player) < 80) {
-    player.onScreenDisplay.setActionBar(`§cNot enough chakra! §7(${Math.floor(api.getChakra(player))}/80)`);
-    return;
-  }
-  api.setChakra(player, api.getChakra(player) - 80);
-  api.startCooldown(player, "bijuudama", 600);
-  const dim = player.dimension;
-  const CHARGE = 24;
-  api.anim(player, "animation.aegis.rasengan_hold");
+  if (ch?.done) return;
   const front = () => api.add(player.getHeadLocation(), api.add(api.scale(player.getViewDirection(), 2.5), { x: 0, y: 0.6, z: 0 }));
-  const orb = api.spawnFx(dim, "aegis:jutsu_orb", "aegis:as_bijuudama", front());
-  api.follow(orb, () => (api.isValid(player) ? api.sub(front(), { x: 0, y: 0.25, z: 0 }) : undefined), CHARGE);
-  api.sound(dim, "mob.warden.sonic_charge", player.location, 1, 0.9);
-  for (let i = 0; i < CHARGE; i += 4) system.runTimeout(() => api.isValid(player) && api.particle(dim, "aegis:bijuudama_charge", front()), i);
-  system.runTimeout(() => {
-    if (!api.isValid(player)) return;
-    api.anim(player, "animation.aegis.both_palms");
-    api.launchProjectile(player, front(), player.getViewDirection(), {
-      speed: 1.4, maxAge: 50, damage: 30, radius: 5.5, knock: 2.5, fire: 0,
-      orbEvent: "aegis:as_bijuudama", trail: "aegis:beast_aura", burst: "aegis:beast_burst", color: b.color,
-      hitRadius: 2, sound: "random.explode",
-    });
-    api.sound(dim, "mob.warden.sonic_boom", player.location, 1.5, 0.9);
-  }, CHARGE);
+  if (!ch) {
+    const left = api.cooldownLeft(player, "bijuudama");
+    if (left > 0 || api.getChakra(player) < 80) {
+      player.onScreenDisplay.setActionBar(left > 0 ? `§7Tailed Beast Bomb ready in §f${(left / 20).toFixed(1)}s` : "§cNot enough chakra for a Tailed Beast Bomb (80)");
+      bombCharge.set(player.id, { done: true });
+      return;
+    }
+    ch = { ticks: 0, orb: api.spawnFx(player.dimension, "aegis:jutsu_orb", "aegis:as_bijuudama", front()) };
+    api.follow(ch.orb, () => (api.isValid(player) && bombCharge.get(player.id)?.orb === ch.orb ? api.sub(front(), { x: 0, y: 0.25, z: 0 }) : undefined), BOMB_CHARGE + 20);
+    api.anim(player, "animation.aegis.rasengan_hold");
+    api.sound(player.dimension, "mob.warden.sonic_charge", player.location, 1, 0.9);
+    bombCharge.set(player.id, ch);
+  }
+  ch.ticks += 5;
+  api.particle(player.dimension, "aegis:bijuudama_charge", front());
+  player.onScreenDisplay.setActionBar(`§5Charging Tailed Beast Bomb ${"§d■".repeat(ch.ticks / 5)}${"§8■".repeat(Math.max(0, (BOMB_CHARGE - ch.ticks) / 5))}`);
+  if (ch.ticks < BOMB_CHARGE) return;
+
+  ch.done = true;
+  api.removeFx(ch.orb);
+  api.setChakra(player, api.getChakra(player) - 80);
+  api.startCooldown(player, "bijuudama", 400);
+  api.anim(player, "animation.aegis.both_palms");
+  api.launchProjectile(player, front(), player.getViewDirection(), {
+    speed: 1.5, maxAge: 50, damage: 32, radius: 6, knock: 2.8, fire: 0,
+    orbEvent: "aegis:as_bijuudama", trail: "aegis:beast_aura", burst: "aegis:beast_burst", color: b.color,
+    hitRadius: 2, sound: "random.explode",
+  });
+  api.sound(player.dimension, "mob.warden.sonic_boom", player.location, 1.5, 0.9);
   player.onScreenDisplay.setActionBar("§5Tailed Beast Bomb!");
+}
+
+// Every 5 ticks: wearing your own cloak = Tailed Beast Mode.
+function updateCloak(player) {
+  const worn = chestItem(player)?.typeId;
+  const id = sealedBeastId(player);
+  if (!isCloakItem(worn)) {
+    if (cloakActive.has(player.id)) {
+      endTransformation(player);
+      player.onScreenDisplay.setActionBar("§7You return to normal.");
+    }
+    return;
+  }
+  if (!id || worn !== cloakItemOf(id)) {
+    unequipCloak(player);
+    player.onScreenDisplay.setActionBar("§cThis chakra rejects you — it isn't your Tailed Beast.");
+    return;
+  }
+  const b = BEASTS[id];
+  if (!cloakActive.has(player.id)) {
+    if (api.getChakra(player) < 20) {
+      unequipCloak(player);
+      player.onScreenDisplay.setActionBar("§cNot enough chakra to transform!");
+      return;
+    }
+    startTransformation(player, b);
+  }
+  let drain = 3; // per second
+  try {
+    if (player.getDynamicProperty("aegis:clan") === "uzumaki") drain = 1.5; // Uzumaki chakra
+  } catch {
+    /* ignore */
+  }
+  const c = api.getChakra(player) - drain * 0.25;
+  api.setChakra(player, c);
+  if (c <= 0) {
+    endTransformation(player);
+    unequipCloak(player);
+    player.onScreenDisplay.setActionBar("§7Out of chakra — the transformation fades.");
+    return;
+  }
+  // short effects, refreshed while transformed so they end on their own
+  eff(player, "strength", 30, 1, false);
+  eff(player, "speed", 30, 1, false);
+  eff(player, "resistance", 30, 1, false);
+  eff(player, "jump_boost", 30, 1, false);
+  for (const [effect, amp] of CLOAK_PERKS[id] ?? []) eff(player, effect, 30, amp, false);
+  api.particle(player.dimension, "aegis:beast_aura", player.location, b.color);
+  updateBombCharge(player, b);
 }
 
 export function handleBijuuItemUse(player, itemStack) {
@@ -555,16 +704,7 @@ export function handleBijuuItemUse(player, itemStack) {
     useSummonScroll(player);
     return true;
   }
-  if (itemStack.typeId === CLOAK_ITEM) {
-    if (!sealedBeastId(player)) {
-      player.onScreenDisplay.setActionBar("§7No Tailed Beast is sealed within you.");
-      return true;
-    }
-    if (player.isSneaking) playerBeastBomb(player);
-    else toggleCloak(player);
-    return true;
-  }
-  return false;
+  return false; // cloaks are worn (chest slot), not used
 }
 
 // ---------------------------------------------------------------------------
@@ -595,34 +735,14 @@ export function initBijuu(helpers) {
     }
   }, 10);
 
-  // Cloak upkeep every 5 ticks
+  // Tailed Beast Mode upkeep every 5 ticks
   system.runInterval(() => {
     for (const player of world.getAllPlayers()) {
-      if (!cloakActive.has(player.id)) continue;
-      const b = BEASTS[sealedBeastId(player)];
-      if (!b) {
-        cloakActive.delete(player.id);
-        continue;
-      }
-      let drain = 3; // per second
       try {
-        if (player.getDynamicProperty("aegis:clan") === "uzumaki") drain = 1.5; // Uzumaki chakra
+        updateCloak(player);
       } catch {
         /* ignore */
       }
-      const c = api.getChakra(player) - drain * 0.25;
-      api.setChakra(player, c);
-      if (c <= 0) {
-        cloakActive.delete(player.id);
-        player.onScreenDisplay.setActionBar("§7Out of chakra — the cloak fades.");
-        continue;
-      }
-      // short effects, refreshed while the cloak is up so they end on their own
-      eff(player, "strength", 30, 1, false);
-      eff(player, "speed", 30, 1, false);
-      eff(player, "resistance", 30, 0, false);
-      eff(player, "jump_boost", 30, 1, false);
-      api.particle(player.dimension, "aegis:beast_aura", player.location, b.color);
     }
   }, 5);
 
@@ -650,7 +770,12 @@ export function initBijuu(helpers) {
     else world.sendMessage(`§7${fullName(b)}§7 was defeated, but no one sealed it.`);
   });
 
-  world.afterEvents.playerSpawn.subscribe(({ player }) => giveCloak(player));
+  world.afterEvents.playerSpawn.subscribe(({ player }) => {
+    // swap the old single cloak item for the beast-specific wearable one
+    const inv = player.getComponent("minecraft:inventory")?.container;
+    if (inv) for (let i = 0; i < inv.size; i++) if (inv.getItem(i)?.typeId === OLD_CLOAK_ITEM) inv.setItem(i, undefined);
+    giveCloak(player);
+  });
 
   system.afterEvents.scriptEventReceive.subscribe(({ id, message, sourceEntity }) => {
     if (id !== "aegis:bijuu" || sourceEntity?.typeId !== "minecraft:player") return;

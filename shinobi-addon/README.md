@@ -38,12 +38,39 @@ Your clan shows above your head, e.g. `[Uchiha] Steve`.
 | Inuzuka | Common | 17% | 100 | Speed, Night Vision | Fang Over Fang dash / **Summon Ninja Hound** (tamed wolf) |
 | Yamanaka | Common | 17% | 100 | — | Mind Body Disturbance (nausea, blindness, slow) |
 
+### Mangekyō Sharingan (Uchiha)
+
+Kill things with your Sharingan **active** to grow it: mobs = 1 point, players = 10. At **100 points**
+it awakens into the **Mangekyō Sharingan** (replaces your Sharingan item):
+
+- 40% dodge chance (instead of 30%) and Strength while active (drains 3 chakra/sec)
+- Cheaper, longer **Amaterasu** (sneak + right-click)
+- **Susanoo** automatically manifests when you drop below 30% health while it's active:
+  Resistance IV, extra hearts, Strength II, Regeneration (costs 30 chakra, 60s cooldown)
+
+Check your progress with `/scriptevent aegis:clan info`.
+
+### Clan jutsu discounts
+
+| Clan | Cheaper jutsu |
+|---|---|
+| Uchiha | Fireball −40%, Chidori −30% |
+| Uzumaki | Rasengan −30%, Shadow Clone −40% |
+| Sarutobi | Fireball −30% |
+
+### Bloodline Reroll Scroll
+
+Craft: `D G D` / `G S G` / `D G D` (D = diamond, G = gold block, S = Blank Scroll).
+Right-click, then right-click again within 5s to confirm. Rolls a **different** clan
+(Mangekyō progress is lost).
+
 Commands (cheats on) — handy for testing:
 
 ```
 /scriptevent aegis:clan reroll
 /scriptevent aegis:clan set uchiha
 /scriptevent aegis:clan info
+/scriptevent aegis:clan mangekyo
 ```
 
 Clan odds, stats and abilities are all in `behavior_pack/scripts/clans.js`.
@@ -58,6 +85,7 @@ Clan odds, stats and abilities are all in `behavior_pack/scripts/clans.js`.
 | Shadow Clone Jutsu | 40 | 10s | Summons 2 clones (max 4) that fight hostile mobs for 30s. Hit your own clone to dispel it. |
 | Body Flicker | 10 | 0.75s | Burst of speed where you're looking, with a moment of slow-falling. |
 | Wind Style: Great Breakthrough | 15 | 1.5s | Cone of wind that blasts everything in front of you away. |
+| Chidori | 35 | 4s | Charge up lightning, then lunge forward: the first thing you hit takes 13 damage. |
 
 ## Ninja tools
 

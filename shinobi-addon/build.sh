@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Packages the add-on into dist/ShinobiWay.mcaddon (double-click / open it to import into Minecraft).
+# IMPORTANT: bump the version in BOTH manifest.json files for every release, or Minecraft keeps the old copy.
 set -euo pipefail
 cd "$(dirname "$0")"
 rm -rf dist && mkdir -p dist/tmp

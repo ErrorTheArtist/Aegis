@@ -1,0 +1,32 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "aegis:saiken",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/aegis/saiken"
+      },
+      "geometry": {
+        "default": "geometry.aegis.saiken"
+      },
+      "animations": {
+        "idle": "animation.aegis.saiken.idle"
+      },
+      "scripts": {
+        "animate": [
+          "idle"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ],
+      "spawn_egg": {
+        "base_color": "#dce1d2",
+        "overlay_color": "#78c86e"
+      }
+    }
+  }
+}

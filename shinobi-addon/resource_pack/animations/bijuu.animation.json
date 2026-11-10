@@ -1,0 +1,719 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.aegis.bijuu_roar": {
+      "animation_length": 1.6,
+      "bones": {
+        "head": {
+          "rotation": {
+            "0.0": [
+              0,
+              0,
+              0
+            ],
+            "0.25": [
+              -35,
+              0,
+              0
+            ],
+            "1.2": [
+              -35,
+              0,
+              0
+            ],
+            "1.6": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        "body": {
+          "rotation": {
+            "0.0": [
+              0,
+              0,
+              0
+            ],
+            "0.25": [
+              -6,
+              0,
+              0
+            ],
+            "1.2": [
+              -6,
+              0,
+              0
+            ],
+            "1.6": [
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      }
+    },
+    "animation.aegis.shukaku.idle": {
+      "loop": true,
+      "bones": {
+        "head": {
+          "rotation": [
+            "q.target_x_rotation * 0.6 - math.sin(v.attack_time * 180) * 20",
+            "q.target_y_rotation * 0.6",
+            0
+          ]
+        },
+        "leg0": {
+          "rotation": [
+            "1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg1": {
+          "rotation": [
+            "-1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg2": {
+          "rotation": [
+            "-1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg3": {
+          "rotation": [
+            "1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "tail0": {
+          "rotation": [
+            "math.sin(q.life_time * 70 + 0) * 7",
+            "math.cos(q.life_time * 55 + 0) * 9",
+            0
+          ]
+        }
+      }
+    },
+    "animation.aegis.matatabi.idle": {
+      "loop": true,
+      "bones": {
+        "head": {
+          "rotation": [
+            "q.target_x_rotation * 0.6 - math.sin(v.attack_time * 180) * 20",
+            "q.target_y_rotation * 0.6",
+            0
+          ]
+        },
+        "leg0": {
+          "rotation": [
+            "1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg1": {
+          "rotation": [
+            "-1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg2": {
+          "rotation": [
+            "-1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg3": {
+          "rotation": [
+            "1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "tail0": {
+          "rotation": [
+            "math.sin(q.life_time * 70 + 0) * 7",
+            "math.cos(q.life_time * 55 + 0) * 9",
+            0
+          ]
+        },
+        "tail1": {
+          "rotation": [
+            "math.sin(q.life_time * 70 + 40) * 7",
+            "math.cos(q.life_time * 55 + 55) * 9",
+            0
+          ]
+        }
+      }
+    },
+    "animation.aegis.isobu.idle": {
+      "loop": true,
+      "bones": {
+        "head": {
+          "rotation": [
+            "q.target_x_rotation * 0.6 - math.sin(v.attack_time * 180) * 20",
+            "q.target_y_rotation * 0.6",
+            0
+          ]
+        },
+        "leg0": {
+          "rotation": [
+            "1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg1": {
+          "rotation": [
+            "-1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg2": {
+          "rotation": [
+            "-1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg3": {
+          "rotation": [
+            "1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "tail0": {
+          "rotation": [
+            "math.sin(q.life_time * 70 + 0) * 7",
+            "math.cos(q.life_time * 55 + 0) * 9",
+            0
+          ]
+        },
+        "tail1": {
+          "rotation": [
+            "math.sin(q.life_time * 70 + 40) * 7",
+            "math.cos(q.life_time * 55 + 55) * 9",
+            0
+          ]
+        },
+        "tail2": {
+          "rotation": [
+            "math.sin(q.life_time * 70 + 80) * 7",
+            "math.cos(q.life_time * 55 + 110) * 9",
+            0
+          ]
+        }
+      }
+    },
+    "animation.aegis.son_goku.idle": {
+      "loop": true,
+      "bones": {
+        "head": {
+          "rotation": [
+            "q.target_x_rotation * 0.6 - math.sin(v.attack_time * 180) * 20",
+            "q.target_y_rotation * 0.6",
+            0
+          ]
+        },
+        "leg0": {
+          "rotation": [
+            "1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg1": {
+          "rotation": [
+            "-1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg2": {
+          "rotation": [
+            "-1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg3": {
+          "rotation": [
+            "1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "tail0": {
+          "rotation": [
+            "math.sin(q.life_time * 70 + 0) * 7",
+            "math.cos(q.life_time * 55 + 0) * 9",
+            0
+          ]
+        },
+        "tail1": {
+          "rotation": [
+            "math.sin(q.life_time * 70 + 40) * 7",
+            "math.cos(q.life_time * 55 + 55) * 9",
+            0
+          ]
+        },
+        "tail2": {
+          "rotation": [
+            "math.sin(q.life_time * 70 + 80) * 7",
+            "math.cos(q.life_time * 55 + 110) * 9",
+            0
+          ]
+        },
+        "tail3": {
+          "rotation": [
+            "math.sin(q.life_time * 70 + 120) * 7",
+            "math.cos(q.life_time * 55 + 165) * 9",
+            0
+          ]
+        }
+      }
+    },
+    "animation.aegis.kokuo.idle": {
+      "loop": true,
+      "bones": {
+        "head": {
+          "rotation": [
+            "q.target_x_rotation * 0.6 - math.sin(v.attack_time * 180) * 20",
+            "q.target_y_rotation * 0.6",
+            0
+          ]
+        },
+        "leg0": {
+          "rotation": [
+            "1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg1": {
+          "rotation": [
+            "-1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg2": {
+          "rotation": [
+            "-1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg3": {
+          "rotation": [
+            "1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "tail0": {
+          "rotation": [
+            "math.sin(q.life_time * 70 + 0) * 7",
+            "math.cos(q.life_time * 55 + 0) * 9",
+            0
+          ]
+        },
+        "tail1": {
+          "rotation": [
+            "math.sin(q.life_time * 70 + 40) * 7",
+            "math.cos(q.life_time * 55 + 55) * 9",
+            0
+          ]
+        },
+        "tail2": {
+          "rotation": [
+            "math.sin(q.life_time * 70 + 80) * 7",
+            "math.cos(q.life_time * 55 + 110) * 9",
+            0
+          ]
+        },
+        "tail3": {
+          "rotation": [
+            "math.sin(q.life_time * 70 + 120) * 7",
+            "math.cos(q.life_time * 55 + 165) * 9",
+            0
+          ]
+        },
+        "tail4": {
+          "rotation": [
+            "math.sin(q.life_time * 70 + 160) * 7",
+            "math.cos(q.life_time * 55 + 220) * 9",
+            0
+          ]
+        }
+      }
+    },
+    "animation.aegis.saiken.idle": {
+      "loop": true,
+      "bones": {
+        "head": {
+          "rotation": [
+            "q.target_x_rotation * 0.6 - math.sin(v.attack_time * 180) * 20",
+            "q.target_y_rotation * 0.6",
+            0
+          ]
+        },
+        "tail0": {
+          "rotation": [
+            "math.sin(q.life_time * 70 + 0) * 7",
+            "math.cos(q.life_time * 55 + 0) * 9",
+            0
+          ]
+        },
+        "tail1": {
+          "rotation": [
+            "math.sin(q.life_time * 70 + 40) * 7",
+            "math.cos(q.life_time * 55 + 55) * 9",
+            0
+          ]
+        },
+        "tail2": {
+          "rotation": [
+            "math.sin(q.life_time * 70 + 80) * 7",
+            "math.cos(q.life_time * 55 + 110) * 9",
+            0
+          ]
+        },
+        "tail3": {
+          "rotation": [
+            "math.sin(q.life_time * 70 + 120) * 7",
+            "math.cos(q.life_time * 55 + 165) * 9",
+            0
+          ]
+        },
+        "tail4": {
+          "rotation": [
+            "math.sin(q.life_time * 70 + 160) * 7",
+            "math.cos(q.life_time * 55 + 220) * 9",
+            0
+          ]
+        },
+        "tail5": {
+          "rotation": [
+            "math.sin(q.life_time * 70 + 200) * 7",
+            "math.cos(q.life_time * 55 + 275) * 9",
+            0
+          ]
+        }
+      }
+    },
+    "animation.aegis.chomei.idle": {
+      "loop": true,
+      "bones": {
+        "head": {
+          "rotation": [
+            "q.target_x_rotation * 0.6 - math.sin(v.attack_time * 180) * 20",
+            "q.target_y_rotation * 0.6",
+            0
+          ]
+        },
+        "leg0": {
+          "rotation": [
+            "1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg1": {
+          "rotation": [
+            "-1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg2": {
+          "rotation": [
+            "-1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg3": {
+          "rotation": [
+            "1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg4": {
+          "rotation": [
+            "1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg5": {
+          "rotation": [
+            "-1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "tail0": {
+          "rotation": [
+            "math.sin(q.life_time * 70 + 0) * 7",
+            "math.cos(q.life_time * 55 + 0) * 9",
+            0
+          ]
+        },
+        "wing0": {
+          "rotation": [
+            0,
+            0,
+            "-1 * math.sin(q.life_time * 1600 + 0) * 22"
+          ]
+        },
+        "wing1": {
+          "rotation": [
+            0,
+            0,
+            "1 * math.sin(q.life_time * 1600 + 30) * 22"
+          ]
+        },
+        "wing2": {
+          "rotation": [
+            0,
+            0,
+            "-1 * math.sin(q.life_time * 1600 + 60) * 22"
+          ]
+        },
+        "wing3": {
+          "rotation": [
+            0,
+            0,
+            "1 * math.sin(q.life_time * 1600 + 90) * 22"
+          ]
+        },
+        "wing4": {
+          "rotation": [
+            0,
+            0,
+            "-1 * math.sin(q.life_time * 1600 + 120) * 22"
+          ]
+        },
+        "wing5": {
+          "rotation": [
+            0,
+            0,
+            "1 * math.sin(q.life_time * 1600 + 150) * 22"
+          ]
+        }
+      }
+    },
+    "animation.aegis.gyuki.idle": {
+      "loop": true,
+      "bones": {
+        "head": {
+          "rotation": [
+            "q.target_x_rotation * 0.6 - math.sin(v.attack_time * 180) * 20",
+            "q.target_y_rotation * 0.6",
+            0
+          ]
+        },
+        "leg0": {
+          "rotation": [
+            "1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg1": {
+          "rotation": [
+            "-1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg2": {
+          "rotation": [
+            "-1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg3": {
+          "rotation": [
+            "1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "tail0": {
+          "rotation": [
+            "math.sin(q.life_time * 70 + 0) * 7",
+            "math.cos(q.life_time * 55 + 0) * 9",
+            0
+          ]
+        },
+        "tail1": {
+          "rotation": [
+            "math.sin(q.life_time * 70 + 40) * 7",
+            "math.cos(q.life_time * 55 + 55) * 9",
+            0
+          ]
+        },
+        "tail2": {
+          "rotation": [
+            "math.sin(q.life_time * 70 + 80) * 7",
+            "math.cos(q.life_time * 55 + 110) * 9",
+            0
+          ]
+        },
+        "tail3": {
+          "rotation": [
+            "math.sin(q.life_time * 70 + 120) * 7",
+            "math.cos(q.life_time * 55 + 165) * 9",
+            0
+          ]
+        },
+        "tail4": {
+          "rotation": [
+            "math.sin(q.life_time * 70 + 160) * 7",
+            "math.cos(q.life_time * 55 + 220) * 9",
+            0
+          ]
+        },
+        "tail5": {
+          "rotation": [
+            "math.sin(q.life_time * 70 + 200) * 7",
+            "math.cos(q.life_time * 55 + 275) * 9",
+            0
+          ]
+        },
+        "tail6": {
+          "rotation": [
+            "math.sin(q.life_time * 70 + 240) * 7",
+            "math.cos(q.life_time * 55 + 330) * 9",
+            0
+          ]
+        },
+        "tail7": {
+          "rotation": [
+            "math.sin(q.life_time * 70 + 280) * 7",
+            "math.cos(q.life_time * 55 + 385) * 9",
+            0
+          ]
+        }
+      }
+    },
+    "animation.aegis.kurama.idle": {
+      "loop": true,
+      "bones": {
+        "head": {
+          "rotation": [
+            "q.target_x_rotation * 0.6 - math.sin(v.attack_time * 180) * 20",
+            "q.target_y_rotation * 0.6",
+            0
+          ]
+        },
+        "leg0": {
+          "rotation": [
+            "1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg1": {
+          "rotation": [
+            "-1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg2": {
+          "rotation": [
+            "-1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg3": {
+          "rotation": [
+            "1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "tail0": {
+          "rotation": [
+            "math.sin(q.life_time * 70 + 0) * 7",
+            "math.cos(q.life_time * 55 + 0) * 9",
+            0
+          ]
+        },
+        "tail1": {
+          "rotation": [
+            "math.sin(q.life_time * 70 + 40) * 7",
+            "math.cos(q.life_time * 55 + 55) * 9",
+            0
+          ]
+        },
+        "tail2": {
+          "rotation": [
+            "math.sin(q.life_time * 70 + 80) * 7",
+            "math.cos(q.life_time * 55 + 110) * 9",
+            0
+          ]
+        },
+        "tail3": {
+          "rotation": [
+            "math.sin(q.life_time * 70 + 120) * 7",
+            "math.cos(q.life_time * 55 + 165) * 9",
+            0
+          ]
+        },
+        "tail4": {
+          "rotation": [
+            "math.sin(q.life_time * 70 + 160) * 7",
+            "math.cos(q.life_time * 55 + 220) * 9",
+            0
+          ]
+        },
+        "tail5": {
+          "rotation": [
+            "math.sin(q.life_time * 70 + 200) * 7",
+            "math.cos(q.life_time * 55 + 275) * 9",
+            0
+          ]
+        },
+        "tail6": {
+          "rotation": [
+            "math.sin(q.life_time * 70 + 240) * 7",
+            "math.cos(q.life_time * 55 + 330) * 9",
+            0
+          ]
+        },
+        "tail7": {
+          "rotation": [
+            "math.sin(q.life_time * 70 + 280) * 7",
+            "math.cos(q.life_time * 55 + 385) * 9",
+            0
+          ]
+        },
+        "tail8": {
+          "rotation": [
+            "math.sin(q.life_time * 70 + 320) * 7",
+            "math.cos(q.life_time * 55 + 440) * 9",
+            0
+          ]
+        }
+      }
+    }
+  }
+}

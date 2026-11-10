@@ -1,8 +1,9 @@
 // Shinobi Way — ninja add-on for Minecraft Bedrock.
 // Chakra system, jutsu scrolls and ninja tools, driven by @minecraft/server.
 
-import { world, system, ItemStack } from "@minecraft/server";
+import { world, system, ItemStack, MolangVariableMap } from "@minecraft/server";
 import { initClans, clanMaxChakra, clanRegenMultiplier, handleClanItemUse, clanJutsuCostMultiplier } from "./clans.js";
+import { initBijuu, bijuuChakraBonus, bijuuRegenMultiplier, handleBijuuItemUse } from "./bijuu.js";
 
 // ---------------------------------------------------------------------------
 // Config
@@ -12,7 +13,7 @@ const WELCOME_PROP = "aegis:welcomed";
 const OWNER_PROP = "aegis:owner";
 
 const BASE_MAX_CHAKRA = 100;
-const getMaxChakra = (player) => clanMaxChakra(player, BASE_MAX_CHAKRA);
+const getMaxChakra = (player) => clanMaxChakra(player, BASE_MAX_CHAKRA) + bijuuChakraBonus(player);
 const REGEN_PER_SECOND = 4; // base regen
 const HEADBAND_REGEN_BONUS = 1.5; // multiplier while wearing the headband
 const FOCUS_REGEN_BONUS = 3; // multiplier while sneaking and standing still
@@ -44,9 +45,13 @@ const norm = (v) => {
 };
 const dot = (a, b) => a.x * b.x + a.y * b.y + a.z * b.z;
 
-function particle(dim, id, loc) {
+function particle(dim, id, loc, color) {
   try {
-    dim.spawnParticle(id, loc);
+    if (color) {
+      const vars = new MolangVariableMap();
+      vars.setColorRGB("variable.color", { red: color[0], green: color[1], blue: color[2] });
+      dim.spawnParticle(id, loc, vars);
+    } else dim.spawnParticle(id, loc);
   } catch {
     /* unknown particle or unloaded chunk — ignore */
   }
@@ -249,6 +254,7 @@ function startCooldown(player, itemId, ticks) {
 world.afterEvents.itemUse.subscribe(({ source: player, itemStack }) => {
   if (!itemStack || player.typeId !== "minecraft:player") return;
   if (handleClanItemUse(player, itemStack)) return;
+  if (handleBijuuItemUse(player, itemStack)) return;
   const jutsu = JUTSU[itemStack.typeId];
   if (!jutsu) return;
 
@@ -274,79 +280,95 @@ world.afterEvents.itemUse.subscribe(({ source: player, itemStack }) => {
   player.onScreenDisplay.setActionBar(`§6${jutsu.name}!`);
 });
 
-// --- Fire Style: Fireball Jutsu: a scripted fireball that flies forward and bursts. ---
-const fireballs = [];
+// --- Scripted projectiles (Fireball Jutsu, Flame Bullet, Tailed Beast Bombs). ---
+const projectiles = [];
 
-function castFireball(player, dir = player.getViewDirection()) {
-  const start = add(player.getHeadLocation(), scale(dir, 1.5));
-  anim(player, "animation.aegis.hand_signs");
-  const orb = spawnFx(player.dimension, "aegis:jutsu_orb", "aegis:as_fireball", sub(start, { x: 0, y: 0.25, z: 0 }));
-  fireballs.push({ caster: player, dim: player.dimension, pos: start, dir, age: 0, orb });
-  sound(player.dimension, "mob.ghast.fireball", start, 1, 0.8);
+const FIREBALL = {
+  speed: 1.35, maxAge: 30, damage: 9, radius: 3.5, knock: 0.8, fire: 5, orbEvent: "aegis:as_fireball",
+  trail: "aegis:fire_trail", burst: "aegis:fire_burst", hitRadius: 1.6, sound: "random.explode",
+};
+
+// Launches a projectile from `start` along `dir`. opts override FIREBALL's defaults.
+function launchProjectile(caster, start, dir, opts = {}) {
+  const o = { ...FIREBALL, ...opts };
+  const orb = spawnFx(caster.dimension, "aegis:jutsu_orb", o.orbEvent, sub(start, { x: 0, y: o.orbOffset ?? 0.25, z: 0 }));
+  projectiles.push({ caster, dim: caster.dimension, pos: start, dir: norm(dir), age: 0, orb, o });
 }
 
-function updateFireballs() {
-  for (let i = fireballs.length - 1; i >= 0; i--) {
-    const fb = fireballs[i];
-    let hit = false;
+function castFireball(player, dir = player.getViewDirection()) {
+  anim(player, "animation.aegis.hand_signs");
+  launchProjectile(player, add(player.getHeadLocation(), scale(dir, 1.5)), dir);
+  sound(player.dimension, "mob.ghast.fireball", player.location, 1, 0.8);
+}
 
+function updateProjectiles() {
+  for (let i = projectiles.length - 1; i >= 0; i--) {
+    const pr = projectiles[i];
+    const o = pr.o;
+    let hit = false;
+    let fizzled = false;
     // Move in small sub-steps so it doesn't skip through walls.
-    for (let step = 0; step < 3 && !hit; step++) {
-      fb.pos = add(fb.pos, scale(fb.dir, 0.45));
+    const steps = Math.max(1, Math.ceil(o.speed / 0.45));
+    for (let step = 0; step < steps && !hit; step++) {
+      pr.pos = add(pr.pos, scale(pr.dir, o.speed / steps));
       try {
-        const block = fb.dim.getBlock(fb.pos);
+        const block = pr.dim.getBlock(pr.pos);
         if (!block || (!block.isAir && !block.isLiquid)) hit = true;
-        else if (block.isLiquid) {
-          particle(fb.dim, "minecraft:water_evaporation_bucket_emitter", fb.pos);
-          sound(fb.dim, "random.fizz", fb.pos);
-          removeFx(fb.orb);
-          fireballs.splice(i, 1);
-          hit = null;
+        else if (block.isLiquid && o.fire) {
+          particle(pr.dim, "minecraft:water_evaporation_bucket_emitter", pr.pos);
+          sound(pr.dim, "random.fizz", pr.pos);
+          fizzled = true;
           break;
         }
       } catch {
         hit = true; // unloaded chunk
       }
-      if (hit === false && isValid(fb.caster)) {
-        const near = fb.dim.getEntities({ location: fb.pos, maxDistance: 1.6 });
-        if (near.some((e) => canBeHit(e, fb.caster))) hit = true;
+      if (!hit && isValid(pr.caster)) {
+        const near = pr.dim.getEntities({ location: pr.pos, maxDistance: o.hitRadius });
+        if (near.some((e) => canBeHit(e, pr.caster) && !(o.ignoreFamily && e.matches?.({ families: [o.ignoreFamily] })))) hit = true;
       }
     }
-    if (hit === null) continue;
-
-    particle(fb.dim, "aegis:fire_trail", fb.pos);
-    if (isValid(fb.orb)) {
+    if (fizzled) {
+      removeFx(pr.orb);
+      projectiles.splice(i, 1);
+      continue;
+    }
+    particle(pr.dim, o.trail, pr.pos, o.color);
+    if (isValid(pr.orb)) {
       try {
-        fb.orb.teleport(sub(fb.pos, { x: 0, y: 0.25, z: 0 }));
+        pr.orb.teleport(sub(pr.pos, { x: 0, y: o.orbOffset ?? 0.25, z: 0 }));
       } catch {
         /* ignore */
       }
     }
-
-    fb.age++;
-    if (hit || fb.age > 30) {
-      removeFx(fb.orb);
-      explodeFireball(fb);
-      fireballs.splice(i, 1);
+    pr.age++;
+    if (hit || pr.age > o.maxAge) {
+      removeFx(pr.orb);
+      explodeProjectile(pr);
+      projectiles.splice(i, 1);
     }
   }
 }
 
-function explodeFireball(fb) {
-  sound(fb.dim, "random.explode", fb.pos, 1, 1.2);
-  particle(fb.dim, "aegis:fire_burst", fb.pos);
-  particle(fb.dim, "minecraft:huge_explosion_emitter", fb.pos);
-  if (!isValid(fb.caster)) return;
-  for (const e of fb.dim.getEntities({ location: fb.pos, maxDistance: 3.5 })) {
-    if (!canBeHit(e, fb.caster)) continue;
-    hurt(e, 9, fb.caster, "fire");
-    try {
-      e.setOnFire(5, true);
-    } catch {
-      /* ignore */
+function explodeProjectile(pr) {
+  const o = pr.o;
+  sound(pr.dim, o.sound, pr.pos, 1, o.radius > 4 ? 0.6 : 1.2);
+  particle(pr.dim, o.burst, pr.pos, o.color);
+  particle(pr.dim, "minecraft:huge_explosion_emitter", pr.pos);
+  if (!isValid(pr.caster)) return;
+  for (const e of pr.dim.getEntities({ location: pr.pos, maxDistance: o.radius })) {
+    if (!canBeHit(e, pr.caster)) continue;
+    if (o.ignoreFamily && e.matches?.({ families: [o.ignoreFamily] })) continue;
+    hurt(e, o.damage, pr.caster, o.fire ? "fire" : "entityExplosion");
+    if (o.fire) {
+      try {
+        e.setOnFire(o.fire, true);
+      } catch {
+        /* ignore */
+      }
     }
-    const away = norm(sub(e.location, fb.pos));
-    knockback(e, away.x, away.z, 0.8, 0.35);
+    const away = norm(sub(e.location, pr.pos));
+    knockback(e, away.x, away.z, o.knock, 0.35 + o.knock * 0.2);
   }
 }
 
@@ -608,7 +630,7 @@ world.afterEvents.projectileHitBlock.subscribe((ev) => {
 // Tick loops
 // ---------------------------------------------------------------------------
 system.runInterval(() => {
-  updateFireballs();
+  updateProjectiles();
   updateFollowers();
 }, 1);
 
@@ -624,7 +646,7 @@ system.runInterval(() => {
     const max = getMaxChakra(player);
 
     // Regeneration
-    let rate = REGEN_PER_SECOND * clanRegenMultiplier(player);
+    let rate = REGEN_PER_SECOND * clanRegenMultiplier(player) * bijuuRegenMultiplier(player);
     if (wearingHeadband(player)) rate *= HEADBAND_REGEN_BONUS;
 
     const prev = lastPos.get(player.id);
@@ -682,4 +704,10 @@ initClans({
   add, sub, scale, norm, dot, particle, sound, knockback, hurt, isValid, canBeHit, isSafeSpot,
   getChakra, setChakra, getMaxChakra, cooldownLeft, startCooldown, castFireball,
   anim, handPos, spawnFx, removeFx, follow, lungeStrike,
+});
+
+initBijuu({
+  add, sub, scale, norm, dot, particle, sound, knockback, hurt, isValid, canBeHit, isSafeSpot,
+  getChakra, setChakra, getMaxChakra, cooldownLeft, startCooldown, anim, handPos, spawnFx, removeFx,
+  follow, launchProjectile,
 });

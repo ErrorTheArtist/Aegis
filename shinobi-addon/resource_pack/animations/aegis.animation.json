@@ -293,7 +293,7 @@
       "loop": true,
       "bones": {
         "root": {
-          "scale": "q.variant == 1 ? 2.2 : 1.0"
+          "scale": "q.variant == 2 ? 4.5 : (q.variant == 1 ? 2.2 : 1.0)"
         },
         "core": {
           "rotation": [

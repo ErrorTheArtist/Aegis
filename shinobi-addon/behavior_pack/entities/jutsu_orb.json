@@ -20,6 +20,11 @@
         "minecraft:variant": {
           "value": 1
         }
+      },
+      "aegis:bijuudama": {
+        "minecraft:variant": {
+          "value": 2
+        }
       }
     },
     "components": {
@@ -84,6 +89,13 @@
         "add": {
           "component_groups": [
             "aegis:fireball"
+          ]
+        }
+      },
+      "aegis:as_bijuudama": {
+        "add": {
+          "component_groups": [
+            "aegis:bijuudama"
           ]
         }
       }

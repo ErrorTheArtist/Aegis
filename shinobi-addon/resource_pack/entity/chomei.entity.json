@@ -1,0 +1,32 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "aegis:chomei",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/aegis/chomei"
+      },
+      "geometry": {
+        "default": "geometry.aegis.chomei"
+      },
+      "animations": {
+        "idle": "animation.aegis.chomei.idle"
+      },
+      "scripts": {
+        "animate": [
+          "idle"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ],
+      "spawn_egg": {
+        "base_color": "#50a046",
+        "overlay_color": "#96dcff"
+      }
+    }
+  }
+}

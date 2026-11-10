@@ -1,0 +1,32 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "aegis:matatabi",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/aegis/matatabi"
+      },
+      "geometry": {
+        "default": "geometry.aegis.matatabi"
+      },
+      "animations": {
+        "idle": "animation.aegis.matatabi.idle"
+      },
+      "scripts": {
+        "animate": [
+          "idle"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ],
+      "spawn_egg": {
+        "base_color": "#285ad2",
+        "overlay_color": "#82c8ff"
+      }
+    }
+  }
+}

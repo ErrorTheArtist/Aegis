@@ -1,0 +1,23 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:item": {
+    "description": {
+      "identifier": "aegis:bijuu_scroll",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "aegis_bijuu_scroll"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "Tailed Beast Summoning Scroll"
+      },
+      "minecraft:max_stack_size": 4,
+      "minecraft:glint": true
+    }
+  }
+}

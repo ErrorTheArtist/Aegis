@@ -1,0 +1,32 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "aegis:son_goku",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/aegis/son_goku"
+      },
+      "geometry": {
+        "default": "geometry.aegis.son_goku"
+      },
+      "animations": {
+        "idle": "animation.aegis.son_goku.idle"
+      },
+      "scripts": {
+        "animate": [
+          "idle"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ],
+      "spawn_egg": {
+        "base_color": "#aa3228",
+        "overlay_color": "#e6c896"
+      }
+    }
+  }
+}

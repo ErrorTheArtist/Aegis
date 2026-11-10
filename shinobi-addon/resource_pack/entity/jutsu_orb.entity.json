@@ -8,7 +8,8 @@
       },
       "textures": {
         "rasengan": "textures/entity/aegis/rasengan_orb",
-        "fireball": "textures/entity/aegis/fireball_orb"
+        "fireball": "textures/entity/aegis/fireball_orb",
+        "bijuudama": "textures/entity/aegis/bijuudama_orb"
       },
       "geometry": {
         "default": "geometry.aegis.jutsu_orb"

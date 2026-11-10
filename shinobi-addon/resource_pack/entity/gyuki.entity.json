@@ -1,0 +1,32 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "aegis:gyuki",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/aegis/gyuki"
+      },
+      "geometry": {
+        "default": "geometry.aegis.gyuki"
+      },
+      "animations": {
+        "idle": "animation.aegis.gyuki.idle"
+      },
+      "scripts": {
+        "animate": [
+          "idle"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ],
+      "spawn_egg": {
+        "base_color": "#8c468c",
+        "overlay_color": "#dcc8dc"
+      }
+    }
+  }
+}

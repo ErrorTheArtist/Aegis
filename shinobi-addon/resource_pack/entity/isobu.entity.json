@@ -1,0 +1,32 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "aegis:isobu",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/aegis/isobu"
+      },
+      "geometry": {
+        "default": "geometry.aegis.isobu"
+      },
+      "animations": {
+        "idle": "animation.aegis.isobu.idle"
+      },
+      "scripts": {
+        "animate": [
+          "idle"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ],
+      "spawn_egg": {
+        "base_color": "#6e8c78",
+        "overlay_color": "#aa5a3c"
+      }
+    }
+  }
+}

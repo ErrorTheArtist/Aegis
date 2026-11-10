@@ -342,3 +342,30 @@ for x in range(64):
         sus.putpixel((x, y), (150 + n * 10, 70 + n * 6, 230, 150))
 save(sus, ENT / "susanoo.png")
 print("FX textures generated.")
+
+# --- Tailed Beast Bomb orb -----------------------------------------------------
+save(orb_texture((15, 5, 25, 255), (90, 40, 160, 200), (30, 10, 60, 220)), ENT / "bijuudama_orb.png")
+print("Bijuudama texture generated.")
+
+# --- Tailed beast items ----------------------------------------------------------
+save(draw(canvas(), scroll, {"P": (60, 40, 50, 255), "p": (40, 25, 35, 255), "R": (20, 20, 20, 255), "r": (10, 10, 10, 255), "C": (200, 30, 30, 255)}), ITEMS / "bijuu_scroll.png")
+flame = [
+    "................",
+    ".......O........",
+    "......OO........",
+    "......OYO.......",
+    ".....OYYO...O...",
+    "....OOYYOO.OO...",
+    "...OOYYWYOOO....",
+    "...OYYWWWYYO....",
+    "..OOYWWWWWYOO...",
+    "..OYYWWWWWYYO...",
+    "..OYYWWWWWYYO...",
+    "..OOYYWWWYYOO...",
+    "...OOYYYYYOO....",
+    "....OOOOOOO.....",
+    "................",
+    "................",
+]
+save(draw(canvas(), flame, {"O": (235, 100, 20, 255), "Y": (255, 180, 40, 255), "W": (255, 240, 200, 255)}), ITEMS / "bijuu_cloak.png")
+print("Tailed beast item textures generated.")

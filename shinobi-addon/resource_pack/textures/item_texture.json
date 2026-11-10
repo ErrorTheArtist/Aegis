@@ -76,6 +76,12 @@
     },
     "aegis_reroll_scroll": {
       "textures": "textures/items/aegis/reroll_scroll"
+    },
+    "aegis_bijuu_scroll": {
+      "textures": "textures/items/aegis/bijuu_scroll"
+    },
+    "aegis_bijuu_cloak": {
+      "textures": "textures/items/aegis/bijuu_cloak"
     }
   }
 }

@@ -1,0 +1,32 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "aegis:kurama",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/aegis/kurama"
+      },
+      "geometry": {
+        "default": "geometry.aegis.kurama"
+      },
+      "animations": {
+        "idle": "animation.aegis.kurama.idle"
+      },
+      "scripts": {
+        "animate": [
+          "idle"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ],
+      "spawn_egg": {
+        "base_color": "#eb6e14",
+        "overlay_color": "#ffe6be"
+      }
+    }
+  }
+}

@@ -6,7 +6,8 @@
         "textures": {
           "Array.skins": [
             "Texture.rasengan",
-            "Texture.fireball"
+            "Texture.fireball",
+            "Texture.bijuudama"
           ]
         }
       },

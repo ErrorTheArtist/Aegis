@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""Generates the legendary swords: 3D held models (attachables), textures,
-icons (rendered from the model), items and recipes.
+"""Generates the legendary swords: detailed 32x32 icons (rendered from a voxel design),
+items and recipes. Swords are held like normal hand-held items.
 Run from the shinobi-addon folder:  python3 tools/gen_swords.py
 """
 import json
@@ -217,34 +217,12 @@ def icon(cubes, colors):
 # ---------------------------------------------------------------------------
 atlas_path = RP / "textures" / "item_texture.json"
 atlas = json.loads(atlas_path.read_text())
-anims = {
-    # held pose: tip tilted up a little in third person
-    "animation.aegis.sword.hold_third_person": {"loop": True, "bones": {"sword": {"rotation": [-25, 0, 0]}}},
-    "animation.aegis.sword.hold_first_person": {"loop": True, "bones": {"sword": {"rotation": [-10, 0, 0]}}},
-}
-w(RP / "animations" / "swords.animation.json", {"format_version": "1.8.0", "animations": anims})
 
 for sid, sd in SWORDS.items():
     cubes = sd["cubes"]
     cols = {k: tuple(v) for k, v in sd["colors"].items()}
     (RP / "textures" / "models" / "swords").mkdir(parents=True, exist_ok=True)
-    palette(cols).save(RP / "textures" / "models" / "swords" / f"{sid}.png")
     icon(cubes, cols).save(RP / "textures" / "items" / "aegis" / f"{sid}.png")
-
-    geo_cubes = [{k: v for k, v in cu.items() if k != "_sw"} for cu in cubes]
-    w(RP / "models" / "entity" / f"sword_{sid}.geo.json", {"format_version": "1.16.0", "minecraft:geometry": [{
-        "description": {"identifier": f"geometry.aegis.sword_{sid}", "texture_width": 64, "texture_height": 64,
-                        "visible_bounds_width": 4, "visible_bounds_height": 4, "visible_bounds_offset": [0, 1, 0]},
-        "bones": [{"name": "sword", "pivot": list(G), "binding": "q.item_slot_to_bone_name(c.item_slot)", "cubes": geo_cubes}]}]})
-
-    w(RP / "attachables" / f"sword_{sid}.json", {"format_version": "1.10.0", "minecraft:attachable": {"description": {
-        "identifier": f"aegis:{sid}",
-        "materials": {"default": "entity_alphatest", "enchanted": "entity_alphatest_glint"},
-        "textures": {"default": f"textures/models/swords/{sid}", "enchanted": "textures/misc/enchanted_item_glint"},
-        "geometry": {"default": f"geometry.aegis.sword_{sid}"},
-        "animations": {"third": "animation.aegis.sword.hold_third_person", "first": "animation.aegis.sword.hold_first_person"},
-        "scripts": {"animate": [{"third": "!c.is_first_person"}, {"first": "c.is_first_person"}]},
-        "render_controllers": ["controller.render.item_default"]}}})
 
     w(BP / "items" / f"{sid}.json", {"format_version": "1.21.60", "minecraft:item": {
         "description": {"identifier": f"aegis:{sid}", "menu_category": {"category": "equipment", "group": "minecraft:itemGroup.name.sword"}},

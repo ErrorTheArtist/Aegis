@@ -1,0 +1,336 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.aegis.hand_signs": {
+      "animation_length": 0.6,
+      "bones": {
+        "rightArm": {
+          "rotation": {
+            "0.0": [
+              "(v.is_first_person ? 0.0 : 1.0) * -60",
+              "(v.is_first_person ? 0.0 : 1.0) * -35",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ],
+            "0.15": [
+              "(v.is_first_person ? 0.0 : 1.0) * -75",
+              "(v.is_first_person ? 0.0 : 1.0) * -25",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ],
+            "0.3": [
+              "(v.is_first_person ? 0.0 : 1.0) * -55",
+              "(v.is_first_person ? 0.0 : 1.0) * -45",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ],
+            "0.45": [
+              "(v.is_first_person ? 0.0 : 1.0) * -80",
+              "(v.is_first_person ? 0.0 : 1.0) * -30",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ],
+            "0.6": [
+              "(v.is_first_person ? 0.0 : 1.0) * -60",
+              "(v.is_first_person ? 0.0 : 1.0) * -35",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ]
+          }
+        },
+        "leftArm": {
+          "rotation": {
+            "0.0": [
+              "(v.is_first_person ? 0.0 : 1.0) * -60",
+              "(v.is_first_person ? 0.0 : 1.0) * 35",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ],
+            "0.15": [
+              "(v.is_first_person ? 0.0 : 1.0) * -50",
+              "(v.is_first_person ? 0.0 : 1.0) * 45",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ],
+            "0.3": [
+              "(v.is_first_person ? 0.0 : 1.0) * -75",
+              "(v.is_first_person ? 0.0 : 1.0) * 25",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ],
+            "0.45": [
+              "(v.is_first_person ? 0.0 : 1.0) * -55",
+              "(v.is_first_person ? 0.0 : 1.0) * 40",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ],
+            "0.6": [
+              "(v.is_first_person ? 0.0 : 1.0) * -60",
+              "(v.is_first_person ? 0.0 : 1.0) * 35",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ]
+          }
+        }
+      }
+    },
+    "animation.aegis.rasengan_hold": {
+      "animation_length": 0.8,
+      "bones": {
+        "rightArm": {
+          "rotation": {
+            "0.0": [
+              "(v.is_first_person ? 0.0 : 1.0) * -40",
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ],
+            "0.15": [
+              "(v.is_first_person ? 0.0 : 1.0) * -75",
+              "(v.is_first_person ? 0.0 : 1.0) * -10",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ],
+            "0.8": [
+              "(v.is_first_person ? 0.0 : 1.0) * -75",
+              "(v.is_first_person ? 0.0 : 1.0) * -10",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ]
+          }
+        },
+        "leftArm": {
+          "rotation": {
+            "0.0": [
+              "(v.is_first_person ? 0.0 : 1.0) * -20",
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ],
+            "0.15": [
+              "(v.is_first_person ? 0.0 : 1.0) * -60",
+              "(v.is_first_person ? 0.0 : 1.0) * 40",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ],
+            "0.8": [
+              "(v.is_first_person ? 0.0 : 1.0) * -60",
+              "(v.is_first_person ? 0.0 : 1.0) * 40",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ]
+          }
+        }
+      }
+    },
+    "animation.aegis.chidori_charge": {
+      "animation_length": 0.6,
+      "bones": {
+        "rightArm": {
+          "rotation": {
+            "0.0": [
+              "(v.is_first_person ? 0.0 : 1.0) * -10",
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ],
+            "0.15": [
+              "(v.is_first_person ? 0.0 : 1.0) * -25",
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 35"
+            ],
+            "0.6": [
+              "(v.is_first_person ? 0.0 : 1.0) * -25",
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 35"
+            ]
+          }
+        },
+        "leftArm": {
+          "rotation": {
+            "0.0": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ],
+            "0.15": [
+              "(v.is_first_person ? 0.0 : 1.0) * -40",
+              "(v.is_first_person ? 0.0 : 1.0) * 45",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ],
+            "0.6": [
+              "(v.is_first_person ? 0.0 : 1.0) * -40",
+              "(v.is_first_person ? 0.0 : 1.0) * 45",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ]
+          }
+        },
+        "body": {
+          "rotation": {
+            "0.0": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ],
+            "0.15": [
+              "(v.is_first_person ? 0.0 : 1.0) * 8",
+              "(v.is_first_person ? 0.0 : 1.0) * -10",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ],
+            "0.6": [
+              "(v.is_first_person ? 0.0 : 1.0) * 8",
+              "(v.is_first_person ? 0.0 : 1.0) * -10",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ]
+          }
+        }
+      }
+    },
+    "animation.aegis.palm_thrust": {
+      "animation_length": 0.45,
+      "bones": {
+        "rightArm": {
+          "rotation": {
+            "0.0": [
+              "(v.is_first_person ? 0.0 : 1.0) * -40",
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ],
+            "0.08": [
+              "(v.is_first_person ? 0.0 : 1.0) * -95",
+              "(v.is_first_person ? 0.0 : 1.0) * -5",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ],
+            "0.3": [
+              "(v.is_first_person ? 0.0 : 1.0) * -95",
+              "(v.is_first_person ? 0.0 : 1.0) * -5",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ],
+            "0.45": [
+              "(v.is_first_person ? 0.0 : 1.0) * -30",
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ]
+          }
+        },
+        "body": {
+          "rotation": {
+            "0.0": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ],
+            "0.08": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * -15",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ],
+            "0.45": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ]
+          }
+        }
+      }
+    },
+    "animation.aegis.both_palms": {
+      "animation_length": 0.6,
+      "bones": {
+        "rightArm": {
+          "rotation": {
+            "0.0": [
+              "(v.is_first_person ? 0.0 : 1.0) * -30",
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ],
+            "0.1": [
+              "(v.is_first_person ? 0.0 : 1.0) * -95",
+              "(v.is_first_person ? 0.0 : 1.0) * -10",
+              "(v.is_first_person ? 0.0 : 1.0) * -15"
+            ],
+            "0.45": [
+              "(v.is_first_person ? 0.0 : 1.0) * -95",
+              "(v.is_first_person ? 0.0 : 1.0) * -10",
+              "(v.is_first_person ? 0.0 : 1.0) * -15"
+            ],
+            "0.6": [
+              "(v.is_first_person ? 0.0 : 1.0) * -20",
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ]
+          }
+        },
+        "leftArm": {
+          "rotation": {
+            "0.0": [
+              "(v.is_first_person ? 0.0 : 1.0) * -30",
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ],
+            "0.1": [
+              "(v.is_first_person ? 0.0 : 1.0) * -95",
+              "(v.is_first_person ? 0.0 : 1.0) * 10",
+              "(v.is_first_person ? 0.0 : 1.0) * 15"
+            ],
+            "0.45": [
+              "(v.is_first_person ? 0.0 : 1.0) * -95",
+              "(v.is_first_person ? 0.0 : 1.0) * 10",
+              "(v.is_first_person ? 0.0 : 1.0) * 15"
+            ],
+            "0.6": [
+              "(v.is_first_person ? 0.0 : 1.0) * -20",
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ]
+          }
+        }
+      }
+    },
+    "animation.aegis.ninja_run": {
+      "loop": true,
+      "bones": {
+        "rightArm": {
+          "rotation": [
+            "(v.is_first_person ? 0.0 : 1.0) * 75",
+            "(v.is_first_person ? 0.0 : 1.0) * 0",
+            "(v.is_first_person ? 0.0 : 1.0) * 8"
+          ]
+        },
+        "leftArm": {
+          "rotation": [
+            "(v.is_first_person ? 0.0 : 1.0) * 75",
+            "(v.is_first_person ? 0.0 : 1.0) * 0",
+            "(v.is_first_person ? 0.0 : 1.0) * -8"
+          ]
+        }
+      }
+    },
+    "animation.aegis.orb_spin": {
+      "loop": true,
+      "bones": {
+        "root": {
+          "scale": "q.variant == 1 ? 2.2 : 1.0"
+        },
+        "core": {
+          "rotation": [
+            "q.life_time * 540",
+            "q.life_time * 720",
+            0
+          ]
+        },
+        "shell": {
+          "rotation": [
+            "-q.life_time * 360",
+            "-q.life_time * 900",
+            "q.life_time * 200"
+          ],
+          "scale": "1.0 + math.sin(q.life_time * 1440) * 0.08"
+        }
+      }
+    },
+    "animation.aegis.susanoo": {
+      "loop": true,
+      "bones": {
+        "root": {
+          "scale": "math.min(1.0, q.life_time * 2.5)",
+          "position": [
+            0,
+            "math.sin(q.life_time * 120) * 0.6",
+            0
+          ]
+        },
+        "arms": {
+          "rotation": [
+            "math.sin(q.life_time * 90) * 4",
+            0,
+            0
+          ]
+        }
+      }
+    }
+  }
+}

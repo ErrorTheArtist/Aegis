@@ -1,0 +1,28 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "aegis:susanoo",
+      "materials": {
+        "default": "entity_alphablend"
+      },
+      "textures": {
+        "default": "textures/entity/aegis/susanoo"
+      },
+      "geometry": {
+        "default": "geometry.aegis.susanoo"
+      },
+      "animations": {
+        "idle": "animation.aegis.susanoo"
+      },
+      "scripts": {
+        "animate": [
+          "idle"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.aegis.glow"
+      ]
+    }
+  }
+}

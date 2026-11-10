@@ -1,0 +1,37 @@
+{
+  "format_version": "1.8.0",
+  "render_controllers": {
+    "controller.render.aegis.jutsu_orb": {
+      "arrays": {
+        "textures": {
+          "Array.skins": [
+            "Texture.rasengan",
+            "Texture.fireball"
+          ]
+        }
+      },
+      "geometry": "Geometry.default",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Array.skins[q.variant]"
+      ],
+      "ignore_lighting": true
+    },
+    "controller.render.aegis.glow": {
+      "geometry": "Geometry.default",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.default"
+      ],
+      "ignore_lighting": true
+    }
+  }
+}

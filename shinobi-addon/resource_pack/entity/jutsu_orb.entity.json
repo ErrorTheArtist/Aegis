@@ -1,0 +1,29 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "aegis:jutsu_orb",
+      "materials": {
+        "default": "entity_alphablend"
+      },
+      "textures": {
+        "rasengan": "textures/entity/aegis/rasengan_orb",
+        "fireball": "textures/entity/aegis/fireball_orb"
+      },
+      "geometry": {
+        "default": "geometry.aegis.jutsu_orb"
+      },
+      "animations": {
+        "spin": "animation.aegis.orb_spin"
+      },
+      "scripts": {
+        "animate": [
+          "spin"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.aegis.jutsu_orb"
+      ]
+    }
+  }
+}

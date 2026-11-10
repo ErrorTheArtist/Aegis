@@ -287,3 +287,50 @@ for k in range(3):
         ms.putpixel((round(7.5 + math.cos(a) * r), round(7.5 + math.sin(a) * r)), (10, 10, 10, 255))
 save(ms, ITEMS / "mangekyo.png")
 print("Extra textures generated.")
+
+# --- Particle textures (white, tinted in the particle files) -----------------
+import random
+
+PART = RP / "textures" / "particle" / "aegis"
+
+
+def radial(alpha_fn):
+    img = canvas()
+    for x in range(16):
+        for y in range(16):
+            r = math.hypot(x - 7.5, y - 7.5) / 8
+            a = max(0, min(255, int(alpha_fn(r, x, y) * 255)))
+            img.putpixel((x, y), (255, 255, 255, a))
+    return img
+
+
+save(radial(lambda r, x, y: (1 - r) ** 2 if r < 1 else 0), PART / "glow.png")
+save(radial(lambda r, x, y: max(0, 1 - r * 1.1) if (abs(x - 7.5) < 1.2 or abs(y - 7.5) < 1.2 or abs(abs(x - 7.5) - abs(y - 7.5)) < 1.0) else 0), PART / "spark.png")
+random.seed(7)
+save(radial(lambda r, x, y: max(0, (1 - r) * (0.6 + random.random() * 0.4))), PART / "smoke.png")
+
+# --- Model textures -----------------------------------------------------------
+ENT = RP / "textures" / "entity" / "aegis"
+
+
+def orb_texture(core, shell_a, shell_b):
+    img = canvas(32, 32)
+    for x in range(32):
+        for y in range(32):
+            if y < 8:  # core UV region (4x4x4 box)
+                img.putpixel((x, y), core)
+            elif y < 20:  # shell (6x6x6 box) — swirly stripes, translucent
+                img.putpixel((x, y), shell_a if (x + y) % 4 < 2 else shell_b)
+    return img
+
+
+save(orb_texture((235, 250, 255, 255), (90, 170, 255, 150), (170, 220, 255, 110)), ENT / "rasengan_orb.png")
+save(orb_texture((255, 240, 150, 255), (255, 120, 20, 170), (255, 60, 10, 130)), ENT / "fireball_orb.png")
+
+sus = canvas(64, 64)
+for x in range(64):
+    for y in range(64):
+        n = (x * 7 + y * 13) % 5
+        sus.putpixel((x, y), (150 + n * 10, 70 + n * 6, 230, 150))
+save(sus, ENT / "susanoo.png")
+print("FX textures generated.")

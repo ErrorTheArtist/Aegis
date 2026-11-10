@@ -338,11 +338,12 @@ function amaterasu(p, pulses, dmg) {
   const t = targetInView(p, 24);
   if (!t) return noTarget(p);
   api.sound(p.dimension, "mob.wither.shoot", p.location, 0.7, 0.6);
+  line(p, p.getHeadLocation(), api.add(t.location, { x: 0, y: 1, z: 0 }), "aegis:amaterasu");
   for (let i = 0; i < pulses; i++) {
     system.runTimeout(() => {
       if (!api.isValid(t)) return;
-      for (let k = 0; k < 6; k++) {
-        api.particle(t.dimension, "minecraft:dragon_breath_trail", api.add(t.location, { x: Math.random() - 0.5, y: Math.random() * 1.8, z: Math.random() - 0.5 }));
+      for (let k = 0; k < 4; k++) {
+        system.runTimeout(() => api.isValid(t) && api.particle(t.dimension, "aegis:amaterasu", t.location), k * 5);
       }
       api.hurt(t, dmg, p, "fire");
       try {
@@ -392,9 +393,10 @@ const ABILITIES = {
     sneak: {
       name: "Eight Trigrams Palm Rotation", cost: 30, cd: 160,
       cast: (p) => {
+        api.anim(p, "animation.aegis.both_palms");
         for (let i = 0; i < 24; i++) {
           const a = (i / 24) * Math.PI * 2;
-          api.particle(p.dimension, "minecraft:knockback_roar_particle", api.add(p.location, { x: Math.cos(a) * 2, y: 1, z: Math.sin(a) * 2 }));
+          api.particle(p.dimension, "aegis:wind_gust", api.add(p.location, { x: Math.cos(a) * 2, y: 1, z: Math.sin(a) * 2 }));
         }
         api.sound(p.dimension, "mob.breeze.wind_burst", p.location, 1, 0.8);
         for (const e of nearbyTargets(p, 5)) {
@@ -413,11 +415,13 @@ const ABILITIES = {
     use: {
       name: "Almighty Push", cost: 50, cd: 200,
       cast: (p) => {
+        api.anim(p, "animation.aegis.both_palms");
         api.particle(p.dimension, "minecraft:huge_explosion_emitter", p.location);
+        api.particle(p.dimension, "aegis:chakra_burst", api.add(p.location, { x: 0, y: 1, z: 0 }));
         for (let r = 1; r <= 8; r += 1.5) {
           for (let i = 0; i < 16; i++) {
             const a = (i / 16) * Math.PI * 2;
-            api.particle(p.dimension, "minecraft:knockback_roar_particle", api.add(p.location, { x: Math.cos(a) * r, y: 0.5, z: Math.sin(a) * r }));
+            api.particle(p.dimension, "aegis:wind_gust", api.add(p.location, { x: Math.cos(a) * r, y: 0.5, z: Math.sin(a) * r }));
           }
         }
         api.sound(p.dimension, "random.explode", p.location, 1, 0.5);
@@ -434,6 +438,7 @@ const ABILITIES = {
       cast: (p) => {
         const t = targetInView(p, 30);
         if (!t) return noTarget(p);
+        api.anim(p, "animation.aegis.palm_thrust");
         line(p, p.getHeadLocation(), t.location, "minecraft:portal_reverse_particle");
         const to = api.norm({ x: p.location.x - t.location.x, y: 0, z: p.location.z - t.location.z });
         api.knockback(t, to.x, to.z, 3, 0.4);
@@ -452,6 +457,7 @@ const ABILITIES = {
         for (const pl of p.dimension.getPlayers({ location: p.location, maxDistance: 8 })) {
           eff(pl, "instant_health", 1, 1);
           eff(pl, "regeneration", 200, 1);
+          api.particle(pl.dimension, "aegis:chakra_aura", pl.location);
           api.particle(pl.dimension, "minecraft:villager_happy", api.add(pl.location, { x: 0, y: 1, z: 0 }));
         }
         api.sound(p.dimension, "random.levelup", p.location, 0.6, 1.4);
@@ -467,6 +473,7 @@ const ABILITIES = {
       cast: (p) => {
         const targets = nearbyTargets(p, 9);
         if (!targets.length) return noTarget(p);
+        api.anim(p, "animation.aegis.hand_signs");
         for (const e of targets) {
           line(p, api.add(p.location, { x: 0, y: 1, z: 0 }), api.add(e.location, { x: 0, y: 1, z: 0 }), "minecraft:electric_spark_particle");
           eff(e, "slowness", 100, 255);
@@ -501,9 +508,10 @@ const ABILITIES = {
       cast: (p) => {
         const t = targetInView(p, 18);
         if (!t) return noTarget(p);
+        api.anim(p, "animation.aegis.hand_signs");
         for (let i = 0; i < 5; i++) {
           system.runTimeout(() => {
-            if (api.isValid(t) && api.isValid(p)) line(p, p.location, t.location, "minecraft:dragon_breath_trail");
+            if (api.isValid(t) && api.isValid(p)) line(p, api.add(p.location, { x: 0, y: 0.05, z: 0 }), api.add(t.location, { x: 0, y: 0.05, z: 0 }), "aegis:shadow");
           }, i * 20);
         }
         eff(t, "slowness", 120, 255);
@@ -526,7 +534,8 @@ const ABILITIES = {
         eff(p, "resistance", 300, 1);
         eff(p, "absorption", 300, 3);
         eff(p, "slowness", 300, 0);
-        api.particle(p.dimension, "minecraft:huge_explosion_emitter", p.location);
+        api.anim(p, "animation.aegis.hand_signs");
+        api.particle(p.dimension, "aegis:smoke_puff", p.location);
         api.sound(p.dimension, "mob.irongolem.repair", p.location, 1, 0.6);
         return true;
       },
@@ -540,6 +549,7 @@ const ABILITIES = {
       cast: (p) => {
         const dir = p.getViewDirection();
         const hits = nearbyTargets(p, 10).filter((e) => api.dot(api.norm(api.sub(e.location, p.location)), dir) > 0.5);
+        api.anim(p, "animation.aegis.palm_thrust");
         for (let d = 1; d <= 10; d++) api.particle(p.dimension, "minecraft:spore_blossom_shower_particle", api.add(p.getHeadLocation(), api.scale(dir, d)));
         if (!hits.length) return noTarget(p);
         for (const e of hits) {
@@ -562,11 +572,12 @@ const ABILITIES = {
         const d = p.getViewDirection();
         const h = api.norm({ x: d.x, y: 0, z: d.z });
         api.knockback(p, h.x, h.z, 3.2, 0.3);
+        api.anim(p, "animation.aegis.palm_thrust");
         const hit = new Set();
         for (let i = 1; i <= 12; i++) {
           system.runTimeout(() => {
             if (!api.isValid(p)) return;
-            api.particle(p.dimension, "minecraft:knockback_roar_particle", p.location);
+            api.particle(p.dimension, "aegis:wind_gust", p.location);
             for (const e of nearbyTargets(p, 2.5)) {
               if (hit.has(e.id)) continue;
               hit.add(e.id);
@@ -585,7 +596,7 @@ const ABILITIES = {
           const wolf = p.dimension.spawnEntity("minecraft:wolf", p.location);
           wolf.getComponent("minecraft:tameable")?.tame(p);
           wolf.nameTag = `${p.name}'s Hound`;
-          api.particle(p.dimension, "minecraft:large_explosion", p.location);
+          api.particle(p.dimension, "aegis:smoke_puff", wolf.location);
           api.sound(p.dimension, "mob.wolf.bark", p.location, 1, 1);
         } catch {
           return false;
@@ -602,6 +613,7 @@ const ABILITIES = {
       cast: (p) => {
         const t = targetInView(p, 20);
         if (!t) return noTarget(p);
+        api.anim(p, "animation.aegis.hand_signs");
         line(p, p.getHeadLocation(), api.add(t.location, { x: 0, y: 1.5, z: 0 }), "minecraft:villager_happy");
         eff(t, "nausea", 200, 0);
         eff(t, "blindness", 100, 0);
@@ -617,6 +629,7 @@ const ABILITIES = {
 // Temporary wall of logs in front of the caster, removed after 10s.
 function woodWall(p) {
   const dim = p.dimension;
+  api.anim(p, "animation.aegis.hand_signs");
   const d = p.getViewDirection();
   const fwd = Math.abs(d.x) > Math.abs(d.z) ? { x: Math.sign(d.x), z: 0 } : { x: 0, z: Math.sign(d.z) };
   const side = { x: -fwd.z, z: fwd.x };
@@ -736,7 +749,7 @@ export function initClans(helpers) {
       const health = hurtEntity.getComponent("minecraft:health");
       health.setCurrentValue(Math.min(health.effectiveMax, health.currentValue + damage));
       hurtEntity.onScreenDisplay.setActionBar("§cSharingan: §7attack predicted — dodged!");
-      api.particle(hurtEntity.dimension, "minecraft:large_explosion", api.add(hurtEntity.location, { x: 0, y: 1, z: 0 }));
+      api.particle(hurtEntity.dimension, "aegis:smoke_puff", hurtEntity.location);
     } catch {
       /* ignore */
     }
@@ -763,7 +776,7 @@ export function initClans(helpers) {
     if (!api.canBeHit(hitEntity, damagingEntity)) return;
     api.hurt(hitEntity, 4, damagingEntity, "magic");
     eff(hitEntity, "weakness", 60, 0);
-    api.particle(hitEntity.dimension, "minecraft:electric_spark_particle", api.add(hitEntity.location, { x: 0, y: 1, z: 0 }));
+    api.particle(hitEntity.dimension, "aegis:chakra_burst", api.add(hitEntity.location, { x: 0, y: 1, z: 0 }));
   });
 
   // Dojutsu drain + Byakugan vision + passives.
@@ -785,7 +798,7 @@ export function initClans(helpers) {
           // mark every living thing within 40 blocks, even through walls
           for (const e of player.dimension.getEntities({ location: player.location, maxDistance: 40 })) {
             if (e.id === player.id || !e.getComponent("minecraft:health")) continue;
-            api.particle(e.dimension, "minecraft:blue_flame_particle", api.add(e.location, { x: 0, y: 2.2, z: 0 }));
+            api.particle(e.dimension, "aegis:byakugan_mark", api.add(e.location, { x: 0, y: 2.2, z: 0 }));
           }
         }
       }
@@ -843,9 +856,10 @@ function awakenMangekyo(player) {
     fadeInDuration: 10, stayDuration: 70, fadeOutDuration: 20,
   });
   api.sound(player.dimension, "mob.wither.spawn", player.location, 0.6, 1.2);
+  api.particle(player.dimension, "aegis:susanoo_flame", player.location);
   for (let i = 0; i < 20; i++) {
     const a = (i / 20) * Math.PI * 2;
-    api.particle(player.dimension, "minecraft:dragon_breath_trail", api.add(player.location, { x: Math.cos(a) * 1.5, y: 1, z: Math.sin(a) * 1.5 }));
+    api.particle(player.dimension, "aegis:amaterasu", api.add(player.location, { x: Math.cos(a) * 1.5, y: 0, z: Math.sin(a) * 1.5 }));
   }
   player.sendMessage("§cYou awakened the §4Mangekyō Sharingan§c! §7Stronger dodge, Strength, cheaper Amaterasu, and §5Susanoo§7 protects you at low health.");
   world.sendMessage(`§e${player.name} has awakened the §4Mangekyō Sharingan§e!`);
@@ -865,16 +879,11 @@ function trySusanoo(player) {
   eff(player, "absorption", 300, 4);
   eff(player, "strength", 300, 1);
   eff(player, "regeneration", 100, 1);
-  for (let t = 0; t < 6; t++) {
-    system.runTimeout(() => {
-      if (!api.isValid(player)) return;
-      for (let i = 0; i < 16; i++) {
-        const a = (i / 16) * Math.PI * 2;
-        for (const y of [0.5, 1.5, 2.5]) {
-          api.particle(player.dimension, "minecraft:dragon_breath_trail", api.add(player.location, { x: Math.cos(a) * 1.6, y, z: Math.sin(a) * 1.6 }));
-        }
-      }
-    }, t * 20);
+  // The Susanoo ribcage model stays wrapped around you for 6 seconds.
+  const model = api.spawnFx(player.dimension, "aegis:susanoo", undefined, player.location);
+  api.follow(model, () => (api.isValid(player) ? player.location : undefined), 120, () => ({ x: 0, y: player.getRotation().y }));
+  for (let t = 0; t < 12; t++) {
+    system.runTimeout(() => api.isValid(player) && api.particle(player.dimension, "aegis:susanoo_flame", player.location), t * 10);
   }
   api.sound(player.dimension, "mob.warden.emerge", player.location, 0.8, 0.8);
   player.onScreenDisplay.setTitle("§5Susanoo", { subtitle: "§7protects you", fadeInDuration: 2, stayDuration: 30, fadeOutDuration: 10 });

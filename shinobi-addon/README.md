@@ -87,6 +87,21 @@ Clan odds, stats and abilities are all in `behavior_pack/scripts/clans.js`.
 | Wind Style: Great Breakthrough | 15 | 1.5s | Cone of wind that blasts everything in front of you away. |
 | Chidori | 35 | 4s | Charge up lightning, then lunge forward: the first thing you hit takes 13 damage. |
 
+## Visuals
+
+- **Player animations** (played on your character, third person): hand signs before casting
+  (Fireball, Shadow Clone, Substitution, clan jutsu), holding out the Rasengan, the Chidori
+  charge pose, palm thrusts (Rasengan/Chidori strike, Gale Palm, Rinnegan), and a **ninja run**
+  with arms swept back while sprinting.
+- **3D models**: a spinning glowing **Rasengan** orb in your hand, a **fireball** that flies with
+  a fire trail, and a purple **Susanoo** ribcage that wraps around you.
+- **Custom particles**: Rasengan swirl, Chidori lightning crackle and burst, black Amaterasu flames,
+  fire trails and explosions, smoke puffs (Substitution / Shadow Clones / Body Flicker),
+  chakra aura while focusing, Byakugan markers, Nara shadows, Susanoo flames, wind gusts.
+
+Animations: `resource_pack/animations/aegis.animation.json` · particles: `resource_pack/particles/` ·
+models: `resource_pack/models/entity/`.
+
 ## Ninja tools
 
 - **Kunai** — throwable, 6 damage. Drops back as an item when it hits a block.

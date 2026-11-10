@@ -100,6 +100,7 @@ function isValid(e) {
 function canBeHit(e, caster) {
   if (!isValid(e) || e.id === caster.id) return false;
   if (e.typeId === "minecraft:item" || e.typeId === "minecraft:xp_orb") return false;
+  if (e.typeId === "aegis:jutsu_orb" || e.typeId === "aegis:susanoo") return false;
   if (e.typeId === "aegis:chakra_clone") {
     try {
       if (e.getDynamicProperty(OWNER_PROP) === caster.id) return false;
@@ -108,6 +109,89 @@ function canBeHit(e, caster) {
     }
   }
   return !!e.getComponent("minecraft:health");
+}
+
+// ---------------------------------------------------------------------------
+// Visuals: player animations, effect models that follow things, lunges
+// ---------------------------------------------------------------------------
+function anim(entity, name, controller = "aegis_jutsu", stopExpression) {
+  try {
+    const opts = { blendOutTime: 0.15, controller };
+    if (stopExpression) opts.stopExpression = stopExpression;
+    entity.playAnimation(name, opts);
+  } catch {
+    /* ignore */
+  }
+}
+
+// World position of the player's right hand (roughly).
+function handPos(player) {
+  const d = player.getViewDirection();
+  const h = norm({ x: d.x, y: 0, z: d.z });
+  const right = { x: -h.z, y: 0, z: h.x };
+  return add(player.getHeadLocation(), add(add(scale(d, 0.7), scale(right, 0.35)), { x: 0, y: -0.45, z: 0 }));
+}
+
+function spawnFx(dim, typeId, event, loc) {
+  try {
+    const e = dim.spawnEntity(typeId, loc);
+    if (event) e.triggerEvent(event);
+    return e;
+  } catch {
+    return undefined;
+  }
+}
+
+function removeFx(e) {
+  try {
+    if (isValid(e)) e.remove();
+  } catch {
+    /* ignore */
+  }
+}
+
+// Effect models (Rasengan orb, Susanoo...) glued to a moving position every tick.
+const followers = [];
+
+function follow(entity, posFn, ticks, rotFn) {
+  if (entity) followers.push({ entity, posFn, rotFn, until: system.currentTick + ticks });
+}
+
+function updateFollowers() {
+  for (let i = followers.length - 1; i >= 0; i--) {
+    const f = followers[i];
+    const pos = isValid(f.entity) && system.currentTick < f.until ? f.posFn() : undefined;
+    if (!pos) {
+      removeFx(f.entity);
+      followers.splice(i, 1);
+      continue;
+    }
+    try {
+      const rot = f.rotFn?.();
+      f.entity.teleport(pos, rot ? { rotation: rot } : undefined);
+    } catch {
+      /* ignore */
+    }
+  }
+}
+
+// Dash forward; the first thing within `range` during the next `ticks` gets onHit().
+function lungeStrike(player, { power = 3, range = 2.5, ticks = 12, onHit, trail }) {
+  const dim = player.dimension;
+  const d = player.getViewDirection();
+  const h = norm({ x: d.x, y: 0, z: d.z });
+  knockback(player, h.x, h.z, power, 0.2);
+  let done = false;
+  for (let t = 1; t <= ticks; t++) {
+    system.runTimeout(() => {
+      if (done || !isValid(player)) return;
+      trail?.();
+      const target = dim.getEntities({ location: player.location, maxDistance: range }).find((e) => canBeHit(e, player));
+      if (!target) return;
+      done = true;
+      onHit(target);
+    }, t);
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -195,7 +279,9 @@ const fireballs = [];
 
 function castFireball(player, dir = player.getViewDirection()) {
   const start = add(player.getHeadLocation(), scale(dir, 1.5));
-  fireballs.push({ caster: player, dim: player.dimension, pos: start, dir, age: 0 });
+  anim(player, "animation.aegis.hand_signs");
+  const orb = spawnFx(player.dimension, "aegis:jutsu_orb", "aegis:as_fireball", sub(start, { x: 0, y: 0.25, z: 0 }));
+  fireballs.push({ caster: player, dim: player.dimension, pos: start, dir, age: 0, orb });
   sound(player.dimension, "mob.ghast.fireball", start, 1, 0.8);
 }
 
@@ -213,6 +299,7 @@ function updateFireballs() {
         else if (block.isLiquid) {
           particle(fb.dim, "minecraft:water_evaporation_bucket_emitter", fb.pos);
           sound(fb.dim, "random.fizz", fb.pos);
+          removeFx(fb.orb);
           fireballs.splice(i, 1);
           hit = null;
           break;
@@ -227,12 +314,18 @@ function updateFireballs() {
     }
     if (hit === null) continue;
 
-    particle(fb.dim, "minecraft:basic_flame_particle", fb.pos);
-    particle(fb.dim, "minecraft:mobflame_single", fb.pos);
-    particle(fb.dim, "minecraft:large_explosion", fb.pos);
+    particle(fb.dim, "aegis:fire_trail", fb.pos);
+    if (isValid(fb.orb)) {
+      try {
+        fb.orb.teleport(sub(fb.pos, { x: 0, y: 0.25, z: 0 }));
+      } catch {
+        /* ignore */
+      }
+    }
 
     fb.age++;
     if (hit || fb.age > 30) {
+      removeFx(fb.orb);
       explodeFireball(fb);
       fireballs.splice(i, 1);
     }
@@ -241,6 +334,7 @@ function updateFireballs() {
 
 function explodeFireball(fb) {
   sound(fb.dim, "random.explode", fb.pos, 1, 1.2);
+  particle(fb.dim, "aegis:fire_burst", fb.pos);
   particle(fb.dim, "minecraft:huge_explosion_emitter", fb.pos);
   if (!isValid(fb.caster)) return;
   for (const e of fb.dim.getEntities({ location: fb.pos, maxDistance: 3.5 })) {
@@ -256,29 +350,41 @@ function explodeFireball(fb) {
   }
 }
 
-// --- Rasengan: a devastating close-range strike. ---
+// --- Rasengan: form the spinning orb in your palm, then drive it into the first thing you reach. ---
 function castSphere(player) {
-  const hits = player.getEntitiesFromViewDirection({ maxDistance: 5 });
-  const target = hits.map((h) => h.entity).find((e) => canBeHit(e, player));
-  if (!target) {
-    player.onScreenDisplay.setActionBar("§7No target in reach for the Rasengan.");
-    return false;
+  const dim = player.dimension;
+  const CHARGE = 14;
+  anim(player, "animation.aegis.rasengan_hold");
+  const orb = spawnFx(dim, "aegis:jutsu_orb", "aegis:as_rasengan", handPos(player));
+  follow(orb, () => (isValid(player) ? sub(handPos(player), { x: 0, y: 0.25, z: 0 }) : undefined), CHARGE + 14);
+  sound(dim, "item.trident.riptide_1", player.location, 0.7, 1.6);
+  for (let i = 0; i < CHARGE + 14; i++) {
+    system.runTimeout(() => {
+      if (!isValid(player)) return;
+      const hp = handPos(player);
+      particle(dim, "aegis:rasengan", hp);
+      particle(dim, "aegis:rasengan_core", hp);
+    }, i);
   }
-  const dir = player.getViewDirection();
-  const center = add(target.location, { x: 0, y: 1, z: 0 });
-
-  // swirl of particles
-  for (let i = 0; i < 16; i++) {
-    const a = (i / 16) * Math.PI * 2;
-    particle(player.dimension, "minecraft:electric_spark_particle", add(center, { x: Math.cos(a) * 0.8, y: Math.sin(a * 2) * 0.3, z: Math.sin(a) * 0.8 }));
-  }
-  particle(player.dimension, "minecraft:huge_explosion_emitter", center);
-  sound(player.dimension, "mob.breeze.wind_burst", center, 1, 0.7);
-  sound(player.dimension, "random.explode", center, 0.6, 1.6);
-
-  hurt(target, 14, player);
-  const h = norm({ x: dir.x, y: 0, z: dir.z });
-  knockback(target, h.x, h.z, 3.2, 0.7);
+  system.runTimeout(() => {
+    if (!isValid(player)) return;
+    anim(player, "animation.aegis.palm_thrust");
+    sound(dim, "mob.breeze.wind_burst", player.location, 0.6, 1.4);
+    lungeStrike(player, {
+      power: 2.6, range: 2.6, ticks: 14,
+      onHit: (target) => {
+        const center = add(target.location, { x: 0, y: 1, z: 0 });
+        particle(dim, "aegis:chakra_burst", center);
+        particle(dim, "minecraft:huge_explosion_emitter", center);
+        sound(dim, "random.explode", center, 0.7, 1.6);
+        hurt(target, 14, player);
+        const d = player.getViewDirection();
+        const h = norm({ x: d.x, y: 0, z: d.z });
+        knockback(target, h.x, h.z, 3.2, 0.7);
+        removeFx(orb);
+      },
+    });
+  }, CHARGE);
   return true;
 }
 
@@ -287,7 +393,8 @@ const substitutionArmed = new Map(); // playerId -> tick it expires
 
 function castSubstitution(player) {
   substitutionArmed.set(player.id, system.currentTick + 160);
-  particle(player.dimension, "minecraft:villager_happy", add(player.location, { x: 0, y: 1, z: 0 }));
+  anim(player, "animation.aegis.hand_signs");
+  particle(player.dimension, "aegis:chakra_aura", player.location);
   sound(player.dimension, "random.pop", player.location, 1, 0.6);
   player.sendMessage("§7[Substitution] Ready — the next hit you take will be avoided (8s).");
 }
@@ -312,9 +419,7 @@ world.afterEvents.entityHurt.subscribe(({ hurtEntity, damage, damageSource }) =>
   }
 
   // Poof: smoke where we stood.
-  for (let i = 0; i < 6; i++) {
-    particle(dim, "minecraft:large_explosion", add(oldLoc, { x: Math.random() - 0.5, y: Math.random() * 1.8, z: Math.random() - 0.5 }));
-  }
+  particle(dim, "aegis:smoke_puff", oldLoc);
   sound(dim, "mob.endermen.portal", oldLoc, 1, 1.4);
 
   // Reappear behind the attacker (or step back if there isn't one).
@@ -334,6 +439,7 @@ world.afterEvents.entityHurt.subscribe(({ hurtEntity, damage, damageSource }) =>
   if (isSafeSpot(dim, dest)) {
     try {
       player.teleport(dest, facing ? { facingLocation: facing } : undefined);
+      particle(dim, "aegis:smoke_puff", dest);
     } catch {
       /* ignore */
     }
@@ -363,6 +469,7 @@ function castClones(player) {
     return false;
   }
   const count = Math.min(2, room);
+  anim(player, "animation.aegis.hand_signs");
   for (let i = 0; i < count; i++) {
     const a = Math.random() * Math.PI * 2;
     let loc = add(player.location, { x: Math.cos(a) * 1.5, y: 0, z: Math.sin(a) * 1.5 });
@@ -371,7 +478,7 @@ function castClones(player) {
       const clone = dim.spawnEntity("aegis:chakra_clone", loc);
       clone.setDynamicProperty(OWNER_PROP, player.id);
       clone.nameTag = `${player.name}'s Shadow Clone`;
-      particle(dim, "minecraft:large_explosion", add(loc, { x: 0, y: 1, z: 0 }));
+      particle(dim, "aegis:smoke_puff", loc);
     } catch {
       /* ignore */
     }
@@ -383,7 +490,7 @@ function castClones(player) {
 world.afterEvents.entityDie.subscribe(({ deadEntity }) => {
   if (deadEntity.typeId !== "aegis:chakra_clone") return;
   try {
-    particle(deadEntity.dimension, "minecraft:large_explosion", add(deadEntity.location, { x: 0, y: 1, z: 0 }));
+    particle(deadEntity.dimension, "aegis:smoke_puff", deadEntity.location);
   } catch {
     /* ignore */
   }
@@ -393,7 +500,7 @@ world.afterEvents.entityDie.subscribe(({ deadEntity }) => {
 world.afterEvents.entityHitEntity.subscribe(({ damagingEntity, hitEntity }) => {
   if (hitEntity.typeId === "aegis:chakra_clone" && damagingEntity.typeId === "minecraft:player") {
     if (hitEntity.getDynamicProperty(OWNER_PROP) === damagingEntity.id) {
-      particle(hitEntity.dimension, "minecraft:large_explosion", add(hitEntity.location, { x: 0, y: 1, z: 0 }));
+      particle(hitEntity.dimension, "aegis:smoke_puff", hitEntity.location);
       try {
         hitEntity.triggerEvent("aegis:dispel");
       } catch {
@@ -413,9 +520,7 @@ function castFlashStep(player) {
   } catch {
     /* ignore */
   }
-  for (let i = 0; i < 5; i++) {
-    particle(player.dimension, "minecraft:large_explosion", add(player.location, { x: 0, y: 0.5 + i * 0.25, z: 0 }));
-  }
+  particle(player.dimension, "aegis:smoke_puff", player.location);
   sound(player.dimension, "mob.enderdragon.flap", player.location, 0.8, 1.6);
 }
 
@@ -424,8 +529,9 @@ function castGalePalm(player) {
   const dim = player.dimension;
   const dir = player.getViewDirection();
   const head = player.getHeadLocation();
+  anim(player, "animation.aegis.palm_thrust");
   for (let d = 1; d <= 8; d++) {
-    particle(dim, "minecraft:knockback_roar_particle", add(head, scale(dir, d)));
+    particle(dim, "aegis:wind_gust", add(head, scale(dir, d)));
   }
   sound(dim, "mob.breeze.wind_burst", head, 1, 1);
   sound(dim, "mob.enderdragon.flap", head, 1, 0.6);
@@ -440,43 +546,35 @@ function castGalePalm(player) {
   }
 }
 
-// --- Chidori: charge forward wrapped in lightning; the first thing you hit takes it all. ---
+// --- Chidori: lightning gathers in your hand, then you lunge; the first thing you hit takes it all. ---
 function castChidori(player) {
   const dim = player.dimension;
-  const dir = player.getViewDirection();
-  const h = norm({ x: dir.x, y: 0, z: dir.z });
+  const CHARGE = 14;
+  anim(player, "animation.aegis.chidori_charge");
   sound(dim, "ambient.weather.thunder", player.location, 0.5, 1.8);
   sound(dim, "mob.bee.loop", player.location, 1, 2); // the "thousand birds" chirp
-  // short charge-up, then the lunge
-  for (let i = 0; i < 8; i++) {
+  for (let i = 0; i < CHARGE + 14; i++) {
     system.runTimeout(() => {
       if (!isValid(player)) return;
-      const hand = add(player.getHeadLocation(), add(scale(player.getViewDirection(), 0.8), { x: 0, y: -0.6, z: 0 }));
-      particle(dim, "minecraft:electric_spark_particle", hand);
-      particle(dim, "minecraft:electric_spark_particle", add(hand, { x: (Math.random() - 0.5) * 0.4, y: (Math.random() - 0.5) * 0.4, z: (Math.random() - 0.5) * 0.4 }));
+      const hand = sub(handPos(player), { x: 0, y: 0.25, z: 0 });
+      particle(dim, "aegis:chidori", hand);
+      if (i % 4 === 0) particle(dim, "minecraft:electric_spark_particle", hand);
     }, i);
   }
   system.runTimeout(() => {
     if (!isValid(player)) return;
-    knockback(player, h.x, h.z, 3.6, 0.2);
-    let done = false;
-    for (let t = 1; t <= 14; t++) {
-      system.runTimeout(() => {
-        if (done || !isValid(player)) return;
-        particle(dim, "minecraft:electric_spark_particle", add(player.location, { x: 0, y: 1, z: 0 }));
-        const target = dim.getEntities({ location: player.location, maxDistance: 2.6 }).find((e) => canBeHit(e, player));
-        if (!target) return;
-        done = true;
+    anim(player, "animation.aegis.palm_thrust");
+    lungeStrike(player, {
+      power: 3.6, range: 2.6, ticks: 14,
+      onHit: (target) => {
         hurt(target, 13, player);
         const kb = norm({ x: target.location.x - player.location.x, y: 0, z: target.location.z - player.location.z });
         knockback(target, kb.x, kb.z, 1.5, 0.4);
-        for (let k = 0; k < 10; k++) {
-          particle(dim, "minecraft:electric_spark_particle", add(target.location, { x: Math.random() - 0.5, y: Math.random() * 2, z: Math.random() - 0.5 }));
-        }
+        particle(dim, "aegis:lightning_burst", add(target.location, { x: 0, y: 1, z: 0 }));
         sound(dim, "ambient.weather.lightning.impact", target.location, 0.8, 1.4);
-      }, t);
-    }
-  }, 8);
+      },
+    });
+  }, CHARGE);
 }
 
 // ---------------------------------------------------------------------------
@@ -509,9 +607,13 @@ world.afterEvents.projectileHitBlock.subscribe((ev) => {
 // ---------------------------------------------------------------------------
 // Tick loops
 // ---------------------------------------------------------------------------
-system.runInterval(updateFireballs, 1);
+system.runInterval(() => {
+  updateFireballs();
+  updateFollowers();
+}, 1);
 
 const lastPos = new Map();
+const running = new Set();
 
 system.runInterval(() => {
   const now = system.currentTick;
@@ -531,9 +633,16 @@ system.runInterval(() => {
     const still = prev && Math.abs(prev.x - loc.x) < 0.05 && Math.abs(prev.z - loc.z) < 0.05;
     const focusing = player.isSneaking && still && chakra < max;
     const held = heldTypeId(player);
+
+    // Ninja run: arms swept back while sprinting.
+    const sprinting = !!player.isSprinting;
+    if (sprinting && !running.has(player.id)) {
+      running.add(player.id);
+      anim(player, "animation.aegis.ninja_run", "aegis_run", "!q.is_sprinting");
+    } else if (!sprinting) running.delete(player.id);
     if (focusing) {
       rate *= FOCUS_REGEN_BONUS;
-      particle(player.dimension, "minecraft:soul_particle", add(loc, { x: (Math.random() - 0.5) * 1.2, y: 0.2, z: (Math.random() - 0.5) * 1.2 }));
+      particle(player.dimension, "aegis:chakra_aura", loc);
     }
 
     const next = Math.min(max, chakra + rate * (HUD_INTERVAL / 20));
@@ -572,4 +681,5 @@ world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
 initClans({
   add, sub, scale, norm, dot, particle, sound, knockback, hurt, isValid, canBeHit, isSafeSpot,
   getChakra, setChakra, getMaxChakra, cooldownLeft, startCooldown, castFireball,
+  anim, handPos, spawnFx, removeFx, follow, lungeStrike,
 });

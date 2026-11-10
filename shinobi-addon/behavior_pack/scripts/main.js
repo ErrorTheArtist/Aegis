@@ -20,12 +20,12 @@ const HUD_INTERVAL = 5; // ticks
 
 // cost = chakra, cooldown = ticks
 const JUTSU = {
-  "aegis:fireball_scroll": { name: "Great Fireball", cost: 25, cooldown: 40, cast: castFireball },
-  "aegis:sphere_scroll": { name: "Spiral Chakra Sphere", cost: 30, cooldown: 60, cast: castSphere },
-  "aegis:substitution_scroll": { name: "Substitution", cost: 20, cooldown: 100, cast: castSubstitution },
-  "aegis:clone_scroll": { name: "Chakra Clones", cost: 40, cooldown: 200, cast: castClones },
-  "aegis:flash_scroll": { name: "Flash Step", cost: 10, cooldown: 15, cast: castFlashStep },
-  "aegis:wind_scroll": { name: "Gale Palm", cost: 15, cooldown: 30, cast: castGalePalm },
+  "aegis:fireball_scroll": { name: "Fire Style: Fireball Jutsu", cost: 25, cooldown: 40, cast: castFireball },
+  "aegis:sphere_scroll": { name: "Rasengan", cost: 30, cooldown: 60, cast: castSphere },
+  "aegis:substitution_scroll": { name: "Substitution Jutsu", cost: 20, cooldown: 100, cast: castSubstitution },
+  "aegis:clone_scroll": { name: "Shadow Clone Jutsu", cost: 40, cooldown: 200, cast: castClones },
+  "aegis:flash_scroll": { name: "Body Flicker", cost: 10, cooldown: 15, cast: castFlashStep },
+  "aegis:wind_scroll": { name: "Wind Style: Great Breakthrough", cost: 15, cooldown: 30, cast: castGalePalm },
 };
 
 // ---------------------------------------------------------------------------
@@ -185,7 +185,7 @@ world.afterEvents.itemUse.subscribe(({ source: player, itemStack }) => {
   player.onScreenDisplay.setActionBar(`§6${jutsu.name}!`);
 });
 
-// --- Great Fireball: a scripted fireball that flies forward and bursts. ---
+// --- Fire Style: Fireball Jutsu: a scripted fireball that flies forward and bursts. ---
 const fireballs = [];
 
 function castFireball(player) {
@@ -252,12 +252,12 @@ function explodeFireball(fb) {
   }
 }
 
-// --- Spiral Chakra Sphere: a devastating close-range strike. ---
+// --- Rasengan: a devastating close-range strike. ---
 function castSphere(player) {
   const hits = player.getEntitiesFromViewDirection({ maxDistance: 5 });
   const target = hits.map((h) => h.entity).find((e) => canBeHit(e, player));
   if (!target) {
-    player.onScreenDisplay.setActionBar("§7No target in reach for the Chakra Sphere.");
+    player.onScreenDisplay.setActionBar("§7No target in reach for the Rasengan.");
     return false;
   }
   const dir = player.getViewDirection();
@@ -347,7 +347,7 @@ function isSafeSpot(dim, loc) {
   }
 }
 
-// --- Chakra Clones: summon allies that fight hostile mobs for 30 seconds. ---
+// --- Shadow Clone Jutsu: summon allies that fight hostile mobs for 30 seconds. ---
 function castClones(player) {
   const dim = player.dimension;
   const existing = dim
@@ -366,7 +366,7 @@ function castClones(player) {
     try {
       const clone = dim.spawnEntity("aegis:chakra_clone", loc);
       clone.setDynamicProperty(OWNER_PROP, player.id);
-      clone.nameTag = `${player.name}'s Clone`;
+      clone.nameTag = `${player.name}'s Shadow Clone`;
       particle(dim, "minecraft:large_explosion", add(loc, { x: 0, y: 1, z: 0 }));
     } catch {
       /* ignore */
@@ -399,7 +399,7 @@ world.afterEvents.entityHitEntity.subscribe(({ damagingEntity, hitEntity }) => {
   }
 });
 
-// --- Flash Step: a burst of speed in the direction you're looking. ---
+// --- Body Flicker: a burst of speed in the direction you're looking. ---
 function castFlashStep(player) {
   const dir = player.getViewDirection();
   const h = norm({ x: dir.x, y: 0, z: dir.z });
@@ -415,7 +415,7 @@ function castFlashStep(player) {
   sound(player.dimension, "mob.enderdragon.flap", player.location, 0.8, 1.6);
 }
 
-// --- Gale Palm: blast everything in front of you away. ---
+// --- Wind Style: Great Breakthrough: blast everything in front of you away. ---
 function castGalePalm(player) {
   const dim = player.dimension;
   const dir = player.getViewDirection();
@@ -512,11 +512,11 @@ world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
   player.setDynamicProperty(WELCOME_PROP, true);
   player.sendMessage(
     [
-      "§6=== Shinobi Way ===",
+      "§6=== Naruto: Shinobi Way ===",
       "§7Craft §fBlank Scrolls§7 (paper + stick) and add a catalyst + lapis to learn jutsu.",
       "§7Right-click a jutsu scroll to cast it. Each jutsu costs §bchakra§7.",
       "§7Sneak and stand still to §3focus§7 and regenerate chakra faster.",
-      "§7Wear a §fShinobi Headband§7 for faster regen. Eat §aChakra Pills§7 for a boost.",
+      "§7Wear a §fHidden Leaf Headband§7 for faster regen. Eat §aSoldier Pills§7 for a boost.",
     ].join("\n")
   );
 });

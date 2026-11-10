@@ -9,7 +9,9 @@
     },
     "components": {
       "minecraft:icon": {
-        "texture": "aegis_sphere_scroll"
+        "textures": {
+          "default": "aegis_sphere_scroll"
+        }
       },
       "minecraft:display_name": {
         "value": "Jutsu Scroll: Rasengan"

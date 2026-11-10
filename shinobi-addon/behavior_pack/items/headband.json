@@ -9,7 +9,9 @@
     },
     "components": {
       "minecraft:icon": {
-        "texture": "aegis_headband"
+        "textures": {
+          "default": "aegis_headband"
+        }
       },
       "minecraft:display_name": {
         "value": "Hidden Leaf Headband"

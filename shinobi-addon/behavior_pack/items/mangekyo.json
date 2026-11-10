@@ -9,7 +9,9 @@
     },
     "components": {
       "minecraft:icon": {
-        "texture": "aegis_mangekyo"
+        "textures": {
+          "default": "aegis_mangekyo"
+        }
       },
       "minecraft:display_name": {
         "value": "Mangeky\u014d Sharingan"

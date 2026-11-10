@@ -9,7 +9,9 @@
     },
     "components": {
       "minecraft:icon": {
-        "texture": "aegis_rinnegan"
+        "textures": {
+          "default": "aegis_rinnegan"
+        }
       },
       "minecraft:display_name": {
         "value": "Rinnegan"

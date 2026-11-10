@@ -9,7 +9,9 @@
     },
     "components": {
       "minecraft:icon": {
-        "texture": "aegis_flame_bullet"
+        "textures": {
+          "default": "aegis_flame_bullet"
+        }
       },
       "minecraft:display_name": {
         "value": "Flame Bullet Scroll (Sarutobi)"

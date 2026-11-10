@@ -9,7 +9,9 @@
     },
     "components": {
       "minecraft:icon": {
-        "texture": "aegis_sealing_chains"
+        "textures": {
+          "default": "aegis_sealing_chains"
+        }
       },
       "minecraft:display_name": {
         "value": "Sealing Chains Scroll (Uzumaki)"

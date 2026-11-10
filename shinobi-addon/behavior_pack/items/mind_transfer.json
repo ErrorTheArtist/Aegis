@@ -9,7 +9,9 @@
     },
     "components": {
       "minecraft:icon": {
-        "texture": "aegis_mind_transfer"
+        "textures": {
+          "default": "aegis_mind_transfer"
+        }
       },
       "minecraft:display_name": {
         "value": "Mind Transfer Scroll (Yamanaka)"

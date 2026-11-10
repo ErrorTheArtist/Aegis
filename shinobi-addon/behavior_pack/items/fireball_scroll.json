@@ -9,7 +9,9 @@
     },
     "components": {
       "minecraft:icon": {
-        "texture": "aegis_fireball_scroll"
+        "textures": {
+          "default": "aegis_fireball_scroll"
+        }
       },
       "minecraft:display_name": {
         "value": "Jutsu Scroll: Fire Style: Fireball Jutsu"

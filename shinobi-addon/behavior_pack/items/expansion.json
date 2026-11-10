@@ -9,7 +9,9 @@
     },
     "components": {
       "minecraft:icon": {
-        "texture": "aegis_expansion"
+        "textures": {
+          "default": "aegis_expansion"
+        }
       },
       "minecraft:display_name": {
         "value": "Expansion Scroll (Akimichi)"

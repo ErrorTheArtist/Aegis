@@ -9,7 +9,9 @@
     },
     "components": {
       "minecraft:icon": {
-        "texture": "aegis_sharingan"
+        "textures": {
+          "default": "aegis_sharingan"
+        }
       },
       "minecraft:display_name": {
         "value": "Sharingan"

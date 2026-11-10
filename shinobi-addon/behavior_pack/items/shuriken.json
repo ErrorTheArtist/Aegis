@@ -9,7 +9,9 @@
     },
     "components": {
       "minecraft:icon": {
-        "texture": "aegis_shuriken"
+        "textures": {
+          "default": "aegis_shuriken"
+        }
       },
       "minecraft:display_name": {
         "value": "Shuriken"

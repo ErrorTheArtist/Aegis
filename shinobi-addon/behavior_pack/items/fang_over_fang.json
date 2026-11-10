@@ -9,7 +9,9 @@
     },
     "components": {
       "minecraft:icon": {
-        "texture": "aegis_fang_over_fang"
+        "textures": {
+          "default": "aegis_fang_over_fang"
+        }
       },
       "minecraft:display_name": {
         "value": "Fang Over Fang Scroll (Inuzuka)"

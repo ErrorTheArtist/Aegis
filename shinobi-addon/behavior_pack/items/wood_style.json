@@ -9,7 +9,9 @@
     },
     "components": {
       "minecraft:icon": {
-        "texture": "aegis_wood_style"
+        "textures": {
+          "default": "aegis_wood_style"
+        }
       },
       "minecraft:display_name": {
         "value": "Wood Style Scroll (Senju)"

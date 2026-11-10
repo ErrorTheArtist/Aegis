@@ -9,7 +9,9 @@
     },
     "components": {
       "minecraft:icon": {
-        "texture": "aegis_kunai"
+        "textures": {
+          "default": "aegis_kunai"
+        }
       },
       "minecraft:display_name": {
         "value": "Kunai"

@@ -9,7 +9,9 @@
     },
     "components": {
       "minecraft:icon": {
-        "texture": "aegis_substitution_scroll"
+        "textures": {
+          "default": "aegis_substitution_scroll"
+        }
       },
       "minecraft:display_name": {
         "value": "Jutsu Scroll: Substitution Jutsu"

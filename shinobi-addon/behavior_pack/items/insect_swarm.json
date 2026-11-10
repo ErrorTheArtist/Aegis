@@ -9,7 +9,9 @@
     },
     "components": {
       "minecraft:icon": {
-        "texture": "aegis_insect_swarm"
+        "textures": {
+          "default": "aegis_insect_swarm"
+        }
       },
       "minecraft:display_name": {
         "value": "Insect Swarm Scroll (Aburame)"

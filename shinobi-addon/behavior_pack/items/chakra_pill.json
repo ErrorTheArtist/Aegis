@@ -9,7 +9,9 @@
     },
     "components": {
       "minecraft:icon": {
-        "texture": "aegis_chakra_pill"
+        "textures": {
+          "default": "aegis_chakra_pill"
+        }
       },
       "minecraft:display_name": {
         "value": "Soldier Pill"

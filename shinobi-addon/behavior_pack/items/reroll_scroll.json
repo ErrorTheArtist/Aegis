@@ -9,7 +9,9 @@
     },
     "components": {
       "minecraft:icon": {
-        "texture": "aegis_reroll_scroll"
+        "textures": {
+          "default": "aegis_reroll_scroll"
+        }
       },
       "minecraft:display_name": {
         "value": "Bloodline Reroll Scroll"

@@ -9,7 +9,9 @@
     },
     "components": {
       "minecraft:icon": {
-        "texture": "aegis_shadow_possession"
+        "textures": {
+          "default": "aegis_shadow_possession"
+        }
       },
       "minecraft:display_name": {
         "value": "Shadow Possession Scroll (Nara)"

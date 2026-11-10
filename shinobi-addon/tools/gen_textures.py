@@ -162,20 +162,28 @@ for name, color in SCROLL_COLORS.items():
     pal = {"P": PAPER, "p": PAPER_D, "R": ROD, "r": ROD_D, "C": color}
     save(draw(canvas(), scroll, pal), ITEMS / f"{name}.png")
 
-# --- Headband armor layer (64x32 armor texture) ------------------------------
-armor = canvas(64, 32)
-# Helmet geometry uses the same UV as the head (0,0 .. 32,16). Paint a band on the
-# side faces (rows 10-12 of the 8px-tall side faces => y = 8+2 .. 8+4).
-for x in range(0, 32):
-    for y in range(10, 13):
-        armor.putpixel((x, y), BLUE if y < 12 else BLUE_D)
-# Metal plate on the front face (front face spans x=8..15, y=8..15).
-for x in range(9, 15):
-    for y in range(9, 14):
-        armor.putpixel((x, y), STEEL)
-for x, y in [(10, 11), (11, 12), (12, 12), (13, 11), (11, 10), (12, 10)]:
-    armor.putpixel((x, y), DARK)
-save(armor, RP / "textures" / "models" / "armor" / "aegis_headband.png")
+# --- Headband model texture (32x16, matches geometry.aegis.headband) -------
+hb = canvas(32, 16)
+# cloth band: box UV for an 8x2x8 cube at (0,0) -> 32x10 region
+for x in range(32):
+    for y in range(10):
+        hb.putpixel((x, y), BLUE if (x + y) % 5 else BLUE_D)
+for x in range(32):
+    hb.putpixel((x, 9), BLUE_D)  # lower edge shading on the side faces
+# metal plate: box UV for a 4x3x1 cube at (0,10) -> 10x4 region; front face = (1,11) 4x3
+for x in range(10):
+    for y in range(10, 14):
+        hb.putpixel((x, y), STEEL)
+for x in range(1, 5):
+    hb.putpixel((x, 11), LIGHT)  # top highlight
+for x, y in [(2, 12), (3, 12), (3, 13), (2, 13)]:
+    hb.putpixel((x, y), DARK)  # engraved village symbol
+hb.putpixel((4, 12), DARK)
+# tails: box UV for a 1x4x1 cube at (12,10) -> 4x5 region
+for x in range(12, 16):
+    for y in range(10, 15):
+        hb.putpixel((x, y), BLUE_D if y == 14 else BLUE)
+save(hb, RP / "textures" / "models" / "armor" / "aegis_headband.png")
 
 # --- Chakra clone skin (64x64, standard humanoid layout) ---------------------
 SKIN, HAIR = (225, 180, 140, 255), (235, 190, 60, 255)

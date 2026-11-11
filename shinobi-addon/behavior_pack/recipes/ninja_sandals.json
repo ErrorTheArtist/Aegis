@@ -1,0 +1,30 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "aegis:ninja_sandals"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "S S",
+      "B B"
+    ],
+    "key": {
+      "S": {
+        "item": "minecraft:string"
+      },
+      "B": {
+        "item": "minecraft:blue_wool"
+      }
+    },
+    "result": {
+      "item": "aegis:ninja_sandals",
+      "count": 1
+    },
+    "unlock": {
+      "context": "AlwaysUnlocked"
+    }
+  }
+}

@@ -101,9 +101,10 @@ let api; // helpers from main.js
 
 // Clan discounts on the normal jutsu scrolls (multiplier on chakra cost).
 const JUTSU_DISCOUNTS = {
-  uchiha: { "aegis:fireball_scroll": 0.6, "aegis:chidori_scroll": 0.7 },
-  uzumaki: { "aegis:sphere_scroll": 0.7, "aegis:clone_scroll": 0.6 },
-  sarutobi: { "aegis:fireball_scroll": 0.7 },
+  uchiha: { "aegis:fireball_scroll": 0.6, "aegis:chidori_scroll": 0.7, "aegis:phoenix_scroll": 0.7, "aegis:chidori_current_scroll": 0.8 },
+  uzumaki: { "aegis:sphere_scroll": 0.7, "aegis:clone_scroll": 0.6, "aegis:rasenshuriken_scroll": 0.75 },
+  sarutobi: { "aegis:fireball_scroll": 0.7, "aegis:phoenix_scroll": 0.7 },
+  senju: { "aegis:mystical_palm_scroll": 0.6, "aegis:water_dragon_scroll": 0.8 },
 };
 
 export function clanJutsuCostMultiplier(player, itemId) {
@@ -677,7 +678,7 @@ const ABILITIES = {
 // Temporary wall of logs in front of the caster, removed after 10s.
 function woodWall(p) {
   const dim = p.dimension;
-  api.anim(p, "animation.aegis.hand_signs");
+  api.anim(p, "animation.aegis.earth_slam");
   const d = p.getViewDirection();
   const fwd = Math.abs(d.x) > Math.abs(d.z) ? { x: Math.sign(d.x), z: 0 } : { x: 0, z: Math.sign(d.z) };
   const side = { x: -fwd.z, z: fwd.x };

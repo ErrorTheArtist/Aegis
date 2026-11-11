@@ -418,6 +418,12 @@ const SHOPS = {
     ["aegis:clone_scroll", 1, "Shadow Clone Jutsu", 16, 15],
     ["aegis:sphere_scroll", 1, "Rasengan", 24, 25],
     ["aegis:chidori_scroll", 1, "Chidori", 24, 25],
+    ["aegis:phoenix_scroll", 1, "Phoenix Sage Fire", 12, 10],
+    ["aegis:earth_wall_scroll", 1, "Earth Wall", 14, 12],
+    ["aegis:water_dragon_scroll", 1, "Water Dragon Bullet", 16, 15],
+    ["aegis:mystical_palm_scroll", 1, "Mystical Palm (healing)", 18, 20],
+    ["aegis:chidori_current_scroll", 1, "Chidori Current", 20, 25],
+    ["aegis:rasenshuriken_scroll", 1, "Rasenshuriken", 40, 50],
     ["aegis:summon_toad_scroll", 1, "Summoning: Toad", 20, 20],
     ["aegis:summon_slug_scroll", 1, "Summoning: Slug", 20, 20],
     ["aegis:summon_snake_scroll", 1, "Summoning: Snake", 20, 20],
@@ -436,6 +442,15 @@ const SHOPS = {
     ["aegis:hiramekarei", 1, "Hiramekarei", 44, 30],
     ["aegis:samehada", 1, "Samehada", 48, 35],
     ["aegis:kubikiribocho", 1, "Kubikiribōchō", 48, 35],
+    ["aegis:flak_jacket", 1, "Leaf Flak Jacket", 8, 1],
+    ["aegis:shinobi_pants", 1, "Shinobi Pants", 6, 1],
+    ["aegis:ninja_sandals", 1, "Ninja Sandals", 3, 1],
+    ["aegis:anbu_mask", 1, "Anbu Mask", 12, 30],
+    ["aegis:anbu_armor", 1, "Anbu Armor", 20, 30],
+    ["aegis:samurai_helmet", 1, "Samurai Kabuto", 18, 40],
+    ["aegis:samurai_armor", 1, "Samurai Dō", 28, 40],
+    ["aegis:samurai_leggings", 1, "Samurai Haidate", 22, 40],
+    ["aegis:samurai_boots", 1, "Samurai Suneate", 14, 40],
     ["__repair", 0, "Repair the item in your hand", 5, 1],
   ],
   ramen: [
@@ -622,6 +637,11 @@ function endExam(player, passed) {
     addPoints(player, EXAMS[ex.rank].bonus);
     applyNameTag(player);
     showTitle(player, `§6${RANKS[ex.rank]}!`, { subtitle: `§7Exam passed — +${EXAMS[ex.rank].bonus} stat points`, stayDuration: 60 });
+    if (ex.rank === 3) {
+      giveItem(player, "aegis:hokage_hat", 1);
+      giveItem(player, "aegis:hokage_robe", 1);
+      player.sendMessage("§fYou received the §6Hokage Hat§f and §6Hokage Robe§f.");
+    }
     api.sound(player.dimension, "ui.toast.challenge_complete", player.location, 1, 1);
     world.sendMessage(`§e${player.name} passed the exam and is now a §6${RANKS[ex.rank]}§e!`);
   } else {

@@ -365,3 +365,10 @@ for k in range(6):
             ems.putpixel((round(7.5 + math.cos(a + off * 0.25) * r), round(7.5 + math.sin(a + off * 0.25) * r)), (10, 10, 10, 255))
 save(ems, ITEMS / "eternal_mangekyo.png")
 print("Eternal Mangekyō texture generated.")
+
+# The detailed 32x32 item icons are drawn by gen_icons.py; re-draw them so this script never
+# leaves the old 16x16 placeholders behind.
+import subprocess
+import sys
+
+subprocess.run([sys.executable, str(ROOT / "tools" / "gen_icons.py")], check=True)

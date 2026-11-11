@@ -1,0 +1,44 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:item": {
+    "description": {
+      "identifier": "aegis:samurai_leggings",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "aegis_samurai_leggings"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "Samurai Haidate"
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:wearable": {
+        "slot": "slot.armor.legs",
+        "protection": 6
+      },
+      "minecraft:durability": {
+        "max_durability": 480
+      },
+      "minecraft:enchantable": {
+        "slot": "armor_legs",
+        "value": 12
+      },
+      "minecraft:repairable": {
+        "repair_items": [
+          {
+            "items": [
+              "minecraft:iron_ingot",
+              "minecraft:leather"
+            ],
+            "repair_amount": 80
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:item": {
+    "description": {
+      "identifier": "aegis:ninja_sandals",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "aegis_ninja_sandals"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "Ninja Sandals"
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:wearable": {
+        "slot": "slot.armor.feet",
+        "protection": 2
+      },
+      "minecraft:durability": {
+        "max_durability": 300
+      },
+      "minecraft:enchantable": {
+        "slot": "armor_feet",
+        "value": 12
+      },
+      "minecraft:repairable": {
+        "repair_items": [
+          {
+            "items": [
+              "minecraft:iron_ingot",
+              "minecraft:leather"
+            ],
+            "repair_amount": 80
+          }
+        ]
+      }
+    }
+  }
+}

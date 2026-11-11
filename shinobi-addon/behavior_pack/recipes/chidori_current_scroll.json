@@ -1,0 +1,29 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:recipe_shapeless": {
+    "description": {
+      "identifier": "aegis:chidori_current_scroll"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "ingredients": [
+      {
+        "item": "aegis:blank_scroll"
+      },
+      {
+        "item": "minecraft:copper_ingot"
+      },
+      {
+        "item": "minecraft:lapis_lazuli"
+      }
+    ],
+    "result": {
+      "item": "aegis:chidori_current_scroll",
+      "count": 1
+    },
+    "unlock": {
+      "context": "AlwaysUnlocked"
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "aegis:rasenshuriken",
+      "materials": {
+        "default": "entity_alphablend"
+      },
+      "textures": {
+        "default": "textures/entity/aegis/rasenshuriken"
+      },
+      "geometry": {
+        "default": "geometry.aegis.rasenshuriken"
+      },
+      "animations": {
+        "spin": "animation.aegis.rasenshuriken_spin"
+      },
+      "scripts": {
+        "animate": [
+          "spin"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.aegis.glow"
+      ]
+    }
+  }
+}

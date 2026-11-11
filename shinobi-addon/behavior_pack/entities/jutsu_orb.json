@@ -25,6 +25,11 @@
         "minecraft:variant": {
           "value": 2
         }
+      },
+      "aegis:water": {
+        "minecraft:variant": {
+          "value": 3
+        }
       }
     },
     "components": {
@@ -96,6 +101,13 @@
         "add": {
           "component_groups": [
             "aegis:bijuudama"
+          ]
+        }
+      },
+      "aegis:as_water": {
+        "add": {
+          "component_groups": [
+            "aegis:water"
           ]
         }
       }

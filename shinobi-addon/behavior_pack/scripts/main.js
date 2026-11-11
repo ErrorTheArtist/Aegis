@@ -10,6 +10,7 @@ import { initNpcs } from "./npcs.js";
 import { initEnemies, spawnAkatsukiNear } from "./enemies.js";
 import { initCompanions, handleSummonUse } from "./companions.js";
 import { initSage, sageMultiplier } from "./sage.js";
+import { initArmor, armorChakraBonus, armorRegenMultiplier, armorDamageMultiplier } from "./armor.js";
 import { initLevels, handleRecordUse, levelChakraBonus, levelRegenMultiplier, ninjutsuMultiplier, cooldownMultiplier, gainJutsuXp, getLevel } from "./levels.js";
 
 // ---------------------------------------------------------------------------
@@ -20,7 +21,7 @@ const WELCOME_PROP = "aegis:welcomed";
 const OWNER_PROP = "aegis:owner";
 
 const BASE_MAX_CHAKRA = 100;
-const getMaxChakra = (player) => clanMaxChakra(player, BASE_MAX_CHAKRA) + bijuuChakraBonus(player) + levelChakraBonus(player);
+const getMaxChakra = (player) => clanMaxChakra(player, BASE_MAX_CHAKRA) + bijuuChakraBonus(player) + levelChakraBonus(player) + armorChakraBonus(player);
 const REGEN_PER_SECOND = 4; // base regen
 const HEADBAND_REGEN_BONUS = 1.5; // multiplier while wearing the headband
 const FOCUS_REGEN_BONUS = 3; // multiplier while sneaking and standing still
@@ -37,6 +38,12 @@ const JUTSU = {
   "aegis:flash_scroll": { name: "Body Flicker", cost: 10, cooldown: 15, cast: castFlashStep },
   "aegis:wind_scroll": { name: "Wind Style: Great Breakthrough", cost: 15, cooldown: 30, cast: castGalePalm },
   "aegis:chidori_scroll": { name: "Chidori", cost: 35, cooldown: 80, cast: castChidori },
+  "aegis:phoenix_scroll": { name: "Fire Style: Phoenix Sage Fire", cost: 30, cooldown: 60, cast: castPhoenix },
+  "aegis:water_dragon_scroll": { name: "Water Style: Water Dragon Bullet", cost: 35, cooldown: 80, cast: castWaterDragon },
+  "aegis:earth_wall_scroll": { name: "Earth Style: Earth Wall", cost: 25, cooldown: 200, cast: castEarthWall },
+  "aegis:chidori_current_scroll": { name: "Lightning Style: Chidori Current", cost: 30, cooldown: 120, cast: castChidoriCurrent },
+  "aegis:rasenshuriken_scroll": { name: "Wind Style: Rasenshuriken", cost: 60, cooldown: 240, cast: castRasenshuriken },
+  "aegis:mystical_palm_scroll": { name: "Mystical Palm Technique", cost: 25, cooldown: 100, cast: castMysticalPalm },
 };
 
 // ---------------------------------------------------------------------------
@@ -91,7 +98,7 @@ function knockback(entity, dirX, dirZ, horizontal, vertical) {
 
 function hurt(target, amount, attacker, cause = "entityAttack") {
   // Ninjutsu stat boosts every scripted technique a player lands.
-  if (attacker?.typeId === "minecraft:player") amount *= ninjutsuMultiplier(attacker) * sageMultiplier(attacker);
+  if (attacker?.typeId === "minecraft:player") amount *= ninjutsuMultiplier(attacker) * sageMultiplier(attacker) * armorDamageMultiplier(attacker);
   try {
     target.applyDamage(amount, { cause, damagingEntity: attacker });
   } catch {
@@ -307,12 +314,12 @@ const FIREBALL = {
 // Launches a projectile from `start` along `dir`. opts override FIREBALL's defaults.
 function launchProjectile(caster, start, dir, opts = {}) {
   const o = { ...FIREBALL, ...opts };
-  const orb = o.noOrb ? undefined : spawnFx(caster.dimension, "aegis:jutsu_orb", o.orbEvent, sub(start, { x: 0, y: o.orbOffset ?? 0.25, z: 0 }));
+  const orb = o.noOrb ? undefined : spawnFx(caster.dimension, o.orbEntity ?? "aegis:jutsu_orb", o.orbEntity ? undefined : o.orbEvent, sub(start, { x: 0, y: o.orbOffset ?? 0.25, z: 0 }));
   projectiles.push({ caster, dim: caster.dimension, pos: start, dir: norm(dir), age: 0, orb, o });
 }
 
 function castFireball(player, dir = player.getViewDirection()) {
-  anim(player, "animation.aegis.hand_signs");
+  anim(player, "animation.aegis.jutsu_breath");
   launchProjectile(player, add(player.getHeadLocation(), scale(dir, 1.5)), dir);
   sound(player.dimension, "mob.ghast.fireball", player.location, 1, 0.8);
 }
@@ -385,7 +392,15 @@ function explodeProjectile(pr) {
     }
     const away = norm(sub(e.location, pr.pos));
     knockback(e, away.x, away.z, o.knock, 0.35 + o.knock * 0.2);
+    for (const [id, ticks, amp] of o.effects ?? []) {
+      try {
+        e.addEffect(id, ticks, { amplifier: amp });
+      } catch {
+        /* ignore */
+      }
+    }
   }
+  o.onExplode?.(pr.pos, pr.dim, pr.caster);
 }
 
 // --- Rasengan: form the spinning orb in your palm, then drive it into the first thing you reach. ---
@@ -615,6 +630,201 @@ function castChidori(player) {
   }, CHARGE);
 }
 
+// --- Fire Style: Phoenix Sage Fire — a fan of small fireballs. ---
+function castPhoenix(player) {
+  anim(player, "animation.aegis.jutsu_breath");
+  system.runTimeout(() => {
+    if (!isValid(player)) return;
+    const d = player.getViewDirection();
+    const start = add(player.getHeadLocation(), scale(d, 1.2));
+    for (let i = 0; i < 5; i++) {
+      const ang = (i - 2) * 0.16 + (Math.random() - 0.5) * 0.06;
+      const c = Math.cos(ang);
+      const sn = Math.sin(ang);
+      const dir = { x: d.x * c - d.z * sn, y: d.y + (Math.random() - 0.5) * 0.08, z: d.x * sn + d.z * c };
+      system.runTimeout(() => {
+        if (!isValid(player)) return;
+        launchProjectile(player, start, dir, { noOrb: true, speed: 1.3, maxAge: 26, damage: 5, radius: 2.2, knock: 0.4, fire: 4, trail: "aegis:fire_trail", burst: "aegis:fire_burst" });
+      }, i * 2);
+    }
+    sound(player.dimension, "mob.blaze.shoot", player.location, 1, 1.2);
+  }, 9);
+}
+
+// --- Water Style: Water Dragon Bullet — a heavy water orb that crashes and slows. ---
+function castWaterDragon(player) {
+  anim(player, "animation.aegis.hand_signs");
+  sound(player.dimension, "bucket.fill_water", player.location, 1, 0.8);
+  for (let t = 0; t < 12; t += 3) system.runTimeout(() => isValid(player) && particle(player.dimension, "aegis:water_splash", add(player.location, { x: 0, y: 0.2, z: 0 })), t);
+  system.runTimeout(() => {
+    if (!isValid(player)) return;
+    anim(player, "animation.aegis.both_palms");
+    const d = player.getViewDirection();
+    launchProjectile(player, add(player.getHeadLocation(), scale(d, 1.8)), d, {
+      orbEvent: "aegis:as_water", speed: 1.0, maxAge: 40, damage: 14, radius: 4.2, knock: 2.6, fire: 0,
+      trail: "aegis:water_splash", burst: "aegis:water_splash", hitRadius: 2, sound: "random.splash", effects: [["slowness", 60, 2]],
+    });
+    sound(player.dimension, "random.splash", player.location, 1, 0.6);
+  }, 14);
+}
+
+// --- Earth Style: Earth Wall — a mud-brick wall erupts in front of you for 15s. ---
+function castEarthWall(player) {
+  const dim = player.dimension;
+  const d = player.getViewDirection();
+  const fwd = Math.abs(d.x) > Math.abs(d.z) ? { x: Math.sign(d.x), z: 0 } : { x: 0, z: Math.sign(d.z) };
+  const side = { x: -fwd.z, z: fwd.x };
+  const base = { x: Math.floor(player.location.x) + fwd.x * 3, y: Math.floor(player.location.y), z: Math.floor(player.location.z) + fwd.z * 3 };
+  const spots = [];
+  for (let s2 = -3; s2 <= 3; s2++) for (let y = 0; y < 4; y++) spots.push({ x: base.x + side.x * s2, y: base.y + y, z: base.z + side.z * s2 });
+  if (!spots.some((l) => dim.getBlock(l)?.isAir)) return false;
+  anim(player, "animation.aegis.earth_slam");
+  sound(dim, "dig.stone", player.location, 1, 0.5);
+  const placed = [];
+  system.runTimeout(() => {
+    for (const l of spots) {
+      system.runTimeout(() => {
+        try {
+          const b = dim.getBlock(l);
+          if (b?.isAir) {
+            b.setType("minecraft:mud_bricks");
+            placed.push(l);
+          }
+        } catch {
+          /* ignore */
+        }
+      }, (l.y - base.y) * 2);
+    }
+    particle(dim, "aegis:dust", { x: base.x + 0.5, y: base.y, z: base.z + 0.5 });
+    particle(dim, "minecraft:huge_explosion_emitter", { x: base.x + 0.5, y: base.y, z: base.z + 0.5 });
+    sound(dim, "random.explode", base, 0.6, 0.5);
+    for (const e of dim.getEntities({ location: { x: base.x + 0.5, y: base.y, z: base.z + 0.5 }, maxDistance: 4 })) {
+      if (!canBeHit(e, player)) continue;
+      hurt(e, 6, player);
+      knockback(e, fwd.x, fwd.z, 1.2, 0.9);
+    }
+  }, 7);
+  system.runTimeout(() => {
+    for (const l of placed) {
+      try {
+        const b = dim.getBlock(l);
+        if (b?.typeId === "minecraft:mud_bricks") b.setType("minecraft:air");
+      } catch {
+        /* ignore */
+      }
+    }
+    particle(dim, "aegis:dust", { x: base.x + 0.5, y: base.y, z: base.z + 0.5 });
+  }, 300);
+}
+
+// --- Lightning Style: Chidori Current — lightning bursts out of your whole body. ---
+function castChidoriCurrent(player) {
+  const dim = player.dimension;
+  anim(player, "animation.aegis.lightning_burst");
+  sound(dim, "mob.bee.loop", player.location, 1, 2);
+  system.runTimeout(() => {
+    if (!isValid(player)) return;
+    sound(dim, "ambient.weather.thunder", player.location, 0.6, 1.8);
+    for (let k = 1; k <= 5; k++) {
+      system.runTimeout(() => {
+        if (!isValid(player)) return;
+        for (let i = 0; i < 14; i++) {
+          const a = (i / 14) * Math.PI * 2;
+          particle(dim, "aegis:chidori", add(player.location, { x: Math.cos(a) * k, y: 0.6 + Math.random(), z: Math.sin(a) * k }));
+        }
+      }, k);
+    }
+    particle(dim, "aegis:lightning_burst", add(player.location, { x: 0, y: 1, z: 0 }));
+    for (const e of dim.getEntities({ location: player.location, maxDistance: 5.5 })) {
+      if (!canBeHit(e, player)) continue;
+      hurt(e, 8, player, "lightning");
+      try {
+        e.addEffect("slowness", 50, { amplifier: 4 });
+        e.addEffect("weakness", 80, { amplifier: 1 });
+      } catch {
+        /* ignore */
+      }
+      particle(dim, "aegis:chidori", add(e.location, { x: 0, y: 1, z: 0 }));
+    }
+  }, 6);
+}
+
+// --- Wind Style: Rasenshuriken — form the shuriken overhead, hurl it, and it erupts into a storm of wind blades. ---
+function castRasenshuriken(player) {
+  const dim = player.dimension;
+  const CHARGE = 21;
+  anim(player, "animation.aegis.throw_overhead");
+  const above = () => add(player.getHeadLocation(), { x: 0, y: 1.3, z: 0 });
+  const model = spawnFx(dim, "aegis:rasenshuriken", undefined, above());
+  follow(model, () => (isValid(player) ? sub(above(), { x: 0, y: 0.4, z: 0 }) : undefined), CHARGE);
+  sound(dim, "mob.breeze.idle_ground", player.location, 1, 1.4);
+  for (let t = 0; t < CHARGE; t += 3) {
+    system.runTimeout(() => {
+      if (!isValid(player)) return;
+      particle(dim, "aegis:wind_gust", above());
+      particle(dim, "aegis:rasengan", above());
+    }, t);
+  }
+  system.runTimeout(() => {
+    if (!isValid(player)) return;
+    removeFx(model);
+    const d = player.getViewDirection();
+    launchProjectile(player, add(above(), scale(d, 1)), d, {
+      orbEntity: "aegis:rasenshuriken", orbOffset: 0.4, speed: 1.15, maxAge: 40, damage: 22, radius: 6, knock: 1.6, fire: 0,
+      trail: "aegis:wind_gust", burst: "aegis:chakra_burst", hitRadius: 2.2, sound: "random.explode",
+      onExplode: (pos, pdim, caster) => {
+        // the sphere of micro wind blades lingers and keeps cutting
+        for (let k = 0; k < 5; k++) {
+          system.runTimeout(() => {
+            for (let i = 0; i < 18; i++) {
+              const a = Math.random() * Math.PI * 2;
+              const r = Math.random() * 5;
+              particle(pdim, "aegis:slash", add(pos, { x: Math.cos(a) * r, y: (Math.random() - 0.3) * 4, z: Math.sin(a) * r }), [0.85, 0.95, 1]);
+            }
+            particle(pdim, "aegis:wind_gust", pos);
+            if (!isValid(caster)) return;
+            for (const e of pdim.getEntities({ location: pos, maxDistance: 5.5 })) if (canBeHit(e, caster)) hurt(e, 4, caster, "magic");
+          }, k * 5);
+        }
+        sound(pdim, "mob.breeze.wind_burst", pos, 2, 0.6);
+      },
+    });
+    sound(dim, "mob.breeze.shoot", player.location, 1, 0.8);
+  }, CHARGE);
+}
+
+// --- Medical: Mystical Palm Technique — heal the ally you're looking at (or yourself). ---
+function castMysticalPalm(player) {
+  let target = player;
+  try {
+    const hit = player.getEntitiesFromViewDirection({ maxDistance: 6 }).map((h) => h.entity)
+      .find((e) => e.typeId === "minecraft:player" || e.typeId === "aegis:genin" || e.getDynamicProperty?.(OWNER_PROP) === player.id);
+    if (hit) target = hit;
+  } catch {
+    /* heal self */
+  }
+  anim(player, "animation.aegis.heal_palms");
+  sound(player.dimension, "beacon.ambient", player.location, 1, 1.6);
+  for (let t = 0; t <= 20; t += 4) {
+    system.runTimeout(() => {
+      if (!isValid(target)) return;
+      particle(target.dimension, "aegis:heal", target.location);
+      try {
+        const h = target.getComponent("minecraft:health");
+        h.setCurrentValue(Math.min(h.effectiveMax, h.currentValue + 2));
+      } catch {
+        /* ignore */
+      }
+    }, t);
+  }
+  try {
+    target.addEffect("regeneration", 100, { amplifier: 1 });
+  } catch {
+    /* ignore */
+  }
+  if (target !== player) player.onScreenDisplay.setActionBar(`§aHealing ${target.nameTag || target.name || "your ally"}…`);
+}
+
 // ---------------------------------------------------------------------------
 // Chakra pill
 // ---------------------------------------------------------------------------
@@ -662,7 +872,7 @@ system.runInterval(() => {
     const max = getMaxChakra(player);
 
     // Regeneration
-    let rate = isTransformed(player) && !isBijuuMastered(player) ? 0 : REGEN_PER_SECOND * clanRegenMultiplier(player) * bijuuRegenMultiplier(player) * levelRegenMultiplier(player);
+    let rate = isTransformed(player) && !isBijuuMastered(player) ? 0 : REGEN_PER_SECOND * clanRegenMultiplier(player) * bijuuRegenMultiplier(player) * levelRegenMultiplier(player) * armorRegenMultiplier(player);
     if (wearingHeadband(player)) rate *= HEADBAND_REGEN_BONUS;
 
     const prev = lastPos.get(player.id);
@@ -741,3 +951,4 @@ initNpcs({ ...npcApi, spawnAkatsukiNear: (p, msg) => spawnAkatsukiNear(p, msg) }
 initEnemies(npcApi);
 initCompanions(npcApi);
 initSage({ ...npcApi, getMaxChakra });
+initArmor(npcApi);

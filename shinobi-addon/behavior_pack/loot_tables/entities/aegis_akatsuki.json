@@ -66,6 +66,25 @@
           "weight": 4
         }
       ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "item",
+          "name": "aegis:akatsuki_cloak",
+          "weight": 1
+        },
+        {
+          "type": "item",
+          "name": "aegis:akatsuki_hat",
+          "weight": 1
+        },
+        {
+          "type": "empty",
+          "weight": 2
+        }
+      ]
     }
   ]
 }

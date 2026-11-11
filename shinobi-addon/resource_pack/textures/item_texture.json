@@ -151,6 +151,63 @@
     },
     "aegis_eternal_mangekyo": {
       "textures": "textures/items/aegis/eternal_mangekyo"
+    },
+    "aegis_phoenix_scroll": {
+      "textures": "textures/items/aegis/phoenix_scroll"
+    },
+    "aegis_water_dragon_scroll": {
+      "textures": "textures/items/aegis/water_dragon_scroll"
+    },
+    "aegis_earth_wall_scroll": {
+      "textures": "textures/items/aegis/earth_wall_scroll"
+    },
+    "aegis_chidori_current_scroll": {
+      "textures": "textures/items/aegis/chidori_current_scroll"
+    },
+    "aegis_rasenshuriken_scroll": {
+      "textures": "textures/items/aegis/rasenshuriken_scroll"
+    },
+    "aegis_mystical_palm_scroll": {
+      "textures": "textures/items/aegis/mystical_palm_scroll"
+    },
+    "aegis_flak_jacket": {
+      "textures": "textures/items/aegis/flak_jacket"
+    },
+    "aegis_shinobi_pants": {
+      "textures": "textures/items/aegis/shinobi_pants"
+    },
+    "aegis_ninja_sandals": {
+      "textures": "textures/items/aegis/ninja_sandals"
+    },
+    "aegis_anbu_mask": {
+      "textures": "textures/items/aegis/anbu_mask"
+    },
+    "aegis_anbu_armor": {
+      "textures": "textures/items/aegis/anbu_armor"
+    },
+    "aegis_akatsuki_cloak": {
+      "textures": "textures/items/aegis/akatsuki_cloak"
+    },
+    "aegis_akatsuki_hat": {
+      "textures": "textures/items/aegis/akatsuki_hat"
+    },
+    "aegis_samurai_helmet": {
+      "textures": "textures/items/aegis/samurai_helmet"
+    },
+    "aegis_samurai_armor": {
+      "textures": "textures/items/aegis/samurai_armor"
+    },
+    "aegis_samurai_leggings": {
+      "textures": "textures/items/aegis/samurai_leggings"
+    },
+    "aegis_samurai_boots": {
+      "textures": "textures/items/aegis/samurai_boots"
+    },
+    "aegis_hokage_hat": {
+      "textures": "textures/items/aegis/hokage_hat"
+    },
+    "aegis_hokage_robe": {
+      "textures": "textures/items/aegis/hokage_robe"
     }
   }
 }

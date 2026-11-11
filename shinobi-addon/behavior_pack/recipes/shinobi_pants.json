@@ -1,0 +1,28 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "aegis:shinobi_pants"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "BBB",
+      "B B",
+      "B B"
+    ],
+    "key": {
+      "B": {
+        "item": "minecraft:blue_wool"
+      }
+    },
+    "result": {
+      "item": "aegis:shinobi_pants",
+      "count": 1
+    },
+    "unlock": {
+      "context": "AlwaysUnlocked"
+    }
+  }
+}

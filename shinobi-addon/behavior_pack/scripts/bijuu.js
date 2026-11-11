@@ -6,12 +6,18 @@
 //   /scriptevent aegis:bijuu seal kurama     — become that beast's Jinchūriki directly
 //   /scriptevent aegis:bijuu release         — release your sealed beast
 //   /scriptevent aegis:bijuu info            — show your sealed beast
+//   /scriptevent aegis:bijuu master          — master your sealed beast instantly (testing)
+//
+// Uzumaki with 100 Chakra + 100 Vitality can seal a weakened beast alive (into themselves or another
+// player) and, once they carry a beast, open the seal and master it through an inner trial.
 //
 // Jinchūriki get a wearable Tailed Beast Cloak (chest slot). Wearing it = Tailed Beast Mode.
 // Hold sneak for 1.5s while transformed to charge and fire a Tailed Beast Bomb.
 
 import { world, system, ItemStack, ItemLockMode } from "@minecraft/server";
+import { ActionFormData, MessageFormData } from "@minecraft/server-ui";
 import { showTitle } from "./hud.js";
+import { getStat, gainXp } from "./levels.js";
 
 const BIJUU_PROP = "aegis:bijuu";
 const OLD_CLOAK_ITEM = "aegis:bijuu_cloak";
@@ -75,6 +81,15 @@ export function bijuuChakraBonus(player) {
 }
 
 // No natural chakra regen while in Tailed Beast Mode (and sneaking charges a bomb, not focus).
+const MASTERED_PROP = "aegis:bijuu_mastered";
+export function isBijuuMastered(player) {
+  try {
+    return !!sealedBeastId(player) && player.getDynamicProperty(MASTERED_PROP) === true;
+  } catch {
+    return false;
+  }
+}
+
 export function isTransformed(player) {
   return cloakActive.has(player.id);
 }
@@ -397,6 +412,7 @@ function updateBoss(boss, now) {
   }
   // Chakra aura + natural toughness
   api.particle(boss.dimension, "aegis:beast_aura", boss.location, b.color);
+  if (beingSealed.has(boss.id)) return; // bound by sealing chains
   if (!boss.getEffect?.("resistance")) eff(boss, "resistance", 999999, st.enraged ? 1 : 0, false);
 
   // Phase 2 at half health
@@ -572,11 +588,12 @@ function unequipCloak(player) {
   }
 }
 
-function sealInto(player, id) {
+export function sealInto(player, id, sealer) {
   const b = BEASTS[id];
   endTransformation(player);
   removeCloak(player);
   player.setDynamicProperty(BIJUU_PROP, id);
+  player.setDynamicProperty(MASTERED_PROP, false);
   giveCloak(player);
   showTitle(player, "§6Jinchūriki", { subtitle: `§7${b.text}${b.name}§7 is sealed within you`, fadeInDuration: 5, stayDuration: 70, fadeOutDuration: 20 });
   api.sound(player.dimension, "ui.toast.challenge_complete", player.location, 1, 0.8);
@@ -584,13 +601,15 @@ function sealInto(player, id) {
   player.sendMessage(
     `§6You are now the Jinchūriki of ${fullName(b)}§6!\n§7+${bijuuChakraBonus(player)} max chakra, faster regen.\n§7Wear the §fTailed Beast Cloak§7 (chest slot) to enter §6Tailed Beast Mode§7. While transformed, §fhold sneak§7 to charge a §5Tailed Beast Bomb§7.`
   );
-  world.sendMessage(`§e${player.name} sealed ${fullName(b)}§e and became its Jinchūriki!`);
+  if (sealer && sealer.id !== player.id) world.sendMessage(`§6${sealer.name}§e sealed ${fullName(b)}§e into §6${player.name}§e!`);
+  else world.sendMessage(`§e${player.name} sealed ${fullName(b)}§e and became its Jinchūriki!`);
 }
 
 function release(player) {
   endTransformation(player);
   removeCloak(player);
   player.setDynamicProperty(BIJUU_PROP, undefined);
+  player.setDynamicProperty(MASTERED_PROP, false);
 }
 
 function startTransformation(player, b) {
@@ -621,8 +640,8 @@ function updateBombCharge(player, b) {
   const front = () => api.add(player.getHeadLocation(), api.add(api.scale(player.getViewDirection(), 2.5), { x: 0, y: 0.6, z: 0 }));
   if (!ch) {
     const left = api.cooldownLeft(player, "bijuudama");
-    if (left > 0 || api.getChakra(player) < 80) {
-      player.onScreenDisplay.setActionBar(left > 0 ? `§7Tailed Beast Bomb ready in §f${(left / 20).toFixed(1)}s` : "§cNot enough chakra for a Tailed Beast Bomb (80)");
+    if (left > 0 || api.getChakra(player) < (isBijuuMastered(player) ? 40 : 80)) {
+      player.onScreenDisplay.setActionBar(left > 0 ? `§7Tailed Beast Bomb ready in §f${(left / 20).toFixed(1)}s` : `§cNot enough chakra for a Tailed Beast Bomb (${isBijuuMastered(player) ? 40 : 80})`);
       bombCharge.set(player.id, { done: true });
       return;
     }
@@ -639,11 +658,12 @@ function updateBombCharge(player, b) {
 
   ch.done = true;
   api.removeFx(ch.orb);
-  api.setChakra(player, api.getChakra(player) - 80);
-  api.startCooldown(player, "bijuudama", 400);
+  const mastered = isBijuuMastered(player);
+  api.setChakra(player, api.getChakra(player) - (mastered ? 40 : 80));
+  api.startCooldown(player, "bijuudama", mastered ? 200 : 400);
   api.anim(player, "animation.aegis.both_palms");
   api.launchProjectile(player, front(), player.getViewDirection(), {
-    speed: 1.5, maxAge: 50, damage: 32, radius: 6, knock: 2.8, fire: 0,
+    speed: 1.5, maxAge: 50, damage: mastered ? 45 : 32, radius: mastered ? 7 : 6, knock: 2.8, fire: 0,
     orbEvent: "aegis:as_bijuudama", trail: "aegis:beast_aura", burst: "aegis:beast_burst", color: b.color,
     hitRadius: 2, sound: "random.explode",
   });
@@ -676,9 +696,10 @@ function updateCloak(player) {
     }
     startTransformation(player, b);
   }
-  let drain = 3; // per second
+  const mastered = isBijuuMastered(player);
+  let drain = mastered ? 0 : 3; // per second — a mastered beast lends its chakra freely
   try {
-    if (player.getDynamicProperty("aegis:clan") === "uzumaki") drain = 1.5; // Uzumaki chakra
+    if (!mastered && player.getDynamicProperty("aegis:clan") === "uzumaki") drain = 1.5; // Uzumaki chakra
   } catch {
     /* ignore */
   }
@@ -691,12 +712,14 @@ function updateCloak(player) {
     return;
   }
   // short effects, refreshed while transformed so they end on their own
-  eff(player, "strength", 30, 1, false);
+  eff(player, "strength", 30, mastered ? 2 : 1, false);
   eff(player, "speed", 30, 1, false);
-  eff(player, "resistance", 30, 1, false);
+  eff(player, "resistance", 30, mastered ? 2 : 1, false);
   eff(player, "jump_boost", 30, 1, false);
+  if (mastered) eff(player, "regeneration", 30, 0, false);
   for (const [effect, amp] of CLOAK_PERKS[id] ?? []) eff(player, effect, 30, amp, false);
   api.particle(player.dimension, "aegis:beast_aura", player.location, b.color);
+  if (mastered) api.particle(player.dimension, "aegis:beast_aura", player.location, [1, 0.85, 0.3]);
   updateBombCharge(player, b);
 }
 
@@ -736,6 +759,11 @@ export function initBijuu(helpers) {
     }
   }, 10);
 
+  system.runInterval(tickTrials, 20);
+  world.afterEvents.entityDie.subscribe(({ deadEntity }) => {
+    if (deadEntity.typeId === "minecraft:player" && trials.has(deadEntity.id)) endTrial(deadEntity.id, "§cYou fell. The seal closes again…");
+  });
+
   // Tailed Beast Mode upkeep every 5 ticks
   system.runInterval(() => {
     for (const player of world.getAllPlayers()) {
@@ -752,6 +780,13 @@ export function initBijuu(helpers) {
     const id = beastIdOf(deadEntity);
     if (!id) return;
     bossState.delete(deadEntity.id);
+    for (const [pid, tr] of trials) {
+      if (tr.entityId !== deadEntity.id) continue;
+      trials.delete(pid);
+      const owner = world.getAllPlayers().find((p) => p.id === pid);
+      if (owner) masterBeast(owner);
+      return;
+    }
     const b = BEASTS[id];
     try {
       api.particle(deadEntity.dimension, "aegis:beast_burst", api.add(deadEntity.location, { x: 0, y: 2, z: 0 }), b.color);
@@ -785,14 +820,229 @@ export function initBijuu(helpers) {
     if (cmd === "summon" && BEASTS[arg]) summonBeast(player, arg);
     else if (cmd === "summon") summonBeast(player, rollBeastId());
     else if (cmd === "seal" && BEASTS[arg]) sealInto(player, arg);
+    else if (cmd === "master") {
+      if (sealedBeastId(player)) masterBeast(player);
+      else player.sendMessage("§7Seal a beast first.");
+    }
     else if (cmd === "release") {
       release(player);
       player.sendMessage("§7Your Tailed Beast has been released.");
     } else if (cmd === "info") {
       const b = BEASTS[sealedBeastId(player)];
-      player.sendMessage(b ? `§7Sealed within you: ${fullName(b)}` : "§7No Tailed Beast is sealed within you.");
+      player.sendMessage(b ? `§7Sealed within you: ${fullName(b)}${isBijuuMastered(player) ? " §6(mastered)" : ""}` : "§7No Tailed Beast is sealed within you.");
     } else {
-      player.sendMessage(`§7Usage: /scriptevent aegis:bijuu <summon [beast] | seal <beast> | release | info>\n§7Beasts: ${Object.keys(BEASTS).join(", ")}`);
+      player.sendMessage(`§7Usage: /scriptevent aegis:bijuu <summon [beast] | seal <beast> | master | release | info>\n§7Beasts: ${Object.keys(BEASTS).join(", ")}`);
     }
   });
+}
+
+// ---------------------------------------------------------------------------
+// Uzumaki Sealing Jutsu (Four Symbols Seal) — seal a weakened beast alive
+// ---------------------------------------------------------------------------
+const SEAL_COST = 150;
+const SEAL_TICKS = 60;
+const beingSealed = new Set(); // beast entity ids
+const GOLD = [1, 0.85, 0.3];
+
+const isUzumaki = (p) => {
+  try {
+    return p.getDynamicProperty("aegis:clan") === "uzumaki";
+  } catch {
+    return false;
+  }
+};
+
+function beastInSight(player) {
+  try {
+    const hit = player.getEntitiesFromViewDirection({ maxDistance: 32 }).map((h) => h.entity).find((e) => beastIdOf(e));
+    if (hit) return hit;
+  } catch {
+    /* ignore */
+  }
+  return player.dimension.getEntities({ location: player.location, maxDistance: 16, families: ["tailed_beast"] }).find((e) => beastIdOf(e));
+}
+
+// Entry point (Uzumaki: sneak + use the Sealing Chains).
+export async function uzumakiSealMenu(player) {
+  if (!isUzumaki(player)) return player.sendMessage("§cOnly the Uzumaki know this sealing jutsu.");
+  const beast = beastInSight(player);
+  if (!beast) return openSealMenu(player);
+
+  const chakraStat = getStat(player, "chakra");
+  const vitStat = getStat(player, "vitality");
+  if (chakraStat < 100 || vitStat < 100) {
+    return player.sendMessage(`§cThe Four Symbols Seal needs §f100 Chakra§c and §f100 Vitality§c stats §7(you: ${chakraStat} / ${vitStat})`);
+  }
+  if (beingSealed.has(beast.id)) return;
+  let hp = 1;
+  try {
+    const h = beast.getComponent("minecraft:health");
+    hp = h.currentValue / h.effectiveMax;
+  } catch {
+    /* ignore */
+  }
+  const b = BEASTS[beastIdOf(beast)];
+  if (hp > 0.5) return player.sendMessage(`§c${b.name} is too strong to seal — weaken it below half health first §7(${Math.round(hp * 100)}%)`);
+  const left = api.cooldownLeft(player, "uzumaki_seal");
+  if (left > 0) return player.sendMessage(`§7The sealing jutsu is ready in ${(left / 20).toFixed(0)}s.`);
+  if (api.getChakra(player) < SEAL_COST) return player.sendMessage(`§cNot enough chakra (${SEAL_COST} needed).`);
+
+  const others = player.dimension.getPlayers({ location: player.location, maxDistance: 16 }).filter((p) => p.id !== player.id);
+  const form = new ActionFormData()
+    .title("§6Four Symbols Seal")
+    .body(`§7Seal ${fullName(b)}§7 alive. Who becomes its Jinchūriki?\n§8(Replaces any beast they already carry.)`)
+    .button("§6Seal it into myself");
+  for (const o of others) form.button(`§eSeal it into ${o.name}`);
+  const r = await form.show(player);
+  if (r.canceled || r.selection === undefined) return;
+  const target = r.selection === 0 ? player : others[r.selection - 1];
+  if (!target || !api.isValid(beast)) return;
+  sealRitual(player, beast, target);
+}
+
+function sealRitual(sealer, beast, target) {
+  const id = beastIdOf(beast);
+  const b = BEASTS[id];
+  const dim = beast.dimension;
+  beingSealed.add(beast.id);
+  api.setChakra(sealer, api.getChakra(sealer) - SEAL_COST);
+  api.startCooldown(sealer, "uzumaki_seal", 1200);
+  api.anim(sealer, "animation.aegis.hand_signs");
+  showTitle(sealer, "§6Four Symbols Seal", { subtitle: `§7Binding ${b.name}…`, fadeInDuration: 2, stayDuration: 50, fadeOutDuration: 10 });
+  api.sound(dim, "random.anvil_land", beast.location, 1, 0.6);
+
+  const fail = (why) => {
+    beingSealed.delete(beast.id);
+    if (api.isValid(sealer)) sealer.sendMessage(`§cThe seal broke: ${why}`);
+  };
+  for (let t = 0; t <= SEAL_TICKS; t += 5) {
+    system.runTimeout(() => {
+      if (!beingSealed.has(beast.id)) return;
+      if (!api.isValid(beast)) return fail("the beast is gone.");
+      if (!api.isValid(sealer) || !api.isValid(target)) return fail("the sealer or vessel left.");
+      const d = api.sub(beast.location, sealer.location);
+      if (d.x * d.x + d.y * d.y + d.z * d.z > 40 * 40) return fail("you moved too far away.");
+      // golden chains from the sealer and the vessel into the beast
+      const mid = api.add(beast.location, { x: 0, y: 2, z: 0 });
+      for (const from of [sealer, target]) {
+        const a = api.add(from.location, { x: 0, y: 1, z: 0 });
+        const dd = api.sub(mid, a);
+        for (let i = 0; i <= 12; i++) api.particle(dim, "aegis:slash", api.add(a, api.scale(dd, i / 12)), GOLD);
+      }
+      for (let i = 0; i < 12; i++) {
+        const ang = (i / 12) * Math.PI * 2 + t * 0.2;
+        api.particle(dim, "aegis:slash", api.add(beast.location, { x: Math.cos(ang) * 3, y: 0.5 + (t / SEAL_TICKS) * 3, z: Math.sin(ang) * 3 }), GOLD);
+      }
+      try {
+        beast.addEffect("slowness", 20, { amplifier: 255, showParticles: false });
+        beast.addEffect("weakness", 20, { amplifier: 10, showParticles: false });
+      } catch {
+        /* ignore */
+      }
+      if (t < SEAL_TICKS) return;
+      // sealed!
+      beingSealed.delete(beast.id);
+      bossState.delete(beast.id);
+      let maxHp = 1000;
+      try {
+        maxHp = beast.getComponent("minecraft:health").effectiveMax;
+      } catch {
+        /* ignore */
+      }
+      api.particle(dim, "aegis:beast_burst", mid, b.color);
+      api.particle(dim, "aegis:beast_burst", mid, GOLD);
+      api.sound(dim, "mob.enderdragon.growl", mid, 2, 0.6);
+      beast.remove();
+      api.particle(target.dimension, "aegis:beast_burst", api.add(target.location, { x: 0, y: 1, z: 0 }), GOLD);
+      sealInto(target, id, sealer);
+      gainXp(sealer, maxHp * 3);
+    }, t);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Opening the seal: an Uzumaki Jinchūriki faces the dark half of their beast.
+// Win and the beast is mastered (Tailed Beast Mode with no drain, regen, stronger buffs and bombs).
+// ---------------------------------------------------------------------------
+const trials = new Map(); // player id -> { entityId, deadline, dim }
+const TRIAL_SECONDS = 240;
+
+async function openSealMenu(player) {
+  const id = sealedBeastId(player);
+  if (!id) return player.sendMessage("§7No Tailed Beast in sight — and none sealed inside you.");
+  if (isBijuuMastered(player)) return player.sendMessage(`§6You and ${BEASTS[id].name} already fight as one.`);
+  if (trials.has(player.id)) return player.sendMessage("§cYou are already facing your beast!");
+  const b = BEASTS[id];
+  const r = await new MessageFormData()
+    .title("§6Open the Seal")
+    .body(`Open the seal and face the dark half of ${b.name}?\n\nDefeat it within ${TRIAL_SECONDS / 60} minutes to master ${b.name}:\n§7- Tailed Beast Mode costs no chakra and regen keeps working\n§7- Strength III, Resistance III, Regeneration\n§7- Tailed Beast Bomb: 40 chakra, 10s cooldown, bigger blast\n\n§cIf you fall, the seal closes again.`)
+    .button1("§6Open the seal")
+    .button2("Not yet")
+    .show(player);
+  if (r.selection !== 0) return;
+  startTrial(player, id);
+}
+
+function startTrial(player, id) {
+  const b = BEASTS[id];
+  const dim = player.dimension;
+  const d = player.getViewDirection();
+  const h = api.norm({ x: d.x, y: 0, z: d.z });
+  const at = api.add(player.location, api.scale(h, 10));
+  try {
+    const e = dim.spawnEntity(`aegis:${id}`, at);
+    e.nameTag = `§8Dark ${b.name}`;
+    e.setDynamicProperty("aegis:trial_of", player.id);
+    try {
+      const hc = e.getComponent("minecraft:health");
+      hc.setCurrentValue(Math.round(hc.effectiveMax * 0.6));
+    } catch {
+      /* ignore */
+    }
+    api.particle(dim, "aegis:beast_burst", api.add(at, { x: 0, y: 2, z: 0 }), [0.15, 0.05, 0.2]);
+    trials.set(player.id, { entityId: e.id, deadline: system.currentTick + TRIAL_SECONDS * 20, dim: dim.id });
+    showTitle(player, "§8The Seal Opens", { subtitle: `§7Defeat the dark half of ${b.name}!`, fadeInDuration: 5, stayDuration: 60, fadeOutDuration: 15 });
+    api.sound(dim, "mob.wither.spawn", player.location, 0.8, 0.6);
+  } catch {
+    player.sendMessage("§cThe seal wouldn't open here.");
+  }
+}
+
+function endTrial(pid, message) {
+  const tr = trials.get(pid);
+  if (!tr) return;
+  trials.delete(pid);
+  try {
+    world.getEntity(tr.entityId)?.remove();
+  } catch {
+    /* ignore */
+  }
+  const p = world.getAllPlayers().find((x) => x.id === pid);
+  if (p) showTitle(p, "§cTrial failed", { subtitle: message, stayDuration: 50 });
+}
+
+function tickTrials() {
+  for (const [pid, tr] of [...trials]) {
+    const p = world.getAllPlayers().find((x) => x.id === pid);
+    if (!p) {
+      endTrial(pid, "");
+      continue;
+    }
+    const left = Math.ceil((tr.deadline - system.currentTick) / 20);
+    if (left <= 0) endTrial(pid, "§7Time ran out. The seal closes again…");
+    else p.onScreenDisplay.setActionBar(`§8Inner trial §7— §f${left}s`);
+  }
+}
+
+function masterBeast(player) {
+  const id = sealedBeastId(player);
+  if (!id) return;
+  const b = BEASTS[id];
+  player.setDynamicProperty(MASTERED_PROP, true);
+  showTitle(player, `§6${b.name} Mastered`, { subtitle: "§7Your Tailed Beast now fights alongside you", fadeInDuration: 5, stayDuration: 80, fadeOutDuration: 20 });
+  api.particle(player.dimension, "aegis:beast_burst", api.add(player.location, { x: 0, y: 1, z: 0 }), GOLD);
+  api.particle(player.dimension, "aegis:beast_burst", api.add(player.location, { x: 0, y: 1, z: 0 }), b.color);
+  api.sound(player.dimension, "ui.toast.challenge_complete", player.location, 1, 0.7);
+  player.sendMessage(`§6You opened the seal and mastered ${fullName(b)}§6! §7Tailed Beast Mode no longer drains chakra, and its power has grown.`);
+  world.sendMessage(`§e${player.name} has fully mastered ${fullName(b)}§e!`);
 }

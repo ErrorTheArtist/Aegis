@@ -3,7 +3,7 @@
 
 import { world, system, ItemStack, MolangVariableMap } from "@minecraft/server";
 import { initClans, clanMaxChakra, clanRegenMultiplier, handleClanItemUse, clanJutsuCostMultiplier } from "./clans.js";
-import { initBijuu, bijuuChakraBonus, bijuuRegenMultiplier, handleBijuuItemUse, isTransformed } from "./bijuu.js";
+import { initBijuu, bijuuChakraBonus, bijuuRegenMultiplier, handleBijuuItemUse, isTransformed, isBijuuMastered } from "./bijuu.js";
 import { initSwords, handleSwordUse } from "./swords.js";
 import { initHud } from "./hud.js";
 import { initNpcs } from "./npcs.js";
@@ -662,7 +662,7 @@ system.runInterval(() => {
     const max = getMaxChakra(player);
 
     // Regeneration
-    let rate = isTransformed(player) ? 0 : REGEN_PER_SECOND * clanRegenMultiplier(player) * bijuuRegenMultiplier(player) * levelRegenMultiplier(player);
+    let rate = isTransformed(player) && !isBijuuMastered(player) ? 0 : REGEN_PER_SECOND * clanRegenMultiplier(player) * bijuuRegenMultiplier(player) * levelRegenMultiplier(player);
     if (wearingHeadband(player)) rate *= HEADBAND_REGEN_BONUS;
 
     const prev = lastPos.get(player.id);

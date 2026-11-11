@@ -10,6 +10,7 @@
 
 import { world, system, ItemStack, ItemLockMode } from "@minecraft/server";
 import { showTitle } from "./hud.js";
+import { uzumakiSealMenu } from "./bijuu.js";
 import { statEffectLevels, getLevel, getRank, RANKS } from "./levels.js";
 
 const CLAN_PROP = "aegis:clan";
@@ -50,7 +51,7 @@ export const CLANS = {
     name: "Uzumaki", color: "§6", rarity: "epic", weight: 7,
     maxChakra: 200, regen: 1.5, effects: [["health_boost", 0]],
     item: "aegis:sealing_chains",
-    perks: "Adamantine Sealing Chains, cheaper Rasengan & Shadow Clones, 200 chakra, fast regen, +2 hearts",
+    perks: "Adamantine Sealing Chains (sneak: Four Symbols Seal — seal Tailed Beasts alive, open & master your own), cheaper Rasengan & Shadow Clones, 200 chakra, fast regen, +2 hearts",
   },
   hyuga: {
     name: "Hyuga", color: "§7", rarity: "epic", weight: 8,
@@ -521,6 +522,14 @@ const ABILITIES = {
         }
         api.sound(p.dimension, "random.anvil_land", p.location, 0.6, 1.5);
         return true;
+      },
+    },
+    // Four Symbols Seal: seal a weakened Tailed Beast alive, or open your own seal (bijuu.js).
+    sneak: {
+      name: "Four Symbols Seal", cost: 0, cd: 10,
+      cast: (p) => {
+        system.run(() => uzumakiSealMenu(p).catch(() => {}));
+        return false; // the sealing menu handles its own chakra cost and cooldown
       },
     },
   },

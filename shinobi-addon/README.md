@@ -63,7 +63,7 @@ Your clan shows above your head, e.g. `[Uchiha] Steve`.
 | Otsutsuki | Legendary | 1% | 250 | Strength, Speed, Resistance, 2× regen | **Rinnegan**: Almighty Push / **Universal Pull** |
 | Senju | Legendary | 3% | 180 | Regeneration, +4 hearts | **Wood Style**: Wood Wall (10s) / **Healing Jutsu** (you + nearby players) |
 | Uchiha | Epic | 6% | 140 | Fire Resistance | **Sharingan**: toggle (night vision, 30% dodge, drains chakra) / **Amaterasu** (needs Sharingan on) |
-| Uzumaki | Epic | 7% | 200 | +2 hearts, 1.5× regen | Adamantine Sealing Chains (freeze everything nearby) |
+| Uzumaki | Epic | 7% | 200 | +2 hearts, 1.5× regen | Adamantine Sealing Chains (freeze everything nearby) / **Four Symbols Seal** (seal Tailed Beasts alive, master your own) |
 | Hyuga | Epic | 8% | 130 | — | **Byakugan**: toggle (see all life within 40 blocks, Gentle Fist bonus damage) / **Palm Rotation** |
 | Sarutobi | Rare | 9% | 120 | Fire Resistance | Fire Style: Flame Bullet (3 fireballs) |
 | Nara | Rare | 11% | 110 | — | Shadow Possession Jutsu (freeze a target for 6s) |
@@ -194,9 +194,26 @@ Land the **killing blow** and the beast is sealed inside you (a new one replaces
 - **Hold sneak for 1.5s** while transformed to charge and fire a **Tailed Beast Bomb** (80 chakra, 20s cooldown).
 - Only the beast's own Jinchūriki can wear its cloak.
 
+### Uzumaki: Four Symbols Seal & mastering your beast
+
+Only the **Uzumaki** can do this (sneak + use the **Sealing Chains**):
+
+- **Seal a Tailed Beast alive** — needs **100 Chakra and 100 Vitality** stats, 150 chakra, and the beast weakened
+  **below half health**. Look at it, choose who becomes the Jinchūriki (**yourself or any player within 16 blocks**),
+  and golden chains bind it for a 3-second ritual. The beast isn't killed — it's sealed straight into that player.
+  You get the XP. 60 s cooldown. Stay within 40 blocks or the seal breaks.
+- **Open the seal** — an Uzumaki who carries a beast (sneak + use the chains with no beast in sight) can face the
+  **dark half of their beast** (60% health, 4 minutes). Defeat it to **master** your beast, like Naruto with Kurama:
+  - Tailed Beast Mode **no longer drains chakra** and chakra regen keeps working
+  - Strength III, Resistance III and Regeneration while transformed (plus the beast's perk), golden aura
+  - Tailed Beast Bomb costs **40** chakra, **10 s** cooldown, 45 damage with a bigger blast
+
+  Sealing a different beast into you later resets mastery. If you fall in the trial, the seal closes and you can try again.
+
 ```
 /scriptevent aegis:bijuu summon kurama
 /scriptevent aegis:bijuu seal kurama
+/scriptevent aegis:bijuu master
 /scriptevent aegis:bijuu release
 /scriptevent aegis:bijuu info
 ```

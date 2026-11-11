@@ -535,7 +535,7 @@ function useSummonScroll(player) {
     it.amount -= 1;
     inv.setItem(slot, it);
   } else inv.setItem(slot, undefined);
-  api.anim(player, "animation.aegis.hand_signs");
+  api.anim(player, "animation.aegis.summon_slam");
   summonBeast(player, rollBeastId());
 }
 

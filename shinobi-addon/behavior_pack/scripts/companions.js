@@ -167,7 +167,7 @@ export function handleSummonUse(player, itemStack) {
   api.gainJutsuXp(player, SUMMON_COST);
   // one summon at a time
   for (const e of player.dimension.getEntities({ families: ["summon"] })) if (ownerOf(e) === player.id) e.remove();
-  api.anim(player, "animation.aegis.earth_slam");
+  api.anim(player, "animation.aegis.summon_slam");
   const d = player.getViewDirection();
   const h = api.norm({ x: d.x, y: 0, z: d.z });
   const at = api.add(player.location, api.scale(h, 3));

@@ -11,7 +11,7 @@
 import { world, system, ItemStack, ItemLockMode } from "@minecraft/server";
 import { showTitle } from "./hud.js";
 import { uzumakiSealMenu } from "./bijuu.js";
-import { transformCinematic, impactFx, sfx } from "./cinematic.js";
+import { transformCinematic, impactFx, sfx, chargeFx } from "./cinematic.js";
 import { statEffectLevels, getLevel, getRank, RANKS } from "./levels.js";
 
 const CLAN_PROP = "aegis:clan";
@@ -374,6 +374,7 @@ function amaterasu(p, pulses, dmg) {
   }
   const t = targetInView(p, 24);
   if (!t) return noTarget(p);
+  api.anim(p, "animation.aegis.eye_activate");
   api.sound(p.dimension, "mob.wither.shoot", p.location, 0.7, 0.6);
   sfx(p.dimension, "aegis.fire", t.location, 1.5, 0.6);
   impactFx(p.dimension, t.location, [0.15, 0.02, 0.1], 1);
@@ -407,6 +408,8 @@ function toggleDojutsu(player, kind, label) {
   }
   activeDojutsu.set(player.id, kind);
   refreshEffects(player, true);
+  api.anim(player, "animation.aegis.eye_activate");
+  chargeFx(player, kind === "byakugan" ? [0.85, 0.82, 1] : kind === "eternal" ? [0.6, 0.1, 0.55] : [0.85, 0.05, 0.08], 6);
   api.sound(player.dimension, "mob.endermen.stare", player.location, 0.4, 1.8);
   player.onScreenDisplay.setActionBar(`§c${label}!`);
   return true;
@@ -459,7 +462,7 @@ const ABILITIES = {
     use: {
       name: "Almighty Push", cost: 50, cd: 200,
       cast: (p) => {
-        api.anim(p, "animation.aegis.both_palms");
+        api.anim(p, "animation.aegis.almighty_push");
         impactFx(p.dimension, p.location, [0.7, 0.5, 1], 3);
         api.particle(p.dimension, "minecraft:huge_explosion_emitter", p.location);
         api.particle(p.dimension, "aegis:chakra_burst", api.add(p.location, { x: 0, y: 1, z: 0 }));
@@ -483,7 +486,7 @@ const ABILITIES = {
       cast: (p) => {
         const t = targetInView(p, 30);
         if (!t) return noTarget(p);
-        api.anim(p, "animation.aegis.palm_thrust");
+        api.anim(p, "animation.aegis.pull");
         line(p, p.getHeadLocation(), t.location, "minecraft:portal_reverse_particle");
         const to = api.norm({ x: p.location.x - t.location.x, y: 0, z: p.location.z - t.location.z });
         api.knockback(t, to.x, to.z, 3, 0.4);
@@ -518,7 +521,7 @@ const ABILITIES = {
       cast: (p) => {
         const targets = nearbyTargets(p, 9);
         if (!targets.length) return noTarget(p);
-        api.anim(p, "animation.aegis.hand_signs");
+        api.anim(p, "animation.aegis.chains_cast");
         for (const e of targets) {
           line(p, api.add(p.location, { x: 0, y: 1, z: 0 }), api.add(e.location, { x: 0, y: 1, z: 0 }), "minecraft:electric_spark_particle");
           eff(e, "slowness", 100, 255);
@@ -549,7 +552,7 @@ const ABILITIES = {
         const d = p.getViewDirection();
         for (const ang of [-0.25, 0, 0.25]) {
           const c = Math.cos(ang), s = Math.sin(ang);
-          api.castFireball(p, { x: d.x * c - d.z * s, y: d.y, z: d.x * s + d.z * c });
+          api.castFireball(p, { x: d.x * c - d.z * s, y: d.y, z: d.x * s + d.z * c }, "animation.aegis.phoenix_breath", 10);
         }
         return true;
       },
@@ -563,7 +566,8 @@ const ABILITIES = {
       cast: (p) => {
         const t = targetInView(p, 18);
         if (!t) return noTarget(p);
-        api.anim(p, "animation.aegis.hand_signs");
+        api.anim(p, "animation.aegis.shadow_seal");
+        chargeFx(p, [0.1, 0.1, 0.12], 9);
         for (let i = 0; i < 5; i++) {
           system.runTimeout(() => {
             if (api.isValid(t) && api.isValid(p)) line(p, api.add(p.location, { x: 0, y: 0.05, z: 0 }), api.add(t.location, { x: 0, y: 0.05, z: 0 }), "aegis:shadow");
@@ -589,7 +593,8 @@ const ABILITIES = {
         eff(p, "resistance", 300, 1);
         eff(p, "absorption", 300, 3);
         eff(p, "slowness", 300, 0);
-        api.anim(p, "animation.aegis.hand_signs");
+        api.anim(p, "animation.aegis.expansion");
+        chargeFx(p, [1, 0.85, 0.3], 9);
         api.particle(p.dimension, "aegis:smoke_puff", p.location);
         api.sound(p.dimension, "mob.irongolem.repair", p.location, 1, 0.6);
         return true;
@@ -604,7 +609,7 @@ const ABILITIES = {
       cast: (p) => {
         const dir = p.getViewDirection();
         const hits = nearbyTargets(p, 10).filter((e) => api.dot(api.norm(api.sub(e.location, p.location)), dir) > 0.5);
-        api.anim(p, "animation.aegis.palm_thrust");
+        api.anim(p, "animation.aegis.insect_release");
         for (let d = 1; d <= 10; d++) api.particle(p.dimension, "minecraft:spore_blossom_shower_particle", api.add(p.getHeadLocation(), api.scale(dir, d)));
         if (!hits.length) return noTarget(p);
         for (const e of hits) {
@@ -627,7 +632,7 @@ const ABILITIES = {
         const d = p.getViewDirection();
         const h = api.norm({ x: d.x, y: 0, z: d.z });
         api.knockback(p, h.x, h.z, 3.2, 0.3);
-        api.anim(p, "animation.aegis.palm_thrust");
+        api.anim(p, "animation.aegis.fang_drill");
         const hit = new Set();
         for (let i = 1; i <= 12; i++) {
           system.runTimeout(() => {
@@ -668,7 +673,8 @@ const ABILITIES = {
       cast: (p) => {
         const t = targetInView(p, 20);
         if (!t) return noTarget(p);
-        api.anim(p, "animation.aegis.hand_signs");
+        api.anim(p, "animation.aegis.mind_seal");
+        chargeFx(p, [0.4, 0.7, 1], 9);
         line(p, p.getHeadLocation(), api.add(t.location, { x: 0, y: 1.5, z: 0 }), "minecraft:villager_happy");
         eff(t, "nausea", 200, 0);
         eff(t, "blindness", 100, 0);

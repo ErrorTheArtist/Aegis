@@ -5,6 +5,7 @@ First-person arms are left alone (v.is_first_person) so the camera view isn't tw
 Run from the shinobi-addon folder:  python3 tools/gen_player_anims.py
 """
 import json
+import math
 from pathlib import Path
 
 P = Path(__file__).resolve().parent.parent / "resource_pack" / "animations" / "aegis.animation.json"
@@ -155,6 +156,183 @@ A["animation.aegis.power_up"] = anim(3.8, {
     "head": {"rotation": {"0.0": Z, "0.3": [25, 0, 0], "1.95": [25, 0, 0], "2.15": [-35, 0, 0], "3.3": [-30, 0, 0], "3.8": Z}},
     "rightLeg": {"rotation": {"0.0": Z, "0.3": [-25, 0, 10], "1.95": [-25, 0, 10], "2.15": [0, 0, 18], "3.3": [0, 0, 18], "3.8": Z}},
     "leftLeg": {"rotation": {"0.0": Z, "0.3": [25, 0, -10], "1.95": [25, 0, -10], "2.15": [0, 0, -18], "3.3": [0, 0, -18], "3.8": Z}}})
+
+# ===========================================================================
+# Per-jutsu animations (each technique has its own motion)
+# ===========================================================================
+def seal_chain(t0, n, step=0.12):
+    """A run of distinct hand seals starting at t0 (arms meet in front of the chest)."""
+    poses = [([-75, -35, 0], [-75, 35, 0]), ([-95, -20, -15], [-60, 45, 10]), ([-60, -45, 5], [-95, 25, -10]),
+             ([-85, -40, -10], [-85, 40, 10]), ([-100, -15, 0], [-70, 30, 15]), ([-65, -30, 10], [-100, 20, -5])]
+    r, l = {}, {}
+    for i in range(n):
+        t = f"{t0 + i * step:.2f}"
+        r[t], l[t] = poses[i % len(poses)]
+    return r, l
+
+
+# Fireball: three quick seals → deep inhale (lean back) → blow out with a hand-ring at the mouth.
+_r, _l = seal_chain(0.06, 3, 0.1)
+A["animation.aegis.fireball_jutsu"] = anim(1.0, {
+    "rightArm": {"rotation": {"0.0": Z, **_r, "0.4": [-130, -45, 0], "0.62": [-115, -40, 0], "0.8": [-100, -30, 0], "1.0": Z}},
+    "leftArm": {"rotation": {"0.0": Z, **_l, "0.4": [-70, 20, -10], "0.62": [-30, 0, -35], "0.8": [-20, 0, -30], "1.0": Z}},
+    "body": {"rotation": {"0.0": Z, "0.3": [4, 0, 0], "0.45": [-22, 0, 0], "0.6": [20, 0, 0], "0.8": [15, 0, 0], "1.0": Z}},
+    "head": {"rotation": {"0.0": Z, "0.3": [10, 0, 0], "0.45": [-35, 0, 0], "0.6": [12, 0, 0], "0.8": [8, 0, 0], "1.0": Z}},
+    "rightLeg": {"rotation": {"0.0": Z, "0.45": [8, 0, 6], "0.6": [-30, 0, 6], "0.8": [-30, 0, 6], "1.0": Z}},
+    "leftLeg": {"rotation": {"0.0": Z, "0.45": [-8, 0, -6], "0.6": [25, 0, -6], "0.8": [25, 0, -6], "1.0": Z}}})
+
+# Phoenix Sage Fire: hand at the mouth, head sweeps left → right spraying fireballs.
+A["animation.aegis.phoenix_breath"] = anim(1.1, {
+    "rightArm": {"rotation": {"0.0": Z, "0.15": [-125, -45, 0], "0.95": [-125, -45, 0], "1.1": Z}},
+    "leftArm": {"rotation": {"0.0": Z, "0.15": [-40, 0, -30], "0.95": [-40, 0, -30], "1.1": Z}},
+    "body": {"rotation": {"0.0": Z, "0.2": [-14, 25, 0], "0.45": [14, 20, 0], "0.7": [14, -20, 0], "0.95": [10, -25, 0], "1.1": Z}},
+    "head": {"rotation": {"0.0": Z, "0.2": [-25, 20, 0], "0.45": [10, 25, 0], "0.7": [10, -25, 0], "0.95": [8, -30, 0], "1.1": Z}},
+    "rightLeg": {"rotation": {"0.0": Z, "0.3": [-22, 0, 6], "0.95": [-22, 0, 6], "1.1": Z}},
+    "leftLeg": {"rotation": {"0.0": Z, "0.3": [20, 0, -6], "0.95": [20, 0, -6], "1.1": Z}}})
+
+# Rasengan forming: palm out, the other hand circles over it shaping the sphere; low stance.
+_circ = {f"{0.25 + i * 0.08:.2f}": [-70 + 12 * math.sin(i * 1.3), 35 + 15 * math.cos(i * 1.3), -10 * math.sin(i * 1.3)] for i in range(8)}
+A["animation.aegis.rasengan_form"] = anim(0.95, {
+    "rightArm": {"rotation": {"0.0": Z, "0.2": [-65, -10, 15], "0.95": [-68, -8, 15]}},
+    "leftArm": {"rotation": {"0.0": Z, "0.2": [-55, 40, 0], **_circ, "0.95": [-62, 42, 0]}},
+    "body": {"rotation": {"0.0": Z, "0.25": [14, -18, 0], "0.95": [16, -20, 0]}},
+    "head": {"rotation": {"0.0": Z, "0.25": [18, 10, 0], "0.95": [10, 15, 0]}},
+    "rightLeg": {"rotation": {"0.0": Z, "0.25": [-28, 0, 8], "0.95": [-28, 0, 8]}},
+    "leftLeg": {"rotation": {"0.0": Z, "0.25": [25, 0, -8], "0.95": [25, 0, -8]}}})
+# Rasengan / Chidori strike: sprint lean then drive the arm all the way through.
+A["animation.aegis.ram_strike"] = anim(0.6, {
+    "rightArm": {"rotation": {"0.0": [-60, 0, 10], "0.1": [20, 10, 20], "0.22": [-105, -10, 0], "0.45": [-100, -8, 0], "0.6": Z},
+                 "position": {"0.0": Z, "0.1": [0, 0, 3], "0.22": [0, 0, -5], "0.45": [0, 0, -5], "0.6": Z}},
+    "leftArm": {"rotation": {"0.0": Z, "0.1": [-50, 30, -10], "0.22": [45, 0, -25], "0.6": Z}},
+    "body": {"rotation": {"0.0": [10, 0, 0], "0.1": [18, 30, 0], "0.22": [20, -30, 0], "0.45": [18, -28, 0], "0.6": Z}},
+    "head": {"rotation": {"0.0": Z, "0.1": [-15, -20, 0], "0.22": [-18, 25, 0], "0.6": Z}},
+    "rightLeg": {"rotation": {"0.0": Z, "0.1": [25, 0, 0], "0.22": [-55, 0, 0], "0.45": [-50, 0, 0], "0.6": Z}},
+    "leftLeg": {"rotation": {"0.0": Z, "0.1": [-30, 0, 0], "0.22": [40, 0, 0], "0.45": [38, 0, 0], "0.6": Z}}})
+
+# Substitution: snap ram seal, duck — poof.
+A["animation.aegis.substitution"] = anim(0.5, {
+    "rightArm": {"rotation": {"0.0": Z, "0.08": [-95, -30, 0], "0.3": [-95, -30, 0], "0.5": Z}},
+    "leftArm": {"rotation": {"0.0": Z, "0.08": [-95, 30, 0], "0.3": [-95, 30, 0], "0.5": Z}},
+    "body": {"rotation": {"0.0": Z, "0.15": [25, 0, 0], "0.35": [25, 0, 0], "0.5": Z}},
+    "head": {"rotation": {"0.0": Z, "0.15": [20, 0, 0], "0.5": Z}},
+    "rightLeg": {"rotation": {"0.0": Z, "0.15": [-35, 0, 10], "0.35": [-35, 0, 10], "0.5": Z}},
+    "leftLeg": {"rotation": {"0.0": Z, "0.15": [25, 0, -10], "0.35": [25, 0, -10], "0.5": Z}}})
+
+# Shadow Clone: the cross-shaped seal held at the chest, then arms flare out.
+A["animation.aegis.clone_seal"] = anim(0.9, {
+    "rightArm": {"rotation": {"0.0": Z, "0.12": [-90, -40, 20], "0.55": [-92, -42, 20], "0.68": [-30, 0, 80], "0.9": Z}},
+    "leftArm": {"rotation": {"0.0": Z, "0.12": [-80, 40, -30], "0.55": [-82, 42, -30], "0.68": [-30, 0, -80], "0.9": Z}},
+    "body": {"rotation": {"0.0": Z, "0.12": [6, 0, 0], "0.55": [6, 0, 0], "0.68": [-10, 0, 0], "0.9": Z}},
+    "head": {"rotation": {"0.0": Z, "0.12": [10, 0, 0], "0.55": [10, 0, 0], "0.68": [-15, 0, 0], "0.9": Z}},
+    "rightLeg": {"rotation": {"0.0": Z, "0.12": [0, 0, 12], "0.75": [0, 0, 12], "0.9": Z}},
+    "leftLeg": {"rotation": {"0.0": Z, "0.12": [0, 0, -12], "0.75": [0, 0, -12], "0.9": Z}}})
+
+# Body Flicker: drop low, arms swept back — gone.
+A["animation.aegis.body_flicker"] = anim(0.5, {
+    "rightArm": {"rotation": {"0.0": Z, "0.08": [70, 0, 15], "0.38": [75, 0, 15], "0.5": Z}},
+    "leftArm": {"rotation": {"0.0": Z, "0.08": [70, 0, -15], "0.38": [75, 0, -15], "0.5": Z}},
+    "body": {"rotation": {"0.0": Z, "0.08": [30, 0, 0], "0.38": [30, 0, 0], "0.5": Z}},
+    "head": {"rotation": {"0.0": Z, "0.08": [-25, 0, 0], "0.38": [-25, 0, 0], "0.5": Z}},
+    "rightLeg": {"rotation": {"0.0": Z, "0.08": [-40, 0, 0], "0.38": [-40, 0, 0], "0.5": Z}},
+    "leftLeg": {"rotation": {"0.0": Z, "0.08": [45, 0, 0], "0.38": [45, 0, 0], "0.5": Z}}})
+
+# Wind palm (Great Breakthrough): twist back, then a huge two-handed gust push with a lunge.
+A["animation.aegis.wind_palm"] = anim(0.7, {
+    "rightArm": {"rotation": {"0.0": Z, "0.15": [-40, 50, 40], "0.28": [-95, 0, -20], "0.55": [-95, 0, -20], "0.7": Z}},
+    "leftArm": {"rotation": {"0.0": Z, "0.15": [-60, 30, -10], "0.28": [-95, 0, 20], "0.55": [-95, 0, 20], "0.7": Z}},
+    "body": {"rotation": {"0.0": Z, "0.15": [-6, 40, 0], "0.28": [14, -10, 0], "0.55": [12, -10, 0], "0.7": Z}},
+    "rightLeg": {"rotation": {"0.0": Z, "0.28": [-40, 0, 0], "0.55": [-40, 0, 0], "0.7": Z}},
+    "leftLeg": {"rotation": {"0.0": Z, "0.28": [30, 0, 0], "0.55": [30, 0, 0], "0.7": Z}}})
+
+# Water Dragon: a long flowing seal chain with the body swaying, then both palms launch.
+_r, _l = seal_chain(0.05, 6, 0.11)
+A["animation.aegis.water_seals"] = anim(0.8, {
+    "rightArm": {"rotation": {"0.0": Z, **_r, "0.8": [-80, -30, 0]}},
+    "leftArm": {"rotation": {"0.0": Z, **_l, "0.8": [-80, 30, 0]}},
+    "body": {"rotation": {"0.0": Z, "0.2": [6, 12, 0], "0.4": [6, -12, 0], "0.6": [6, 12, 0], "0.8": [4, 0, 0]}},
+    "head": {"rotation": {"0.0": Z, "0.2": [12, 8, 0], "0.4": [12, -8, 0], "0.6": [12, 8, 0], "0.8": [8, 0, 0]}},
+    "rightLeg": {"rotation": {"0.0": Z, "0.2": [0, 0, 10], "0.8": [0, 0, 10]}},
+    "leftLeg": {"rotation": {"0.0": Z, "0.2": [0, 0, -10], "0.8": [0, 0, -10]}}})
+
+# Summoning: bite the thumb, swing the hand down and slam it into the ground.
+A["animation.aegis.summon_slam"] = anim(1.0, {
+    "rightArm": {"rotation": {"0.0": Z, "0.15": [-150, -40, 0], "0.35": [-150, -40, 0], "0.45": [-175, 0, 10], "0.6": [-20, 0, 10], "0.9": [-20, 0, 10], "1.0": Z}},
+    "leftArm": {"rotation": {"0.0": Z, "0.15": [-20, 0, -20], "0.6": [10, 0, -40], "0.9": [10, 0, -40], "1.0": Z}},
+    "body": {"rotation": {"0.0": Z, "0.15": [10, 10, 0], "0.45": [-10, 0, 0], "0.6": [45, 0, 0], "0.9": [45, 0, 0], "1.0": Z}},
+    "head": {"rotation": {"0.0": Z, "0.15": [20, -20, 0], "0.45": [-10, 0, 0], "0.6": [-30, 0, 0], "0.9": [-30, 0, 0], "1.0": Z}},
+    "rightLeg": {"rotation": {"0.0": Z, "0.6": [-55, 0, 10], "0.9": [-55, 0, 10], "1.0": Z}},
+    "leftLeg": {"rotation": {"0.0": Z, "0.6": [35, 0, -10], "0.9": [35, 0, -10], "1.0": Z}}})
+
+# Dōjutsu activation: hand sweeps across the eyes, head snaps up.
+A["animation.aegis.eye_activate"] = anim(0.6, {
+    "rightArm": {"rotation": {"0.0": Z, "0.12": [-140, -55, 0], "0.3": [-140, -55, 0], "0.42": [-60, 20, 30], "0.6": Z}},
+    "leftArm": {"rotation": {"0.0": Z, "0.3": [10, 0, -15], "0.6": Z}},
+    "body": {"rotation": {"0.0": Z, "0.12": [10, 0, 0], "0.42": [-6, 0, 0], "0.6": Z}},
+    "head": {"rotation": {"0.0": Z, "0.12": [25, 0, 0], "0.3": [25, 0, 0], "0.42": [-15, 0, 0], "0.6": Z}}})
+
+# Almighty Push: arms wide, explode outward, chest forward.
+A["animation.aegis.almighty_push"] = anim(0.8, {
+    "rightArm": {"rotation": {"0.0": Z, "0.2": [-60, 0, 30], "0.32": [-60, 0, 110], "0.65": [-60, 0, 110], "0.8": Z}},
+    "leftArm": {"rotation": {"0.0": Z, "0.2": [-60, 0, -30], "0.32": [-60, 0, -110], "0.65": [-60, 0, -110], "0.8": Z}},
+    "body": {"rotation": {"0.0": Z, "0.2": [12, 0, 0], "0.32": [-14, 0, 0], "0.65": [-12, 0, 0], "0.8": Z}},
+    "head": {"rotation": {"0.0": Z, "0.2": [15, 0, 0], "0.32": [-20, 0, 0], "0.65": [-20, 0, 0], "0.8": Z}},
+    "rightLeg": {"rotation": {"0.0": Z, "0.32": [0, 0, 15], "0.65": [0, 0, 15], "0.8": Z}},
+    "leftLeg": {"rotation": {"0.0": Z, "0.32": [0, 0, -15], "0.65": [0, 0, -15], "0.8": Z}}})
+
+# Pull (Universal Pull / chains): reach out, grab, yank back.
+A["animation.aegis.pull"] = anim(0.6, {
+    "rightArm": {"rotation": {"0.0": Z, "0.12": [-100, -10, 0], "0.25": [-100, -10, 0], "0.38": [-30, 30, 30], "0.6": Z}},
+    "leftArm": {"rotation": {"0.0": Z, "0.12": [-90, 10, 0], "0.25": [-90, 10, 0], "0.38": [-20, -20, -30], "0.6": Z}},
+    "body": {"rotation": {"0.0": Z, "0.12": [12, 0, 0], "0.38": [-14, 0, 0], "0.6": Z}},
+    "rightLeg": {"rotation": {"0.0": Z, "0.12": [-25, 0, 0], "0.38": [20, 0, 0], "0.6": Z}},
+    "leftLeg": {"rotation": {"0.0": Z, "0.12": [20, 0, 0], "0.38": [-25, 0, 0], "0.6": Z}}})
+
+# Nara: the rat seal, held low and steady while the shadow stretches.
+A["animation.aegis.shadow_seal"] = anim(1.2, {
+    "rightArm": {"rotation": {"0.0": Z, "0.12": [-70, -40, 0], "1.05": [-72, -40, 0], "1.2": Z}},
+    "leftArm": {"rotation": {"0.0": Z, "0.12": [-70, 40, 0], "1.05": [-72, 40, 0], "1.2": Z}},
+    "body": {"rotation": {"0.0": Z, "0.12": [20, 0, 0], "1.05": [20, 0, 0], "1.2": Z}},
+    "head": {"rotation": {"0.0": Z, "0.12": [-10, 0, 0], "1.05": [-10, 0, 0], "1.2": Z}},
+    "rightLeg": {"rotation": {"0.0": Z, "0.12": [-30, 0, 15], "1.05": [-30, 0, 15], "1.2": Z}},
+    "leftLeg": {"rotation": {"0.0": Z, "0.12": [20, 0, -15], "1.05": [20, 0, -15], "1.2": Z}}})
+
+# Yamanaka: hands form a diamond and aim at the target.
+A["animation.aegis.mind_seal"] = anim(0.9, {
+    "rightArm": {"rotation": {"0.0": Z, "0.15": [-95, -25, 0], "0.75": [-97, -25, 0], "0.9": Z}},
+    "leftArm": {"rotation": {"0.0": Z, "0.15": [-95, 25, 0], "0.75": [-97, 25, 0], "0.9": Z}},
+    "body": {"rotation": {"0.0": Z, "0.15": [6, 0, 0], "0.75": [6, 0, 0], "0.9": Z}},
+    "head": {"rotation": {"0.0": Z, "0.15": [-5, 0, 0], "0.75": [-5, 0, 0], "0.9": Z}}})
+
+# Akimichi Expansion: flex and swell.
+A["animation.aegis.expansion"] = anim(0.9, {
+    "rightArm": {"rotation": {"0.0": Z, "0.2": [-30, 0, 70], "0.35": [-120, 0, 60], "0.75": [-120, 0, 60], "0.9": Z}},
+    "leftArm": {"rotation": {"0.0": Z, "0.2": [-30, 0, -70], "0.35": [-120, 0, -60], "0.75": [-120, 0, -60], "0.9": Z}},
+    "body": {"rotation": {"0.0": Z, "0.2": [15, 0, 0], "0.35": [-10, 0, 0], "0.75": [-10, 0, 0], "0.9": Z}},
+    "head": {"rotation": {"0.0": Z, "0.35": [-25, 0, 0], "0.75": [-25, 0, 0], "0.9": Z}},
+    "rightLeg": {"rotation": {"0.0": Z, "0.35": [0, 0, 18], "0.75": [0, 0, 18], "0.9": Z}},
+    "leftLeg": {"rotation": {"0.0": Z, "0.35": [0, 0, -18], "0.75": [0, 0, -18], "0.9": Z}}})
+
+# Aburame: arms thrown open, sleeves release the swarm.
+A["animation.aegis.insect_release"] = anim(0.8, {
+    "rightArm": {"rotation": {"0.0": Z, "0.15": [-40, -30, -20], "0.3": [-80, 30, 60], "0.65": [-80, 30, 60], "0.8": Z}},
+    "leftArm": {"rotation": {"0.0": Z, "0.15": [-40, 30, 20], "0.3": [-80, -30, -60], "0.65": [-80, -30, -60], "0.8": Z}},
+    "body": {"rotation": {"0.0": Z, "0.15": [10, 0, 0], "0.3": [-6, 0, 0], "0.65": [-6, 0, 0], "0.8": Z}}})
+
+# Inuzuka Fang Over Fang: dive forward into a drill.
+A["animation.aegis.fang_drill"] = anim(0.7, {
+    "rightArm": {"rotation": {"0.0": Z, "0.1": [-160, 0, 10], "0.6": [-160, 0, 10], "0.7": Z}},
+    "leftArm": {"rotation": {"0.0": Z, "0.1": [-160, 0, -10], "0.6": [-160, 0, -10], "0.7": Z}},
+    "body": {"rotation": {"0.0": Z, "0.1": [40, 0, 0], "0.6": [40, 720, 0], "0.7": [0, 720, 0]}},
+    "rightLeg": {"rotation": {"0.0": Z, "0.1": [40, 0, 0], "0.6": [40, 0, 0], "0.7": Z}},
+    "leftLeg": {"rotation": {"0.0": Z, "0.1": [40, 0, 0], "0.6": [40, 0, 0], "0.7": Z}}})
+
+# Sealing chains / Four Symbols: hands thrust forward, fingers spread, then twist the seal.
+A["animation.aegis.chains_cast"] = anim(0.9, {
+    "rightArm": {"rotation": {"0.0": Z, "0.15": [-95, -15, -20], "0.45": [-95, -15, -20], "0.6": [-95, 30, 20], "0.8": [-95, 30, 20], "0.9": Z}},
+    "leftArm": {"rotation": {"0.0": Z, "0.15": [-95, 15, 20], "0.45": [-95, 15, 20], "0.6": [-95, -30, -20], "0.8": [-95, -30, -20], "0.9": Z}},
+    "body": {"rotation": {"0.0": Z, "0.15": [10, 0, 0], "0.6": [6, 15, 0], "0.8": [6, 15, 0], "0.9": Z}},
+    "rightLeg": {"rotation": {"0.0": Z, "0.15": [-25, 0, 8], "0.8": [-25, 0, 8], "0.9": Z}},
+    "leftLeg": {"rotation": {"0.0": Z, "0.15": [20, 0, -8], "0.8": [20, 0, -8], "0.9": Z}}})
 
 # --- Swords ---------------------------------------------------------------------
 A["animation.aegis.sword_slash"] = anim(0.55, {

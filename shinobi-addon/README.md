@@ -322,10 +322,17 @@ roar (`resource_pack/sounds/aegis/`).
 - **Icons**: every item has a detailed 32×32 icon — scrolls with a unique glowing emblem per jutsu, clan crests,
   shaded dōjutsu eyes, metallic kunai/shuriken, ramen, the Shinobi Record — drawn at 4× by `tools/gen_icons.py`.
   Sword and armor icons are rendered from their 3D models.
-- **Animations**: smooth jutsu animations (catmull-rom curves pre-sampled into keyframes) with wind-ups, follow-through and leg stances: three-seal hand
-  signs, Rasengan crouch, Chidori sprinter stance, lunging palm strike, two-handed push, fire breath, ground slam
-  (Earth Wall / summoning / Wood Wall), overhead Rasenshuriken throw, healing palms, Chidori Current burst, ninja run,
-  and five sword attacks (`tools/gen_player_anims.py`).
+- **Animations**: every jutsu has its own animation with anticipation, follow-through and leg stances, plus an
+  elemental **charge-up** (vortex under your feet, chakra streaks, flame puffs in the jutsu's colour):
+  Fireball (seals → deep inhale → exhale), Phoenix Sage Fire (head sweeps the fan of flames), Rasengan (low stance,
+  the other hand shapes the sphere → sprinting ram strike), Chidori (sprinter crouch → ram strike), Substitution
+  (snap seal and duck), Shadow Clone (cross seal → arms flare), Body Flicker (dive low), Wind Style (twist → two-hand
+  gust), Water Dragon (long flowing seal chain → palms), Earth Wall / Wood Wall (leap and slam), Chidori Current
+  (chest bursts open), Rasenshuriken (held overhead → hurl), Mystical Palm (healing palms), Summoning (bite thumb →
+  slam the ground), dōjutsu activation (hand sweeps the eyes), Almighty Push, Universal Pull, Sealing Chains,
+  Shadow Possession (rat seal), Mind Transfer (diamond seal), Expansion (flex), Insect Swarm (sleeves thrown open),
+  Fang Over Fang (spinning drill), the transformation power-up, a ninja run and five sword attacks
+  (`tools/gen_player_anims.py`).
 
 - **3D models**: a spinning glowing **Rasengan** orb in your hand, a **fireball** and **water dragon** orb that fly
   with trails, the spinning **Rasenshuriken**, and a purple **Susanoo** ribcage that wraps around you.

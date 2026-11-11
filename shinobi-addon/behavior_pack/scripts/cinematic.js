@@ -110,6 +110,22 @@ export function impactFx(dim, pos, color = [1, 0.5, 0.1], power = 1) {
   shake(dim, pos, 0.12 * power, 0.25 + 0.15 * power, 10 + power * 8);
 }
 
+// Elemental wind-up while a jutsu charges: vortex under the feet, chakra streaks and puffs.
+export function chargeFx(player, color, ticks = 12, sound) {
+  if (!valid(player)) return;
+  if (sound) sfx(player.dimension, sound, player.location, 1.2, 1);
+  for (let t = 0; t < ticks; t += 3) {
+    system.runTimeout(() => {
+      if (!valid(player)) return;
+      const dim = player.dimension;
+      fx(dim, "aegis:cine_swirl", player.location, color);
+      fx(dim, "aegis:cine_bolt", add(player.location, { x: 0, y: 1, z: 0 }), color);
+      if (t % 6 === 0) fx(dim, "aegis:beast_aura", player.location, color);
+    }, t);
+  }
+  system.runTimeout(() => valid(player) && fx(player.dimension, "aegis:cine_flame", add(player.location, { x: 0, y: 1, z: 0 }), color), Math.max(0, ticks - 2));
+}
+
 // Quick cast flourish for regular jutsu.
 export function castFx(player, color, sound) {
   if (!valid(player)) return;

@@ -11,7 +11,7 @@ import { initEnemies, spawnAkatsukiNear } from "./enemies.js";
 import { initCompanions, handleSummonUse } from "./companions.js";
 import { initSage, sageMultiplier } from "./sage.js";
 import { initArmor, armorChakraBonus, armorRegenMultiplier, armorDamageMultiplier } from "./armor.js";
-import { impactFx, castFx, sfx, shake } from "./cinematic.js";
+import { impactFx, castFx, sfx, shake, chargeFx } from "./cinematic.js";
 import { initLevels, handleRecordUse, levelChakraBonus, levelRegenMultiplier, ninjutsuMultiplier, cooldownMultiplier, gainJutsuXp, getLevel, xpInfo } from "./levels.js";
 
 // ---------------------------------------------------------------------------
@@ -319,11 +319,17 @@ function launchProjectile(caster, start, dir, opts = {}) {
   projectiles.push({ caster, dim: caster.dimension, pos: start, dir: norm(dir), age: 0, orb, o });
 }
 
-function castFireball(player, dir = player.getViewDirection()) {
-  anim(player, "animation.aegis.jutsu_breath");
-  launchProjectile(player, add(player.getHeadLocation(), scale(dir, 1.5)), dir);
-  sound(player.dimension, "mob.ghast.fireball", player.location, 1, 0.8);
-  sfx(player.dimension, "aegis.fire", player.location, 1.2, 1);
+// Fire Style: Fireball — seals, a deep inhale, then the fireball bursts out (launch synced to the exhale).
+function castFireball(player, dir, animName = "animation.aegis.fireball_jutsu", delay = 12) {
+  anim(player, animName);
+  chargeFx(player, [1, 0.45, 0.1], delay);
+  system.runTimeout(() => {
+    if (!isValid(player)) return;
+    const d = dir ?? player.getViewDirection();
+    launchProjectile(player, add(player.getHeadLocation(), scale(d, 1.5)), d);
+    sound(player.dimension, "mob.ghast.fireball", player.location, 1, 0.8);
+    sfx(player.dimension, "aegis.fire", player.location, 1.2, 1);
+  }, delay);
 }
 
 function updateProjectiles() {
@@ -410,7 +416,8 @@ function explodeProjectile(pr) {
 function castSphere(player) {
   const dim = player.dimension;
   const CHARGE = 14;
-  anim(player, "animation.aegis.rasengan_hold");
+  anim(player, "animation.aegis.rasengan_form");
+  chargeFx(player, [0.4, 0.75, 1], CHARGE);
   const orb = spawnFx(dim, "aegis:jutsu_orb", "aegis:as_rasengan", handPos(player));
   follow(orb, () => (isValid(player) ? sub(handPos(player), { x: 0, y: 0.25, z: 0 }) : undefined), CHARGE + 14);
   sfx(dim, "aegis.rasengan", player.location, 1.3, 1);
@@ -424,7 +431,7 @@ function castSphere(player) {
   }
   system.runTimeout(() => {
     if (!isValid(player)) return;
-    anim(player, "animation.aegis.palm_thrust");
+    anim(player, "animation.aegis.ram_strike");
     sound(dim, "mob.breeze.wind_burst", player.location, 0.6, 1.4);
     lungeStrike(player, {
       power: 2.6, range: 2.6, ticks: 14,
@@ -450,7 +457,7 @@ const substitutionArmed = new Map(); // playerId -> tick it expires
 
 function castSubstitution(player) {
   substitutionArmed.set(player.id, system.currentTick + 160);
-  anim(player, "animation.aegis.hand_signs");
+  anim(player, "animation.aegis.substitution");
   particle(player.dimension, "aegis:chakra_aura", player.location);
   sound(player.dimension, "random.pop", player.location, 1, 0.6);
   player.sendMessage("§7[Substitution] Ready — the next hit you take will be avoided (8s).");
@@ -526,7 +533,8 @@ function castClones(player) {
     return false;
   }
   const count = Math.min(2, room);
-  anim(player, "animation.aegis.hand_signs");
+  anim(player, "animation.aegis.clone_seal");
+  chargeFx(player, [1, 1, 1], 9, "aegis.whoosh");
   for (let i = 0; i < count; i++) {
     const a = Math.random() * Math.PI * 2;
     let loc = add(player.location, { x: Math.cos(a) * 1.5, y: 0, z: Math.sin(a) * 1.5 });
@@ -569,6 +577,7 @@ world.afterEvents.entityHitEntity.subscribe(({ damagingEntity, hitEntity }) => {
 
 // --- Body Flicker: a burst of speed in the direction you're looking. ---
 function castFlashStep(player) {
+  anim(player, "animation.aegis.body_flicker");
   const dir = player.getViewDirection();
   const h = norm({ x: dir.x, y: 0, z: dir.z });
   knockback(player, h.x, h.z, 3.0, Math.max(0.25, dir.y * 0.8));
@@ -587,7 +596,7 @@ function castGalePalm(player) {
   const dim = player.dimension;
   const dir = player.getViewDirection();
   const head = player.getHeadLocation();
-  anim(player, "animation.aegis.palm_thrust");
+  anim(player, "animation.aegis.wind_palm");
   for (let d = 1; d <= 8; d++) {
     particle(dim, "aegis:wind_gust", add(head, scale(dir, d)));
   }
@@ -612,6 +621,7 @@ function castChidori(player) {
   const dim = player.dimension;
   const CHARGE = 14;
   anim(player, "animation.aegis.chidori_charge");
+  chargeFx(player, [0.6, 0.85, 1], CHARGE);
   sound(dim, "ambient.weather.thunder", player.location, 0.5, 1.8);
   sfx(dim, "aegis.chidori", player.location, 1.4, 1); // the "thousand birds" chirp
   for (let i = 0; i < CHARGE + 14; i++) {
@@ -624,7 +634,7 @@ function castChidori(player) {
   }
   system.runTimeout(() => {
     if (!isValid(player)) return;
-    anim(player, "animation.aegis.palm_thrust");
+    anim(player, "animation.aegis.ram_strike");
     lungeStrike(player, {
       power: 3.6, range: 2.6, ticks: 14,
       onHit: (target) => {
@@ -642,7 +652,8 @@ function castChidori(player) {
 
 // --- Fire Style: Phoenix Sage Fire — a fan of small fireballs. ---
 function castPhoenix(player) {
-  anim(player, "animation.aegis.jutsu_breath");
+  anim(player, "animation.aegis.phoenix_breath");
+  chargeFx(player, [1, 0.45, 0.1], 9);
   system.runTimeout(() => {
     if (!isValid(player)) return;
     const d = player.getViewDirection();
@@ -664,7 +675,8 @@ function castPhoenix(player) {
 
 // --- Water Style: Water Dragon Bullet — a heavy water orb that crashes and slows. ---
 function castWaterDragon(player) {
-  anim(player, "animation.aegis.hand_signs");
+  anim(player, "animation.aegis.water_seals");
+  chargeFx(player, [0.3, 0.6, 1], 14);
   sound(player.dimension, "bucket.fill_water", player.location, 1, 0.8);
   for (let t = 0; t < 12; t += 3) system.runTimeout(() => isValid(player) && particle(player.dimension, "aegis:water_splash", add(player.location, { x: 0, y: 0.2, z: 0 })), t);
   system.runTimeout(() => {
@@ -690,6 +702,7 @@ function castEarthWall(player) {
   for (let s2 = -3; s2 <= 3; s2++) for (let y = 0; y < 4; y++) spots.push({ x: base.x + side.x * s2, y: base.y + y, z: base.z + side.z * s2 });
   if (!spots.some((l) => dim.getBlock(l)?.isAir)) return false;
   anim(player, "animation.aegis.earth_slam");
+  chargeFx(player, [0.65, 0.5, 0.3], 7);
   sound(dim, "dig.stone", player.location, 1, 0.5);
   const placed = [];
   system.runTimeout(() => {
@@ -733,6 +746,7 @@ function castEarthWall(player) {
 function castChidoriCurrent(player) {
   const dim = player.dimension;
   anim(player, "animation.aegis.lightning_burst");
+  chargeFx(player, [0.6, 0.85, 1], 6);
   sound(dim, "mob.bee.loop", player.location, 1, 2);
   system.runTimeout(() => {
     if (!isValid(player)) return;
@@ -768,6 +782,7 @@ function castRasenshuriken(player) {
   const dim = player.dimension;
   const CHARGE = 21;
   anim(player, "animation.aegis.throw_overhead");
+  chargeFx(player, [0.8, 0.95, 1], 21);
   const above = () => add(player.getHeadLocation(), { x: 0, y: 1.3, z: 0 });
   const model = spawnFx(dim, "aegis:rasenshuriken", undefined, above());
   follow(model, () => (isValid(player) ? sub(above(), { x: 0, y: 0.4, z: 0 }) : undefined), CHARGE);
@@ -818,6 +833,7 @@ function castMysticalPalm(player) {
     /* heal self */
   }
   anim(player, "animation.aegis.heal_palms");
+  chargeFx(player, [0.3, 1, 0.4], 9);
   sound(player.dimension, "beacon.ambient", player.location, 1, 1.6);
   sfx(player.dimension, "aegis.seal", player.location, 1, 1.3);
   castFx(player, [0.3, 1, 0.4]);

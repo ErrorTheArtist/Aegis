@@ -222,7 +222,8 @@ SKINS = [
 ]
 (RP / "textures" / "entity" / "aegis" / "npc").mkdir(parents=True, exist_ok=True)
 for name, o in SKINS:
-    humanoid(o).save(RP / "textures" / "entity" / "aegis" / "npc" / f"{name}.png")
+    custom = Path(__file__).parent / "skins" / f"{name}.png"  # hand-made skins override the generated ones
+    (Image.open(custom).convert("RGBA") if custom.exists() else humanoid(o)).save(RP / "textures" / "entity" / "aegis" / "npc" / f"{name}.png")
 
 skin_tex = {f"s{i}": f"textures/entity/aegis/npc/{n}" for i, (n, _) in enumerate(SKINS)}
 w(RP / "render_controllers" / "npc.render_controllers.json", {"format_version": "1.8.0", "render_controllers": {

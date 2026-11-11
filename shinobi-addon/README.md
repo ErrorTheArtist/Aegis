@@ -381,6 +381,9 @@ S-rank missions and gives big XP.
 
 All also drop 16–32 emeralds, diamonds and pills.
 
+Their skins live in `tools/skins/<name>.png` (standard 64×64 Minecraft skins). Replace a file there and run
+`python3 tools/gen_npcs.py` to change a skin — any NPC skin with a file in that folder uses it instead of the generated one.
+
 ### Summoning
 
 Summoning scrolls (Sensei): **Toad** (belly-slam AoE), **Slug** (heals you, restores chakra, acid), **Snake**

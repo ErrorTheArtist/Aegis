@@ -1,13 +1,15 @@
-# Naruto: Shinobi Way — a add-on for Minecraft Bedrock
+# Way of The Shinobi
+
+*The Best Naruto Addon made by \_errorlegend*
 
 A Naruto add-on: chakra, jutsu scrolls, kunai, shuriken, clones and more.
 Uses the real Naruto names (Rasengan, Shadow Clone Jutsu, etc.) — personal use only.
 
 ## Install
 
-1. Get `dist/ShinobiWay.mcaddon` (or run `./build.sh` to rebuild it).
+1. Get `dist/WayOfTheShinobi.mcaddon` (or run `./build.sh` to rebuild it).
 2. Open the file on your device — Minecraft imports both packs automatically.
-3. Create/edit a world → **Behavior Packs** → activate **Naruto: Shinobi Way (Behavior)**
+3. Create/edit a world → **Behavior Packs** → activate **Way of The Shinobi**
    (the resource pack is applied automatically).
 4. Requires Minecraft Bedrock **1.21.60+**. No experimental toggles needed.
 
@@ -396,7 +398,7 @@ All items are also in the creative inventory.
 behavior_pack/   items, entities, recipes, scripts/main.js (jutsu) + scripts/clans.js (clans)
 resource_pack/   textures, client entities, headband attachable
 tools/gen_textures.py   regenerates the placeholder pixel art (needs Pillow)
-build.sh         packages dist/ShinobiWay.mcaddon
+build.sh         packages dist/WayOfTheShinobi.mcaddon
 ```
 
 Tuning (chakra costs, cooldowns, damage) lives at the top of `behavior_pack/scripts/main.js`.

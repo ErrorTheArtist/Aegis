@@ -1,13 +1,13 @@
 {
   "format_version": 2,
   "header": {
-    "name": "Naruto: Shinobi Way (Resources)",
-    "description": "Textures and models for the Shinobi Way ninja add-on.",
+    "name": "Way of The Shinobi (Resources)",
+    "description": "The Best Naruto Addon made by _errorlegend",
     "uuid": "021eff9f-c0fb-4765-9c0b-08387d62edb5",
     "version": [
       1,
       12,
-      1
+      2
     ],
     "min_engine_version": [
       1,
@@ -22,7 +22,7 @@
       "version": [
         1,
         12,
-        1
+        2
       ]
     }
   ],
@@ -32,7 +32,7 @@
       "version": [
         1,
         12,
-        1
+        2
       ]
     }
   ]

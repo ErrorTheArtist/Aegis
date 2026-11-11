@@ -1,4 +1,4 @@
-// Shinobi Way — ninja add-on for Minecraft Bedrock.
+// Way of The Shinobi — Naruto add-on for Minecraft Bedrock.
 // Chakra system, jutsu scrolls and ninja tools, driven by @minecraft/server.
 
 import { world, system, ItemStack, MolangVariableMap } from "@minecraft/server";
@@ -909,7 +909,7 @@ world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
   player.setDynamicProperty(WELCOME_PROP, true);
   player.sendMessage(
     [
-      "§6=== Naruto: Shinobi Way ===",
+      "§6=== Way of The Shinobi ===",
       "§7Craft §fBlank Scrolls§7 (paper + stick) and add a catalyst + lapis to learn jutsu.",
       "§7Right-click a jutsu scroll to cast it. Each jutsu costs §bchakra§7.",
       "§7Sneak and stand still to §3focus§7 and regenerate chakra faster.",

@@ -1,13 +1,13 @@
 {
   "format_version": 2,
   "header": {
-    "name": "Naruto: Shinobi Way (Behavior)",
-    "description": "Ninja add-on: chakra, jutsu scrolls, kunai, shuriken and more.",
+    "name": "Way of The Shinobi",
+    "description": "The Best Naruto Addon made by _errorlegend",
     "uuid": "23a31107-035a-4102-bc35-0d5fb16df98a",
     "version": [
       1,
       12,
-      1
+      2
     ],
     "min_engine_version": [
       1,
@@ -22,7 +22,7 @@
       "version": [
         1,
         12,
-        1
+        2
       ]
     },
     {
@@ -32,7 +32,7 @@
       "version": [
         1,
         12,
-        1
+        2
       ],
       "entry": "scripts/main.js"
     }
@@ -43,7 +43,7 @@
       "version": [
         1,
         12,
-        1
+        2
       ]
     },
     {

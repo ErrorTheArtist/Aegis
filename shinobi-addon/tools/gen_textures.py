@@ -219,13 +219,7 @@ rect(skin, 0, 16, 16, 32, PANTS)
 rect(skin, 16, 48, 32, 64, PANTS)
 save(skin, RP / "textures" / "entity" / "aegis" / "chakra_clone.png")
 
-# --- Pack icons --------------------------------------------------------------
-icon = SHURIKEN_IMG
-bg = Image.new("RGBA", (16, 16), (230, 120, 30, 255))
-bg.alpha_composite(icon)
-bg = bg.resize((128, 128), Image.NEAREST)
-save(bg, RP / "pack_icon.png")
-save(bg, ROOT / "behavior_pack" / "pack_icon.png")
+# Pack icons (pack_icon.png) are custom artwork — not generated here.
 
 print("Textures generated.")
 

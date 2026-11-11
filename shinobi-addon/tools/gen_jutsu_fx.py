@@ -163,3 +163,8 @@ for sid, (name, cat) in SCROLLS.items():
     atlas["texture_data"][f"aegis_{sid}"] = {"textures": f"textures/items/aegis/{sid}"}
 w(atlas_p, atlas)
 print("Jutsu FX generated.")
+
+# Particles are owned by tools/gen_particles.py — regenerate them so they win over anything written above.
+import subprocess as _sp  # noqa: E402
+import sys as _sys  # noqa: E402
+_sp.run([_sys.executable, str(Path(__file__).resolve().parent / "gen_particles.py")], check=True)

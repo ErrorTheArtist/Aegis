@@ -580,6 +580,19 @@ python3 tools/anim_preview.py gif fireball_jutsu -o fireball.gif
 python3 tools/anim_preview.py sheet earth_slam ram_strike -o sheet.png
 ```
 
+## Particles
+
+All 29 effects come from `tools/gen_particles.py`: procedural textures (animated flipbooks for billowing smoke,
+fireballs and flame tongues; random variants for sparks, lightning bolts and rock debris; shockwave ring, vortex,
+beam, slash streak, wind swoosh, water droplet) and the effects themselves — pop-in / grow / shrink sizes,
+white-hot → colour → ember colour ramps, spin, drag and gravity, flat ground shockwaves and vortexes, an imploding
+Tailed Beast Bomb charge and an orbiting Rasengan. Effects use fewer, larger particles than before, so they're
+lighter on weak devices. Preview them without Minecraft:
+
+```
+python3 tools/gen_particles.py --preview fire_burst smoke_puff cine_ring -o particles.png
+```
+
 ## Project layout
 
 ```

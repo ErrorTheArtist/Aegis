@@ -163,7 +163,7 @@ function defaultsFor(type) {
   };
 }
 
-// Creates (or replaces) a spawner block + config. Used by placement and by village generation.
+// Creates (or replaces) a spawner block + config.
 export function createSpawner(dim, loc, overrides = {}) {
   const pos = { x: Math.floor(loc.x), y: Math.floor(loc.y), z: Math.floor(loc.z) };
   try {

@@ -9,7 +9,6 @@ import { initHud } from "./hud.js";
 import { initNpcs } from "./npcs.js";
 import { initEnemies, spawnAkatsukiNear } from "./enemies.js";
 import { initCompanions, handleSummonUse } from "./companions.js";
-import { initVillages } from "./villages.js";
 import { initSage, sageMultiplier } from "./sage.js";
 import { initLevels, handleRecordUse, levelChakraBonus, levelRegenMultiplier, ninjutsuMultiplier, cooldownMultiplier, gainJutsuXp, getLevel } from "./levels.js";
 
@@ -741,5 +740,4 @@ const npcApi = {
 initNpcs({ ...npcApi, spawnAkatsukiNear: (p, msg) => spawnAkatsukiNear(p, msg) });
 initEnemies(npcApi);
 initCompanions(npcApi);
-initVillages(npcApi);
 initSage({ ...npcApi, getMaxChakra });

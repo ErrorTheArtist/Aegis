@@ -14,6 +14,7 @@
 // the HUD steps aside during that time. Always use showTitle() instead of onScreenDisplay.setTitle().
 
 import { world, system } from "@minecraft/server";
+import { getRyo } from "./currency.js";
 
 const BUCKETS = 50;
 const titles = new Map(); // player id -> { text, subtitle, until, shown }
@@ -53,7 +54,7 @@ function encode(player) {
   const xpCode = need > 0 ? bucket(xp, need) : code(BUCKETS);
   return {
     title: "AEG" + bucket(hp, hpMax) + xpCode + "§f" + `HP ${hp}/${hpMax}`,
-    subtitle: "AEC" + bucket(ck, ckMax) + "§f" + `CK ${ck}/${ckMax}\n§eLevel ${api.getLevel(player)}\n§f${need > 0 ? `${xp}/${need} XP` : "MAX"}\n§6Points ${points}`,
+    subtitle: "AEC" + bucket(ck, ckMax) + "§f" + `CK ${ck}/${ckMax}\n§eLevel ${api.getLevel(player)}\n§f${need > 0 ? `${xp}/${need} XP` : "MAX"}\n§6Points ${points}\n§6Ryō ${getRyo(player).toLocaleString("en-US")}`,
   };
 }
 

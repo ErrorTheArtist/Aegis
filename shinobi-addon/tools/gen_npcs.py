@@ -542,16 +542,16 @@ def cnt(lo, hi):
 
 
 w(BP / "loot_tables" / "entities" / "aegis_ninja.json", {"pools": [
-    {"rolls": 1, "entries": [{"type": "item", "name": "minecraft:emerald", "weight": 1, "functions": cnt(1, 3)}]},
+    {"rolls": 1, "entries": [{"type": "item", "name": "aegis:ryo", "weight": 1, "functions": cnt(1, 3)}]},
     {"rolls": 1, "entries": [{"type": "item", "name": "aegis:kunai", "weight": 1, "functions": cnt(1, 4)}, {"type": "empty", "weight": 1}]},
     {"rolls": 1, "entries": [{"type": "item", "name": "aegis:chakra_pill", "weight": 3}, {"type": "item", "name": "aegis:blank_scroll", "weight": 2},
                              {"type": "item", "name": "aegis:shuriken", "weight": 2, "functions": cnt(2, 6)}, {"type": "empty", "weight": 6}]}]})
 w(BP / "loot_tables" / "entities" / "aegis_legend.json", {"pools": [
-    {"rolls": 1, "entries": [{"type": "item", "name": "minecraft:emerald", "weight": 1, "functions": cnt(16, 32)}]},
+    {"rolls": 1, "entries": [{"type": "item", "name": "aegis:ryo", "weight": 1, "functions": cnt(16, 32)}]},
     {"rolls": 1, "entries": [{"type": "item", "name": "minecraft:diamond", "weight": 1, "functions": cnt(3, 8)}]},
     {"rolls": 1, "entries": [{"type": "item", "name": "aegis:chakra_pill", "weight": 1, "functions": cnt(4, 8)}]}]})
 w(BP / "loot_tables" / "entities" / "aegis_akatsuki.json", {"pools": [
-    {"rolls": 1, "entries": [{"type": "item", "name": "minecraft:emerald", "weight": 1, "functions": cnt(10, 20)}]},
+    {"rolls": 1, "entries": [{"type": "item", "name": "aegis:ryo", "weight": 1, "functions": cnt(10, 20)}]},
     {"rolls": 1, "entries": [{"type": "item", "name": "minecraft:diamond", "weight": 1, "functions": cnt(2, 5)}]},
     {"rolls": 1, "entries": [{"type": "item", "name": "aegis:reroll_scroll", "weight": 1}, {"type": "item", "name": "aegis:bijuu_scroll", "weight": 1},
                              {"type": "item", "name": "aegis:samehada", "weight": 1}, {"type": "item", "name": "aegis:shibuki", "weight": 1},

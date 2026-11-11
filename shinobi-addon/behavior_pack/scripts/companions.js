@@ -2,9 +2,9 @@
 
 import { world, system } from "@minecraft/server";
 import { ActionFormData } from "@minecraft/server-ui";
-import { countItem, takeItem } from "./npcs.js";
+import { getRyo, spendRyo, fmtRyo } from "./currency.js";
 
-const RECRUIT_COST = 15;
+const RECRUIT_COST = 1500; // Ryō
 const MAX_COMPANION_LEVEL = 10;
 const SUMMONS = {
   "aegis:summon_toad_scroll": { entity: "aegis:summon_toad", name: "Toad", sound: "mob.slime.big" },
@@ -51,12 +51,12 @@ async function geninMenu(player, e) {
   if (!owner) {
     const r = await new ActionFormData()
       .title("§lGenin")
-      .body(`§7"Hire me and I'll fight by your side! I get stronger with every battle."\n\n§aYour emeralds: §f${countItem(player, "minecraft:emerald")}`)
-      .button(`§2Recruit\n§r§7${RECRUIT_COST} emeralds`)
+      .body(`§7"Hire me and I'll fight by your side! I get stronger with every battle."\n\n§6Your Ryō: §f${fmtRyo(getRyo(player))}`)
+      .button(`§2Recruit\n§r§7${fmtRyo(RECRUIT_COST)}`)
       .button("Not now")
       .show(player);
     if (r.canceled || r.selection !== 0) return;
-    if (!takeItem(player, "minecraft:emerald", RECRUIT_COST)) return player.sendMessage(`§cYou need ${RECRUIT_COST} emeralds.`);
+    if (!spendRyo(player, RECRUIT_COST)) return player.sendMessage(`§cYou need ${fmtRyo(RECRUIT_COST)}.`);
     // leave the spawner (it will send a new recruit later) and join the player
     for (const tag of e.getTags()) if (tag.startsWith("aegis_sp_")) e.removeTag(tag);
     e.setDynamicProperty("aegis:spawner", undefined);

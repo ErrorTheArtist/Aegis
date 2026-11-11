@@ -5,6 +5,7 @@
 import { world, system } from "@minecraft/server";
 import { ActionFormData } from "@minecraft/server-ui";
 import { showTitle } from "./hud.js";
+import { spendRyo, fmtRyo } from "./currency.js";
 
 export const NATURES = {
   fire: { name: "Fire Release", color: "§c", rgb: [1, 0.45, 0.1] },
@@ -33,7 +34,7 @@ export const JUTSU_NATURE = {
   "aegis:water_prison_scroll": "water",
 };
 
-// Level + emerald price for your 2nd, 3rd, 4th and 5th release.
+// Level + price (in units of 100 Ryō) for your 2nd, 3rd, 4th and 5th release.
 export const NATURE_TRAINING = [null, null, { lvl: 25, ems: 24 }, { lvl: 50, ems: 40 }, { lvl: 90, ems: 56 }, { lvl: 140, ems: 64 }];
 
 const PROP = "aegis:natures";
@@ -97,7 +98,7 @@ function rollNature(player) {
 }
 
 // Jutsu Sensei: learn another release.
-export async function natureTraining(player, priceOf, takeItem, getLevel) {
+export async function natureTraining(player, priceOf, getLevel) {
   const have = getNatures(player);
   const next = NATURE_TRAINING[have.length + 1];
   if (!next) return player.sendMessage("§6You have mastered all five chakra natures.");
@@ -105,13 +106,13 @@ export async function natureTraining(player, priceOf, takeItem, getLevel) {
   const price = priceOf(next.ems);
   const f = new ActionFormData()
     .title("§lChakra Nature Training")
-    .body(`§7Your releases: ${have.map(natureLabel).join("§7, ") || "§8none"}\n\n§7Learning release #${have.length + 1} costs §a${price} emeralds§7 and needs §eLv ${next.lvl}§7.`);
+    .body(`§7Your releases: ${have.map(natureLabel).join("§7, ") || "§8none"}\n\n§7Learning release #${have.length + 1} costs §6${fmtRyo(price)}§7 and needs §eLv ${next.lvl}§7.`);
   for (const n of missing) f.button(`${natureLabel(n)}`);
   f.button("Leave");
   const r = await f.show(player);
   if (r.canceled || r.selection === undefined || r.selection >= missing.length) return;
   if (getLevel(player) < next.lvl) return player.sendMessage(`§cReach level ${next.lvl} first.`);
-  if (!takeItem(player, "minecraft:emerald", price)) return player.sendMessage(`§cYou need ${price} emeralds.`);
+  if (!spendRyo(player, price)) return player.sendMessage(`§cYou need ${fmtRyo(price)}.`);
   const n = missing[r.selection];
   setNatures(player, [...have, n]);
   showTitle(player, `${NATURES[n].color}${NATURES[n].name}`, { subtitle: "§7New chakra nature learned!", stayDuration: 50 });

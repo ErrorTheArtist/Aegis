@@ -14,6 +14,8 @@ import { initArmor, armorChakraBonus, armorRegenMultiplier, armorDamageMultiplie
 import { impactFx, castFx, sfx, shake, chargeFx } from "./cinematic.js";
 import { makeJutsu2 } from "./jutsu2.js";
 import { makeReleases } from "./releases.js";
+import { initCurrency } from "./currency.js";
+import { initQuests } from "./quests.js";
 import { initNatures, natureCostMultiplier, natureDamageMultiplier, onJutsuCast, natureTag } from "./natures.js";
 import { initLevels, handleRecordUse, levelChakraBonus, levelRegenMultiplier, ninjutsuMultiplier, cooldownMultiplier, gainJutsuXp, getLevel, xpInfo } from "./levels.js";
 
@@ -997,6 +999,8 @@ Object.assign(JUTSU, makeJutsu2(npcApi));
   registerClanAbilities(rel.abilities);
 }
 initNatures(npcApi);
+initCurrency(npcApi);
+initQuests(npcApi);
 initNpcs({ ...npcApi, spawnAkatsukiNear: (p, msg) => spawnAkatsukiNear(p, msg) });
 initEnemies(npcApi);
 initCompanions(npcApi);

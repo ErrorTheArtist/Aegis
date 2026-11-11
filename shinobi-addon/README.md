@@ -92,8 +92,8 @@ basic jutsu — affinity just makes them better.
 | Earth | Earth Wall, Earth Spikes |
 | Water | Water Dragon Bullet, Water Prison |
 
-Learn more releases at the **Jutsu Sensei** (*Chakra Nature Training*): 2nd release Lv 25 / 24 emeralds, 3rd Lv 50 / 40,
-4th Lv 90 / 56, 5th Lv 140 / 64. `/scriptevent aegis:nature info|reroll|add <nature>|set <nature>` for testing.
+Learn more releases at the **Jutsu Sensei** (*Chakra Nature Training*): 2nd release Lv 25 / 2,400 Ryō, 3rd Lv 50 / 4,000,
+4th Lv 90 / 5,600, 5th Lv 140 / 6,400. `/scriptevent aegis:nature info|reroll|add <nature>|set <nature>` for testing.
 
 ### Kekkei genkai releases (clan-bound)
 
@@ -125,7 +125,7 @@ Check your progress with `/scriptevent aegis:clan info`.
 
 ### Eternal Mangekyō Sharingan (Uchiha)
 
-Uchiha with the Mangekyō can awaken the **Eternal Mangekyō** at an **Uchiha Clan Elder** (Lv 100, 64 emeralds).
+Uchiha with the Mangekyō can awaken the **Eternal Mangekyō** at an **Uchiha Clan Elder** (Lv 100, 6,400 Ryō).
 It replaces your Mangekyō item:
 
 - half the chakra drain (1.5/sec), **50% dodge**, Strength II + Speed while active
@@ -136,7 +136,7 @@ It replaces your Mangekyō item:
 
 ### Sage Mode
 
-Learn it from a **Jutsu Sensei** (Sage Training: Lv 60, 48 emeralds). Then **hold sneak and stand still for 5 seconds**
+Learn it from a **Jutsu Sensei** (Sage Training: Lv 60, 4,800 Ryō). Then **hold sneak and stand still for 5 seconds**
 to gather natural energy (a green bar fills on the action bar) and enter **Sage Mode** for 60 seconds:
 
 - **full chakra** on entering
@@ -429,6 +429,34 @@ how many to keep spawned (1–6) · respawn on/off + delay (5–600 s) · stay i
 invulnerable · shop prices / mission rewards % · greeting line · spawn height (0 = first free space).
 Friendly NPCs are leashed to their spawner; breaking the spawner removes its NPCs.
 
+### Ryō currency
+
+**Ryō** is the shinobi money. Your wallet is shown on the HUD under your stat points.
+
+- **Earn it:** enemy ninja, Akatsuki, Legends and Tailed Beasts drop **Ryō notes** (100 Ryō each) — picking them up puts
+  them straight into your wallet. Missions and quests pay Ryō too.
+- **Spend it:** every shop, the Clan Elder, Sage Training, nature training and recruiting Genin.
+- **Pay a player / exchange emeralds:** open your **Shinobi Record → Ryō Wallet**. Old emeralds exchange for **100 Ryō
+  each** (also at the Jutsu Sensei and Weaponsmith).
+- Admin: `/scriptevent aegis:ryo give 5000` · `take 5000` · `set 0` (the player who runs it).
+
+### Quest Givers (design your own quests)
+
+Place an **NPC Spawner** and choose **Quest Giver**. Its name, outfit, greeting and count come from the normal spawner
+settings; right after saving, the **Quest Settings** open (later: sneak-tap the spawner → *Quest settings*):
+
+| Setting | |
+|---|---|
+| Quest title & story | what the NPC tells the player |
+| Enemy to fight | any hostile mob, zombies, skeletons, spiders, creepers, any enemy ninja, Rogue / Sound / Anbu, any Akatsuki or Itachi / Kisame / Deidara, any Tailed Beast or a specific one (Shukaku … Kurama), or a Legend (Naruto, Sasuke, Tsunade, Hiruzen, Minato) |
+| How many | 1–30 |
+| Spawn them when the quest starts | on: they appear around the player (only those count) · off: hunt them anywhere in the world |
+| Rewards | Ryō, XP, and an item — pick one from the list or use **the item in your hand** (any item, any amount) |
+| Minimum level · Repeatable · Time limit | 1–200 · on/off · 0–30 minutes (0 = none) |
+
+Players talk to the Quest Giver to accept, see their progress, claim the reward or abandon. One quest at a time
+(missions from the Mission Desk are separate). `/scriptevent aegis:quest` shows your current quest, `… abandon` drops it.
+
 ### Friendly NPCs (talk to them)
 
 | NPC | What they do |
@@ -436,19 +464,19 @@ Friendly NPCs are leashed to their spawner; breaking the spawner removes its NPC
 | **Jutsu Sensei** | Sells jutsu scrolls (Fireball → Rasengan/Chidori), Summoning scrolls and **Sage Training** (Lv 60); level requirements apply |
 | **Weaponsmith** | Kunai, shuriken, headbands, all 8 legendary swords (Lv 15–35), repairs the item in your hand |
 | **Ramen Shop** | Ichiraku Ramen (heal + 60 chakra + regen), Miso Ramen (+30 chakra + speed), Soldier Pills |
-| **Hokage (Mission Desk)** | D/C/B/A/S missions (kill mobs, ninja, a Tailed Beast, an Akatsuki member) for XP, emeralds and items |
+| **Hokage (Mission Desk)** | D/C/B/A/S missions (kill mobs, ninja, a Tailed Beast, an Akatsuki member) for XP, Ryō and items |
 | **Exam Proctor** | Rank exams: **Chūnin** (Lv 20, beat 4 rogue ninja in 90 s), **Jōnin** (Lv 60, 3 Anbu + 3 Sound in 2 min), nothing higher — exams stop at Jōnin. Ranks show on your name tag and give +5/+10 stat points |
-| **Clan Elder** | For their clan: **Clan Mastery** 1–3 (+10% clan max chakra, −10% clan ability cooldowns each); the Uchiha Elder also awakens the **Eternal Mangekyō**. Others: **Bloodline transfer** into that clan (64 emeralds, Lv 30) |
+| **Clan Elder** | For their clan: **Clan Mastery** 1–3 (+10% clan max chakra, −10% clan ability cooldowns each); the Uchiha Elder also awakens the **Eternal Mangekyō**. Others: **Bloodline transfer** into that clan (6,400 Ryō, Lv 30) |
 | **Leaf Shinobi** | Chatter and tips |
-| **Genin** | Recruit for 15 emeralds — follows you, fights, levels up to 10 (Strength, Resistance, hearts). Talk to toggle follow/stay or dismiss |
+| **Genin** | Recruit for 1,500 Ryō — follows you, fights, levels up to 10 (Strength, Resistance, hearts). Talk to toggle follow/stay or dismiss |
 
-Shops use **emeralds** (dropped by enemy ninja, Akatsuki and paid by missions).
+Shops use **Ryō** — see *Ryō currency* below.
 
 ### Enemies
 
 - **Rogue ninja** (kunai, Fireball, Substitution), **Sound ninja** (sound-wave blast, nausea), **Rogue Anbu** (blink
   behind you and strike) **wander the overworld day and night** in groups of 1–3 (more in the dark/underground).
-  Killing them gives XP (and levels), emeralds, kunai and pills.
+  Killing them gives XP (and levels), Ryō, kunai and pills.
 - **Akatsuki bosses** with boss bars: **Itachi** (Amaterasu, Tsukuyomi, Fireball, crow Substitution),
   **Kisame** (Water Shark Bomb, Water Prison, Samehada chakra drain), **Deidara** (C1 clay birds, telegraphed C3
   blast, keeps his distance). They **rarely roam the world** (Normal/Hard difficulty — you get a "sighted nearby"
@@ -469,7 +497,7 @@ S-rank missions and gives big XP.
 | **Hiruzen Sarutobi** | 800 | Fire Dragon (triple fireball), Shuriken Shadow Clone storm, Enma staff sweep | **Reaper Death Seal** — weakness, slowness & nausea | Phoenix Flower, Great Fire Annihilation, 32 shuriken |
 | **Minato Namikaze** | 750 | Flying Raijin teleport-slash, kunai volley, Rasengan from behind | **Flying Raijin barrage** — 5 blinks + Rasengan | Body Flicker scroll, 16 kunai, Rasengan |
 
-All also drop 16–32 emeralds, diamonds and pills.
+All also drop 1,600–3,200 Ryō, diamonds and pills.
 
 Their skins live in `tools/skins/<name>.png` (standard 64×64 Minecraft skins). Replace a file there and run
 `python3 tools/gen_npcs.py` to change a skin — any NPC skin with a file in that folder uses it instead of the generated one.

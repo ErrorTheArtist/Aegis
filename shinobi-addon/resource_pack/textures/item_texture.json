@@ -352,6 +352,9 @@
     },
     "aegis_hydrification": {
       "textures": "textures/items/aegis/hydrification"
+    },
+    "aegis_ryo": {
+      "textures": "textures/items/aegis/ryo"
     }
   }
 }

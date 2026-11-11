@@ -1,0 +1,22 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:item": {
+    "description": {
+      "identifier": "aegis:ryo",
+      "menu_category": {
+        "category": "items"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "aegis_ryo"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "Ryō Note (100 Ryō)"
+      },
+      "minecraft:max_stack_size": 64
+    }
+  }
+}

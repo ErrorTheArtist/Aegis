@@ -14,7 +14,9 @@ import { getLevel, gainXp, getRank, setRank, addPoints, RANKS } from "./levels.j
 import { hasSageTraining, grantSage } from "./sage.js";
 import { hasEternalMangekyo, awakenEternal } from "./clans.js";
 import { natureTraining } from "./natures.js";
+import { getRyo, spendRyo, addRyo, fmtRyo, exchangeEmeralds, EMERALD_RATE } from "./currency.js";
 import { RELEASE_SCROLLS } from "./releases.js";
+import { questGiver, questEditor, defaultQuest } from "./quests.js";
 
 const SPAWNER = "aegis:npc_spawner";
 const INDEX_PROP = "aegis:spawners";
@@ -37,6 +39,8 @@ export const NPC_TYPES = {
     greeting: "Think you're ready to rank up?" },
   villager: { label: "Leaf Shinobi (chatter)", entity: "aegis:npc", skin: 15, name: "§aLeaf Shinobi", friendly: true,
     greeting: "Nice weather for training, huh?" },
+  quest_giver: { label: "§eQuest Giver (design your own quest)", entity: "aegis:npc", skin: 15, name: "§eQuest Giver", friendly: true,
+    greeting: "I have a job for a capable shinobi." },
   genin: { label: "Genin (recruitable companion)", entity: "aegis:genin", skin: -1, name: "§fGenin", friendly: true,
     greeting: "Hire me and I'll fight by your side!" },
   rogue: { label: "Rogue Ninja (hostile)", entity: "aegis:hostile_ninja", skin: 9, name: "§cRogue Ninja", tier: "rogue" },
@@ -120,7 +124,8 @@ const isCreative = (p) => {
   }
 };
 
-const priceOf = (base, cfg) => Math.max(1, Math.round(base * ((cfg?.price ?? 100) / 100)));
+// Prices are written in "units" of 100 Ryō (the old emerald prices); a spawner's price % scales them.
+const priceOf = (base, cfg) => Math.max(1, Math.round(base * 100 * ((cfg?.price ?? 100) / 100)));
 
 function say(player, npc, text) {
   player.sendMessage(`${npc.nameTag || "NPC"}§r§7: ${text}`);
@@ -162,7 +167,7 @@ function forget(key) {
   world.setDynamicProperty(INDEX_PROP, JSON.stringify([...configs.keys()]));
 }
 
-function defaultsFor(type) {
+export function defaultsFor(type) {
   const t = NPC_TYPES[type];
   const hostile = !t.friendly;
   return {
@@ -331,16 +336,18 @@ function tickSpawners() {
 // ---------------------------------------------------------------------------
 async function spawnerMenu(player, cfg) {
   const t = NPC_TYPES[cfg.type];
-  const r = await new ActionFormData()
+  const form = new ActionFormData()
     .title("§lNPC Spawner")
     .body(`§7Type: §f${t.label}\n§7Name: §f${cfg.name || t.name}\n§7Count: §f${cfg.count}§7 · Respawn: §f${cfg.respawn ? cfg.delay + "s" : "off"}\n§7Position: §f${cfg.x} ${cfg.y} ${cfg.z}`)
     .button("§2Configure")
     .button("§9Respawn now")
     .button("§6Remove NPCs (they come back if respawn is on)")
-    .button("§cDelete spawner")
-    .show(player);
+    .button("§cDelete spawner");
+  if (cfg.type === "quest_giver") form.button("§eQuest settings\n§r§7enemies, rewards, story");
+  const r = await form.show(player);
   if (r.canceled) return;
   if (r.selection === 0) return configure(player, cfg);
+  if (r.selection === 4) return cfg.type === "quest_giver" ? questEditor(player, cfg, save) : undefined;
   if (r.selection === 1) {
     removeNpcs(cfg);
     cfg.spawned = false;
@@ -409,6 +416,13 @@ async function configure(player, cfg) {
   cfg.missingSince = undefined;
   save(cfg);
   player.sendMessage(`§aSpawner saved: §f${NPC_TYPES[cfg.type].label}§7. Cover the block if you like — the NPC spawns in the first free space above it.`);
+  if (cfg.type === "quest_giver") {
+    if (!cfg.quest) {
+      cfg.quest = defaultQuest();
+      save(cfg);
+    }
+    system.runTimeout(() => questEditor(player, cfg, save).catch(() => {}), 10);
+  }
 }
 
 function cfgForEntity(e) {
@@ -449,6 +463,7 @@ const SHOPS = {
     ["aegis:summon_snake_scroll", 1, "Summoning: Snake", 20, 20],
     ["aegis:blank_scroll", 4, "Blank Scroll ×4", 2, 1],
     ["__sage", 0, "Sage Training (learn Sage Mode)", 48, 60],
+    ["__exchange", 0, "Exchange emeralds for Ryō", 0, 1],
     ["__nature", 0, "Chakra Nature Training (learn another release)", 0, 1],
   ],
   weaponsmith: [
@@ -473,6 +488,7 @@ const SHOPS = {
     ["aegis:samurai_leggings", 1, "Samurai Haidate", 22, 40],
     ["aegis:samurai_boots", 1, "Samurai Suneate", 14, 40],
     ["__repair", 0, "Repair the item in your hand", 5, 1],
+    ["__exchange", 0, "Exchange emeralds for Ryō", 0, 1],
   ],
   ramen: [
     ["aegis:ramen", 1, "Ichiraku Ramen (heal, +60 chakra, regen)", 3, 1],
@@ -482,37 +498,40 @@ const SHOPS = {
 };
 
 async function shop(player, npc, cfg, list, title) {
-  const ems = countItem(player, "minecraft:emerald");
+  const ems = getRyo(player);
   const lvl = getLevel(player);
-  const f = new ActionFormData().title(title).body(`§7${cfg?.greeting || NPC_TYPES[cfg?.type ?? npc.getDynamicProperty("aegis:role")]?.greeting || ""}\n\n§aYour emeralds: §f${ems}`);
-  for (const [, , label, base, req] of list) {
+  const f = new ActionFormData().title(title).body(`§7${cfg?.greeting || NPC_TYPES[cfg?.type ?? npc.getDynamicProperty("aegis:role")]?.greeting || ""}\n\n§6Your Ryō: §f${fmtRyo(ems)}`);
+  for (const [id, , label, base, req] of list) {
     const p = priceOf(base, cfg);
-    f.button(base === 0 ? `§5${label}\n§r§7price depends on how many you know` : `${lvl < req ? "§8" : ems >= p ? "§2" : "§c"}${label}\n§r§7${p} emeralds${lvl < req ? ` · Lv ${req}` : ""}`);
+    f.button(id === "__exchange" ? `§e${label}\n§r§7${EMERALD_RATE} Ryō per emerald` : base === 0 ? `§5${label}\n§r§7price depends on how many you know` : `${lvl < req ? "§8" : ems >= p ? "§2" : "§c"}${label}\n§r§7${fmtRyo(p)}${lvl < req ? ` · Lv ${req}` : ""}`);
   }
   const r = await f.show(player);
   if (r.canceled || r.selection === undefined) return;
   const [id, amount, label, base, req] = list[r.selection];
   const price = priceOf(base, cfg);
   if (lvl < req) player.sendMessage(`§cYou need to be level ${req} for that.`);
-  else if (id === "__nature") {
-    return natureTraining(player, (n) => priceOf(n, cfg), takeItem, getLevel);
+  else if (id === "__exchange") {
+    const n = exchangeEmeralds(player);
+    player.sendMessage(n ? `§aExchanged ${n} emeralds for §6${fmtRyo(n * EMERALD_RATE)}§a.` : "§7You have no emeralds to exchange.");
+  } else if (id === "__nature") {
+    return natureTraining(player, (n) => priceOf(n, cfg), getLevel);
   } else if (id === "__sage") {
     if (hasSageTraining(player)) player.sendMessage("§7You've already mastered Sage Mode.");
-    else if (!takeItem(player, "minecraft:emerald", price)) player.sendMessage(`§cYou need ${price} emeralds.`);
+    else if (!spendRyo(player, price)) player.sendMessage(`§cYou need ${fmtRyo(price)}.`);
     else return grantSage(player);
   } else if (id === "__repair") {
     const inv = container(player);
     const it = inv?.getItem(player.selectedSlotIndex);
     const dur = it?.getComponent("minecraft:durability");
     if (!dur || dur.damage <= 0) player.sendMessage("§7Hold a damaged item to repair it.");
-    else if (!takeItem(player, "minecraft:emerald", price)) player.sendMessage(`§cYou need ${price} emeralds.`);
+    else if (!spendRyo(player, price)) player.sendMessage(`§cYou need ${fmtRyo(price)}.`);
     else {
       dur.damage = 0;
       inv.setItem(player.selectedSlotIndex, it);
       api.sound(player.dimension, "random.anvil_use", player.location, 1, 1);
       player.sendMessage("§aGood as new!");
     }
-  } else if (!takeItem(player, "minecraft:emerald", price)) player.sendMessage(`§cYou need ${price} emeralds.`);
+  } else if (!spendRyo(player, price)) player.sendMessage(`§cYou need ${fmtRyo(price)}.`);
   else {
     giveItem(player, id, amount);
     api.sound(player.dimension, "random.orb", player.location, 1, 1.2);
@@ -559,7 +578,7 @@ async function missionDesk(player, npc, cfg) {
   } else {
     f.body(`§7${cfg?.greeting || NPC_TYPES.mission_desk.greeting}\n§7Choose a mission. Rewards scale with this desk's settings.`);
     for (const [rank, def] of Object.entries(MISSIONS)) {
-      f.button(`${lvl < def.lvl ? "§8" : "§0"}${rank}-rank: ${def.text}\n§r§7${Math.round(def.xp * (cfg?.price ?? 100) / 100)} XP · ${priceOf(def.ems, cfg)} emeralds${lvl < def.lvl ? ` · Lv ${def.lvl}` : ""}`);
+      f.button(`${lvl < def.lvl ? "§8" : "§0"}${rank}-rank: ${def.text}\n§r§7${Math.round(def.xp * (cfg?.price ?? 100) / 100)} XP · ${fmtRyo(priceOf(def.ems, cfg))}${lvl < def.lvl ? ` · Lv ${def.lvl}` : ""}`);
       opts.push(rank);
     }
   }
@@ -574,9 +593,9 @@ async function missionDesk(player, npc, cfg) {
     setMission(player, null);
     const mult = (cfg?.price ?? 100) / 100;
     gainXp(player, Math.round(def.xp * mult));
-    giveItem(player, "minecraft:emerald", priceOf(def.ems, cfg));
+    addRyo(player, priceOf(def.ems, cfg), true);
     for (const [id, n] of def.items) giveItem(player, id, n);
-    showTitle(player, `§a${m.rank}-rank complete!`, { subtitle: `§7+${Math.round(def.xp * mult)} XP, ${priceOf(def.ems, cfg)} emeralds`, stayDuration: 50 });
+    showTitle(player, `§a${m.rank}-rank complete!`, { subtitle: `§7+${Math.round(def.xp * mult)} XP, ${fmtRyo(priceOf(def.ems, cfg))}`, stayDuration: 50 });
     api.sound(player.dimension, "random.levelup", player.location, 1, 1.2);
   } else if (choice) {
     const def = MISSIONS[choice];
@@ -702,20 +721,20 @@ async function clanElder(player, npc, cfg) {
     const next = MASTERY[mastery + 1];
     f.body(`§7${cfg?.greeting || `Welcome home, child of the ${clan.name}.`}\n\n§7Clan Mastery: §e${mastery}/3§7 (each level: +10% clan max chakra, −10% clan ability cooldowns)\n§7Perks: §f${clan.perks}`);
     if (next) {
-      f.button(`§2Train Clan Mastery ${mastery + 1}\n§r§7${priceOf(next.ems, cfg)} emeralds · Lv ${next.lvl}`);
+      f.button(`§2Train Clan Mastery ${mastery + 1}\n§r§7${fmtRyo(priceOf(next.ems, cfg))} · Lv ${next.lvl}`);
       opts.push("train");
     }
     for (const [item, label, ems, lvl] of RELEASE_SCROLLS[clanId] ?? []) {
-      f.button(`${clan.color}${label}\n§r§7${priceOf(ems, cfg)} emeralds · Lv ${lvl}`);
+      f.button(`${clan.color}${label}\n§r§7${fmtRyo(priceOf(ems, cfg))} · Lv ${lvl}`);
       opts.push(["release", item, label, ems, lvl]);
     }
     if (clanId === "uchiha" && player.getDynamicProperty("aegis:mangekyo") === true && !hasEternalMangekyo(player)) {
-      f.button(`§5Awaken the Eternal Mangekyō\n§r§7${priceOf(64, cfg)} emeralds · Lv 100`);
+      f.button(`§5Awaken the Eternal Mangekyō\n§r§7${fmtRyo(priceOf(64, cfg))} · Lv 100`);
       opts.push("eternal");
     }
   } else {
     f.body(`§7You are not of the ${clan.color}${clan.name}§7. But blood can be… arranged.\n§7Perks of our clan: §f${clan.perks}`);
-    f.button(`§5Bloodline transfer: join the ${clan.name}\n§r§7${priceOf(64, cfg)} emeralds · Lv 30 · replaces your clan`);
+    f.button(`§5Bloodline transfer: join the ${clan.name}\n§r§7${fmtRyo(priceOf(64, cfg))} · Lv 30 · replaces your clan`);
     opts.push("join");
   }
   f.button("Leave");
@@ -726,7 +745,7 @@ async function clanElder(player, npc, cfg) {
   if (Array.isArray(c) && c[0] === "release") {
     const [, item, label, ems, lvl] = c;
     if (getLevel(player) < lvl) return player.sendMessage(`§cReach level ${lvl} first.`);
-    if (!takeItem(player, "minecraft:emerald", priceOf(ems, cfg))) return player.sendMessage(`§cYou need ${priceOf(ems, cfg)} emeralds.`);
+    if (!spendRyo(player, priceOf(ems, cfg))) return player.sendMessage(`§cYou need ${fmtRyo(priceOf(ems, cfg))}.`);
     giveItem(player, item, 1);
     api.sound(player.dimension, "random.orb", player.location, 1, 1.2);
     return player.sendMessage(`§aThe elder entrusts you with ${clan.color}${label}§a.`);
@@ -734,19 +753,19 @@ async function clanElder(player, npc, cfg) {
   if (c === "train") {
     const next = MASTERY[mastery + 1];
     if (getLevel(player) < next.lvl) return player.sendMessage(`§cReach level ${next.lvl} first.`);
-    if (!takeItem(player, "minecraft:emerald", priceOf(next.ems, cfg))) return player.sendMessage(`§cYou need ${priceOf(next.ems, cfg)} emeralds.`);
+    if (!spendRyo(player, priceOf(next.ems, cfg))) return player.sendMessage(`§cYou need ${fmtRyo(priceOf(next.ems, cfg))}.`);
     player.setDynamicProperty("aegis:clan_mastery", mastery + 1);
     showTitle(player, `${clan.color}Clan Mastery ${mastery + 1}`, { subtitle: "§7Your bloodline grows stronger", stayDuration: 50 });
     api.sound(player.dimension, "random.levelup", player.location, 1, 0.8);
   } else if (c === "eternal") {
     if (getLevel(player) < 100) return player.sendMessage("§cReach level 100 first.");
-    if (!takeItem(player, "minecraft:emerald", priceOf(64, cfg))) return player.sendMessage(`§cYou need ${priceOf(64, cfg)} emeralds.`);
+    if (!spendRyo(player, priceOf(64, cfg))) return player.sendMessage(`§cYou need ${fmtRyo(priceOf(64, cfg))}.`);
     awakenEternal(player);
   } else if (c === "join") {
     if (getLevel(player) < 30) return player.sendMessage("§cReach level 30 first.");
     const ok = await new MessageFormData().title("Bloodline transfer").body(`Replace your clan with the ${clan.name}? Clan Mastery and Mangekyō progress are lost.`).button1("§5Transfer").button2("Cancel").show(player);
     if (ok.selection !== 0) return;
-    if (!takeItem(player, "minecraft:emerald", priceOf(64, cfg))) return player.sendMessage(`§cYou need ${priceOf(64, cfg)} emeralds.`);
+    if (!spendRyo(player, priceOf(64, cfg))) return player.sendMessage(`§cYou need ${fmtRyo(priceOf(64, cfg))}.`);
     setClanPublic(player, clanId);
     showTitle(player, `${clan.color}${clan.name} Clan`, { subtitle: "§7Your bloodline has changed", stayDuration: 60 });
   }
@@ -782,6 +801,8 @@ async function talk(player, npc) {
       return proctor(player, npc, cfg);
     case "clan_elder":
       return clanElder(player, npc, cfg);
+    case "quest_giver":
+      return questGiver(player, npc, cfg);
     case "villager":
     default:
       say(player, npc, cfg?.greeting || CHATTER[Math.floor(Math.random() * CHATTER.length)]);

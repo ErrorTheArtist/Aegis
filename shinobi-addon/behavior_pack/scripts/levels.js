@@ -14,6 +14,7 @@ import { world, system, ItemStack } from "@minecraft/server";
 import { showTitle } from "./hud.js";
 import { ActionFormData, ModalFormData, MessageFormData } from "@minecraft/server-ui";
 import { applyNameTag, refreshClanEffects } from "./clans.js";
+import { getRyo, fmtRyo, walletMenu } from "./currency.js";
 
 export const MAX_LEVEL = 200;
 const POINTS_PER_LEVEL = 3;
@@ -173,16 +174,19 @@ export async function openStats(player) {
       [
         level >= MAX_LEVEL ? "§6MAX LEVEL" : `§7XP ${bar(xp, need)} §f${xp}/${need}`,
         `§7Unspent points: §e${points}`,
+        `§7Ryō: §6${fmtRyo(getRyo(player))}`,
         "",
         ...ids.map((id) => `${STATS[id].color}${STATS[id].name}§r §f${getStat(player, id)}§7/${STAT_CAP} §8— ${STATS[id].desc}`),
       ].join("\n")
     );
   for (const id of ids) form.button(`${STATS[id].color}${STATS[id].name}  §r§8${getStat(player, id)}/${STAT_CAP}`);
   form.button("§cReset stats");
+  form.button("§6Ryō Wallet\n§r§7pay players · exchange emeralds");
 
   const res = await form.show(player);
   if (res.canceled || res.selection === undefined) return;
   if (res.selection === ids.length) return confirmReset(player);
+  if (res.selection === ids.length + 1) return walletMenu(player);
   const id = ids[res.selection];
   const room = Math.min(getPoints(player), STAT_CAP - getStat(player, id));
   if (room <= 0) {

@@ -273,6 +273,8 @@ for bid, b in BEASTS.items():
 w(RP / "animations" / "bijuu.animation.json", {"format_version": "1.8.0", "animations": anims})
 
 w(BP / "loot_tables" / "entities" / "aegis_bijuu.json", {"pools": [
+    {"rolls": 1, "entries": [{"type": "item", "name": "aegis:ryo", "weight": 1,
+                              "functions": [{"function": "set_count", "count": {"min": 20, "max": 40}}]}]},
     {"rolls": 1, "entries": [{"type": "item", "name": "minecraft:diamond", "weight": 1,
                               "functions": [{"function": "set_count", "count": {"min": 3, "max": 8}}]}]},
     {"rolls": 1, "entries": [{"type": "item", "name": "minecraft:golden_apple", "weight": 1,

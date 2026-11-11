@@ -274,6 +274,14 @@ village's colour. Wear all four for the set bonus:
 | ⚡ **Raikage** (Hidden Cloud) | Yellow | **Lightning Armor**: 35% of punches crackle (+4 lightning dmg, slow), Speed II, Strength II, Haste II, +15% damage |
 | 🪨 **Tsuchikage** (Hidden Stone) | Brown | **Flight Jutsu**: float while sneaking in mid-air, Resistance III, Jump Boost II, +100 max chakra |
 
+**Titles chosen by the server owner:** the exams stop at **Jōnin**. **Sannin** and **Kage** can only be given by the
+server owner (Kage > Sannin > rank on the name tag):
+
+```
+/execute as PlayerName run scriptevent aegis:sannin          (name a Legendary Sannin)
+/execute as PlayerName run scriptevent aegis:sannin clear    (remove the title)
+```
+
 **Becoming Kage:** Kage are **chosen by the server owner** — no NPC, exam, recipe or boss gives a Kage set or title.
 When you appoint someone, they get that Kage's full set and their name tag shows the title
 (e.g. `[Uchiha] Hokage Lv.120 Steve`).
@@ -382,7 +390,7 @@ Friendly NPCs are leashed to their spawner; breaking the spawner removes its NPC
 | **Weaponsmith** | Kunai, shuriken, headbands, all 8 legendary swords (Lv 15–35), repairs the item in your hand |
 | **Ramen Shop** | Ichiraku Ramen (heal + 60 chakra + regen), Miso Ramen (+30 chakra + speed), Soldier Pills |
 | **Hokage (Mission Desk)** | D/C/B/A/S missions (kill mobs, ninja, a Tailed Beast, an Akatsuki member) for XP, emeralds and items |
-| **Exam Proctor** | Rank exams: **Chūnin** (Lv 20, beat 4 rogue ninja in 90 s), **Jōnin** (Lv 60, 3 Anbu + 3 Sound in 2 min), **Sannin** (Lv 120, beat an Akatsuki in 3 min). Ranks show on your name tag and give +5/+10/+20 stat points |
+| **Exam Proctor** | Rank exams: **Chūnin** (Lv 20, beat 4 rogue ninja in 90 s), **Jōnin** (Lv 60, 3 Anbu + 3 Sound in 2 min), nothing higher — exams stop at Jōnin. Ranks show on your name tag and give +5/+10 stat points |
 | **Clan Elder** | For their clan: **Clan Mastery** 1–3 (+10% clan max chakra, −10% clan ability cooldowns each); the Uchiha Elder also awakens the **Eternal Mangekyō**. Others: **Bloodline transfer** into that clan (64 emeralds, Lv 30) |
 | **Leaf Shinobi** | Chatter and tips |
 | **Genin** | Recruit for 15 emeralds — follows you, fights, levels up to 10 (Strength, Resistance, hearts). Talk to toggle follow/stay or dismiss |

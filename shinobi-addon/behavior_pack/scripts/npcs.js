@@ -600,7 +600,6 @@ function missionProgress(killer, kind) {
 const EXAMS = {
   1: { lvl: 20, waves: [["rogue", 4]], time: 90, bonus: 5, text: "Defeat 4 rogue ninja in 90 seconds" },
   2: { lvl: 60, waves: [["anbu", 3], ["sound", 3]], time: 120, bonus: 10, text: "Defeat 3 Anbu and 3 Sound ninja in 2 minutes" },
-  3: { lvl: 120, waves: [["akatsuki", 1]], time: 180, bonus: 20, text: "Defeat an Akatsuki member in 3 minutes" },
 };
 const exams = new Map(); // player id -> { tag, deadline, rank }
 
@@ -608,7 +607,7 @@ async function proctor(player, npc, cfg) {
   const rank = getRank(player);
   const next = EXAMS[rank + 1];
   const f = new ActionFormData().title("§lRank Exams").body(
-    `§7Your rank: §f${RANKS[rank]}\n` + (next ? `§7Next: §e${RANKS[rank + 1]}§7 — ${next.text}\n§7Requires Lv ${next.lvl}. Reward: +${next.bonus} stat points.` : "§6You hold the highest rank: §eLegendary Sannin§6. Only the village can name a Kage.")
+    `§7Your rank: §f${RANKS[rank]}\n` + (next ? `§7Next: §e${RANKS[rank + 1]}§7 — ${next.text}\n§7Requires Lv ${next.lvl}. Reward: +${next.bonus} stat points.` : "§6You are a Jōnin — the highest rank the exams can give.\n§7Sannin and Kage are chosen by the village leaders.")
   );
   if (next) f.button(getLevel(player) >= next.lvl ? `§2Begin the ${RANKS[rank + 1]} Exam` : `§8${RANKS[rank + 1]} Exam (Lv ${next.lvl})`);
   f.button("Leave");

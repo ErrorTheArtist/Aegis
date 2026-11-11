@@ -14,6 +14,14 @@ export const KAGE_VILLAGES = {
   tsuchikage: { title: "§6Tsuchikage", village: "Hidden Stone", icon: "🪨" },
 };
 const KAGE_PROP = "aegis:kage";
+const SANNIN_PROP = "aegis:sannin";
+export const isSannin = (player) => {
+  try {
+    return player.getDynamicProperty(SANNIN_PROP) === true;
+  } catch {
+    return false;
+  }
+};
 
 const SETS = {
   leaf: {
@@ -210,6 +218,19 @@ export function initArmor(helpers) {
     } catch {
       /* ignore */
     }
+  });
+
+  // /scriptevent aegis:sannin [clear] — name (or un-name) the player who runs it a Legendary Sannin
+  system.afterEvents.scriptEventReceive.subscribe(({ id, message, sourceEntity }) => {
+    if (id !== "aegis:sannin" || sourceEntity?.typeId !== "minecraft:player") return;
+    if (String(message ?? "").trim().toLowerCase() === "clear") {
+      sourceEntity.setDynamicProperty(SANNIN_PROP, undefined);
+      api.refreshName?.(sourceEntity);
+      return sourceEntity.sendMessage("§7Sannin title removed.");
+    }
+    sourceEntity.setDynamicProperty(SANNIN_PROP, true);
+    api.refreshName?.(sourceEntity);
+    world.sendMessage(`§e${sourceEntity.name} has been named one of the §aLegendary Sannin§e!`);
   });
 
   // /scriptevent aegis:kage <hokage|kazekage|mizukage|raikage|tsuchikage> — appoint the player who runs it

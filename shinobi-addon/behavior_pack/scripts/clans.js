@@ -9,7 +9,7 @@
 
 import { world, system, ItemStack, ItemLockMode } from "@minecraft/server";
 import { showTitle } from "./hud.js";
-import { statEffectLevels, getLevel } from "./levels.js";
+import { statEffectLevels, getLevel, getRank, RANKS } from "./levels.js";
 
 const CLAN_PROP = "aegis:clan";
 const MS_XP_PROP = "aegis:sharingan_xp";
@@ -129,8 +129,18 @@ export function getClanId(player) {
 
 const getClan = (player) => CLANS[getClanId(player)];
 
+// Clan Mastery (trained at a Clan Elder): +10% clan max chakra and -10% clan ability cooldowns per level.
+const mastery = (player) => {
+  try {
+    return Number(player.getDynamicProperty("aegis:clan_mastery") ?? 0);
+  } catch {
+    return 0;
+  }
+};
+
 export function clanMaxChakra(player, base) {
-  return getClan(player)?.maxChakra ?? base;
+  const c = getClan(player);
+  return c ? Math.round(c.maxChakra * (1 + 0.1 * mastery(player))) : base;
 }
 
 export function clanRegenMultiplier(player) {
@@ -155,7 +165,8 @@ function clanLabel(clan) {
 export function applyNameTag(player) {
   const clan = getClan(player);
   try {
-    const lv = `§eLv.${getLevel(player)}§r`;
+    const rank = getRank(player);
+    const lv = `${rank ? `§7${RANKS[rank]} ` : ""}§eLv.${getLevel(player)}§r`;
     player.nameTag = clan ? `${clan.color}[${clan.name}]§r ${lv} ${player.name}` : `${lv} ${player.name}`;
   } catch {
     /* ignore */
@@ -199,6 +210,8 @@ function removeClanItems(player) {
   }
 }
 
+export const setClanPublic = (player, id) => setClan(player, id);
+
 function setClan(player, id) {
   removeClanItems(player);
   deactivateDojutsu(player);
@@ -206,6 +219,7 @@ function setClan(player, id) {
     // a new bloodline starts from scratch
     player.setDynamicProperty(MS_XP_PROP, 0);
     player.setDynamicProperty(MS_PROP, false);
+    player.setDynamicProperty("aegis:clan_mastery", 0);
   }
   player.setDynamicProperty(CLAN_PROP, id);
   api.setChakra(player, CLANS[id].maxChakra);
@@ -727,7 +741,7 @@ export function handleClanItemUse(player, itemStack) {
   if (move.cast(player) === false) return true;
   if (move.cost) api.setChakra(player, api.getChakra(player) - move.cost);
   api.gainJutsuXp(player, move.cost);
-  api.startCooldown(player, key, move.cd);
+  api.startCooldown(player, key, Math.round(move.cd * (1 - 0.1 * mastery(player))));
   if (move.cost) player.onScreenDisplay.setActionBar(`${CLANS[ability.clan].color}${move.name}!`);
   return true;
 }

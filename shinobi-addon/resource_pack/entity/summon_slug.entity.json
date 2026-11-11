@@ -1,0 +1,32 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "aegis:summon_slug",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/aegis/summon_slug"
+      },
+      "geometry": {
+        "default": "geometry.aegis.summon_slug"
+      },
+      "animations": {
+        "idle": "animation.aegis.summon_slug.idle"
+      },
+      "scripts": {
+        "animate": [
+          "idle"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ],
+      "spawn_egg": {
+        "base_color": "#ebf0f5",
+        "overlay_color": "#5a96e6"
+      }
+    }
+  }
+}

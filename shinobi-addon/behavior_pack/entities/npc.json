@@ -1,0 +1,178 @@
+{
+  "format_version": "1.21.0",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "aegis:npc",
+      "is_spawnable": true,
+      "is_summonable": true,
+      "is_experimental": false,
+      "properties": {
+        "aegis:skin": {
+          "type": "int",
+          "range": [
+            0,
+            15
+          ],
+          "default": 0,
+          "client_sync": true
+        }
+      }
+    },
+    "component_groups": {
+      "aegis:stay": {
+        "minecraft:movement": {
+          "value": 0.0
+        }
+      },
+      "aegis:wander": {
+        "minecraft:behavior.random_stroll": {
+          "priority": 8,
+          "speed_multiplier": 0.6,
+          "xz_dist": 6
+        }
+      },
+      "aegis:invulnerable": {
+        "minecraft:damage_sensor": {
+          "triggers": [
+            {
+              "cause": "all",
+              "deals_damage": "no"
+            }
+          ]
+        }
+      },
+      "aegis:despawnable": {
+        "minecraft:despawn": {
+          "despawn_from_distance": {
+            "min_distance": 32,
+            "max_distance": 80
+          }
+        }
+      }
+    },
+    "components": {
+      "minecraft:movement.basic": {},
+      "minecraft:jump.static": {},
+      "minecraft:can_climb": {},
+      "minecraft:navigation.walk": {
+        "can_path_over_water": true,
+        "can_open_doors": true,
+        "avoid_damage_blocks": true
+      },
+      "minecraft:physics": {},
+      "minecraft:collision_box": {
+        "width": 0.6,
+        "height": 1.8
+      },
+      "minecraft:breathable": {
+        "total_supply": 15,
+        "suffocate_time": 0
+      },
+      "minecraft:behavior.float": {
+        "priority": 0
+      },
+      "minecraft:interact": {
+        "interactions": [
+          {
+            "on_interact": {
+              "filters": {
+                "test": "is_family",
+                "subject": "other",
+                "value": "player"
+              },
+              "event": "aegis:talked",
+              "target": "self"
+            },
+            "interact_text": "Talk",
+            "swing": true
+          }
+        ]
+      },
+      "minecraft:type_family": {
+        "family": [
+          "npc_ninja",
+          "npc"
+        ]
+      },
+      "minecraft:health": {
+        "value": 40,
+        "max": 40
+      },
+      "minecraft:movement": {
+        "value": 0.25
+      },
+      "minecraft:pushable": {
+        "is_pushable": false,
+        "is_pushable_by_piston": false
+      },
+      "minecraft:knockback_resistance": {
+        "value": 1.0
+      },
+      "minecraft:persistent": {},
+      "minecraft:nameable": {
+        "always_show": true,
+        "allow_name_tag_renaming": false
+      },
+      "minecraft:behavior.look_at_player": {
+        "priority": 7,
+        "look_distance": 8,
+        "probability": 0.6
+      },
+      "minecraft:behavior.random_look_around": {
+        "priority": 9
+      },
+      "minecraft:behavior.panic": {
+        "priority": 1,
+        "speed_multiplier": 1.2
+      }
+    },
+    "events": {
+      "aegis:stay": {
+        "remove": {
+          "component_groups": [
+            "aegis:wander"
+          ]
+        },
+        "add": {
+          "component_groups": [
+            "aegis:stay"
+          ]
+        }
+      },
+      "aegis:wander": {
+        "remove": {
+          "component_groups": [
+            "aegis:stay"
+          ]
+        },
+        "add": {
+          "component_groups": [
+            "aegis:wander"
+          ]
+        }
+      },
+      "aegis:invulnerable": {
+        "add": {
+          "component_groups": [
+            "aegis:invulnerable"
+          ]
+        }
+      },
+      "aegis:vulnerable": {
+        "remove": {
+          "component_groups": [
+            "aegis:invulnerable"
+          ]
+        }
+      },
+      "aegis:persist": {
+        "remove": {
+          "component_groups": [
+            "aegis:despawnable"
+          ]
+        }
+      },
+      "aegis:talked": {}
+    }
+  }
+}

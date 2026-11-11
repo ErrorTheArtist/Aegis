@@ -1,0 +1,33 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:item": {
+    "description": {
+      "identifier": "aegis:miso_ramen",
+      "menu_category": {
+        "category": "items"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "aegis_miso_ramen"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "§eMiso Ramen§r\n§7Restores 30 chakra, Speed"
+      },
+      "minecraft:max_stack_size": 16,
+      "minecraft:food": {
+        "nutrition": 8,
+        "saturation_modifier": 0.9,
+        "can_always_eat": true,
+        "using_converts_to": "minecraft:bowl"
+      },
+      "minecraft:use_animation": "eat",
+      "minecraft:use_modifiers": {
+        "use_duration": 1.4,
+        "movement_modifier": 0.4
+      }
+    }
+  }
+}

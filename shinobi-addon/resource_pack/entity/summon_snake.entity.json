@@ -1,0 +1,32 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "aegis:summon_snake",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/aegis/summon_snake"
+      },
+      "geometry": {
+        "default": "geometry.aegis.summon_snake"
+      },
+      "animations": {
+        "idle": "animation.aegis.summon_snake.idle"
+      },
+      "scripts": {
+        "animate": [
+          "idle"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ],
+      "spawn_egg": {
+        "base_color": "#6e3c96",
+        "overlay_color": "#e6dcc8"
+      }
+    }
+  }
+}

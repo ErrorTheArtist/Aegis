@@ -6,6 +6,10 @@ import { initClans, clanMaxChakra, clanRegenMultiplier, handleClanItemUse, clanJ
 import { initBijuu, bijuuChakraBonus, bijuuRegenMultiplier, handleBijuuItemUse, isTransformed } from "./bijuu.js";
 import { initSwords, handleSwordUse } from "./swords.js";
 import { initHud } from "./hud.js";
+import { initNpcs } from "./npcs.js";
+import { initEnemies, spawnAkatsukiNear } from "./enemies.js";
+import { initCompanions, handleSummonUse } from "./companions.js";
+import { initVillages } from "./villages.js";
 import { initLevels, handleRecordUse, levelChakraBonus, levelRegenMultiplier, ninjutsuMultiplier, cooldownMultiplier, gainJutsuXp, getLevel } from "./levels.js";
 
 // ---------------------------------------------------------------------------
@@ -111,7 +115,9 @@ function canBeHit(e, caster) {
   if (!isValid(e) || e.id === caster.id) return false;
   if (e.typeId === "minecraft:item" || e.typeId === "minecraft:xp_orb") return false;
   if (e.typeId === "aegis:jutsu_orb" || e.typeId === "aegis:susanoo") return false;
-  if (e.typeId === "aegis:chakra_clone") {
+  // never hit friendly village NPCs with a player's techniques, nor your own clones / companions / summons
+  if (e.typeId === "aegis:npc" && caster.typeId === "minecraft:player") return false;
+  if (e.typeId.startsWith("aegis:")) {
     try {
       if (e.getDynamicProperty(OWNER_PROP) === caster.id) return false;
     } catch {
@@ -263,6 +269,7 @@ world.afterEvents.itemUse.subscribe(({ source: player, itemStack }) => {
   if (handleClanItemUse(player, itemStack)) return;
   if (handleBijuuItemUse(player, itemStack)) return;
   if (handleSwordUse(player, itemStack)) return;
+  if (handleSummonUse(player, itemStack)) return;
   const jutsu = JUTSU[itemStack.typeId];
   if (!jutsu) return;
 
@@ -725,3 +732,12 @@ initSwords({
 initLevels({ add, particle, sound, getChakra, setChakra });
 
 initHud({ getChakra, getMaxChakra, getLevel });
+
+const npcApi = {
+  add, sub, scale, norm, dot, particle, sound, knockback, hurt, isValid, canBeHit,
+  getChakra, setChakra, cooldownLeft, startCooldown, anim, handPos, launchProjectile, gainJutsuXp,
+};
+initNpcs({ ...npcApi, spawnAkatsukiNear: (p, msg) => spawnAkatsukiNear(p, msg) });
+initEnemies(npcApi);
+initCompanions(npcApi);
+initVillages(npcApi);

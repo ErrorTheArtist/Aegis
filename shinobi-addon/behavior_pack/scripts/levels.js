@@ -52,6 +52,11 @@ const set = (player, key, v) => {
   }
 };
 
+export const RANKS = ["Genin", "Chūnin", "Jōnin", "Kage"];
+export const getRank = (player) => Math.max(0, Math.min(RANKS.length - 1, num(player, "aegis:rank", 0)));
+export const setRank = (player, r) => set(player, "aegis:rank", r);
+export const addPoints = (player, n) => set(player, P.points, num(player, P.points, 0) + n);
+
 export const getLevel = (player) => Math.max(1, Math.min(MAX_LEVEL, num(player, P.level, 1)));
 export const getStat = (player, id) => num(player, `aegis:stat_${id}`, 0);
 const setStat = (player, id, v) => set(player, `aegis:stat_${id}`, v);
@@ -136,7 +141,7 @@ function setLevel(player, level) {
   set(player, P.level, level);
   set(player, P.xp, 0);
   for (const id of Object.keys(STATS)) setStat(player, id, 0);
-  set(player, P.points, pointsForLevel(level));
+  set(player, P.points, pointsForLevel(level) + [0, 5, 15, 35][getRank(player)]);
   clearStatEffects(player);
   applyNameTag(player);
 }

@@ -1,0 +1,132 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.aegis.summon_toad.idle": {
+      "loop": true,
+      "bones": {
+        "head": {
+          "rotation": [
+            "q.target_x_rotation * 0.5",
+            "q.target_y_rotation * 0.5",
+            0
+          ]
+        },
+        "leg0": {
+          "rotation": [
+            "1 * math.cos(q.modified_distance_moved * 30) * 30 * math.min(1, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg1": {
+          "rotation": [
+            "-1 * math.cos(q.modified_distance_moved * 30) * 30 * math.min(1, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg2": {
+          "rotation": [
+            "-1 * math.cos(q.modified_distance_moved * 30) * 30 * math.min(1, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg3": {
+          "rotation": [
+            "1 * math.cos(q.modified_distance_moved * 30) * 30 * math.min(1, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "body": {
+          "scale": [
+            "1 + math.sin(q.life_time * 120) * 0.03",
+            1,
+            "1 + math.sin(q.life_time * 120) * 0.03"
+          ]
+        }
+      }
+    },
+    "animation.aegis.summon_slug.idle": {
+      "loop": true,
+      "bones": {
+        "head": {
+          "rotation": [
+            "q.target_x_rotation * 0.5",
+            "q.target_y_rotation * 0.5",
+            0
+          ]
+        },
+        "body": {
+          "scale": [
+            1,
+            "1 + math.sin(q.life_time * 200) * 0.05",
+            "1 - math.sin(q.life_time * 200) * 0.03"
+          ]
+        }
+      }
+    },
+    "animation.aegis.summon_snake.idle": {
+      "loop": true,
+      "bones": {
+        "head": {
+          "rotation": [
+            "q.target_x_rotation * 0.5",
+            "q.target_y_rotation * 0.5",
+            0
+          ]
+        },
+        "seg0": {
+          "rotation": [
+            0,
+            "math.sin(q.life_time * 300 + 0) * 14",
+            0
+          ]
+        },
+        "seg1": {
+          "rotation": [
+            0,
+            "math.sin(q.life_time * 300 + 50) * 14",
+            0
+          ]
+        },
+        "seg2": {
+          "rotation": [
+            0,
+            "math.sin(q.life_time * 300 + 100) * 14",
+            0
+          ]
+        },
+        "seg3": {
+          "rotation": [
+            0,
+            "math.sin(q.life_time * 300 + 150) * 14",
+            0
+          ]
+        },
+        "seg4": {
+          "rotation": [
+            0,
+            "math.sin(q.life_time * 300 + 200) * 14",
+            0
+          ]
+        },
+        "seg5": {
+          "rotation": [
+            0,
+            "math.sin(q.life_time * 300 + 250) * 14",
+            0
+          ]
+        },
+        "seg6": {
+          "rotation": [
+            0,
+            "math.sin(q.life_time * 300 + 300) * 14",
+            0
+          ]
+        }
+      }
+    }
+  }
+}

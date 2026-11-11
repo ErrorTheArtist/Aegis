@@ -232,6 +232,60 @@
     },
     "aegis_eight_gates_scroll": {
       "textures": "textures/items/aegis/eight_gates_scroll"
+    },
+    "aegis_hokage_pants": {
+      "textures": "textures/items/aegis/hokage_pants"
+    },
+    "aegis_hokage_sandals": {
+      "textures": "textures/items/aegis/hokage_sandals"
+    },
+    "aegis_kazekage_hat": {
+      "textures": "textures/items/aegis/kazekage_hat"
+    },
+    "aegis_kazekage_robe": {
+      "textures": "textures/items/aegis/kazekage_robe"
+    },
+    "aegis_kazekage_pants": {
+      "textures": "textures/items/aegis/kazekage_pants"
+    },
+    "aegis_kazekage_sandals": {
+      "textures": "textures/items/aegis/kazekage_sandals"
+    },
+    "aegis_mizukage_hat": {
+      "textures": "textures/items/aegis/mizukage_hat"
+    },
+    "aegis_mizukage_robe": {
+      "textures": "textures/items/aegis/mizukage_robe"
+    },
+    "aegis_mizukage_pants": {
+      "textures": "textures/items/aegis/mizukage_pants"
+    },
+    "aegis_mizukage_sandals": {
+      "textures": "textures/items/aegis/mizukage_sandals"
+    },
+    "aegis_raikage_hat": {
+      "textures": "textures/items/aegis/raikage_hat"
+    },
+    "aegis_raikage_robe": {
+      "textures": "textures/items/aegis/raikage_robe"
+    },
+    "aegis_raikage_pants": {
+      "textures": "textures/items/aegis/raikage_pants"
+    },
+    "aegis_raikage_sandals": {
+      "textures": "textures/items/aegis/raikage_sandals"
+    },
+    "aegis_tsuchikage_hat": {
+      "textures": "textures/items/aegis/tsuchikage_hat"
+    },
+    "aegis_tsuchikage_robe": {
+      "textures": "textures/items/aegis/tsuchikage_robe"
+    },
+    "aegis_tsuchikage_pants": {
+      "textures": "textures/items/aegis/tsuchikage_pants"
+    },
+    "aegis_tsuchikage_sandals": {
+      "textures": "textures/items/aegis/tsuchikage_sandals"
     }
   }
 }

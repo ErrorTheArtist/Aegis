@@ -2,7 +2,7 @@
 // Chakra system, jutsu scrolls and ninja tools, driven by @minecraft/server.
 
 import { world, system, ItemStack, MolangVariableMap } from "@minecraft/server";
-import { initClans, clanMaxChakra, clanRegenMultiplier, handleClanItemUse, clanJutsuCostMultiplier } from "./clans.js";
+import { initClans, applyNameTag, clanMaxChakra, clanRegenMultiplier, handleClanItemUse, clanJutsuCostMultiplier } from "./clans.js";
 import { initBijuu, bijuuChakraBonus, bijuuRegenMultiplier, handleBijuuItemUse, isTransformed, isBijuuMastered } from "./bijuu.js";
 import { initSwords, handleSwordUse } from "./swords.js";
 import { initHud } from "./hud.js";
@@ -985,4 +985,4 @@ initNpcs({ ...npcApi, spawnAkatsukiNear: (p, msg) => spawnAkatsukiNear(p, msg) }
 initEnemies(npcApi);
 initCompanions(npcApi);
 initSage({ ...npcApi, getMaxChakra });
-initArmor(npcApi);
+initArmor({ ...npcApi, refreshName: applyNameTag });

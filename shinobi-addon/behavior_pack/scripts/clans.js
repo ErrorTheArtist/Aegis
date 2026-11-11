@@ -11,6 +11,7 @@
 import { world, system, ItemStack, ItemLockMode } from "@minecraft/server";
 import { showTitle } from "./hud.js";
 import { uzumakiSealMenu } from "./bijuu.js";
+import { getKage, KAGE_VILLAGES } from "./armor.js";
 import { transformCinematic, impactFx, sfx, chargeFx } from "./cinematic.js";
 import { statEffectLevels, getLevel, getRank, RANKS } from "./levels.js";
 
@@ -175,7 +176,9 @@ export function applyNameTag(player) {
   const clan = getClan(player);
   try {
     const rank = getRank(player);
-    const lv = `${rank ? `§7${RANKS[rank]} ` : ""}§eLv.${getLevel(player)}§r`;
+    const kage = getKage(player);
+    const title = kage ? `${KAGE_VILLAGES[kage].title} ` : rank ? `§7${RANKS[rank]} ` : "";
+    const lv = `${title}§eLv.${getLevel(player)}§r`;
     player.nameTag = clan ? `${clan.color}[${clan.name}]§r ${lv} ${player.name}` : `${lv} ${player.name}`;
   } catch {
     /* ignore */

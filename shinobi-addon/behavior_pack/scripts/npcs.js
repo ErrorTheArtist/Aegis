@@ -13,6 +13,7 @@ import { CLANS, getClanId, setClanPublic, applyNameTag } from "./clans.js";
 import { getLevel, gainXp, getRank, setRank, addPoints, RANKS } from "./levels.js";
 import { hasSageTraining, grantSage } from "./sage.js";
 import { hasEternalMangekyo, awakenEternal } from "./clans.js";
+import { KAGE_VILLAGES, getKage, giveKageSet } from "./armor.js";
 
 const SPAWNER = "aegis:npc_spawner";
 const INDEX_PROP = "aegis:spawners";
@@ -604,8 +605,23 @@ const EXAMS = {
 };
 const exams = new Map(); // player id -> { tag, deadline, rank }
 
+// A new Kage chooses which village they lead and receives that Kage's full set.
+async function chooseKage(player) {
+  const ids = Object.keys(KAGE_VILLAGES);
+  const f = new ActionFormData().title("§lBecome Kage").body("§7Which village will you lead? You'll receive its Kage hat, robe, pants and sandals.");
+  for (const v of ids) f.button(`${KAGE_VILLAGES[v].title}\n§8${KAGE_VILLAGES[v].village}`);
+  const r = await f.show(player);
+  if (r.canceled) return player.sendMessage("§7Talk to the Exam Proctor again to claim your Kage robes.");
+  const v = ids[r.selection];
+  giveKageSet(player, v);
+  applyNameTag(player);
+  showTitle(player, KAGE_VILLAGES[v].title, { subtitle: `§7Leader of the ${KAGE_VILLAGES[v].village}`, stayDuration: 60 });
+  world.sendMessage(`§e${player.name} is now the ${KAGE_VILLAGES[v].title}§e of the ${KAGE_VILLAGES[v].village}!`);
+}
+
 async function proctor(player, npc, cfg) {
   const rank = getRank(player);
+  if (rank === 3 && !getKage(player)) return chooseKage(player);
   const next = EXAMS[rank + 1];
   const f = new ActionFormData().title("§lRank Exams").body(
     `§7Your rank: §f${RANKS[rank]}\n` + (next ? `§7Next: §e${RANKS[rank + 1]}§7 — ${next.text}\n§7Requires Lv ${next.lvl}. Reward: +${next.bonus} stat points.` : "§6You hold the highest rank. The village bows to you, Kage.")
@@ -656,11 +672,7 @@ function endExam(player, passed) {
     addPoints(player, EXAMS[ex.rank].bonus);
     applyNameTag(player);
     showTitle(player, `§6${RANKS[ex.rank]}!`, { subtitle: `§7Exam passed — +${EXAMS[ex.rank].bonus} stat points`, stayDuration: 60 });
-    if (ex.rank === 3) {
-      giveItem(player, "aegis:hokage_hat", 1);
-      giveItem(player, "aegis:hokage_robe", 1);
-      player.sendMessage("§fYou received the §6Hokage Hat§f and §6Hokage Robe§f.");
-    }
+    if (ex.rank === 3) system.runTimeout(() => api.isValid(player) && chooseKage(player), 60);
     api.sound(player.dimension, "ui.toast.challenge_complete", player.location, 1, 1);
     world.sendMessage(`§e${player.name} passed the exam and is now a §6${RANKS[ex.rank]}§e!`);
   } else {

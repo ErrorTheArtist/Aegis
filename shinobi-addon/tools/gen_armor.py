@@ -116,18 +116,56 @@ ARMOR = {
         bones={"rightLeg": [RLEG(0.55, "base", 0, 6), RLEG(0.6, "gold", 5.5, 0.5), c([-4.1, -0.05, -2.9], [4.4, 0.8, 5.2], "dark")],
                "leftLeg": [LLEG(0.55, "base", 0, 6), LLEG(0.6, "gold", 5.5, 0.5), c([-0.3, -0.05, -2.9], [4.4, 0.8, 5.2], "dark")]},
         recipe=(["R R", "I I"], {"I": "minecraft:iron_ingot", "R": "minecraft:red_wool"})),
-    # ---- Hokage (Kage exam reward) ----
-    "hokage_hat": dict(name="Hokage Hat", slot="head", prot=3, dur=600, colors=dict(base=(245, 245, 245), red=(200, 30, 30), gold=(235, 190, 60)),
-        bones={"head": hat_layers(31.5, None, [18, 15, 12, 8, 4], "base", "red") + [c([-1.5, 32.5, -7.6], [3, 2, 0.4], "red"), c([-0.5, 33, -7.8], [1, 1, 0.3], "gold")]},
-        recipe=None),
-    "hokage_robe": dict(name="Hokage Robe", slot="chest", prot=8, dur=700, colors=dict(base=(245, 245, 245), red=(205, 40, 30), accent=(250, 150, 40), dark=(40, 50, 90)),
-        bones={"body": [BODY(0.8, "base"), c([-2.2, 15, 2.95], [4.4, 6, 0.3], "red"), c([-4.6, 21.6, -2.95], [9.2, 0.6, 0.3], "red")],
-               "rightArm": [c([-9, 12, -2.6], [5.4, 10.5, 5.2], "base", 0.1)] + [c([-9.1, 12, -2.7], [5.6, 1.5, 5.4], "red")],
-               "leftArm": [c([3.6, 12, -2.6], [5.4, 10.5, 5.2], "base", 0.1)] + [c([3.5, 12, -2.7], [5.6, 1.5, 5.4], "red")],
-               "rightLeg": [RLEG(0.9, "base", 3, 9)] + [c([-4.9 + i * 1.1, 2.6, -3], [1.1, 1.2 + (i % 2) * 1.2, 0.3], "red" if i % 2 else "accent") for i in range(5)],
-               "leftLeg": [LLEG(0.9, "base", 3, 9)] + [c([-1.1 + i * 1.1, 2.6, -3], [1.1, 1.2 + (i % 2) * 1.2, 0.3], "red" if i % 2 else "accent") for i in range(5)]},
-        recipe=None),
+    # Kage sets (Hokage, Kazekage, Mizukage, Raikage, Tsuchikage) are added below by kage_set().
 }
+
+def kage_set(vid, title, trim, trim2, under, under_dark):
+    """Hat + robe + pants + sandals for one Kage. White robes with the village colour, like the anime."""
+    W = (245, 245, 245)
+    hem = lambda x0, i: c([x0 + i * 1.1, 2.6, -3], [1.1, 1.2 + (i % 2) * 1.2, 0.3], "red" if i % 2 else "accent")
+    return {
+        f"{vid}_hat": dict(name=f"{title} Hat", slot="head", prot=4, dur=900, colors=dict(base=W, red=trim, gold=(235, 190, 60), white=W),
+            bones={"head": [c([-9, 31.5, -9], [18, 1, 18], "base"), c([-7.5, 32.5, -7.5], [15, 1, 15], "red"),
+                            c([-6, 33.5, -6], [12, 1, 12], "base"), c([-4.5, 34.5, -4.5], [9, 1, 9], "base"),
+                            c([-3, 35.5, -3], [6, 1, 6], "red"), c([-1.5, 36.5, -1.5], [3, 1, 3], "base"),
+                            c([-0.4, 37.5, -0.4], [0.8, 0.8, 0.8], "gold"),
+                            # village crest on the front
+                            c([-2.2, 32.6, -7.9], [4.4, 3.2, 0.5], "red"), c([-0.7, 33.2, -8.2], [1.4, 2, 0.4], "white"),
+                            # cloth hanging down the back and sides
+                            c([-4.6, 24.5, 4.4], [9.2, 7, 0.3], "base"), c([-4.6, 24.5, 4.45], [9.2, 0.8, 0.3], "red"),
+                            c([-4.9, 25.5, -3], [0.3, 6, 7.4], "base"), c([4.6, 25.5, -3], [0.3, 6, 7.4], "base")]},
+            recipe=None),
+        f"{vid}_robe": dict(name=f"{title} Robe", slot="chest", prot=9, dur=1100, colors=dict(base=W, red=trim, accent=trim2, dark=under),
+            bones={"body": [BODY(0.8, "base"), c([-2.2, 14.5, 2.95], [4.4, 7, 0.3], "red"), c([-0.8, 15.2, 3.05], [1.6, 5.6, 0.3], "base"),
+                            c([-4.6, 21.6, -2.95], [9.2, 0.6, 0.3], "red"), c([-0.4, 12, -2.95], [0.8, 9.6, 0.3], "red")],
+                   "rightArm": [c([-9, 12, -2.6], [5.4, 10.5, 5.2], "base", 0.1), c([-9.1, 12, -2.7], [5.6, 1.5, 5.4], "red")],
+                   "leftArm": [c([3.6, 12, -2.6], [5.4, 10.5, 5.2], "base", 0.1), c([3.5, 12, -2.7], [5.6, 1.5, 5.4], "red")],
+                   "rightLeg": [RLEG(0.9, "base", 3, 9)] + [hem(-4.9, i) for i in range(5)],
+                   "leftLeg": [LLEG(0.9, "base", 3, 9)] + [hem(-1.1, i) for i in range(5)]},
+            recipe=None),
+        f"{vid}_pants": dict(name=f"{title} Pants", slot="legs", prot=7, dur=1000, colors=dict(base=under, dark=under_dark, red=trim, white=W),
+            bones={"body": [c([-4, 11.4, -2], [8, 1.4, 4], "red", 0.55)],
+                   "rightLeg": [RLEG(0.45, "base", 2, 10), c([-4.45, 4, -2.45], [0.4, 7, 4.9], "red"), RLEG(0.5, "white", 1, 2)],
+                   "leftLeg": [LLEG(0.45, "base", 2, 10), c([3.95, 4, -2.45], [0.4, 7, 4.9], "red"), LLEG(0.5, "white", 1, 2)]},
+            recipe=None),
+        f"{vid}_sandals": dict(name=f"{title} Sandals", slot="feet", prot=3, dur=900, colors=dict(base=under, dark=(30, 25, 25), red=trim, white=W),
+            bones={"rightLeg": [c([-4.1, -0.05, -2.9], [4.4, 0.8, 5.2], "dark"), RLEG(0.5, "base", 0.8, 1.5), RLEG(0.55, "red", 2.3, 1)],
+                   "leftLeg": [c([-0.3, -0.05, -2.9], [4.4, 0.8, 5.2], "dark"), LLEG(0.5, "base", 0.8, 1.5), LLEG(0.55, "red", 2.3, 1)]},
+            recipe=None),
+    }
+
+
+KAGE = {
+    #  id           title          trim (hat/robe)   hem accent        under-outfit      darker
+    "hokage": ("Hokage", (205, 40, 30), (250, 150, 40), (40, 50, 90), (25, 30, 60)),
+    "kazekage": ("Kazekage", (40, 150, 120), (200, 180, 120), (190, 160, 110), (140, 110, 70)),
+    "mizukage": ("Mizukage", (40, 100, 210), (120, 200, 255), (55, 45, 110), (35, 28, 70)),
+    "raikage": ("Raikage", (240, 200, 40), (255, 250, 170), (35, 35, 40), (20, 20, 22)),
+    "tsuchikage": ("Tsuchikage", (125, 90, 50), (110, 140, 60), (80, 100, 55), (55, 70, 38)),
+}
+for _vid, _k in KAGE.items():
+    ARMOR.update(kage_set(_vid, *_k))
+
 
 SLOT = {"head": ("slot.armor.head", "armor_head"), "chest": ("slot.armor.chest", "armor_torso"),
         "legs": ("slot.armor.legs", "armor_legs"), "feet": ("slot.armor.feet", "armor_feet")}
@@ -147,11 +185,11 @@ def palette(colors):
     return img
 
 
-def render_icon(bones, colors, slot):
+def render_icon(bones, colors, slot, from_above=False):
     """3/4 view of the model, cropped and scaled into a 32x32 icon."""
     default = palette({})
     faces = []
-    yaw, pitch = math.radians(-30), math.radians(18)
+    yaw, pitch = math.radians(-30), math.radians(-32 if from_above else 18)
 
     def proj(p):
         x, y, z = p
@@ -208,7 +246,7 @@ for aid, a in ARMOR.items():
     tex_dir = RP / "textures" / "models" / "armor" / "aegis"
     tex_dir.mkdir(parents=True, exist_ok=True)
     palette(a["colors"]).save(tex_dir / f"{aid}.png")
-    render_icon(a["bones"], a["colors"], a["slot"]).save(RP / "textures" / "items" / "aegis" / f"{aid}.png")
+    render_icon(a["bones"], a["colors"], a["slot"], aid.endswith("_hat")).save(RP / "textures" / "items" / "aegis" / f"{aid}.png")
     bones = [{"name": b, "pivot": PIVOTS[b], "cubes": [{k: v for k, v in cu.items() if k != "_sw"} for cu in cubes]} for b, cubes in a["bones"].items()]
     w(RP / "models" / "entity" / f"armor_{aid}.geo.json", {"format_version": "1.12.0", "minecraft:geometry": [{
         "description": {"identifier": f"geometry.aegis.armor_{aid}", "texture_width": 64, "texture_height": 64,

@@ -19,10 +19,10 @@
       "minecraft:max_stack_size": 1,
       "minecraft:wearable": {
         "slot": "slot.armor.head",
-        "protection": 3
+        "protection": 4
       },
       "minecraft:durability": {
-        "max_durability": 600
+        "max_durability": 900
       },
       "minecraft:enchantable": {
         "slot": "armor_head",

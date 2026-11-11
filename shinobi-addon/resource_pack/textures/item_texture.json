@@ -286,6 +286,42 @@
     },
     "aegis_tsuchikage_sandals": {
       "textures": "textures/items/aegis/tsuchikage_sandals"
+    },
+    "aegis_jiraiya_headband": {
+      "textures": "textures/items/aegis/jiraiya_headband"
+    },
+    "aegis_jiraiya_haori": {
+      "textures": "textures/items/aegis/jiraiya_haori"
+    },
+    "aegis_jiraiya_pants": {
+      "textures": "textures/items/aegis/jiraiya_pants"
+    },
+    "aegis_jiraiya_geta": {
+      "textures": "textures/items/aegis/jiraiya_geta"
+    },
+    "aegis_tsunade_seal": {
+      "textures": "textures/items/aegis/tsunade_seal"
+    },
+    "aegis_tsunade_haori": {
+      "textures": "textures/items/aegis/tsunade_haori"
+    },
+    "aegis_tsunade_pants": {
+      "textures": "textures/items/aegis/tsunade_pants"
+    },
+    "aegis_tsunade_sandals": {
+      "textures": "textures/items/aegis/tsunade_sandals"
+    },
+    "aegis_orochimaru_hair": {
+      "textures": "textures/items/aegis/orochimaru_hair"
+    },
+    "aegis_orochimaru_robe": {
+      "textures": "textures/items/aegis/orochimaru_robe"
+    },
+    "aegis_orochimaru_pants": {
+      "textures": "textures/items/aegis/orochimaru_pants"
+    },
+    "aegis_orochimaru_sandals": {
+      "textures": "textures/items/aegis/orochimaru_sandals"
     }
   }
 }

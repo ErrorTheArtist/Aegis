@@ -278,9 +278,20 @@ village's colour. Wear all four for the set bonus:
 server owner (Kage > Sannin > rank on the name tag):
 
 ```
-/execute as PlayerName run scriptevent aegis:sannin          (name a Legendary Sannin)
-/execute as PlayerName run scriptevent aegis:sannin clear    (remove the title)
+/execute as PlayerName run scriptevent aegis:sannin jiraiya   (title + Jiraiya's set; also tsunade / orochimaru)
+/execute as PlayerName run scriptevent aegis:sannin           (title only)
+/execute as PlayerName run scriptevent aegis:sannin clear     (remove the title)
 ```
+
+### The Legendary Sannin sets
+
+Four 3D pieces each, given only with the Sannin command. Wear all four for the bonus:
+
+| Set | Pieces | Set bonus |
+|---|---|---|
+| 🐸 **Jiraiya — Toad Sage** | Horned headband, red haori with the giant scroll, olive pants, wooden geta | +120 max chakra, +10% technique damage, Strength, Resistance, Jump Boost III |
+| 🐌 **Tsunade — Slug Princess** | Byakugō seal with blonde pigtails, green haori with the gamble mark, navy pants, sandals | Regeneration II, Strength II, **25% of punches send enemies flying**, +100 max chakra |
+| 🐍 **Orochimaru — Snake Sage** | Long black hair, pale robe with the purple rope bow, dark pants, sandals | **Immune to poison & wither**, **30% of hits poison**, Speed II, night vision, +15% damage, +120 max chakra |
 
 **Becoming Kage:** Kage are **chosen by the server owner** — no NPC, exam, recipe or boss gives a Kage set or title.
 When you appoint someone, they get that Kage's full set and their name tag shows the title

@@ -167,6 +167,88 @@ for _vid, _k in KAGE.items():
     ARMOR.update(kage_set(_vid, *_k))
 
 
+# ---- The Legendary Sannin (given by the server owner with /scriptevent aegis:sannin <name>) ----
+def rotz(o, s_, sw, deg, piv):
+    return c(o, s_, sw, 0, [0, 0, deg], piv)
+
+
+SANNIN = {
+    # Jiraiya — Toad Sage: horned "oil" headband, red vest over an olive kimono, big scroll on the back, wooden geta.
+    "jiraiya_headband": dict(name="Toad Sage Headband", slot="head", prot=3, dur=900,
+        colors=dict(base=(170, 40, 40), metal=(200, 205, 215), dark=(90, 20, 20), white=(245, 245, 240), black=(25, 25, 30)),
+        bones={"head": [c([-4, 27, -4], [8, 2, 8], "base", 0.6), c([-2.6, 27, -4.95], [5.2, 2.2, 0.5], "metal"),
+                        rotz([-2.5, 28.8, -5], [0.9, 2.6, 0.6], "metal", 25, [-2, 28.8, -4.7]),
+                        rotz([1.6, 28.8, -5], [0.9, 2.6, 0.6], "metal", -25, [2, 28.8, -4.7]),
+                        c([-0.9, 27.4, -5.15], [1.8, 1.4, 0.3], "black"),
+                        c([-4.6, 22, 3.8], [3, 6, 0.6], "white"), c([1.6, 22, 3.8], [3, 6, 0.6], "white")]},
+        recipe=None),
+    "jiraiya_haori": dict(name="Toad Sage Haori", slot="chest", prot=8, dur=1000,
+        colors=dict(base=(105, 125, 70), red=(190, 40, 35), gold=(240, 200, 60), accent=(150, 110, 70), white=(240, 235, 220), dark=(70, 85, 45)),
+        bones={"body": [BODY(0.5, "base"), c([-4.7, 12, -2.9], [3.1, 10.6, 0.4], "red"), c([1.6, 12, -2.9], [3.1, 10.6, 0.4], "red"),
+                        c([-4.7, 12, 2.5], [9.4, 10.6, 0.4], "red"), c([-4.7, 21.5, -2.9], [9.4, 1.1, 5.8], "red"),
+                        c([-3.9, 17, -3.05], [1.2, 1.2, 0.3], "gold"), c([2.7, 17, -3.05], [1.2, 1.2, 0.3], "gold"),
+                        c([-4.8, 13, -2.95], [9.6, 1, 5.9], "dark"),
+                        # the giant scroll strapped across the back
+                        c([-5.5, 17.5, 3], [11, 2.6, 2.6], "white"), c([-5.9, 17.3, 2.8], [1, 3, 3], "accent"), c([4.9, 17.3, 2.8], [1, 3, 3], "accent")],
+               "rightArm": [RARM(0.5, "base"), RARM(0.55, "red", 21, 1)], "leftArm": [LARM(0.5, "base"), LARM(0.55, "red", 21, 1)]},
+        recipe=None),
+    "jiraiya_pants": dict(name="Toad Sage Pants", slot="legs", prot=6, dur=900, colors=dict(base=(105, 125, 70), dark=(70, 85, 45), white=(240, 235, 220)),
+        bones={"body": [c([-4, 11.4, -2], [8, 1.4, 4], "dark", 0.55)],
+               "rightLeg": [RLEG(0.45, "base", 2, 10), RLEG(0.5, "white", 1, 2)], "leftLeg": [LLEG(0.45, "base", 2, 10), LLEG(0.5, "white", 1, 2)]},
+        recipe=None),
+    "jiraiya_geta": dict(name="Toad Sage Geta", slot="feet", prot=3, dur=800, colors=dict(accent=(150, 105, 60), dark=(95, 65, 35), red=(190, 40, 35)),
+        bones={"rightLeg": [c([-4.1, -0.9, -2.9], [4.4, 1, 5.2], "accent"), c([-3.6, -1.5, -2.4], [3.4, 0.6, 1], "dark"), c([-3.6, -1.5, 1.4], [3.4, 0.6, 1], "dark"),
+                            c([-4, 0.1, -2.6], [4.2, 0.7, 0.6], "red")],
+               "leftLeg": [c([-0.3, -0.9, -2.9], [4.4, 1, 5.2], "accent"), c([0.2, -1.5, -2.4], [3.4, 0.6, 1], "dark"), c([0.2, -1.5, 1.4], [3.4, 0.6, 1], "dark"),
+                           c([-0.2, 0.1, -2.6], [4.2, 0.7, 0.6], "red")]},
+        recipe=None),
+    # Tsunade — Slug Princess: Byakugō seal + blonde pigtails, green haori with the gamble mark, grey top, navy pants.
+    "tsunade_seal": dict(name="Byakugō Seal", slot="head", prot=2, dur=800, colors=dict(accent2=(150, 70, 200), gold=(245, 215, 120), dark=(40, 40, 60)),
+        bones={"head": [rotz([-0.6, 28.6, -4.3], [1.2, 1.2, 0.3], "accent2", 45, [0, 29.2, -4.15]),
+                        c([-3.6, 26.5, 3.9], [2.2, 1, 1.4], "dark"), c([1.4, 26.5, 3.9], [2.2, 1, 1.4], "dark"),
+                        c([-3.4, 18.5, 4.1], [1.8, 8, 1.2], "gold"), c([1.6, 18.5, 4.1], [1.8, 8, 1.2], "gold")]},
+        recipe=None),
+    "tsunade_haori": dict(name="Slug Princess Haori", slot="chest", prot=8, dur=1000,
+        colors=dict(base=(95, 160, 85), light=(175, 175, 180), red=(190, 40, 40), white=(240, 240, 240), dark=(60, 110, 55)),
+        bones={"body": [BODY(0.5, "light"), c([-4.75, 9.5, 2.55], [9.5, 13, 0.4], "base"), c([-4.75, 9.5, -2.95], [2.5, 13, 0.4], "base"),
+                        c([2.25, 9.5, -2.95], [2.5, 13, 0.4], "base"), c([-4.75, 22, -2.95], [9.5, 0.6, 5.9], "dark"),
+                        c([-1.6, 15.5, 2.9], [3.2, 3.2, 0.3], "white"), c([-0.9, 16.2, 3.0], [1.8, 1.8, 0.3], "red")],
+               "rightArm": [c([-9.2, 13, -2.8], [5.6, 9.5, 5.6], "base"), c([-9.25, 13, -2.85], [5.7, 0.8, 5.7], "dark")],
+               "leftArm": [c([3.6, 13, -2.8], [5.6, 9.5, 5.6], "base"), c([3.55, 13, -2.85], [5.7, 0.8, 5.7], "dark")]},
+        recipe=None),
+    "tsunade_pants": dict(name="Slug Princess Pants", slot="legs", prot=6, dur=900, colors=dict(base=(45, 55, 95), dark=(30, 35, 65), light=(175, 175, 180)),
+        bones={"body": [c([-4, 11.4, -2], [8, 1.4, 4], "light", 0.55)],
+               "rightLeg": [RLEG(0.45, "base", 3, 9)], "leftLeg": [LLEG(0.45, "base", 3, 9)]},
+        recipe=None),
+    "tsunade_sandals": dict(name="Slug Princess Sandals", slot="feet", prot=3, dur=800, colors=dict(base=(40, 40, 50), dark=(25, 25, 30), light=(220, 210, 190)),
+        bones={"rightLeg": [c([-4.1, -0.05, -2.9], [4.4, 0.8, 5.2], "dark"), c([-3.2, -0.8, 1], [2.4, 0.8, 1.6], "dark"), RLEG(0.5, "light", 0.8, 2.2)],
+               "leftLeg": [c([-0.3, -0.05, -2.9], [4.4, 0.8, 5.2], "dark"), c([0.6, -0.8, 1], [2.4, 0.8, 1.6], "dark"), LLEG(0.5, "light", 0.8, 2.2)]},
+        recipe=None),
+    # Orochimaru — Snake Sage: long black hair, pale robe with the purple rope bow, dark pants.
+    "orochimaru_hair": dict(name="Snake Sage Hair", slot="head", prot=2, dur=800, colors=dict(black=(22, 20, 28), accent2=(120, 60, 160), dark=(45, 40, 55)),
+        bones={"head": [c([-4, 31.2, -4], [8, 1, 8], "black", 0.45), c([-4.2, 18, 3.6], [8.4, 14, 0.9], "black"),
+                        c([-4.55, 22, -3.6], [0.7, 10, 6], "black"), c([3.85, 22, -3.6], [0.7, 10, 6], "black"),
+                        c([-4.45, 27.4, -4.6], [8.9, 0.6, 0.4], "accent2")]},
+        recipe=None),
+    "orochimaru_robe": dict(name="Snake Sage Robe", slot="chest", prot=8, dur=1000,
+        colors=dict(light=(215, 210, 195), accent2=(120, 60, 160), dark=(80, 40, 110), base=(190, 185, 170)),
+        bones={"body": [BODY(0.7, "light"), c([-4.9, 12.6, -3.1], [9.8, 1.6, 6.2], "accent2"), c([-3.2, 11, 3], [6.4, 3, 1.6], "accent2"),
+                        c([-1, 7.5, 3.2], [2, 4, 1], "dark"), c([-0.5, 12, -3.05], [1, 10, 0.3], "base")],
+               "rightArm": [c([-9.2, 12.5, -2.8], [5.6, 10, 5.6], "light")], "leftArm": [c([3.6, 12.5, -2.8], [5.6, 10, 5.6], "light")],
+               "rightLeg": [RLEG(0.85, "light", 4, 8)], "leftLeg": [LLEG(0.85, "light", 4, 8)]},
+        recipe=None),
+    "orochimaru_pants": dict(name="Snake Sage Pants", slot="legs", prot=6, dur=900, colors=dict(base=(40, 38, 50), dark=(25, 24, 32), accent2=(120, 60, 160)),
+        bones={"body": [c([-4, 11.4, -2], [8, 1.4, 4], "accent2", 0.55)],
+               "rightLeg": [RLEG(0.45, "base", 2, 10)], "leftLeg": [LLEG(0.45, "base", 2, 10)]},
+        recipe=None),
+    "orochimaru_sandals": dict(name="Snake Sage Sandals", slot="feet", prot=3, dur=800, colors=dict(base=(40, 38, 50), dark=(20, 20, 25), light=(215, 210, 195)),
+        bones={"rightLeg": [c([-4.1, -0.05, -2.9], [4.4, 0.8, 5.2], "dark"), RLEG(0.5, "base", 0.8, 1.5), RLEG(0.55, "light", 2.3, 1)],
+               "leftLeg": [c([-0.3, -0.05, -2.9], [4.4, 0.8, 5.2], "dark"), LLEG(0.5, "base", 0.8, 1.5), LLEG(0.55, "light", 2.3, 1)]},
+        recipe=None),
+}
+ARMOR.update(SANNIN)
+
+
 SLOT = {"head": ("slot.armor.head", "armor_head"), "chest": ("slot.armor.chest", "armor_torso"),
         "legs": ("slot.armor.legs", "armor_legs"), "feet": ("slot.armor.feet", "armor_feet")}
 
@@ -246,7 +328,7 @@ for aid, a in ARMOR.items():
     tex_dir = RP / "textures" / "models" / "armor" / "aegis"
     tex_dir.mkdir(parents=True, exist_ok=True)
     palette(a["colors"]).save(tex_dir / f"{aid}.png")
-    render_icon(a["bones"], a["colors"], a["slot"], aid.endswith("_hat")).save(RP / "textures" / "items" / "aegis" / f"{aid}.png")
+    render_icon(a["bones"], a["colors"], a["slot"], aid.endswith("_hat") or aid == "jiraiya_headband").save(RP / "textures" / "items" / "aegis" / f"{aid}.png")
     bones = [{"name": b, "pivot": PIVOTS[b], "cubes": [{k: v for k, v in cu.items() if k != "_sw"} for cu in cubes]} for b, cubes in a["bones"].items()]
     w(RP / "models" / "entity" / f"armor_{aid}.geo.json", {"format_version": "1.12.0", "minecraft:geometry": [{
         "description": {"identifier": f"geometry.aegis.armor_{aid}", "texture_width": 64, "texture_height": 64,

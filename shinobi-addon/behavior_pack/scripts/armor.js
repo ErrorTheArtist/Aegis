@@ -79,7 +79,28 @@ const SETS = {
     effects: [["resistance", 2], ["jump_boost", 1]], chakra: 100, regen: 1.3, sneakFloat: true,
     desc: "Flight Jutsu: float while sneaking in the air, Resistance III, Jump Boost II, +100 max chakra",
   },
+  // ---- The Legendary Sannin (given with /scriptevent aegis:sannin <jiraiya|tsunade|orochimaru>) ----
+  jiraiya: {
+    name: "§cToad Sage", sannin: true,
+    pieces: { Head: "aegis:jiraiya_headband", Chest: "aegis:jiraiya_haori", Legs: "aegis:jiraiya_pants", Feet: "aegis:jiraiya_geta" },
+    effects: [["strength", 0], ["resistance", 0], ["jump_boost", 2]], chakra: 120, regen: 1.3, damage: 1.1,
+    desc: "Toad Sage: +120 max chakra, +10% technique damage, Strength, Resistance, toad-like Jump Boost III",
+  },
+  tsunade: {
+    name: "§aSlug Princess", sannin: true,
+    pieces: { Head: "aegis:tsunade_seal", Chest: "aegis:tsunade_haori", Legs: "aegis:tsunade_pants", Feet: "aegis:tsunade_sandals" },
+    effects: [["strength", 1], ["regeneration", 1]], chakra: 100, regen: 1.5, mightyFists: 0.25,
+    desc: "Byakugō: Regeneration II, Strength II, 25% of punches send enemies flying, +100 max chakra",
+  },
+  orochimaru: {
+    name: "§5Snake Sage", sannin: true,
+    pieces: { Head: "aegis:orochimaru_hair", Chest: "aegis:orochimaru_robe", Legs: "aegis:orochimaru_pants", Feet: "aegis:orochimaru_sandals" },
+    effects: [["speed", 1], ["night_vision", 0]], chakra: 120, damage: 1.15, snakeFangs: 0.3, immune: ["poison", "wither"],
+    desc: "Snake Sage: immune to poison & wither, 30% of hits poison, Speed II, night vision, +15% damage",
+  },
 };
+
+export const SANNIN_SETS = { jiraiya: "§cJiraiya", tsunade: "§aTsunade", orochimaru: "§5Orochimaru" };
 
 let api;
 const active = new Map(); // player id -> Set of set ids
@@ -147,19 +168,25 @@ export function getKage(player) {
   }
 }
 
+function giveSet(player, setId) {
+  const inv = player.getComponent("minecraft:inventory")?.container;
+  for (const id of Object.values(SETS[setId].pieces)) {
+    const stack = new ItemStack(id, 1);
+    let left = stack;
+    try {
+      left = inv ? inv.addItem(stack) : stack;
+    } catch {
+      left = stack;
+    }
+    if (left) player.dimension.spawnItem(left, player.location);
+  }
+}
+
 // Gives the full set for a village and records the title. Returns false if the village is unknown.
 export function giveKageSet(player, village) {
   if (!KAGE_VILLAGES[village]) return false;
   player.setDynamicProperty(KAGE_PROP, village);
-  const inv = player.getComponent("minecraft:inventory")?.container;
-  for (const id of Object.values(SETS[village].pieces)) {
-    const stack = new ItemStack(id, 1);
-    try {
-      if (inv?.addItem(stack)) player.dimension.spawnItem(stack, player.location);
-    } catch {
-      player.dimension.spawnItem(stack, player.location);
-    }
-  }
+  giveSet(player, village);
   return true;
 }
 
@@ -171,6 +198,13 @@ function setKage(player, village) {
 
 function floatTick() {
   for (const p of world.getAllPlayers()) {
+    for (const id of has(p, "immune").flat()) {
+      try {
+        if (p.getEffect(id)) p.removeEffect(id);
+      } catch {
+        /* ignore */
+      }
+    }
     if (!active.get(p.id)?.size || !p.isSneaking || p.isOnGround) continue;
     if (![...active.get(p.id)].some((id) => SETS[id].sneakFloat)) continue;
     try {
@@ -220,17 +254,46 @@ export function initArmor(helpers) {
     }
   });
 
-  // /scriptevent aegis:sannin [clear] — name (or un-name) the player who runs it a Legendary Sannin
+  // Tsunade — chakra-enhanced punches; Orochimaru — venomous strikes.
+  world.afterEvents.entityHitEntity.subscribe(({ damagingEntity, hitEntity }) => {
+    if (damagingEntity?.typeId !== "minecraft:player" || !api.isValid(hitEntity) || !api.canBeHit(hitEntity, damagingEntity)) return;
+    const mighty = has(damagingEntity, "mightyFists")[0];
+    if (mighty && Math.random() < mighty) {
+      const d = api.norm({ x: hitEntity.location.x - damagingEntity.location.x, y: 0, z: hitEntity.location.z - damagingEntity.location.z });
+      api.knockback(hitEntity, d.x, d.z, 3.5, 0.7);
+      api.particle(hitEntity.dimension, "aegis:cine_ring", hitEntity.location, [0.4, 1, 0.5]);
+      api.particle(hitEntity.dimension, "aegis:dust", hitEntity.location);
+      api.sound(hitEntity.dimension, "random.explode", hitEntity.location, 0.5, 1.4);
+    }
+    const fangs = has(damagingEntity, "snakeFangs")[0];
+    if (fangs && Math.random() < fangs) {
+      try {
+        hitEntity.addEffect("poison", 80, { amplifier: 1 });
+      } catch {
+        /* ignore */
+      }
+      api.particle(hitEntity.dimension, "aegis:slash", { x: hitEntity.location.x, y: hitEntity.location.y + 1, z: hitEntity.location.z }, [0.55, 0.25, 0.75]);
+    }
+  });
+
+  // /scriptevent aegis:sannin                      — Sannin title only
+  // /scriptevent aegis:sannin <jiraiya|tsunade|orochimaru> — title + that Sannin's full set
+  // /scriptevent aegis:sannin clear                — remove the title
   system.afterEvents.scriptEventReceive.subscribe(({ id, message, sourceEntity }) => {
     if (id !== "aegis:sannin" || sourceEntity?.typeId !== "minecraft:player") return;
-    if (String(message ?? "").trim().toLowerCase() === "clear") {
+    const arg = String(message ?? "").trim().toLowerCase();
+    if (arg === "clear") {
       sourceEntity.setDynamicProperty(SANNIN_PROP, undefined);
       api.refreshName?.(sourceEntity);
       return sourceEntity.sendMessage("§7Sannin title removed.");
     }
+    if (arg && !SANNIN_SETS[arg]) {
+      return sourceEntity.sendMessage("§7Usage: /scriptevent aegis:sannin [jiraiya|tsunade|orochimaru|clear]");
+    }
     sourceEntity.setDynamicProperty(SANNIN_PROP, true);
+    if (arg) giveSet(sourceEntity, arg);
     api.refreshName?.(sourceEntity);
-    world.sendMessage(`§e${sourceEntity.name} has been named one of the §aLegendary Sannin§e!`);
+    world.sendMessage(`§e${sourceEntity.name} has been named one of the §aLegendary Sannin§e${arg ? ` §7(${SANNIN_SETS[arg]}§7's legacy)` : ""}§e!`);
   });
 
   // /scriptevent aegis:kage <hokage|kazekage|mizukage|raikage|tsuchikage> — appoint the player who runs it

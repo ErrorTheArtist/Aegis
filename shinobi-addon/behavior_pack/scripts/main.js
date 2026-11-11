@@ -977,7 +977,7 @@ initHud({ getChakra, getMaxChakra, getLevel, xpInfo });
 
 const npcApi = {
   add, sub, scale, norm, dot, particle, sound, knockback, hurt, isValid, canBeHit,
-  getChakra, setChakra, cooldownLeft, startCooldown, anim, handPos, launchProjectile, gainJutsuXp,
+  getChakra, setChakra, cooldownLeft, startCooldown, anim, handPos, launchProjectile, gainJutsuXp, spawnFx, removeFx,
 };
 initNpcs({ ...npcApi, spawnAkatsukiNear: (p, msg) => spawnAkatsukiNear(p, msg) });
 initEnemies(npcApi);

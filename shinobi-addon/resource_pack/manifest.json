@@ -6,7 +6,7 @@
     "uuid": "021eff9f-c0fb-4765-9c0b-08387d62edb5",
     "version": [
       1,
-      15,
+      16,
       0
     ],
     "min_engine_version": [
@@ -20,20 +20,20 @@
       "type": "resources",
       "uuid": "d3e0d42f-473a-424f-b809-503f2a66e5fc",
       "version": [
-        1,
-        15,
-        0
-      ]
+      1,
+      16,
+      0
+    ]
     }
   ],
   "dependencies": [
     {
       "uuid": "23a31107-035a-4102-bc35-0d5fb16df98a",
       "version": [
-        1,
-        15,
-        0
-      ]
+      1,
+      16,
+      0
+    ]
     }
   ]
 }

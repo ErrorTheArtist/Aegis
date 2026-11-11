@@ -1,0 +1,281 @@
+{
+  "format_version": "1.21.0",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "aegis:legend",
+      "is_spawnable": true,
+      "is_summonable": true,
+      "is_experimental": false,
+      "properties": {
+        "aegis:skin": {
+          "type": "int",
+          "range": [
+            0,
+            20
+          ],
+          "default": 0,
+          "client_sync": true
+        }
+      }
+    },
+    "component_groups": {
+      "aegis:stay": {
+        "minecraft:movement": {
+          "value": 0.0
+        }
+      },
+      "aegis:wander": {
+        "minecraft:behavior.random_stroll": {
+          "priority": 8,
+          "speed_multiplier": 0.6,
+          "xz_dist": 6
+        }
+      },
+      "aegis:invulnerable": {
+        "minecraft:damage_sensor": {
+          "triggers": [
+            {
+              "cause": "all",
+              "deals_damage": "no"
+            }
+          ]
+        }
+      },
+      "aegis:despawnable": {
+        "minecraft:despawn": {
+          "despawn_from_distance": {
+            "min_distance": 32,
+            "max_distance": 80
+          }
+        }
+      },
+      "aegis:legend_naruto": {
+        "minecraft:health": {
+          "value": 900,
+          "max": 900
+        }
+      },
+      "aegis:legend_sasuke": {
+        "minecraft:health": {
+          "value": 850,
+          "max": 850
+        }
+      },
+      "aegis:legend_tsunade": {
+        "minecraft:health": {
+          "value": 950,
+          "max": 950
+        }
+      },
+      "aegis:legend_sarutobi": {
+        "minecraft:health": {
+          "value": 800,
+          "max": 800
+        }
+      },
+      "aegis:legend_minato": {
+        "minecraft:health": {
+          "value": 750,
+          "max": 750
+        }
+      }
+    },
+    "components": {
+      "minecraft:movement.basic": {},
+      "minecraft:jump.static": {},
+      "minecraft:can_climb": {},
+      "minecraft:navigation.walk": {
+        "can_path_over_water": true,
+        "can_open_doors": true,
+        "avoid_damage_blocks": true
+      },
+      "minecraft:physics": {},
+      "minecraft:collision_box": {
+        "width": 0.6,
+        "height": 1.8
+      },
+      "minecraft:breathable": {
+        "total_supply": 15,
+        "suffocate_time": 0
+      },
+      "minecraft:behavior.float": {
+        "priority": 0
+      },
+      "minecraft:type_family": {
+        "family": [
+          "legend",
+          "ninja",
+          "monster",
+          "mob"
+        ]
+      },
+      "minecraft:health": {
+        "value": 800,
+        "max": 800
+      },
+      "minecraft:attack": {
+        "damage": 14
+      },
+      "minecraft:movement": {
+        "value": 0.36
+      },
+      "minecraft:boss": {
+        "hud_range": 48,
+        "should_darken_sky": false
+      },
+      "minecraft:knockback_resistance": {
+        "value": 0.8
+      },
+      "minecraft:pushable": {
+        "is_pushable": false,
+        "is_pushable_by_piston": false
+      },
+      "minecraft:nameable": {
+        "always_show": true
+      },
+      "minecraft:persistent": {},
+      "minecraft:fire_immune": {},
+      "minecraft:damage_sensor": {
+        "triggers": [
+          {
+            "cause": "fall",
+            "deals_damage": "no"
+          }
+        ]
+      },
+      "minecraft:loot": {
+        "table": "loot_tables/entities/aegis_legend.json"
+      },
+      "minecraft:experience_reward": {
+        "on_death": "q.last_hit_by_player ? 500 : 0"
+      },
+      "minecraft:follow_range": {
+        "value": 48
+      },
+      "minecraft:behavior.melee_attack": {
+        "priority": 2,
+        "speed_multiplier": 1.3,
+        "track_target": true
+      },
+      "minecraft:behavior.hurt_by_target": {
+        "priority": 1
+      },
+      "minecraft:behavior.nearest_attackable_target": {
+        "priority": 3,
+        "must_see": false,
+        "reselect_targets": true,
+        "within_radius": 32,
+        "entity_types": [
+          {
+            "filters": {
+              "any_of": [
+                {
+                  "test": "is_family",
+                  "subject": "other",
+                  "value": "player"
+                },
+                {
+                  "test": "is_family",
+                  "subject": "other",
+                  "value": "ninja_companion"
+                }
+              ]
+            },
+            "max_dist": 32
+          }
+        ]
+      },
+      "minecraft:behavior.random_stroll": {
+        "priority": 7,
+        "speed_multiplier": 0.7
+      },
+      "minecraft:behavior.look_at_player": {
+        "priority": 8,
+        "look_distance": 16
+      }
+    },
+    "events": {
+      "aegis:stay": {
+        "remove": {
+          "component_groups": [
+            "aegis:wander"
+          ]
+        },
+        "add": {
+          "component_groups": [
+            "aegis:stay"
+          ]
+        }
+      },
+      "aegis:wander": {
+        "remove": {
+          "component_groups": [
+            "aegis:stay"
+          ]
+        },
+        "add": {
+          "component_groups": [
+            "aegis:wander"
+          ]
+        }
+      },
+      "aegis:invulnerable": {
+        "add": {
+          "component_groups": [
+            "aegis:invulnerable"
+          ]
+        }
+      },
+      "aegis:vulnerable": {
+        "remove": {
+          "component_groups": [
+            "aegis:invulnerable"
+          ]
+        }
+      },
+      "aegis:persist": {
+        "remove": {
+          "component_groups": [
+            "aegis:despawnable"
+          ]
+        }
+      },
+      "aegis:talked": {},
+      "aegis:legend_naruto": {
+        "add": {
+          "component_groups": [
+            "aegis:legend_naruto"
+          ]
+        }
+      },
+      "aegis:legend_sasuke": {
+        "add": {
+          "component_groups": [
+            "aegis:legend_sasuke"
+          ]
+        }
+      },
+      "aegis:legend_tsunade": {
+        "add": {
+          "component_groups": [
+            "aegis:legend_tsunade"
+          ]
+        }
+      },
+      "aegis:legend_sarutobi": {
+        "add": {
+          "component_groups": [
+            "aegis:legend_sarutobi"
+          ]
+        }
+      },
+      "aegis:legend_minato": {
+        "add": {
+          "component_groups": [
+            "aegis:legend_minato"
+          ]
+        }
+      }
+    }
+  }
+}

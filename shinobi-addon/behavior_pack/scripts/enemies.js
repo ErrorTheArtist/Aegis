@@ -4,6 +4,7 @@
 import { world, system } from "@minecraft/server";
 import { showTitle } from "./hud.js";
 import { NPC_TYPES, AKATSUKI, setupNpc } from "./npcs.js";
+import { initLegends, legendTick, updateLegend } from "./legends.js";
 
 const DIMENSIONS = ["overworld", "nether", "the_end"];
 let api;
@@ -210,13 +211,22 @@ function update(e, now) {
     st = { next: now + 40, subNext: 0 };
     state.set(e.id, st);
   }
+  const isLegend = e.typeId === "aegis:legend";
+  if (isLegend) {
+    try {
+      legendTick(e);
+    } catch {
+      /* ignore */
+    }
+  }
   if (now < st.next) return;
-  const isBoss = e.typeId === "aegis:akatsuki";
+  const isBoss = isLegend || e.typeId === "aegis:akatsuki";
   const found = nearest(e, survivalPlayersNear(e.dimension, e.location, isBoss ? 32 : 20));
   if (!found) return;
   let cd = 60;
   try {
-    if (isBoss) cd = MEMBER_AI[e.getDynamicProperty("aegis:member") ?? "itachi"]?.(e, found.target, found.dist) ?? 60;
+    if (isLegend) cd = updateLegend(e, found.target, found.dist);
+    else if (isBoss) cd = MEMBER_AI[e.getDynamicProperty("aegis:member") ?? "itachi"]?.(e, found.target, found.dist) ?? 60;
     else cd = ROLE_AI[e.getDynamicProperty("aegis:role") ?? "rogue"]?.(e, found.target, found.dist) ?? 60;
   } catch {
     /* ignore */
@@ -241,6 +251,7 @@ export function spawnAkatsukiNear(player, message) {
 
 export function initEnemies(helpers) {
   api = helpers;
+  initLegends(helpers);
 
   system.runInterval(() => {
     const now = system.currentTick;

@@ -260,6 +260,11 @@ export function handleRecordUse(player, itemStack) {
 // Setup
 // ---------------------------------------------------------------------------
 function killXp(dead) {
+  try {
+    if (dead.getDynamicProperty("aegis:no_xp")) return 0; // shadow clones etc.
+  } catch {
+    /* ignore */
+  }
   if (dead.typeId === "minecraft:player") return 60 + getLevel(dead) * 6;
   try {
     const h = dead.getComponent("minecraft:health");

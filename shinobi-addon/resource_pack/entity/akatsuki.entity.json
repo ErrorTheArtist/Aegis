@@ -22,7 +22,12 @@
         "s12": "textures/entity/aegis/npc/itachi",
         "s13": "textures/entity/aegis/npc/kisame",
         "s14": "textures/entity/aegis/npc/deidara",
-        "s15": "textures/entity/aegis/npc/chunin"
+        "s15": "textures/entity/aegis/npc/chunin",
+        "s16": "textures/entity/aegis/npc/naruto",
+        "s17": "textures/entity/aegis/npc/sasuke",
+        "s18": "textures/entity/aegis/npc/tsunade",
+        "s19": "textures/entity/aegis/npc/sarutobi",
+        "s20": "textures/entity/aegis/npc/minato"
       },
       "geometry": {
         "default": "geometry.humanoid.custom"

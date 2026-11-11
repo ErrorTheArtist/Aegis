@@ -17,7 +17,8 @@ import { hasEternalMangekyo, awakenEternal } from "./clans.js";
 const SPAWNER = "aegis:npc_spawner";
 const INDEX_PROP = "aegis:spawners";
 const SKIN_NAMES = ["Sensei", "Elder", "Weaponsmith", "Ramen chef", "Hokage", "Proctor", "Genin (orange)", "Genin (blue)",
-  "Genin (pink)", "Rogue ninja", "Sound ninja", "Anbu", "Itachi", "Kisame", "Deidara", "Leaf chūnin"];
+  "Genin (pink)", "Rogue ninja", "Sound ninja", "Anbu", "Itachi", "Kisame", "Deidara", "Leaf chūnin",
+  "Naruto", "Sasuke", "Tsunade", "Hiruzen Sarutobi", "Minato"];
 
 export const NPC_TYPES = {
   sensei: { label: "Jutsu Sensei (jutsu shop)", entity: "aegis:npc", skin: 0, name: "§bJutsu Sensei", friendly: true,
@@ -40,6 +41,12 @@ export const NPC_TYPES = {
   sound: { label: "Sound Ninja (hostile)", entity: "aegis:hostile_ninja", skin: 10, name: "§5Sound Ninja", tier: "sound" },
   anbu: { label: "Anbu (hostile)", entity: "aegis:hostile_ninja", skin: 11, name: "§7Rogue Anbu", tier: "anbu" },
   akatsuki: { label: "Akatsuki (boss)", entity: "aegis:akatsuki", skin: 12, name: "Akatsuki", boss: true },
+  // Legendary bosses — only ever appear from an NPC Spawner.
+  naruto_boss: { label: "§6Legend: Naruto Uzumaki (boss)", entity: "aegis:legend", skin: 16, name: "§6Naruto Uzumaki", boss: true, legend: "naruto" },
+  sasuke_boss: { label: "§5Legend: Sasuke Uchiha (boss)", entity: "aegis:legend", skin: 17, name: "§5Sasuke Uchiha", boss: true, legend: "sasuke" },
+  tsunade_boss: { label: "§aLegend: Tsunade (boss)", entity: "aegis:legend", skin: 18, name: "§aTsunade", boss: true, legend: "tsunade" },
+  sarutobi_boss: { label: "§cLegend: Hiruzen Sarutobi (boss)", entity: "aegis:legend", skin: 19, name: "§cHiruzen Sarutobi", boss: true, legend: "sarutobi" },
+  minato_boss: { label: "§eLegend: Minato Namikaze (boss)", entity: "aegis:legend", skin: 20, name: "§eMinato Namikaze", boss: true, legend: "minato" },
 };
 const TYPE_IDS = Object.keys(NPC_TYPES);
 export const AKATSUKI = {
@@ -158,7 +165,7 @@ function defaultsFor(type) {
   const hostile = !t.friendly;
   return {
     type, name: "", skin: -1, clan: "random", member: "random",
-    count: 1, respawn: true, delay: hostile ? 60 : 10, stay: !hostile && type !== "villager" && type !== "genin",
+    count: 1, respawn: true, delay: t.legend ? 300 : hostile ? 60 : 10, stay: !hostile && type !== "villager" && type !== "genin",
     radius: hostile ? 12 : 6, invuln: !hostile, price: 100, greeting: "", height: 0,
   };
 }
@@ -226,6 +233,10 @@ export function setupNpc(e, cfg, extra = {}) {
     e.setDynamicProperty("aegis:role", cfg.type);
     if (cfg.key) e.setDynamicProperty("aegis:spawner", cfg.key);
     if (member) e.setDynamicProperty("aegis:member", member);
+    if (t.legend) {
+      e.setDynamicProperty("aegis:member", t.legend);
+      e.triggerEvent(`aegis:legend_${t.legend}`);
+    }
     if (cfg.type === "clan_elder") {
       const clan = cfg.clan === "random" || !CLANS[cfg.clan] ? Object.keys(CLANS)[Math.floor(Math.random() * Object.keys(CLANS).length)] : cfg.clan;
       e.setDynamicProperty("aegis:elder_clan", clan);
@@ -777,7 +788,7 @@ function killerOf(damageSource) {
 
 function killKind(dead) {
   const t = dead.typeId;
-  if (t === "aegis:akatsuki") return "akatsuki";
+  if (t === "aegis:akatsuki" || t === "aegis:legend") return "akatsuki";
   if (t === "aegis:hostile_ninja") return "ninja";
   if (["shukaku", "matatabi", "isobu", "son_goku", "kokuo", "saiken", "chomei", "gyuki", "kurama"].some((b) => t === `aegis:${b}`)) return "bijuu";
   try {

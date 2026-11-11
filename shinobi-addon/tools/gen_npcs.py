@@ -163,6 +163,27 @@ def humanoid(o):
         for face in ("front", "left", "right", "back"):
             fx, fy, fw, fh = head[face]
             s.rect(fx, fy, fw, 2, o["bandana"])
+    if o.get("whiskers"):  # Naruto's whisker marks
+        for dy in (5, 6):
+            s.px(x + 0, y + dy, (90, 60, 50)); s.px(x + 7, y + dy, (90, 60, 50))
+    if o.get("diamond"):  # Tsunade's forehead seal
+        s.px(x + 3, y + 3, (150, 60, 170)); s.px(x + 4, y + 3, (150, 60, 170))
+    if o.get("haori"):  # long coat over the outfit (Minato / Tsunade / Hokage)
+        col, hem = o["haori"]
+        for face in ("left", "right", "back"):
+            bx, by, bw, bh = s.part("body")[face]
+            s.rect(bx, by, bw, bh, col)
+        fx_, fy_, fw_, fh_ = s.part("body")["front"]
+        s.rect(fx_, fy_, 2, fh_, col); s.rect(fx_ + 6, fy_, 2, fh_, col)
+        for arm in ("rarm", "larm"):
+            s.fill(arm, col, rows=(0, 10))
+        for leg in ("rleg", "lleg"):
+            s.fill(leg, col, faces=("left", "right", "back"), rows=(0, 6))
+            if hem:
+                for face in ("front", "left", "right", "back"):
+                    lx_, ly_, lw_, lh_ = s.part(leg)[face]
+                    for i in range(lw_):
+                        s.px(lx_ + i, ly_ + 5 - (i % 2), hem)
     if o.get("rope"):  # Sound ninja purple rope belt
         for face in ("front", "back", "left", "right"):
             bx, by, bw, bh = s.part("body")[face]
@@ -188,6 +209,16 @@ SKINS = [
     ("kisame", dict(skin=(110, 140, 170), hair=(40, 60, 120), cloak=True, top=(20, 20, 25), pants=(30, 30, 50), eyes=(240, 240, 240), band=((30, 30, 40), STEEL), slashed=True)),
     ("deidara", dict(hair=(240, 210, 90), cloak=True, top=(20, 20, 25), pants=(30, 30, 50), eyes=(60, 120, 200), long_hair=True, band=((30, 30, 40), STEEL), slashed=True)),
     ("chunin", dict(hair=(80, 55, 35), top=(40, 50, 90), pants=(40, 50, 90), vest=(80, 110, 60), band=((40, 60, 140), STEEL))),
+    # --- legendary bosses (NPC Spawner only) ---
+    ("naruto", dict(hair=(250, 205, 50), top=(240, 120, 30), sleeve=(30, 30, 35), sleeve_len=4, pants=(240, 120, 30), eyes=(60, 120, 230),
+                    band=((30, 30, 40), STEEL), whiskers=True, hair_side=4, bangs=3)),
+    ("sasuke", dict(hair=(20, 20, 30), top=(235, 235, 235), sleeve_len=11, pants=(40, 40, 60), rope=True, eyes=(210, 20, 20), hair_back=8, hair_side=5, bangs=3)),
+    ("tsunade", dict(hair=(245, 220, 120), top=(130, 130, 125), pants=(40, 40, 60), diamond=True, long_hair=True, haori=((80, 140, 70), None),
+                     eyes=(160, 120, 60))),
+    ("sarutobi", dict(hair=(150, 150, 150), top=(240, 240, 240), sleeve_len=11, pants=(240, 240, 240), hat=((240, 240, 240), (200, 30, 30)),
+                      belt=(200, 30, 30), skin=(210, 170, 135))),
+    ("minato", dict(hair=(250, 215, 70), top=(40, 50, 90), pants=(40, 50, 90), vest=(80, 110, 60), band=((40, 60, 140), STEEL),
+                    haori=((245, 245, 245), (210, 40, 30)), eyes=(60, 120, 230), hair_side=5, bangs=3)),
 ]
 (RP / "textures" / "entity" / "aegis" / "npc").mkdir(parents=True, exist_ok=True)
 for name, o in SKINS:
@@ -316,6 +347,34 @@ entity("akatsuki", {**BASE_MOVE,
     events={"minecraft:entity_spawned": {"add": {"component_groups": ["aegis:despawnable"]}},
             "aegis:persist": {"remove": {"component_groups": ["aegis:despawnable"]}, "add": {"component_groups": ["aegis:persistent"]}}})
 client_humanoid("akatsuki", ("#141418", "#c81419"))
+
+# Legendary bosses — only ever created by an NPC Spawner (no spawn rules).
+LEGEND_HP = {"naruto": 900, "sasuke": 850, "tsunade": 950, "sarutobi": 800, "minato": 750}
+entity("legend", {**BASE_MOVE,
+    "minecraft:type_family": {"family": ["legend", "ninja", "monster", "mob"]},
+    "minecraft:health": {"value": 800, "max": 800},
+    "minecraft:attack": {"damage": 14},
+    "minecraft:movement": {"value": 0.36},
+    "minecraft:boss": {"hud_range": 48, "should_darken_sky": False},
+    "minecraft:knockback_resistance": {"value": 0.8},
+    "minecraft:pushable": {"is_pushable": False, "is_pushable_by_piston": False},
+    "minecraft:nameable": {"always_show": True},
+    "minecraft:persistent": {},
+    "minecraft:fire_immune": {},
+    "minecraft:damage_sensor": {"triggers": [{"cause": "fall", "deals_damage": "no"}]},
+    "minecraft:loot": {"table": "loot_tables/entities/aegis_legend.json"},
+    "minecraft:experience_reward": {"on_death": "q.last_hit_by_player ? 500 : 0"},
+    "minecraft:follow_range": {"value": 48},
+    "minecraft:behavior.melee_attack": {"priority": 2, "speed_multiplier": 1.3, "track_target": True},
+    "minecraft:behavior.hurt_by_target": {"priority": 1},
+    "minecraft:behavior.nearest_attackable_target": {"priority": 3, "must_see": False, "reselect_targets": True, "within_radius": 32,
+        "entity_types": [{"filters": {"any_of": [{"test": "is_family", "subject": "other", "value": "player"},
+                                                  {"test": "is_family", "subject": "other", "value": "ninja_companion"}]}, "max_dist": 32}]},
+    "minecraft:behavior.random_stroll": {"priority": 7, "speed_multiplier": 0.7},
+    "minecraft:behavior.look_at_player": {"priority": 8, "look_distance": 16}},
+    groups={f"aegis:legend_{k}": {"minecraft:health": {"value": hp, "max": hp}} for k, hp in LEGEND_HP.items()},
+    events={f"aegis:legend_{k}": {"add": {"component_groups": [f"aegis:legend_{k}"]}} for k in LEGEND_HP})
+client_humanoid("legend", ("#f0782a", "#1e1e28"))
 
 # Recruitable genin companion
 COMPANION_TAMED = {
@@ -486,6 +545,10 @@ w(BP / "loot_tables" / "entities" / "aegis_ninja.json", {"pools": [
     {"rolls": 1, "entries": [{"type": "item", "name": "aegis:kunai", "weight": 1, "functions": cnt(1, 4)}, {"type": "empty", "weight": 1}]},
     {"rolls": 1, "entries": [{"type": "item", "name": "aegis:chakra_pill", "weight": 3}, {"type": "item", "name": "aegis:blank_scroll", "weight": 2},
                              {"type": "item", "name": "aegis:shuriken", "weight": 2, "functions": cnt(2, 6)}, {"type": "empty", "weight": 6}]}]})
+w(BP / "loot_tables" / "entities" / "aegis_legend.json", {"pools": [
+    {"rolls": 1, "entries": [{"type": "item", "name": "minecraft:emerald", "weight": 1, "functions": cnt(16, 32)}]},
+    {"rolls": 1, "entries": [{"type": "item", "name": "minecraft:diamond", "weight": 1, "functions": cnt(3, 8)}]},
+    {"rolls": 1, "entries": [{"type": "item", "name": "aegis:chakra_pill", "weight": 1, "functions": cnt(4, 8)}]}]})
 w(BP / "loot_tables" / "entities" / "aegis_akatsuki.json", {"pools": [
     {"rolls": 1, "entries": [{"type": "item", "name": "minecraft:emerald", "weight": 1, "functions": cnt(10, 20)}]},
     {"rolls": 1, "entries": [{"type": "item", "name": "minecraft:diamond", "weight": 1, "functions": cnt(2, 5)}]},
@@ -610,11 +673,12 @@ for i in ["ramen", "miso_ramen", "summon_toad_scroll", "summon_slug_scroll", "su
 w(atlas_path, atlas)
 
 lang_path = RP / "texts" / "en_US.lang"
-lines = [l for l in lang_path.read_text().splitlines() if not any(k in l for k in ("aegis:npc", "aegis:hostile_ninja", "aegis:akatsuki", "aegis:genin", "aegis:summon_", "tile.aegis:"))]
+lines = [l for l in lang_path.read_text().splitlines() if not any(k in l for k in ("aegis:npc", "aegis:hostile_ninja", "aegis:akatsuki", "aegis:genin", "aegis:legend", "aegis:summon_", "tile.aegis:"))]
 lines += ["entity.aegis:npc.name=Shinobi", "item.spawn_egg.entity.aegis:npc.name=Spawn Shinobi NPC",
           "entity.aegis:hostile_ninja.name=Rogue Ninja", "item.spawn_egg.entity.aegis:hostile_ninja.name=Spawn Rogue Ninja",
           "entity.aegis:akatsuki.name=Akatsuki", "item.spawn_egg.entity.aegis:akatsuki.name=Spawn Akatsuki",
           "entity.aegis:genin.name=Genin", "item.spawn_egg.entity.aegis:genin.name=Spawn Genin",
+          "entity.aegis:legend.name=Legendary Shinobi", "item.spawn_egg.entity.aegis:legend.name=Spawn Legendary Shinobi",
           "tile.aegis:npc_spawner.name=NPC Spawner"]
 for aid, a in ANIMALS.items():
     lines += [f"entity.aegis:{aid}.name={a['name']}", f"item.spawn_egg.entity.aegis:{aid}.name=Spawn {a['name']}"]

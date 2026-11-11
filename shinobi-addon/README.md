@@ -364,6 +364,23 @@ Shops use **emeralds** (dropped by enemy ninja, Akatsuki and paid by missions).
   blast, keeps his distance). They **rarely roam the world** (Normal/Hard difficulty — you get a "sighted nearby"
   warning), **hunt Jinchūriki** (every 5 min, 35% chance) and appear for S-rank missions. ~1,500 XP each.
 
+### Legendary bosses (NPC Spawner only)
+
+These five **never spawn on their own** — place an **NPC Spawner**, choose *Legend: …* as the NPC type, and they
+appear (default respawn: 5 minutes). Each has a boss bar, its own moveset, and a **second phase at half health**
+(+Strength, Speed, Resistance and a chakra aura). Defeating one announces it to the server, counts toward
+S-rank missions and gives big XP.
+
+| Boss | HP | Moves | Phase 2 | Signature drops |
+|---|---|---|---|---|
+| **Naruto Uzumaki** | 900 | Shadow Clones (vanish in one hit, no loot), Rasengan dash, Rasenshuriken | **Nine-Tails Chakra Mode** — Tailed Beast Bomb | Rasengan scroll, Rasenshuriken, Shadow Clone |
+| **Sasuke Uchiha** | 850 | Chidori lunge, Fireball, Amaterasu | **Susanoo** wraps him, **Kirin** lightning (get out of the ring!) | Chidori scroll, Kusanagi, Chidori Current |
+| **Tsunade** | 950 | Chakra-enhanced punch (huge knockback), heel-drop leap, Mystical Palm heal | **Creation Rebirth** — heals half her HP once | Mystical Palm, Slug summon, Earth Wall |
+| **Hiruzen Sarutobi** | 800 | Fire Dragon (triple fireball), Shuriken Shadow Clone storm, Enma staff sweep | **Reaper Death Seal** — weakness, slowness & nausea | Phoenix Flower, Hokage hat, 32 shuriken |
+| **Minato Namikaze** | 750 | Flying Raijin teleport-slash, kunai volley, Rasengan from behind | **Flying Raijin barrage** — 5 blinks + Rasengan | Body Flicker scroll, 16 kunai, Hokage robe |
+
+All also drop 16–32 emeralds, diamonds and pills.
+
 ### Summoning
 
 Summoning scrolls (Sensei): **Toad** (belly-slam AoE), **Slug** (heals you, restores chakra, acid), **Snake**

@@ -274,10 +274,11 @@ village's colour. Wear all four for the set bonus:
 | ⚡ **Raikage** (Hidden Cloud) | Yellow | **Lightning Armor**: 35% of punches crackle (+4 lightning dmg, slow), Speed II, Strength II, Haste II, +15% damage |
 | 🪨 **Tsuchikage** (Hidden Stone) | Brown | **Flight Jutsu**: float while sneaking in mid-air, Resistance III, Jump Boost II, +100 max chakra |
 
-**Becoming Kage:** pass the **Kage exam** at the Exam Proctor (Lv 120) and choose which village you lead — you get that
-Kage's full set and your name tag shows the title (e.g. `[Uchiha] Hokage Lv.120 Steve`). Kage sets can't be crafted.
+**Becoming Kage:** Kage are **chosen by the server owner** — no NPC, exam, recipe or boss gives a Kage set or title.
+When you appoint someone, they get that Kage's full set and their name tag shows the title
+(e.g. `[Uchiha] Hokage Lv.120 Steve`).
 
-Admins can appoint a Kage directly (cheats on):
+Appoint a Kage (cheats on, or from a command block):
 
 ```
 /execute as PlayerName run scriptevent aegis:kage hokage      (or kazekage / mizukage / raikage / tsuchikage)
@@ -381,7 +382,7 @@ Friendly NPCs are leashed to their spawner; breaking the spawner removes its NPC
 | **Weaponsmith** | Kunai, shuriken, headbands, all 8 legendary swords (Lv 15–35), repairs the item in your hand |
 | **Ramen Shop** | Ichiraku Ramen (heal + 60 chakra + regen), Miso Ramen (+30 chakra + speed), Soldier Pills |
 | **Hokage (Mission Desk)** | D/C/B/A/S missions (kill mobs, ninja, a Tailed Beast, an Akatsuki member) for XP, emeralds and items |
-| **Exam Proctor** | Rank exams: **Chūnin** (Lv 20, beat 4 rogue ninja in 90 s), **Jōnin** (Lv 60, 3 Anbu + 3 Sound in 2 min), **Kage** (Lv 120, beat an Akatsuki in 3 min). Ranks show on your name tag and give +5/+10/+20 stat points |
+| **Exam Proctor** | Rank exams: **Chūnin** (Lv 20, beat 4 rogue ninja in 90 s), **Jōnin** (Lv 60, 3 Anbu + 3 Sound in 2 min), **Sannin** (Lv 120, beat an Akatsuki in 3 min). Ranks show on your name tag and give +5/+10/+20 stat points |
 | **Clan Elder** | For their clan: **Clan Mastery** 1–3 (+10% clan max chakra, −10% clan ability cooldowns each); the Uchiha Elder also awakens the **Eternal Mangekyō**. Others: **Bloodline transfer** into that clan (64 emeralds, Lv 30) |
 | **Leaf Shinobi** | Chatter and tips |
 | **Genin** | Recruit for 15 emeralds — follows you, fights, levels up to 10 (Strength, Resistance, hearts). Talk to toggle follow/stay or dismiss |
@@ -410,8 +411,8 @@ S-rank missions and gives big XP.
 | **Naruto Uzumaki** | 900 | Shadow Clones (vanish in one hit, no loot), Rasengan dash, Rasenshuriken | **Nine-Tails Chakra Mode** — Tailed Beast Bomb | Rasengan scroll, Rasenshuriken, Shadow Clone |
 | **Sasuke Uchiha** | 850 | Chidori lunge, Fireball, Amaterasu | **Susanoo** wraps him, **Kirin** lightning (get out of the ring!) | Chidori scroll, Kusanagi, Chidori Current |
 | **Tsunade** | 950 | Chakra-enhanced punch (huge knockback), heel-drop leap, Mystical Palm heal | **Creation Rebirth** — heals half her HP once | Mystical Palm, Slug summon, Earth Wall |
-| **Hiruzen Sarutobi** | 800 | Fire Dragon (triple fireball), Shuriken Shadow Clone storm, Enma staff sweep | **Reaper Death Seal** — weakness, slowness & nausea | Phoenix Flower, Hokage hat, 32 shuriken |
-| **Minato Namikaze** | 750 | Flying Raijin teleport-slash, kunai volley, Rasengan from behind | **Flying Raijin barrage** — 5 blinks + Rasengan | Body Flicker scroll, 16 kunai, Hokage robe |
+| **Hiruzen Sarutobi** | 800 | Fire Dragon (triple fireball), Shuriken Shadow Clone storm, Enma staff sweep | **Reaper Death Seal** — weakness, slowness & nausea | Phoenix Flower, Great Fire Annihilation, 32 shuriken |
+| **Minato Namikaze** | 750 | Flying Raijin teleport-slash, kunai volley, Rasengan from behind | **Flying Raijin barrage** — 5 blinks + Rasengan | Body Flicker scroll, 16 kunai, Rasengan |
 
 All also drop 16–32 emeralds, diamonds and pills.
 

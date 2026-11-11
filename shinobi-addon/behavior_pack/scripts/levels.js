@@ -52,7 +52,7 @@ const set = (player, key, v) => {
   }
 };
 
-export const RANKS = ["Genin", "Chūnin", "Jōnin", "Kage"];
+export const RANKS = ["Genin", "Chūnin", "Jōnin", "Sannin"]; // Kage titles are given by server admins (/scriptevent aegis:kage)
 export const getRank = (player) => Math.max(0, Math.min(RANKS.length - 1, num(player, "aegis:rank", 0)));
 export const setRank = (player, r) => set(player, "aegis:rank", r);
 export const addPoints = (player, n) => set(player, P.points, num(player, P.points, 0) + n);

@@ -14,9 +14,9 @@ export const LEGENDS = {
   tsunade: { name: "§aTsunade", skin: 18, color: [0.4, 1, 0.5], phase: "Creation Rebirth",
     drops: [["aegis:mystical_palm_scroll", 1, 1], ["aegis:summon_slug_scroll", 1, 0.5], ["aegis:earth_wall_scroll", 1, 0.4]] },
   sarutobi: { name: "§cHiruzen Sarutobi", skin: 19, color: [1, 0.35, 0.15], phase: "Reaper Death Seal",
-    drops: [["aegis:phoenix_scroll", 1, 1], ["aegis:hokage_hat", 1, 0.15], ["aegis:shuriken", 32, 1]] },
+    drops: [["aegis:phoenix_scroll", 1, 1], ["aegis:great_fire_scroll", 1, 0.3], ["aegis:shuriken", 32, 1]] },
   minato: { name: "§eMinato Namikaze", skin: 20, color: [1, 0.9, 0.4], phase: "Flying Raijin Barrage",
-    drops: [["aegis:flash_scroll", 1, 1], ["aegis:kunai", 16, 1], ["aegis:hokage_robe", 1, 0.15]] },
+    drops: [["aegis:flash_scroll", 1, 1], ["aegis:kunai", 16, 1], ["aegis:sphere_scroll", 1, 0.3]] },
 };
 
 let api;

@@ -138,6 +138,14 @@ SCROLLS = {
     "chidori_current_scroll": ("Lightning Style: Chidori Current", "minecraft:copper_ingot"),
     "rasenshuriken_scroll": ("Wind Style: Rasenshuriken", "minecraft:diamond_block"),
     "mystical_palm_scroll": ("Medical: Mystical Palm Technique", "minecraft:glistering_melon_slice"),
+    "great_fire_scroll": ("Fire Style: Great Fire Annihilation", "minecraft:blaze_powder"),
+    "kirin_scroll": ("Lightning Style: Kirin", "minecraft:lightning_rod"),
+    "water_prison_scroll": ("Water Style: Water Prison", "minecraft:water_bucket"),
+    "vacuum_scroll": ("Wind Style: Vacuum Bullets", "minecraft:wind_charge"),
+    "earth_spikes_scroll": ("Earth Style: Earth Spikes", "minecraft:pointed_dripstone"),
+    "chidori_spear_scroll": ("Lightning Style: Chidori Sharp Spear", "minecraft:trident"),
+    "ice_needles_scroll": ("Ice Style: Thousand Needles of Death", "minecraft:packed_ice"),
+    "eight_gates_scroll": ("Eight Inner Gates Release", "minecraft:golden_apple"),
 }
 atlas_p = RP / "textures" / "item_texture.json"; atlas = rj(atlas_p)
 for sid, (name, cat) in SCROLLS.items():
@@ -148,6 +156,8 @@ for sid, (name, cat) in SCROLLS.items():
     ing = [{"item": "aegis:blank_scroll"}, {"item": cat}, {"item": "minecraft:lapis_lazuli"}]
     if sid == "rasenshuriken_scroll":
         ing.append({"item": "minecraft:feather"})
+    if sid in ("kirin_scroll", "eight_gates_scroll", "great_fire_scroll"):
+        ing.append({"item": "minecraft:diamond"})
     w(BP / "recipes" / f"{sid}.json", {"format_version": "1.21.60", "minecraft:recipe_shapeless": {
         "description": {"identifier": f"aegis:{sid}"}, "tags": ["crafting_table"], "ingredients": ing,
         "result": {"item": f"aegis:{sid}", "count": 1}, "unlock": {"context": "AlwaysUnlocked"}}})

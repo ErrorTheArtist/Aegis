@@ -507,6 +507,109 @@ def book():
     return img
 
 
+def emblem_great_fire(img):
+    # a wide rolling wall of fire
+    for i, (x, sz) in enumerate(((30, 16), (98, 16), (46, 22), (82, 22), (64, 28))):
+        emblem_flame(img, x, 70 - sz * 0.3, sz, (255, 80 + i * 10, 20))
+    lay = new()
+    shape(lay, lambda d: d.rounded_rectangle([22, 86, 106, 98], radius=6, fill=255), (255, 220, 90), (230, 70, 20))
+    glow(img, lay, (255, 110, 30), 5, 1.6)
+
+
+def emblem_kirin(img):
+    lay = new()
+    d = ImageDraw.Draw(lay)
+    # storm cloud
+    for cx, cy, r in ((44, 34, 14), (64, 28, 17), (84, 34, 14), (54, 40, 12), (76, 40, 12)):
+        d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=(70, 75, 100, 255))
+    # dragon-shaped bolt: a zig-zag body with a head
+    pts = [(64, 46), (52, 60), (70, 66), (50, 82), (66, 86), (56, 104)]
+    d.line(pts, fill=(120, 200, 255, 255), width=11, joint="curve")
+    d.line(pts, fill=(255, 255, 255, 255), width=4, joint="curve")
+    d.polygon([(50, 98), (64, 110), (46, 112)], fill=(255, 255, 255, 255))
+    d.polygon([(74, 60), (88, 52), (80, 66)], fill=(160, 220, 255, 255))
+    glow(img, lay, (120, 200, 255), 8, 2.4)
+
+
+def emblem_water_prison(img):
+    lay = new()
+    shape(lay, lambda d: d.ellipse([26, 26, 102, 102], fill=255), (150, 210, 255), (30, 90, 200), "radial", center=(54, 50), radius=56)
+    d = ImageDraw.Draw(lay)
+    # trapped silhouette
+    d.ellipse([56, 40, 72, 56], fill=(20, 40, 90, 230))
+    d.rounded_rectangle([54, 56, 74, 86], radius=5, fill=(20, 40, 90, 230))
+    d.arc([30, 30, 98, 98], 200, 260, fill=(255, 255, 255, 255), width=4)
+    for x, y in ((38, 72), (88, 46), (84, 82)):
+        d.ellipse([x, y, x + 6, y + 6], outline=(230, 245, 255, 255), width=2)
+    glow(img, lay, (60, 150, 255), 6, 1.8)
+
+
+def emblem_vacuum(img):
+    lay = new()
+    d = ImageDraw.Draw(lay)
+    for i, (x, y) in enumerate(((40, 40), (64, 64), (88, 88))):
+        r = 10 + i * 3
+        d.ellipse([x - r, y - r, x + r, y + r], fill=(200, 255, 220, 255), outline=(60, 200, 130, 255), width=4)
+        d.ellipse([x - r / 2.5, y - r / 2.5, x + r / 2.5, y + r / 2.5], fill=(255, 255, 255, 255))
+        for t in (1, 2):
+            d.line([x - r - 6 * t - 4, y - r - 6 * t + 4, x - r - 6 * t + 2, y - r - 6 * t - 2], fill=(60, 200, 130, 255), width=3)
+    glow(img, lay, (60, 200, 130), 5, 1.6)
+
+
+def emblem_earth_spikes(img):
+    lay = new()
+    for x, h, w in ((30, 34, 14), (50, 52, 18), (72, 64, 20), (94, 42, 14)):
+        shape(lay, lambda d, x=x, h=h, w=w: d.polygon([(x - w / 2, 98), (x + w / 2, 98), (x + 2, 98 - h)], fill=255), (200, 165, 120), (110, 80, 50))
+    d = ImageDraw.Draw(lay)
+    d.line([20, 99, 108, 99], fill=(90, 60, 35, 255), width=5)
+    for x in (26, 60, 88):
+        d.line([x, 99, x + 6, 106], fill=(90, 60, 35, 255), width=3)
+    img.alpha_composite(lay)
+
+
+def emblem_chidori_spear(img):
+    lay = new()
+    d = ImageDraw.Draw(lay)
+    pts = [(22, 98), (40, 82), (36, 76), (60, 58), (56, 52), (84, 34), (106, 22)]
+    d.line(pts, fill=(120, 200, 255, 255), width=12, joint="curve")
+    d.line(pts, fill=(255, 255, 255, 255), width=4, joint="curve")
+    d.polygon([(96, 18), (112, 16), (108, 30)], fill=(255, 255, 255, 255))
+    shape(lay, lambda d: d.ellipse([14, 88, 34, 108], fill=255), (255, 255, 255), (120, 200, 255), "radial", center=(24, 98), radius=12)
+    glow(img, lay, (120, 200, 255), 7, 2.4)
+
+
+def emblem_ice_needles(img):
+    lay = new()
+    d = ImageDraw.Draw(lay)
+    for i in range(12):
+        a = i / 12 * math.pi * 2
+        x0, y0 = 64 + math.cos(a) * 42, 64 + math.sin(a) * 42
+        x1, y1 = 64 + math.cos(a) * 16, 64 + math.sin(a) * 16
+        d.line([x0, y0, x1, y1], fill=(200, 235, 255, 255), width=5)
+        d.line([x0, y0, x1, y1], fill=(255, 255, 255, 255), width=2)
+    for i in range(6):
+        a = i / 6 * math.pi * 2 + 0.26
+        d.polygon([(64 + math.cos(a) * 12, 64 + math.sin(a) * 12), (64 + math.cos(a + 0.5) * 5, 64 + math.sin(a + 0.5) * 5),
+                   (64 + math.cos(a - 0.5) * 5, 64 + math.sin(a - 0.5) * 5)], fill=(150, 215, 255, 255))
+    glow(img, lay, (150, 215, 255), 6, 2)
+
+
+def emblem_eight_gates(img):
+    aura_lay = new()
+    for cx, cy, sz in ((40, 74, 26), (88, 74, 26), (64, 64, 38)):
+        shape(aura_lay, lambda d, cx=cx, cy=cy, sz=sz: d.polygon(flame_poly(cx, cy, sz), fill=255), (180, 255, 190), (40, 170, 70))
+    glow(img, aura_lay, (90, 255, 130), 6, 1.6)
+    lay = new()
+    d = ImageDraw.Draw(lay)
+    # torii-style gate
+    d.rectangle([34, 40, 94, 46], fill=(200, 30, 30, 255))
+    d.rectangle([40, 52, 88, 56], fill=(200, 30, 30, 255))
+    d.rectangle([44, 46, 50, 98], fill=(200, 30, 30, 255))
+    d.rectangle([78, 46, 84, 98], fill=(200, 30, 30, 255))
+    d.polygon([(28, 40), (100, 40), (96, 34), (32, 34)], fill=(40, 30, 30, 255))
+    img.alpha_composite(lay)
+
+
 def aura(color):
     img = new()
     c = color
@@ -545,6 +648,14 @@ if __name__ == "__main__":
     make_scroll("chidori_current_scroll", "blue", emblem_current)
     make_scroll("rasenshuriken_scroll", "gold", emblem_rasenshuriken)
     make_scroll("mystical_palm_scroll", "red", emblem_palm)
+    make_scroll("great_fire_scroll", "red", emblem_great_fire)
+    make_scroll("kirin_scroll", "gold", emblem_kirin)
+    make_scroll("water_prison_scroll", "blue", emblem_water_prison)
+    make_scroll("vacuum_scroll", "red", emblem_vacuum)
+    make_scroll("earth_spikes_scroll", "red", emblem_earth_spikes)
+    make_scroll("chidori_spear_scroll", "blue", emblem_chidori_spear)
+    make_scroll("ice_needles_scroll", "blue", emblem_ice_needles)
+    make_scroll("eight_gates_scroll", "gold", emblem_eight_gates)
     make_scroll("blank_scroll", "red", None)
     # summoning
     make_scroll("summon_toad_scroll", "purple", emblem_toad)

@@ -19100,6 +19100,3092 @@
           }
         }
       }
+    },
+    "animation.aegis.kirin_call": {
+      "animation_length": 1.6,
+      "bones": {
+        "rightArm": {
+          "rotation": {
+            "0": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.05": [
+              "(v.is_first_person ? 0.0 : 1.0) * -9.38",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 4.3"
+            ],
+            "0.1": [
+              "(v.is_first_person ? 0.0 : 1.0) * -22.5",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 10.62"
+            ],
+            "0.15": [
+              "(v.is_first_person ? 0.0 : 1.0) * -39.38",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 16.64"
+            ],
+            "0.2": [
+              "(v.is_first_person ? 0.0 : 1.0) * -60.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 20.0"
+            ],
+            "0.25": [
+              "(v.is_first_person ? 0.0 : 1.0) * -82.05",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 19.79"
+            ],
+            "0.3": [
+              "(v.is_first_person ? 0.0 : 1.0) * -109.34",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 17.78"
+            ],
+            "0.35": [
+              "(v.is_first_person ? 0.0 : 1.0) * -137.62",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 14.86"
+            ],
+            "0.4": [
+              "(v.is_first_person ? 0.0 : 1.0) * -162.59",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 11.97"
+            ],
+            "0.45": [
+              "(v.is_first_person ? 0.0 : 1.0) * -180.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 10.0"
+            ],
+            "0.5": [
+              "(v.is_first_person ? 0.0 : 1.0) * -183.53",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 9.65"
+            ],
+            "0.55": [
+              "(v.is_first_person ? 0.0 : 1.0) * -186.05",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 9.38"
+            ],
+            "0.6": [
+              "(v.is_first_person ? 0.0 : 1.0) * -187.7",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 9.18"
+            ],
+            "0.65": [
+              "(v.is_first_person ? 0.0 : 1.0) * -188.58",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 9.05"
+            ],
+            "0.7": [
+              "(v.is_first_person ? 0.0 : 1.0) * -188.81",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 8.96"
+            ],
+            "0.75": [
+              "(v.is_first_person ? 0.0 : 1.0) * -188.53",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 8.91"
+            ],
+            "0.8": [
+              "(v.is_first_person ? 0.0 : 1.0) * -187.84",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 8.88"
+            ],
+            "0.85": [
+              "(v.is_first_person ? 0.0 : 1.0) * -186.86",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 8.87"
+            ],
+            "0.9": [
+              "(v.is_first_person ? 0.0 : 1.0) * -185.71",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 8.85"
+            ],
+            "0.95": [
+              "(v.is_first_person ? 0.0 : 1.0) * -184.52",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 8.81"
+            ],
+            "1": [
+              "(v.is_first_person ? 0.0 : 1.0) * -183.4",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 8.75"
+            ],
+            "1.05": [
+              "(v.is_first_person ? 0.0 : 1.0) * -182.46",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 8.66"
+            ],
+            "1.1": [
+              "(v.is_first_person ? 0.0 : 1.0) * -181.84",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 8.51"
+            ],
+            "1.15": [
+              "(v.is_first_person ? 0.0 : 1.0) * -181.65",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 8.29"
+            ],
+            "1.2": [
+              "(v.is_first_person ? 0.0 : 1.0) * -182.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 8.0"
+            ],
+            "1.25": [
+              "(v.is_first_person ? 0.0 : 1.0) * -193.04",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 5.48"
+            ],
+            "1.3": [
+              "(v.is_first_person ? 0.0 : 1.0) * -205.85",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 2.3"
+            ],
+            "1.35": [
+              "(v.is_first_person ? 0.0 : 1.0) * -200.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "1.4": [
+              "(v.is_first_person ? 0.0 : 1.0) * -129.25",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -0.5"
+            ],
+            "1.45": [
+              "(v.is_first_person ? 0.0 : 1.0) * -50.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "1.5": [
+              "(v.is_first_person ? 0.0 : 1.0) * -24.07",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "1.55": [
+              "(v.is_first_person ? 0.0 : 1.0) * -9.26",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "1.6": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ]
+          }
+        },
+        "leftArm": {
+          "rotation": {
+            "0": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.05": [
+              "(v.is_first_person ? 0.0 : 1.0) * -17.66",
+              "(v.is_first_person ? 0.0 : 1.0) * 6.8",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.82"
+            ],
+            "0.1": [
+              "(v.is_first_person ? 0.0 : 1.0) * -43.75",
+              "(v.is_first_person ? 0.0 : 1.0) * 16.88",
+              "(v.is_first_person ? 0.0 : 1.0) * 2.19"
+            ],
+            "0.15": [
+              "(v.is_first_person ? 0.0 : 1.0) * -67.97",
+              "(v.is_first_person ? 0.0 : 1.0) * 26.02",
+              "(v.is_first_person ? 0.0 : 1.0) * 2.46"
+            ],
+            "0.2": [
+              "(v.is_first_person ? 0.0 : 1.0) * -80.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 30.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.25": [
+              "(v.is_first_person ? 0.0 : 1.0) * -75.97",
+              "(v.is_first_person ? 0.0 : 1.0) * 27.36",
+              "(v.is_first_person ? 0.0 : 1.0) * -5.27"
+            ],
+            "0.3": [
+              "(v.is_first_person ? 0.0 : 1.0) * -63.1",
+              "(v.is_first_person ? 0.0 : 1.0) * 20.88",
+              "(v.is_first_person ? 0.0 : 1.0) * -13.02"
+            ],
+            "0.35": [
+              "(v.is_first_person ? 0.0 : 1.0) * -46.26",
+              "(v.is_first_person ? 0.0 : 1.0) * 12.72",
+              "(v.is_first_person ? 0.0 : 1.0) * -21.62"
+            ],
+            "0.4": [
+              "(v.is_first_person ? 0.0 : 1.0) * -30.27",
+              "(v.is_first_person ? 0.0 : 1.0) * 5.04",
+              "(v.is_first_person ? 0.0 : 1.0) * -29.49"
+            ],
+            "0.45": [
+              "(v.is_first_person ? 0.0 : 1.0) * -20.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -35.0"
+            ],
+            "0.5": [
+              "(v.is_first_person ? 0.0 : 1.0) * -18.36",
+              "(v.is_first_person ? 0.0 : 1.0) * -0.87",
+              "(v.is_first_person ? 0.0 : 1.0) * -36.17"
+            ],
+            "0.55": [
+              "(v.is_first_person ? 0.0 : 1.0) * -17.27",
+              "(v.is_first_person ? 0.0 : 1.0) * -1.5",
+              "(v.is_first_person ? 0.0 : 1.0) * -37.16"
+            ],
+            "0.6": [
+              "(v.is_first_person ? 0.0 : 1.0) * -16.66",
+              "(v.is_first_person ? 0.0 : 1.0) * -1.92",
+              "(v.is_first_person ? 0.0 : 1.0) * -37.98"
+            ],
+            "0.65": [
+              "(v.is_first_person ? 0.0 : 1.0) * -16.45",
+              "(v.is_first_person ? 0.0 : 1.0) * -2.15",
+              "(v.is_first_person ? 0.0 : 1.0) * -38.64"
+            ],
+            "0.7": [
+              "(v.is_first_person ? 0.0 : 1.0) * -16.59",
+              "(v.is_first_person ? 0.0 : 1.0) * -2.22",
+              "(v.is_first_person ? 0.0 : 1.0) * -39.15"
+            ],
+            "0.75": [
+              "(v.is_first_person ? 0.0 : 1.0) * -17.01",
+              "(v.is_first_person ? 0.0 : 1.0) * -2.16",
+              "(v.is_first_person ? 0.0 : 1.0) * -39.51"
+            ],
+            "0.8": [
+              "(v.is_first_person ? 0.0 : 1.0) * -17.63",
+              "(v.is_first_person ? 0.0 : 1.0) * -1.99",
+              "(v.is_first_person ? 0.0 : 1.0) * -39.74"
+            ],
+            "0.85": [
+              "(v.is_first_person ? 0.0 : 1.0) * -18.4",
+              "(v.is_first_person ? 0.0 : 1.0) * -1.74",
+              "(v.is_first_person ? 0.0 : 1.0) * -39.85"
+            ],
+            "0.9": [
+              "(v.is_first_person ? 0.0 : 1.0) * -19.23",
+              "(v.is_first_person ? 0.0 : 1.0) * -1.44",
+              "(v.is_first_person ? 0.0 : 1.0) * -39.85"
+            ],
+            "0.95": [
+              "(v.is_first_person ? 0.0 : 1.0) * -20.07",
+              "(v.is_first_person ? 0.0 : 1.0) * -1.11",
+              "(v.is_first_person ? 0.0 : 1.0) * -39.74"
+            ],
+            "1": [
+              "(v.is_first_person ? 0.0 : 1.0) * -20.85",
+              "(v.is_first_person ? 0.0 : 1.0) * -0.78",
+              "(v.is_first_person ? 0.0 : 1.0) * -39.54"
+            ],
+            "1.05": [
+              "(v.is_first_person ? 0.0 : 1.0) * -21.5",
+              "(v.is_first_person ? 0.0 : 1.0) * -0.48",
+              "(v.is_first_person ? 0.0 : 1.0) * -39.26"
+            ],
+            "1.1": [
+              "(v.is_first_person ? 0.0 : 1.0) * -21.96",
+              "(v.is_first_person ? 0.0 : 1.0) * -0.23",
+              "(v.is_first_person ? 0.0 : 1.0) * -38.9"
+            ],
+            "1.15": [
+              "(v.is_first_person ? 0.0 : 1.0) * -22.14",
+              "(v.is_first_person ? 0.0 : 1.0) * -0.06",
+              "(v.is_first_person ? 0.0 : 1.0) * -38.48"
+            ],
+            "1.2": [
+              "(v.is_first_person ? 0.0 : 1.0) * -22.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -38.0"
+            ],
+            "1.25": [
+              "(v.is_first_person ? 0.0 : 1.0) * -20.46",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -35.78"
+            ],
+            "1.3": [
+              "(v.is_first_person ? 0.0 : 1.0) * -18.11",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -32.41"
+            ],
+            "1.35": [
+              "(v.is_first_person ? 0.0 : 1.0) * -15.33",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -28.35"
+            ],
+            "1.4": [
+              "(v.is_first_person ? 0.0 : 1.0) * -12.5",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -24.06"
+            ],
+            "1.45": [
+              "(v.is_first_person ? 0.0 : 1.0) * -10.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -20.0"
+            ],
+            "1.5": [
+              "(v.is_first_person ? 0.0 : 1.0) * -6.15",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -12.74"
+            ],
+            "1.55": [
+              "(v.is_first_person ? 0.0 : 1.0) * -2.52",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -5.26"
+            ],
+            "1.6": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ]
+          }
+        },
+        "body": {
+          "rotation": {
+            "0": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.05": [
+              "(v.is_first_person ? 0.0 : 1.0) * -0.86",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.1": [
+              "(v.is_first_person ? 0.0 : 1.0) * -2.05",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.15": [
+              "(v.is_first_person ? 0.0 : 1.0) * -3.48",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.2": [
+              "(v.is_first_person ? 0.0 : 1.0) * -5.06",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.25": [
+              "(v.is_first_person ? 0.0 : 1.0) * -6.69",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.3": [
+              "(v.is_first_person ? 0.0 : 1.0) * -8.3",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.35": [
+              "(v.is_first_person ? 0.0 : 1.0) * -9.78",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.4": [
+              "(v.is_first_person ? 0.0 : 1.0) * -11.04",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.45": [
+              "(v.is_first_person ? 0.0 : 1.0) * -12.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.5": [
+              "(v.is_first_person ? 0.0 : 1.0) * -12.5",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.55": [
+              "(v.is_first_person ? 0.0 : 1.0) * -13.06",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.6": [
+              "(v.is_first_person ? 0.0 : 1.0) * -13.65",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.65": [
+              "(v.is_first_person ? 0.0 : 1.0) * -14.24",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.7": [
+              "(v.is_first_person ? 0.0 : 1.0) * -14.81",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.75": [
+              "(v.is_first_person ? 0.0 : 1.0) * -15.34",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.8": [
+              "(v.is_first_person ? 0.0 : 1.0) * -15.8",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.85": [
+              "(v.is_first_person ? 0.0 : 1.0) * -16.17",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.9": [
+              "(v.is_first_person ? 0.0 : 1.0) * -16.42",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.95": [
+              "(v.is_first_person ? 0.0 : 1.0) * -16.52",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "1": [
+              "(v.is_first_person ? 0.0 : 1.0) * -16.45",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "1.05": [
+              "(v.is_first_person ? 0.0 : 1.0) * -16.19",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "1.1": [
+              "(v.is_first_person ? 0.0 : 1.0) * -15.71",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "1.15": [
+              "(v.is_first_person ? 0.0 : 1.0) * -14.99",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "1.2": [
+              "(v.is_first_person ? 0.0 : 1.0) * -14.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "1.25": [
+              "(v.is_first_person ? 0.0 : 1.0) * -8.3",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "1.3": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.45",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "1.35": [
+              "(v.is_first_person ? 0.0 : 1.0) * 9.95",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "1.4": [
+              "(v.is_first_person ? 0.0 : 1.0) * 17.9",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "1.45": [
+              "(v.is_first_person ? 0.0 : 1.0) * 22.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "1.5": [
+              "(v.is_first_person ? 0.0 : 1.0) * 18.15",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "1.55": [
+              "(v.is_first_person ? 0.0 : 1.0) * 7.85",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "1.6": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ]
+          }
+        },
+        "head": {
+          "rotation": {
+            "0": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.05": [
+              "(v.is_first_person ? 0.0 : 1.0) * -2.9",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.1": [
+              "(v.is_first_person ? 0.0 : 1.0) * -6.93",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.15": [
+              "(v.is_first_person ? 0.0 : 1.0) * -11.78",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.2": [
+              "(v.is_first_person ? 0.0 : 1.0) * -17.12",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.25": [
+              "(v.is_first_person ? 0.0 : 1.0) * -22.63",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.3": [
+              "(v.is_first_person ? 0.0 : 1.0) * -28.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.35": [
+              "(v.is_first_person ? 0.0 : 1.0) * -32.9",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.4": [
+              "(v.is_first_person ? 0.0 : 1.0) * -37.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.45": [
+              "(v.is_first_person ? 0.0 : 1.0) * -40.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.5": [
+              "(v.is_first_person ? 0.0 : 1.0) * -41.35",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.55": [
+              "(v.is_first_person ? 0.0 : 1.0) * -42.59",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.6": [
+              "(v.is_first_person ? 0.0 : 1.0) * -43.7",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.65": [
+              "(v.is_first_person ? 0.0 : 1.0) * -44.67",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.7": [
+              "(v.is_first_person ? 0.0 : 1.0) * -45.48",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.75": [
+              "(v.is_first_person ? 0.0 : 1.0) * -46.13",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.8": [
+              "(v.is_first_person ? 0.0 : 1.0) * -46.59",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.85": [
+              "(v.is_first_person ? 0.0 : 1.0) * -46.86",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.9": [
+              "(v.is_first_person ? 0.0 : 1.0) * -46.91",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.95": [
+              "(v.is_first_person ? 0.0 : 1.0) * -46.74",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "1": [
+              "(v.is_first_person ? 0.0 : 1.0) * -46.33",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "1.05": [
+              "(v.is_first_person ? 0.0 : 1.0) * -45.66",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "1.1": [
+              "(v.is_first_person ? 0.0 : 1.0) * -44.73",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "1.15": [
+              "(v.is_first_person ? 0.0 : 1.0) * -43.51",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "1.2": [
+              "(v.is_first_person ? 0.0 : 1.0) * -42.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "1.25": [
+              "(v.is_first_person ? 0.0 : 1.0) * -34.06",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "1.3": [
+              "(v.is_first_person ? 0.0 : 1.0) * -22.11",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "1.35": [
+              "(v.is_first_person ? 0.0 : 1.0) * -8.93",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "1.4": [
+              "(v.is_first_person ? 0.0 : 1.0) * 2.7",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "1.45": [
+              "(v.is_first_person ? 0.0 : 1.0) * 10.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "1.5": [
+              "(v.is_first_person ? 0.0 : 1.0) * 10.89",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "1.55": [
+              "(v.is_first_person ? 0.0 : 1.0) * 4.89",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "1.6": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ]
+          }
+        },
+        "rightLeg": {
+          "rotation": {
+            "0": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.05": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.87"
+            ],
+            "0.1": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 2.09"
+            ],
+            "0.15": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 3.56"
+            ],
+            "0.2": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 5.17"
+            ],
+            "0.25": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 6.83"
+            ],
+            "0.3": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 8.44"
+            ],
+            "0.35": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 9.91"
+            ],
+            "0.4": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 11.13"
+            ],
+            "0.45": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 12.0"
+            ],
+            "0.5": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.05",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 12.36"
+            ],
+            "0.55": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.19",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 12.63"
+            ],
+            "0.6": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.4",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 12.83"
+            ],
+            "0.65": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.65",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 12.96"
+            ],
+            "0.7": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.93",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 13.04"
+            ],
+            "0.75": [
+              "(v.is_first_person ? 0.0 : 1.0) * 1.2",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 13.06"
+            ],
+            "0.8": [
+              "(v.is_first_person ? 0.0 : 1.0) * 1.45",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 13.03"
+            ],
+            "0.85": [
+              "(v.is_first_person ? 0.0 : 1.0) * 1.66",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 12.96"
+            ],
+            "0.9": [
+              "(v.is_first_person ? 0.0 : 1.0) * 1.8",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 12.86"
+            ],
+            "0.95": [
+              "(v.is_first_person ? 0.0 : 1.0) * 1.85",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 12.74"
+            ],
+            "1": [
+              "(v.is_first_person ? 0.0 : 1.0) * 1.79",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 12.6"
+            ],
+            "1.05": [
+              "(v.is_first_person ? 0.0 : 1.0) * 1.6",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 12.45"
+            ],
+            "1.1": [
+              "(v.is_first_person ? 0.0 : 1.0) * 1.25",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 12.29"
+            ],
+            "1.15": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.73",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 12.14"
+            ],
+            "1.2": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 12.0"
+            ],
+            "1.25": [
+              "(v.is_first_person ? 0.0 : 1.0) * -4.2",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 11.52"
+            ],
+            "1.3": [
+              "(v.is_first_person ? 0.0 : 1.0) * -10.6",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 10.88"
+            ],
+            "1.35": [
+              "(v.is_first_person ? 0.0 : 1.0) * -17.4",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 10.08"
+            ],
+            "1.4": [
+              "(v.is_first_person ? 0.0 : 1.0) * -22.8",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 9.12"
+            ],
+            "1.45": [
+              "(v.is_first_person ? 0.0 : 1.0) * -25.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 8.0"
+            ],
+            "1.5": [
+              "(v.is_first_person ? 0.0 : 1.0) * -19.44",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 5.33"
+            ],
+            "1.55": [
+              "(v.is_first_person ? 0.0 : 1.0) * -8.33",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 2.22"
+            ],
+            "1.6": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ]
+          }
+        },
+        "leftLeg": {
+          "rotation": {
+            "0": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.05": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -0.87"
+            ],
+            "0.1": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -2.09"
+            ],
+            "0.15": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -3.56"
+            ],
+            "0.2": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -5.17"
+            ],
+            "0.25": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -6.83"
+            ],
+            "0.3": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -8.44"
+            ],
+            "0.35": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -9.91"
+            ],
+            "0.4": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -11.13"
+            ],
+            "0.45": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -12.0"
+            ],
+            "0.5": [
+              "(v.is_first_person ? 0.0 : 1.0) * -0.04",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -12.36"
+            ],
+            "0.55": [
+              "(v.is_first_person ? 0.0 : 1.0) * -0.15",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -12.63"
+            ],
+            "0.6": [
+              "(v.is_first_person ? 0.0 : 1.0) * -0.32",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -12.83"
+            ],
+            "0.65": [
+              "(v.is_first_person ? 0.0 : 1.0) * -0.52",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -12.96"
+            ],
+            "0.7": [
+              "(v.is_first_person ? 0.0 : 1.0) * -0.74",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -13.04"
+            ],
+            "0.75": [
+              "(v.is_first_person ? 0.0 : 1.0) * -0.96",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -13.06"
+            ],
+            "0.8": [
+              "(v.is_first_person ? 0.0 : 1.0) * -1.16",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -13.03"
+            ],
+            "0.85": [
+              "(v.is_first_person ? 0.0 : 1.0) * -1.33",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -12.96"
+            ],
+            "0.9": [
+              "(v.is_first_person ? 0.0 : 1.0) * -1.44",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -12.86"
+            ],
+            "0.95": [
+              "(v.is_first_person ? 0.0 : 1.0) * -1.48",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -12.74"
+            ],
+            "1": [
+              "(v.is_first_person ? 0.0 : 1.0) * -1.43",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -12.6"
+            ],
+            "1.05": [
+              "(v.is_first_person ? 0.0 : 1.0) * -1.28",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -12.45"
+            ],
+            "1.1": [
+              "(v.is_first_person ? 0.0 : 1.0) * -1.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -12.29"
+            ],
+            "1.15": [
+              "(v.is_first_person ? 0.0 : 1.0) * -0.58",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -12.14"
+            ],
+            "1.2": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -12.0"
+            ],
+            "1.25": [
+              "(v.is_first_person ? 0.0 : 1.0) * 3.36",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -11.52"
+            ],
+            "1.3": [
+              "(v.is_first_person ? 0.0 : 1.0) * 8.48",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -10.88"
+            ],
+            "1.35": [
+              "(v.is_first_person ? 0.0 : 1.0) * 13.92",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -10.08"
+            ],
+            "1.4": [
+              "(v.is_first_person ? 0.0 : 1.0) * 18.24",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -9.12"
+            ],
+            "1.45": [
+              "(v.is_first_person ? 0.0 : 1.0) * 20.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -8.0"
+            ],
+            "1.5": [
+              "(v.is_first_person ? 0.0 : 1.0) * 15.56",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -5.33"
+            ],
+            "1.55": [
+              "(v.is_first_person ? 0.0 : 1.0) * 6.67",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -2.22"
+            ],
+            "1.6": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ]
+          }
+        }
+      }
+    },
+    "animation.aegis.chidori_spear": {
+      "animation_length": 0.95,
+      "bones": {
+        "rightArm": {
+          "rotation": {
+            "0": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.05": [
+              "(v.is_first_person ? 0.0 : 1.0) * 7.3",
+              "(v.is_first_person ? 0.0 : 1.0) * 2.89",
+              "(v.is_first_person ? 0.0 : 1.0) * 10.26"
+            ],
+            "0.1": [
+              "(v.is_first_person ? 0.0 : 1.0) * 17.37",
+              "(v.is_first_person ? 0.0 : 1.0) * 6.89",
+              "(v.is_first_person ? 0.0 : 1.0) * 24.41"
+            ],
+            "0.15": [
+              "(v.is_first_person ? 0.0 : 1.0) * 25.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 10.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 35.0"
+            ],
+            "0.2": [
+              "(v.is_first_person ? 0.0 : 1.0) * 27.66",
+              "(v.is_first_person ? 0.0 : 1.0) * 10.9",
+              "(v.is_first_person ? 0.0 : 1.0) * 37.47"
+            ],
+            "0.25": [
+              "(v.is_first_person ? 0.0 : 1.0) * 31.05",
+              "(v.is_first_person ? 0.0 : 1.0) * 11.8",
+              "(v.is_first_person ? 0.0 : 1.0) * 39.38"
+            ],
+            "0.3": [
+              "(v.is_first_person ? 0.0 : 1.0) * 34.28",
+              "(v.is_first_person ? 0.0 : 1.0) * 12.57",
+              "(v.is_first_person ? 0.0 : 1.0) * 40.68"
+            ],
+            "0.35": [
+              "(v.is_first_person ? 0.0 : 1.0) * 36.48",
+              "(v.is_first_person ? 0.0 : 1.0) * 13.1",
+              "(v.is_first_person ? 0.0 : 1.0) * 41.26"
+            ],
+            "0.4": [
+              "(v.is_first_person ? 0.0 : 1.0) * 36.75",
+              "(v.is_first_person ? 0.0 : 1.0) * 13.27",
+              "(v.is_first_person ? 0.0 : 1.0) * 41.06"
+            ],
+            "0.45": [
+              "(v.is_first_person ? 0.0 : 1.0) * 34.22",
+              "(v.is_first_person ? 0.0 : 1.0) * 12.94",
+              "(v.is_first_person ? 0.0 : 1.0) * 40.0"
+            ],
+            "0.5": [
+              "(v.is_first_person ? 0.0 : 1.0) * 28.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 12.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 38.0"
+            ],
+            "0.55": [
+              "(v.is_first_person ? 0.0 : 1.0) * -31.94",
+              "(v.is_first_person ? 0.0 : 1.0) * 2.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 19.19"
+            ],
+            "0.6": [
+              "(v.is_first_person ? 0.0 : 1.0) * -92.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -8.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.65": [
+              "(v.is_first_person ? 0.0 : 1.0) * -100.82",
+              "(v.is_first_person ? 0.0 : 1.0) * -9.07",
+              "(v.is_first_person ? 0.0 : 1.0) * -2.43"
+            ],
+            "0.7": [
+              "(v.is_first_person ? 0.0 : 1.0) * -104.21",
+              "(v.is_first_person ? 0.0 : 1.0) * -8.98",
+              "(v.is_first_person ? 0.0 : 1.0) * -2.74"
+            ],
+            "0.75": [
+              "(v.is_first_person ? 0.0 : 1.0) * -102.99",
+              "(v.is_first_person ? 0.0 : 1.0) * -8.14",
+              "(v.is_first_person ? 0.0 : 1.0) * -1.82"
+            ],
+            "0.8": [
+              "(v.is_first_person ? 0.0 : 1.0) * -97.98",
+              "(v.is_first_person ? 0.0 : 1.0) * -7.01",
+              "(v.is_first_person ? 0.0 : 1.0) * -0.61"
+            ],
+            "0.85": [
+              "(v.is_first_person ? 0.0 : 1.0) * -90.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -6.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.9": [
+              "(v.is_first_person ? 0.0 : 1.0) * -44.88",
+              "(v.is_first_person ? 0.0 : 1.0) * -2.88",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.95": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ]
+          }
+        },
+        "leftArm": {
+          "rotation": {
+            "0": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.05": [
+              "(v.is_first_person ? 0.0 : 1.0) * -10.37",
+              "(v.is_first_person ? 0.0 : 1.0) * 13.22",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.1": [
+              "(v.is_first_person ? 0.0 : 1.0) * -24.63",
+              "(v.is_first_person ? 0.0 : 1.0) * 31.44",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.15": [
+              "(v.is_first_person ? 0.0 : 1.0) * -35.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 45.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.2": [
+              "(v.is_first_person ? 0.0 : 1.0) * -37.32",
+              "(v.is_first_person ? 0.0 : 1.0) * 48.08",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.26"
+            ],
+            "0.25": [
+              "(v.is_first_person ? 0.0 : 1.0) * -39.15",
+              "(v.is_first_person ? 0.0 : 1.0) * 50.41",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.87"
+            ],
+            "0.3": [
+              "(v.is_first_person ? 0.0 : 1.0) * -40.34",
+              "(v.is_first_person ? 0.0 : 1.0) * 51.9",
+              "(v.is_first_person ? 0.0 : 1.0) * 1.57"
+            ],
+            "0.35": [
+              "(v.is_first_person ? 0.0 : 1.0) * -40.69",
+              "(v.is_first_person ? 0.0 : 1.0) * 52.49",
+              "(v.is_first_person ? 0.0 : 1.0) * 2.1"
+            ],
+            "0.4": [
+              "(v.is_first_person ? 0.0 : 1.0) * -40.03",
+              "(v.is_first_person ? 0.0 : 1.0) * 52.08",
+              "(v.is_first_person ? 0.0 : 1.0) * 2.19"
+            ],
+            "0.45": [
+              "(v.is_first_person ? 0.0 : 1.0) * -38.19",
+              "(v.is_first_person ? 0.0 : 1.0) * 50.62",
+              "(v.is_first_person ? 0.0 : 1.0) * 1.57"
+            ],
+            "0.5": [
+              "(v.is_first_person ? 0.0 : 1.0) * -35.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 48.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.55": [
+              "(v.is_first_person ? 0.0 : 1.0) * -7.38",
+              "(v.is_first_person ? 0.0 : 1.0) * 24.19",
+              "(v.is_first_person ? 0.0 : 1.0) * -15.12"
+            ],
+            "0.6": [
+              "(v.is_first_person ? 0.0 : 1.0) * 20.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -30.0"
+            ],
+            "0.65": [
+              "(v.is_first_person ? 0.0 : 1.0) * 23.5",
+              "(v.is_first_person ? 0.0 : 1.0) * -3.07",
+              "(v.is_first_person ? 0.0 : 1.0) * -32.06"
+            ],
+            "0.7": [
+              "(v.is_first_person ? 0.0 : 1.0) * 24.07",
+              "(v.is_first_person ? 0.0 : 1.0) * -3.46",
+              "(v.is_first_person ? 0.0 : 1.0) * -32.75"
+            ],
+            "0.75": [
+              "(v.is_first_person ? 0.0 : 1.0) * 22.69",
+              "(v.is_first_person ? 0.0 : 1.0) * -2.3",
+              "(v.is_first_person ? 0.0 : 1.0) * -32.21"
+            ],
+            "0.8": [
+              "(v.is_first_person ? 0.0 : 1.0) * 20.34",
+              "(v.is_first_person ? 0.0 : 1.0) * -0.77",
+              "(v.is_first_person ? 0.0 : 1.0) * -30.58"
+            ],
+            "0.85": [
+              "(v.is_first_person ? 0.0 : 1.0) * 18.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -28.0"
+            ],
+            "0.9": [
+              "(v.is_first_person ? 0.0 : 1.0) * 8.88",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -13.88"
+            ],
+            "0.95": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ]
+          }
+        },
+        "body": {
+          "rotation": {
+            "0": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.05": [
+              "(v.is_first_person ? 0.0 : 1.0) * 4.07",
+              "(v.is_first_person ? 0.0 : 1.0) * -7.3",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.1": [
+              "(v.is_first_person ? 0.0 : 1.0) * 9.7",
+              "(v.is_first_person ? 0.0 : 1.0) * -17.37",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.15": [
+              "(v.is_first_person ? 0.0 : 1.0) * 14.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -25.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.2": [
+              "(v.is_first_person ? 0.0 : 1.0) * 14.92",
+              "(v.is_first_person ? 0.0 : 1.0) * -27.07",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.25": [
+              "(v.is_first_person ? 0.0 : 1.0) * 15.45",
+              "(v.is_first_person ? 0.0 : 1.0) * -29.09",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.3": [
+              "(v.is_first_person ? 0.0 : 1.0) * 15.7",
+              "(v.is_first_person ? 0.0 : 1.0) * -30.76",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.35": [
+              "(v.is_first_person ? 0.0 : 1.0) * 15.77",
+              "(v.is_first_person ? 0.0 : 1.0) * -31.79",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.4": [
+              "(v.is_first_person ? 0.0 : 1.0) * 15.78",
+              "(v.is_first_person ? 0.0 : 1.0) * -31.87",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.45": [
+              "(v.is_first_person ? 0.0 : 1.0) * 15.82",
+              "(v.is_first_person ? 0.0 : 1.0) * -30.7",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.5": [
+              "(v.is_first_person ? 0.0 : 1.0) * 16.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -28.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.55": [
+              "(v.is_first_person ? 0.0 : 1.0) * 17.25",
+              "(v.is_first_person ? 0.0 : 1.0) * -1.5",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.6": [
+              "(v.is_first_person ? 0.0 : 1.0) * 18.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 25.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.65": [
+              "(v.is_first_person ? 0.0 : 1.0) * 18.08",
+              "(v.is_first_person ? 0.0 : 1.0) * 28.29",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.7": [
+              "(v.is_first_person ? 0.0 : 1.0) * 18.16",
+              "(v.is_first_person ? 0.0 : 1.0) * 28.74",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.75": [
+              "(v.is_first_person ? 0.0 : 1.0) * 18.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 27.26",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.8": [
+              "(v.is_first_person ? 0.0 : 1.0) * 17.36",
+              "(v.is_first_person ? 0.0 : 1.0) * 24.71",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.85": [
+              "(v.is_first_person ? 0.0 : 1.0) * 16.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 22.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.9": [
+              "(v.is_first_person ? 0.0 : 1.0) * 7.88",
+              "(v.is_first_person ? 0.0 : 1.0) * 10.81",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.95": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ]
+          }
+        },
+        "head": {
+          "rotation": {
+            "0": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.05": [
+              "(v.is_first_person ? 0.0 : 1.0) * -2.81",
+              "(v.is_first_person ? 0.0 : 1.0) * 7.41",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.1": [
+              "(v.is_first_person ? 0.0 : 1.0) * -6.74",
+              "(v.is_first_person ? 0.0 : 1.0) * 17.04",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.15": [
+              "(v.is_first_person ? 0.0 : 1.0) * -10.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 20.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.2": [
+              "(v.is_first_person ? 0.0 : 1.0) * -10.81",
+              "(v.is_first_person ? 0.0 : 1.0) * 17.86",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.25": [
+              "(v.is_first_person ? 0.0 : 1.0) * -11.64",
+              "(v.is_first_person ? 0.0 : 1.0) * 13.99",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.3": [
+              "(v.is_first_person ? 0.0 : 1.0) * -12.44",
+              "(v.is_first_person ? 0.0 : 1.0) * 8.89",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.35": [
+              "(v.is_first_person ? 0.0 : 1.0) * -13.18",
+              "(v.is_first_person ? 0.0 : 1.0) * 3.05",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.4": [
+              "(v.is_first_person ? 0.0 : 1.0) * -13.79",
+              "(v.is_first_person ? 0.0 : 1.0) * -3.05",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.45": [
+              "(v.is_first_person ? 0.0 : 1.0) * -14.22",
+              "(v.is_first_person ? 0.0 : 1.0) * -8.89",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.5": [
+              "(v.is_first_person ? 0.0 : 1.0) * -14.44",
+              "(v.is_first_person ? 0.0 : 1.0) * -13.99",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.55": [
+              "(v.is_first_person ? 0.0 : 1.0) * -14.38",
+              "(v.is_first_person ? 0.0 : 1.0) * -17.86",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.6": [
+              "(v.is_first_person ? 0.0 : 1.0) * -14.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -20.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.65": [
+              "(v.is_first_person ? 0.0 : 1.0) * -12.82",
+              "(v.is_first_person ? 0.0 : 1.0) * -20.12",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.7": [
+              "(v.is_first_person ? 0.0 : 1.0) * -10.9",
+              "(v.is_first_person ? 0.0 : 1.0) * -18.08",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.75": [
+              "(v.is_first_person ? 0.0 : 1.0) * -8.52",
+              "(v.is_first_person ? 0.0 : 1.0) * -14.58",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.8": [
+              "(v.is_first_person ? 0.0 : 1.0) * -5.97",
+              "(v.is_first_person ? 0.0 : 1.0) * -10.32",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.85": [
+              "(v.is_first_person ? 0.0 : 1.0) * -3.5",
+              "(v.is_first_person ? 0.0 : 1.0) * -6.01",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.9": [
+              "(v.is_first_person ? 0.0 : 1.0) * -1.42",
+              "(v.is_first_person ? 0.0 : 1.0) * -2.33",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.95": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ]
+          }
+        },
+        "rightLeg": {
+          "rotation": {
+            "0": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.05": [
+              "(v.is_first_person ? 0.0 : 1.0) * 7.41",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 1.48"
+            ],
+            "0.1": [
+              "(v.is_first_person ? 0.0 : 1.0) * 17.59",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 3.52"
+            ],
+            "0.15": [
+              "(v.is_first_person ? 0.0 : 1.0) * 25.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 5.0"
+            ],
+            "0.2": [
+              "(v.is_first_person ? 0.0 : 1.0) * 26.92",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 5.27"
+            ],
+            "0.25": [
+              "(v.is_first_person ? 0.0 : 1.0) * 28.86",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 5.39"
+            ],
+            "0.3": [
+              "(v.is_first_person ? 0.0 : 1.0) * 30.42",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 5.4"
+            ],
+            "0.35": [
+              "(v.is_first_person ? 0.0 : 1.0) * 31.21",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 5.33"
+            ],
+            "0.4": [
+              "(v.is_first_person ? 0.0 : 1.0) * 30.83",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 5.22"
+            ],
+            "0.45": [
+              "(v.is_first_person ? 0.0 : 1.0) * 28.89",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 5.1"
+            ],
+            "0.5": [
+              "(v.is_first_person ? 0.0 : 1.0) * 25.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 5.0"
+            ],
+            "0.55": [
+              "(v.is_first_person ? 0.0 : 1.0) * -10.19",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 4.5"
+            ],
+            "0.6": [
+              "(v.is_first_person ? 0.0 : 1.0) * -45.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 4.0"
+            ],
+            "0.65": [
+              "(v.is_first_person ? 0.0 : 1.0) * -49.7",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 4.0"
+            ],
+            "0.7": [
+              "(v.is_first_person ? 0.0 : 1.0) * -50.93",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 4.12"
+            ],
+            "0.75": [
+              "(v.is_first_person ? 0.0 : 1.0) * -49.51",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 4.24"
+            ],
+            "0.8": [
+              "(v.is_first_person ? 0.0 : 1.0) * -46.26",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 4.24"
+            ],
+            "0.85": [
+              "(v.is_first_person ? 0.0 : 1.0) * -42.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 4.0"
+            ],
+            "0.9": [
+              "(v.is_first_person ? 0.0 : 1.0) * -20.81",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 2.0"
+            ],
+            "0.95": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ]
+          }
+        },
+        "leftLeg": {
+          "rotation": {
+            "0": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.05": [
+              "(v.is_first_person ? 0.0 : 1.0) * -8.89",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -1.48"
+            ],
+            "0.1": [
+              "(v.is_first_person ? 0.0 : 1.0) * -21.11",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -3.52"
+            ],
+            "0.15": [
+              "(v.is_first_person ? 0.0 : 1.0) * -30.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -5.0"
+            ],
+            "0.2": [
+              "(v.is_first_person ? 0.0 : 1.0) * -32.14",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -5.27"
+            ],
+            "0.25": [
+              "(v.is_first_person ? 0.0 : 1.0) * -34.08",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -5.39"
+            ],
+            "0.3": [
+              "(v.is_first_person ? 0.0 : 1.0) * -35.51",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -5.4"
+            ],
+            "0.35": [
+              "(v.is_first_person ? 0.0 : 1.0) * -36.12",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -5.33"
+            ],
+            "0.4": [
+              "(v.is_first_person ? 0.0 : 1.0) * -35.61",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -5.22"
+            ],
+            "0.45": [
+              "(v.is_first_person ? 0.0 : 1.0) * -33.67",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -5.1"
+            ],
+            "0.5": [
+              "(v.is_first_person ? 0.0 : 1.0) * -30.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -5.0"
+            ],
+            "0.55": [
+              "(v.is_first_person ? 0.0 : 1.0) * 2.69",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -4.5"
+            ],
+            "0.6": [
+              "(v.is_first_person ? 0.0 : 1.0) * 35.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -4.0"
+            ],
+            "0.65": [
+              "(v.is_first_person ? 0.0 : 1.0) * 39.22",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -4.0"
+            ],
+            "0.7": [
+              "(v.is_first_person ? 0.0 : 1.0) * 40.09",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -4.12"
+            ],
+            "0.75": [
+              "(v.is_first_person ? 0.0 : 1.0) * 38.55",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -4.24"
+            ],
+            "0.8": [
+              "(v.is_first_person ? 0.0 : 1.0) * 35.54",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -4.24"
+            ],
+            "0.85": [
+              "(v.is_first_person ? 0.0 : 1.0) * 32.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -4.0"
+            ],
+            "0.9": [
+              "(v.is_first_person ? 0.0 : 1.0) * 15.81",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -2.0"
+            ],
+            "0.95": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ]
+          }
+        }
+      }
+    },
+    "animation.aegis.ice_seal": {
+      "animation_length": 1.0,
+      "bones": {
+        "rightArm": {
+          "rotation": {
+            "0": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.05": [
+              "(v.is_first_person ? 0.0 : 1.0) * -29.56",
+              "(v.is_first_person ? 0.0 : 1.0) * -7.3",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.1": [
+              "(v.is_first_person ? 0.0 : 1.0) * -70.22",
+              "(v.is_first_person ? 0.0 : 1.0) * -17.37",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.15": [
+              "(v.is_first_person ? 0.0 : 1.0) * -100.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -25.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.2": [
+              "(v.is_first_person ? 0.0 : 1.0) * -104.63",
+              "(v.is_first_person ? 0.0 : 1.0) * -26.52",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.25": [
+              "(v.is_first_person ? 0.0 : 1.0) * -107.4",
+              "(v.is_first_person ? 0.0 : 1.0) * -27.93",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.3": [
+              "(v.is_first_person ? 0.0 : 1.0) * -108.63",
+              "(v.is_first_person ? 0.0 : 1.0) * -29.15",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.35": [
+              "(v.is_first_person ? 0.0 : 1.0) * -108.65",
+              "(v.is_first_person ? 0.0 : 1.0) * -30.09",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.4": [
+              "(v.is_first_person ? 0.0 : 1.0) * -107.79",
+              "(v.is_first_person ? 0.0 : 1.0) * -30.69",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.45": [
+              "(v.is_first_person ? 0.0 : 1.0) * -106.37",
+              "(v.is_first_person ? 0.0 : 1.0) * -30.85",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.5": [
+              "(v.is_first_person ? 0.0 : 1.0) * -104.71",
+              "(v.is_first_person ? 0.0 : 1.0) * -30.51",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.55": [
+              "(v.is_first_person ? 0.0 : 1.0) * -103.15",
+              "(v.is_first_person ? 0.0 : 1.0) * -29.59",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.6": [
+              "(v.is_first_person ? 0.0 : 1.0) * -102.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -28.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.66": [
+              "(v.is_first_person ? 0.0 : 1.0) * -93.94",
+              "(v.is_first_person ? 0.0 : 1.0) * -9.31",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.72": [
+              "(v.is_first_person ? 0.0 : 1.0) * -85.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 10.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.765": [
+              "(v.is_first_person ? 0.0 : 1.0) * -84.66",
+              "(v.is_first_person ? 0.0 : 1.0) * 13.36",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.81": [
+              "(v.is_first_person ? 0.0 : 1.0) * -86.44",
+              "(v.is_first_person ? 0.0 : 1.0) * 14.12",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.855": [
+              "(v.is_first_person ? 0.0 : 1.0) * -86.24",
+              "(v.is_first_person ? 0.0 : 1.0) * 13.33",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.9": [
+              "(v.is_first_person ? 0.0 : 1.0) * -80.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 12.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.95": [
+              "(v.is_first_person ? 0.0 : 1.0) * -39.69",
+              "(v.is_first_person ? 0.0 : 1.0) * 6.12",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "1": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ]
+          }
+        },
+        "leftArm": {
+          "rotation": {
+            "0": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.05": [
+              "(v.is_first_person ? 0.0 : 1.0) * -5.93",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -4.44"
+            ],
+            "0.1": [
+              "(v.is_first_person ? 0.0 : 1.0) * -14.07",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -10.56"
+            ],
+            "0.15": [
+              "(v.is_first_person ? 0.0 : 1.0) * -20.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -15.0"
+            ],
+            "0.2": [
+              "(v.is_first_person ? 0.0 : 1.0) * -20.62",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -15.47"
+            ],
+            "0.25": [
+              "(v.is_first_person ? 0.0 : 1.0) * -21.16",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -15.87"
+            ],
+            "0.3": [
+              "(v.is_first_person ? 0.0 : 1.0) * -21.6",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -16.2"
+            ],
+            "0.35": [
+              "(v.is_first_person ? 0.0 : 1.0) * -21.96",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -16.47"
+            ],
+            "0.4": [
+              "(v.is_first_person ? 0.0 : 1.0) * -22.22",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -16.67"
+            ],
+            "0.45": [
+              "(v.is_first_person ? 0.0 : 1.0) * -22.4",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -16.8"
+            ],
+            "0.5": [
+              "(v.is_first_person ? 0.0 : 1.0) * -22.49",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -16.87"
+            ],
+            "0.55": [
+              "(v.is_first_person ? 0.0 : 1.0) * -22.49",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -16.87"
+            ],
+            "0.6": [
+              "(v.is_first_person ? 0.0 : 1.0) * -22.4",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -16.8"
+            ],
+            "0.65": [
+              "(v.is_first_person ? 0.0 : 1.0) * -22.22",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -16.67"
+            ],
+            "0.7": [
+              "(v.is_first_person ? 0.0 : 1.0) * -21.96",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -16.47"
+            ],
+            "0.75": [
+              "(v.is_first_person ? 0.0 : 1.0) * -21.6",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -16.2"
+            ],
+            "0.8": [
+              "(v.is_first_person ? 0.0 : 1.0) * -21.16",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -15.87"
+            ],
+            "0.85": [
+              "(v.is_first_person ? 0.0 : 1.0) * -20.62",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -15.47"
+            ],
+            "0.9": [
+              "(v.is_first_person ? 0.0 : 1.0) * -20.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -15.0"
+            ],
+            "0.95": [
+              "(v.is_first_person ? 0.0 : 1.0) * -10.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -7.5"
+            ],
+            "1": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ]
+          }
+        },
+        "body": {
+          "rotation": {
+            "0": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.05": [
+              "(v.is_first_person ? 0.0 : 1.0) * 1.19",
+              "(v.is_first_person ? 0.0 : 1.0) * -2.89",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.1": [
+              "(v.is_first_person ? 0.0 : 1.0) * 2.81",
+              "(v.is_first_person ? 0.0 : 1.0) * -6.89",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.15": [
+              "(v.is_first_person ? 0.0 : 1.0) * 4.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -10.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.2": [
+              "(v.is_first_person ? 0.0 : 1.0) * 4.15",
+              "(v.is_first_person ? 0.0 : 1.0) * -10.71",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.25": [
+              "(v.is_first_person ? 0.0 : 1.0) * 4.19",
+              "(v.is_first_person ? 0.0 : 1.0) * -11.44",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.3": [
+              "(v.is_first_person ? 0.0 : 1.0) * 4.15",
+              "(v.is_first_person ? 0.0 : 1.0) * -12.15",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.35": [
+              "(v.is_first_person ? 0.0 : 1.0) * 4.05",
+              "(v.is_first_person ? 0.0 : 1.0) * -12.75",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.4": [
+              "(v.is_first_person ? 0.0 : 1.0) * 3.95",
+              "(v.is_first_person ? 0.0 : 1.0) * -13.2",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.45": [
+              "(v.is_first_person ? 0.0 : 1.0) * 3.85",
+              "(v.is_first_person ? 0.0 : 1.0) * -13.41",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.5": [
+              "(v.is_first_person ? 0.0 : 1.0) * 3.81",
+              "(v.is_first_person ? 0.0 : 1.0) * -13.32",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.55": [
+              "(v.is_first_person ? 0.0 : 1.0) * 3.85",
+              "(v.is_first_person ? 0.0 : 1.0) * -12.88",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.6": [
+              "(v.is_first_person ? 0.0 : 1.0) * 4.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -12.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.66": [
+              "(v.is_first_person ? 0.0 : 1.0) * 6.5",
+              "(v.is_first_person ? 0.0 : 1.0) * -0.5",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.72": [
+              "(v.is_first_person ? 0.0 : 1.0) * 8.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 10.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.767": [
+              "(v.is_first_person ? 0.0 : 1.0) * 7.27",
+              "(v.is_first_person ? 0.0 : 1.0) * 10.07",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.813": [
+              "(v.is_first_person ? 0.0 : 1.0) * 5.93",
+              "(v.is_first_person ? 0.0 : 1.0) * 8.67",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.86": [
+              "(v.is_first_person ? 0.0 : 1.0) * 4.25",
+              "(v.is_first_person ? 0.0 : 1.0) * 6.38",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.907": [
+              "(v.is_first_person ? 0.0 : 1.0) * 2.52",
+              "(v.is_first_person ? 0.0 : 1.0) * 3.78",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.953": [
+              "(v.is_first_person ? 0.0 : 1.0) * 1.01",
+              "(v.is_first_person ? 0.0 : 1.0) * 1.46",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "1": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ]
+          }
+        },
+        "head": {
+          "rotation": {
+            "0": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.05": [
+              "(v.is_first_person ? 0.0 : 1.0) * 1.78",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.1": [
+              "(v.is_first_person ? 0.0 : 1.0) * 4.22",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.15": [
+              "(v.is_first_person ? 0.0 : 1.0) * 6.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.2": [
+              "(v.is_first_person ? 0.0 : 1.0) * 6.33",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.25": [
+              "(v.is_first_person ? 0.0 : 1.0) * 6.63",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.3": [
+              "(v.is_first_person ? 0.0 : 1.0) * 6.89",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.35": [
+              "(v.is_first_person ? 0.0 : 1.0) * 7.07",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.4": [
+              "(v.is_first_person ? 0.0 : 1.0) * 7.15",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.45": [
+              "(v.is_first_person ? 0.0 : 1.0) * 7.11",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.5": [
+              "(v.is_first_person ? 0.0 : 1.0) * 6.92",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.55": [
+              "(v.is_first_person ? 0.0 : 1.0) * 6.56",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.6": [
+              "(v.is_first_person ? 0.0 : 1.0) * 6.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.66": [
+              "(v.is_first_person ? 0.0 : 1.0) * -0.38",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.72": [
+              "(v.is_first_person ? 0.0 : 1.0) * -6.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.767": [
+              "(v.is_first_person ? 0.0 : 1.0) * -5.97",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.813": [
+              "(v.is_first_person ? 0.0 : 1.0) * -5.11",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.86": [
+              "(v.is_first_person ? 0.0 : 1.0) * -3.75",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.907": [
+              "(v.is_first_person ? 0.0 : 1.0) * -2.22",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.953": [
+              "(v.is_first_person ? 0.0 : 1.0) * -0.86",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "1": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ]
+          }
+        },
+        "rightLeg": {
+          "rotation": {
+            "0": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.05": [
+              "(v.is_first_person ? 0.0 : 1.0) * -2.96",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 1.78"
+            ],
+            "0.1": [
+              "(v.is_first_person ? 0.0 : 1.0) * -7.04",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 4.22"
+            ],
+            "0.15": [
+              "(v.is_first_person ? 0.0 : 1.0) * -10.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 6.0"
+            ],
+            "0.2": [
+              "(v.is_first_person ? 0.0 : 1.0) * -10.31",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 6.19"
+            ],
+            "0.25": [
+              "(v.is_first_person ? 0.0 : 1.0) * -10.58",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 6.35"
+            ],
+            "0.3": [
+              "(v.is_first_person ? 0.0 : 1.0) * -10.8",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 6.48"
+            ],
+            "0.35": [
+              "(v.is_first_person ? 0.0 : 1.0) * -10.98",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 6.59"
+            ],
+            "0.4": [
+              "(v.is_first_person ? 0.0 : 1.0) * -11.11",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 6.67"
+            ],
+            "0.45": [
+              "(v.is_first_person ? 0.0 : 1.0) * -11.2",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 6.72"
+            ],
+            "0.5": [
+              "(v.is_first_person ? 0.0 : 1.0) * -11.24",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 6.75"
+            ],
+            "0.55": [
+              "(v.is_first_person ? 0.0 : 1.0) * -11.24",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 6.75"
+            ],
+            "0.6": [
+              "(v.is_first_person ? 0.0 : 1.0) * -11.2",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 6.72"
+            ],
+            "0.65": [
+              "(v.is_first_person ? 0.0 : 1.0) * -11.11",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 6.67"
+            ],
+            "0.7": [
+              "(v.is_first_person ? 0.0 : 1.0) * -10.98",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 6.59"
+            ],
+            "0.75": [
+              "(v.is_first_person ? 0.0 : 1.0) * -10.8",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 6.48"
+            ],
+            "0.8": [
+              "(v.is_first_person ? 0.0 : 1.0) * -10.58",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 6.35"
+            ],
+            "0.85": [
+              "(v.is_first_person ? 0.0 : 1.0) * -10.31",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 6.19"
+            ],
+            "0.9": [
+              "(v.is_first_person ? 0.0 : 1.0) * -10.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 6.0"
+            ],
+            "0.95": [
+              "(v.is_first_person ? 0.0 : 1.0) * -5.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 3.0"
+            ],
+            "1": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ]
+          }
+        },
+        "leftLeg": {
+          "rotation": {
+            "0": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.05": [
+              "(v.is_first_person ? 0.0 : 1.0) * 2.96",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -1.78"
+            ],
+            "0.1": [
+              "(v.is_first_person ? 0.0 : 1.0) * 7.04",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -4.22"
+            ],
+            "0.15": [
+              "(v.is_first_person ? 0.0 : 1.0) * 10.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -6.0"
+            ],
+            "0.2": [
+              "(v.is_first_person ? 0.0 : 1.0) * 10.31",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -6.19"
+            ],
+            "0.25": [
+              "(v.is_first_person ? 0.0 : 1.0) * 10.58",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -6.35"
+            ],
+            "0.3": [
+              "(v.is_first_person ? 0.0 : 1.0) * 10.8",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -6.48"
+            ],
+            "0.35": [
+              "(v.is_first_person ? 0.0 : 1.0) * 10.98",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -6.59"
+            ],
+            "0.4": [
+              "(v.is_first_person ? 0.0 : 1.0) * 11.11",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -6.67"
+            ],
+            "0.45": [
+              "(v.is_first_person ? 0.0 : 1.0) * 11.2",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -6.72"
+            ],
+            "0.5": [
+              "(v.is_first_person ? 0.0 : 1.0) * 11.24",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -6.75"
+            ],
+            "0.55": [
+              "(v.is_first_person ? 0.0 : 1.0) * 11.24",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -6.75"
+            ],
+            "0.6": [
+              "(v.is_first_person ? 0.0 : 1.0) * 11.2",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -6.72"
+            ],
+            "0.65": [
+              "(v.is_first_person ? 0.0 : 1.0) * 11.11",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -6.67"
+            ],
+            "0.7": [
+              "(v.is_first_person ? 0.0 : 1.0) * 10.98",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -6.59"
+            ],
+            "0.75": [
+              "(v.is_first_person ? 0.0 : 1.0) * 10.8",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -6.48"
+            ],
+            "0.8": [
+              "(v.is_first_person ? 0.0 : 1.0) * 10.58",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -6.35"
+            ],
+            "0.85": [
+              "(v.is_first_person ? 0.0 : 1.0) * 10.31",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -6.19"
+            ],
+            "0.9": [
+              "(v.is_first_person ? 0.0 : 1.0) * 10.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -6.0"
+            ],
+            "0.95": [
+              "(v.is_first_person ? 0.0 : 1.0) * 5.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -3.0"
+            ],
+            "1": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ]
+          }
+        }
+      }
+    },
+    "animation.aegis.gates_release": {
+      "animation_length": 1.2,
+      "bones": {
+        "rightArm": {
+          "rotation": {
+            "0": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.05": [
+              "(v.is_first_person ? 0.0 : 1.0) * -14.1",
+              "(v.is_first_person ? 0.0 : 1.0) * -8.01",
+              "(v.is_first_person ? 0.0 : 1.0) * 6.0"
+            ],
+            "0.1": [
+              "(v.is_first_person ? 0.0 : 1.0) * -34.69",
+              "(v.is_first_person ? 0.0 : 1.0) * -19.69",
+              "(v.is_first_person ? 0.0 : 1.0) * 14.75"
+            ],
+            "0.15": [
+              "(v.is_first_person ? 0.0 : 1.0) * -55.43",
+              "(v.is_first_person ? 0.0 : 1.0) * -31.52",
+              "(v.is_first_person ? 0.0 : 1.0) * 23.62"
+            ],
+            "0.2": [
+              "(v.is_first_person ? 0.0 : 1.0) * -70.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -40.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 30.0"
+            ],
+            "0.25": [
+              "(v.is_first_person ? 0.0 : 1.0) * -73.74",
+              "(v.is_first_person ? 0.0 : 1.0) * -42.37",
+              "(v.is_first_person ? 0.0 : 1.0) * 31.41"
+            ],
+            "0.3": [
+              "(v.is_first_person ? 0.0 : 1.0) * -76.63",
+              "(v.is_first_person ? 0.0 : 1.0) * -44.42",
+              "(v.is_first_person ? 0.0 : 1.0) * 32.02"
+            ],
+            "0.35": [
+              "(v.is_first_person ? 0.0 : 1.0) * -78.7",
+              "(v.is_first_person ? 0.0 : 1.0) * -46.11",
+              "(v.is_first_person ? 0.0 : 1.0) * 32.07"
+            ],
+            "0.4": [
+              "(v.is_first_person ? 0.0 : 1.0) * -79.97",
+              "(v.is_first_person ? 0.0 : 1.0) * -47.37",
+              "(v.is_first_person ? 0.0 : 1.0) * 31.81"
+            ],
+            "0.45": [
+              "(v.is_first_person ? 0.0 : 1.0) * -80.46",
+              "(v.is_first_person ? 0.0 : 1.0) * -48.13",
+              "(v.is_first_person ? 0.0 : 1.0) * 31.45"
+            ],
+            "0.5": [
+              "(v.is_first_person ? 0.0 : 1.0) * -80.19",
+              "(v.is_first_person ? 0.0 : 1.0) * -48.33",
+              "(v.is_first_person ? 0.0 : 1.0) * 31.26"
+            ],
+            "0.55": [
+              "(v.is_first_person ? 0.0 : 1.0) * -79.17",
+              "(v.is_first_person ? 0.0 : 1.0) * -47.92",
+              "(v.is_first_person ? 0.0 : 1.0) * 31.46"
+            ],
+            "0.6": [
+              "(v.is_first_person ? 0.0 : 1.0) * -77.43",
+              "(v.is_first_person ? 0.0 : 1.0) * -46.83",
+              "(v.is_first_person ? 0.0 : 1.0) * 32.29"
+            ],
+            "0.65": [
+              "(v.is_first_person ? 0.0 : 1.0) * -75.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -45.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 34.0"
+            ],
+            "0.7": [
+              "(v.is_first_person ? 0.0 : 1.0) * -59.15",
+              "(v.is_first_person ? 0.0 : 1.0) * -32.04",
+              "(v.is_first_person ? 0.0 : 1.0) * 45.15"
+            ],
+            "0.75": [
+              "(v.is_first_person ? 0.0 : 1.0) * -36.63",
+              "(v.is_first_person ? 0.0 : 1.0) * -13.52",
+              "(v.is_first_person ? 0.0 : 1.0) * 59.85"
+            ],
+            "0.8": [
+              "(v.is_first_person ? 0.0 : 1.0) * -20.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 70.0"
+            ],
+            "0.85": [
+              "(v.is_first_person ? 0.0 : 1.0) * -16.46",
+              "(v.is_first_person ? 0.0 : 1.0) * 2.88",
+              "(v.is_first_person ? 0.0 : 1.0) * 72.58"
+            ],
+            "0.9": [
+              "(v.is_first_person ? 0.0 : 1.0) * -16.15",
+              "(v.is_first_person ? 0.0 : 1.0) * 3.24",
+              "(v.is_first_person ? 0.0 : 1.0) * 73.83"
+            ],
+            "0.95": [
+              "(v.is_first_person ? 0.0 : 1.0) * -17.41",
+              "(v.is_first_person ? 0.0 : 1.0) * 2.16",
+              "(v.is_first_person ? 0.0 : 1.0) * 73.29"
+            ],
+            "1": [
+              "(v.is_first_person ? 0.0 : 1.0) * -18.58",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.72",
+              "(v.is_first_person ? 0.0 : 1.0) * 70.5"
+            ],
+            "1.05": [
+              "(v.is_first_person ? 0.0 : 1.0) * -18.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 65.0"
+            ],
+            "1.1": [
+              "(v.is_first_person ? 0.0 : 1.0) * -12.52",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 45.37"
+            ],
+            "1.15": [
+              "(v.is_first_person ? 0.0 : 1.0) * -5.26",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 19.07"
+            ],
+            "1.2": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ]
+          }
+        },
+        "leftArm": {
+          "rotation": {
+            "0": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.05": [
+              "(v.is_first_person ? 0.0 : 1.0) * -14.1",
+              "(v.is_first_person ? 0.0 : 1.0) * 8.01",
+              "(v.is_first_person ? 0.0 : 1.0) * -6.0"
+            ],
+            "0.1": [
+              "(v.is_first_person ? 0.0 : 1.0) * -34.69",
+              "(v.is_first_person ? 0.0 : 1.0) * 19.69",
+              "(v.is_first_person ? 0.0 : 1.0) * -14.75"
+            ],
+            "0.15": [
+              "(v.is_first_person ? 0.0 : 1.0) * -55.43",
+              "(v.is_first_person ? 0.0 : 1.0) * 31.52",
+              "(v.is_first_person ? 0.0 : 1.0) * -23.62"
+            ],
+            "0.2": [
+              "(v.is_first_person ? 0.0 : 1.0) * -70.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 40.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -30.0"
+            ],
+            "0.25": [
+              "(v.is_first_person ? 0.0 : 1.0) * -73.74",
+              "(v.is_first_person ? 0.0 : 1.0) * 42.37",
+              "(v.is_first_person ? 0.0 : 1.0) * -31.41"
+            ],
+            "0.3": [
+              "(v.is_first_person ? 0.0 : 1.0) * -76.63",
+              "(v.is_first_person ? 0.0 : 1.0) * 44.42",
+              "(v.is_first_person ? 0.0 : 1.0) * -32.02"
+            ],
+            "0.35": [
+              "(v.is_first_person ? 0.0 : 1.0) * -78.7",
+              "(v.is_first_person ? 0.0 : 1.0) * 46.11",
+              "(v.is_first_person ? 0.0 : 1.0) * -32.07"
+            ],
+            "0.4": [
+              "(v.is_first_person ? 0.0 : 1.0) * -79.97",
+              "(v.is_first_person ? 0.0 : 1.0) * 47.37",
+              "(v.is_first_person ? 0.0 : 1.0) * -31.81"
+            ],
+            "0.45": [
+              "(v.is_first_person ? 0.0 : 1.0) * -80.46",
+              "(v.is_first_person ? 0.0 : 1.0) * 48.13",
+              "(v.is_first_person ? 0.0 : 1.0) * -31.45"
+            ],
+            "0.5": [
+              "(v.is_first_person ? 0.0 : 1.0) * -80.19",
+              "(v.is_first_person ? 0.0 : 1.0) * 48.33",
+              "(v.is_first_person ? 0.0 : 1.0) * -31.26"
+            ],
+            "0.55": [
+              "(v.is_first_person ? 0.0 : 1.0) * -79.17",
+              "(v.is_first_person ? 0.0 : 1.0) * 47.92",
+              "(v.is_first_person ? 0.0 : 1.0) * -31.46"
+            ],
+            "0.6": [
+              "(v.is_first_person ? 0.0 : 1.0) * -77.43",
+              "(v.is_first_person ? 0.0 : 1.0) * 46.83",
+              "(v.is_first_person ? 0.0 : 1.0) * -32.29"
+            ],
+            "0.65": [
+              "(v.is_first_person ? 0.0 : 1.0) * -75.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 45.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -34.0"
+            ],
+            "0.7": [
+              "(v.is_first_person ? 0.0 : 1.0) * -59.15",
+              "(v.is_first_person ? 0.0 : 1.0) * 32.04",
+              "(v.is_first_person ? 0.0 : 1.0) * -45.15"
+            ],
+            "0.75": [
+              "(v.is_first_person ? 0.0 : 1.0) * -36.63",
+              "(v.is_first_person ? 0.0 : 1.0) * 13.52",
+              "(v.is_first_person ? 0.0 : 1.0) * -59.85"
+            ],
+            "0.8": [
+              "(v.is_first_person ? 0.0 : 1.0) * -20.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -70.0"
+            ],
+            "0.85": [
+              "(v.is_first_person ? 0.0 : 1.0) * -16.46",
+              "(v.is_first_person ? 0.0 : 1.0) * -2.88",
+              "(v.is_first_person ? 0.0 : 1.0) * -72.58"
+            ],
+            "0.9": [
+              "(v.is_first_person ? 0.0 : 1.0) * -16.15",
+              "(v.is_first_person ? 0.0 : 1.0) * -3.24",
+              "(v.is_first_person ? 0.0 : 1.0) * -73.83"
+            ],
+            "0.95": [
+              "(v.is_first_person ? 0.0 : 1.0) * -17.41",
+              "(v.is_first_person ? 0.0 : 1.0) * -2.16",
+              "(v.is_first_person ? 0.0 : 1.0) * -73.29"
+            ],
+            "1": [
+              "(v.is_first_person ? 0.0 : 1.0) * -18.58",
+              "(v.is_first_person ? 0.0 : 1.0) * -0.72",
+              "(v.is_first_person ? 0.0 : 1.0) * -70.5"
+            ],
+            "1.05": [
+              "(v.is_first_person ? 0.0 : 1.0) * -18.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -65.0"
+            ],
+            "1.1": [
+              "(v.is_first_person ? 0.0 : 1.0) * -12.52",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -45.37"
+            ],
+            "1.15": [
+              "(v.is_first_person ? 0.0 : 1.0) * -5.26",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -19.07"
+            ],
+            "1.2": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ]
+          }
+        },
+        "body": {
+          "rotation": {
+            "0": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.05": [
+              "(v.is_first_person ? 0.0 : 1.0) * 4.38",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.1": [
+              "(v.is_first_person ? 0.0 : 1.0) * 10.75",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.15": [
+              "(v.is_first_person ? 0.0 : 1.0) * 17.25",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.2": [
+              "(v.is_first_person ? 0.0 : 1.0) * 22.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.25": [
+              "(v.is_first_person ? 0.0 : 1.0) * 23.48",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.3": [
+              "(v.is_first_person ? 0.0 : 1.0) * 24.94",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.35": [
+              "(v.is_first_person ? 0.0 : 1.0) * 26.3",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.4": [
+              "(v.is_first_person ? 0.0 : 1.0) * 27.43",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.45": [
+              "(v.is_first_person ? 0.0 : 1.0) * 28.23",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.5": [
+              "(v.is_first_person ? 0.0 : 1.0) * 28.59",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.55": [
+              "(v.is_first_person ? 0.0 : 1.0) * 28.41",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.6": [
+              "(v.is_first_person ? 0.0 : 1.0) * 27.59",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.65": [
+              "(v.is_first_person ? 0.0 : 1.0) * 26.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.7": [
+              "(v.is_first_person ? 0.0 : 1.0) * 14.37",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.75": [
+              "(v.is_first_person ? 0.0 : 1.0) * -2.15",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.8": [
+              "(v.is_first_person ? 0.0 : 1.0) * -14.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.85": [
+              "(v.is_first_person ? 0.0 : 1.0) * -16.45",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.9": [
+              "(v.is_first_person ? 0.0 : 1.0) * -16.7",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.95": [
+              "(v.is_first_person ? 0.0 : 1.0) * -15.54",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "1": [
+              "(v.is_first_person ? 0.0 : 1.0) * -13.71",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "1.05": [
+              "(v.is_first_person ? 0.0 : 1.0) * -12.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "1.1": [
+              "(v.is_first_person ? 0.0 : 1.0) * -8.3",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "1.15": [
+              "(v.is_first_person ? 0.0 : 1.0) * -3.48",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "1.2": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ]
+          }
+        },
+        "head": {
+          "rotation": {
+            "0": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.05": [
+              "(v.is_first_person ? 0.0 : 1.0) * 3.97",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.1": [
+              "(v.is_first_person ? 0.0 : 1.0) * 9.75",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.15": [
+              "(v.is_first_person ? 0.0 : 1.0) * 15.66",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.2": [
+              "(v.is_first_person ? 0.0 : 1.0) * 20.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.25": [
+              "(v.is_first_person ? 0.0 : 1.0) * 21.49",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.3": [
+              "(v.is_first_person ? 0.0 : 1.0) * 23.17",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.35": [
+              "(v.is_first_person ? 0.0 : 1.0) * 24.85",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.4": [
+              "(v.is_first_person ? 0.0 : 1.0) * 26.33",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.45": [
+              "(v.is_first_person ? 0.0 : 1.0) * 27.42",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.5": [
+              "(v.is_first_person ? 0.0 : 1.0) * 27.93",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.55": [
+              "(v.is_first_person ? 0.0 : 1.0) * 27.65",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.6": [
+              "(v.is_first_person ? 0.0 : 1.0) * 26.41",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.65": [
+              "(v.is_first_person ? 0.0 : 1.0) * 24.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.7": [
+              "(v.is_first_person ? 0.0 : 1.0) * 6.63",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.75": [
+              "(v.is_first_person ? 0.0 : 1.0) * -17.74",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.8": [
+              "(v.is_first_person ? 0.0 : 1.0) * -35.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.85": [
+              "(v.is_first_person ? 0.0 : 1.0) * -38.5",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.9": [
+              "(v.is_first_person ? 0.0 : 1.0) * -38.81",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.95": [
+              "(v.is_first_person ? 0.0 : 1.0) * -36.87",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "1": [
+              "(v.is_first_person ? 0.0 : 1.0) * -33.62",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "1.05": [
+              "(v.is_first_person ? 0.0 : 1.0) * -30.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "1.1": [
+              "(v.is_first_person ? 0.0 : 1.0) * -20.74",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "1.15": [
+              "(v.is_first_person ? 0.0 : 1.0) * -8.7",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "1.2": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ]
+          }
+        },
+        "rightLeg": {
+          "rotation": {
+            "0": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.05": [
+              "(v.is_first_person ? 0.0 : 1.0) * -4.02",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 2.39"
+            ],
+            "0.1": [
+              "(v.is_first_person ? 0.0 : 1.0) * -9.88",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 5.88"
+            ],
+            "0.15": [
+              "(v.is_first_person ? 0.0 : 1.0) * -15.8",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 9.42"
+            ],
+            "0.2": [
+              "(v.is_first_person ? 0.0 : 1.0) * -20.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 12.0"
+            ],
+            "0.25": [
+              "(v.is_first_person ? 0.0 : 1.0) * -21.14",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 12.66"
+            ],
+            "0.3": [
+              "(v.is_first_person ? 0.0 : 1.0) * -22.12",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 13.12"
+            ],
+            "0.35": [
+              "(v.is_first_person ? 0.0 : 1.0) * -22.89",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 13.41"
+            ],
+            "0.4": [
+              "(v.is_first_person ? 0.0 : 1.0) * -23.44",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 13.57"
+            ],
+            "0.45": [
+              "(v.is_first_person ? 0.0 : 1.0) * -23.74",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 13.66"
+            ],
+            "0.5": [
+              "(v.is_first_person ? 0.0 : 1.0) * -23.78",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 13.7"
+            ],
+            "0.55": [
+              "(v.is_first_person ? 0.0 : 1.0) * -23.51",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 13.75"
+            ],
+            "0.6": [
+              "(v.is_first_person ? 0.0 : 1.0) * -22.93",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 13.83"
+            ],
+            "0.65": [
+              "(v.is_first_person ? 0.0 : 1.0) * -22.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 14.0"
+            ],
+            "0.7": [
+              "(v.is_first_person ? 0.0 : 1.0) * -15.63",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 14.78"
+            ],
+            "0.75": [
+              "(v.is_first_person ? 0.0 : 1.0) * -6.59",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 15.56"
+            ],
+            "0.8": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 16.0"
+            ],
+            "0.85": [
+              "(v.is_first_person ? 0.0 : 1.0) * 1.41",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 16.22"
+            ],
+            "0.9": [
+              "(v.is_first_person ? 0.0 : 1.0) * 1.58",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 16.49"
+            ],
+            "0.95": [
+              "(v.is_first_person ? 0.0 : 1.0) * 1.06",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 16.55"
+            ],
+            "1": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.35",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 16.14"
+            ],
+            "1.05": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 15.0"
+            ],
+            "1.1": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 10.48"
+            ],
+            "1.15": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 4.41"
+            ],
+            "1.2": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ]
+          }
+        },
+        "leftLeg": {
+          "rotation": {
+            "0": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0"
+            ],
+            "0.05": [
+              "(v.is_first_person ? 0.0 : 1.0) * 4.02",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -2.39"
+            ],
+            "0.1": [
+              "(v.is_first_person ? 0.0 : 1.0) * 9.88",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -5.88"
+            ],
+            "0.15": [
+              "(v.is_first_person ? 0.0 : 1.0) * 15.8",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -9.42"
+            ],
+            "0.2": [
+              "(v.is_first_person ? 0.0 : 1.0) * 20.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -12.0"
+            ],
+            "0.25": [
+              "(v.is_first_person ? 0.0 : 1.0) * 21.14",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -12.66"
+            ],
+            "0.3": [
+              "(v.is_first_person ? 0.0 : 1.0) * 22.12",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -13.12"
+            ],
+            "0.35": [
+              "(v.is_first_person ? 0.0 : 1.0) * 22.89",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -13.41"
+            ],
+            "0.4": [
+              "(v.is_first_person ? 0.0 : 1.0) * 23.44",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -13.57"
+            ],
+            "0.45": [
+              "(v.is_first_person ? 0.0 : 1.0) * 23.74",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -13.66"
+            ],
+            "0.5": [
+              "(v.is_first_person ? 0.0 : 1.0) * 23.78",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -13.7"
+            ],
+            "0.55": [
+              "(v.is_first_person ? 0.0 : 1.0) * 23.51",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -13.75"
+            ],
+            "0.6": [
+              "(v.is_first_person ? 0.0 : 1.0) * 22.93",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -13.83"
+            ],
+            "0.65": [
+              "(v.is_first_person ? 0.0 : 1.0) * 22.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -14.0"
+            ],
+            "0.7": [
+              "(v.is_first_person ? 0.0 : 1.0) * 15.63",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -14.78"
+            ],
+            "0.75": [
+              "(v.is_first_person ? 0.0 : 1.0) * 6.59",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -15.56"
+            ],
+            "0.8": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -16.0"
+            ],
+            "0.85": [
+              "(v.is_first_person ? 0.0 : 1.0) * -1.41",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -16.22"
+            ],
+            "0.9": [
+              "(v.is_first_person ? 0.0 : 1.0) * -1.58",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -16.49"
+            ],
+            "0.95": [
+              "(v.is_first_person ? 0.0 : 1.0) * -1.06",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -16.55"
+            ],
+            "1": [
+              "(v.is_first_person ? 0.0 : 1.0) * -0.35",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -16.14"
+            ],
+            "1.05": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -15.0"
+            ],
+            "1.1": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -10.48"
+            ],
+            "1.15": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0.0",
+              "(v.is_first_person ? 0.0 : 1.0) * -4.41"
+            ],
+            "1.2": [
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0",
+              "(v.is_first_person ? 0.0 : 1.0) * 0"
+            ]
+          }
+        }
+      }
     }
   }
 }

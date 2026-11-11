@@ -152,6 +152,18 @@ Clan odds, stats and abilities are all in `behavior_pack/scripts/clans.js`.
 | Lightning Style: Chidori Current | 30 | 6s | Lightning bursts from your whole body: 8 damage and a stun to everything within 5 blocks. |
 | Wind Style: Rasenshuriken | 60 | 12s | Form the spinning shuriken overhead and hurl it: 22 damage, then a storm of wind blades keeps cutting (5 × 4). |
 | Mystical Palm Technique | 25 | 5s | Heal the player/companion you're looking at (or yourself): +12 HP over 1s and Regeneration II. |
+| Wind Style: Vacuum Bullets | 30 | 3s | Five compressed air bullets in quick succession: 6 damage + strong knockback each. |
+| Earth Style: Earth Spikes | 35 | 5s | A 14-block line of stone spikes rips out of the ground: 10 damage, launches and slows (spikes crumble after 4s). |
+| Water Style: Water Prison | 35 | 12s | Trap the target you look at (12 blocks) in a sphere of water for 5s (2s on bosses): can't move, 3 drowning damage per second. |
+| Ice Style: Thousand Needles of Death | 45 | 8s | A ring of ice needles forms around your target, then closes in: 16 damage, Slowness IV and Mining Fatigue. |
+| Lightning Style: Chidori Sharp Spear | 40 | 5s | The Chidori stretches into a 16-block lightning blade that pierces everything in line: 12 damage + stun. |
+| Fire Style: Great Fire Annihilation | 55 | 10s | A huge wall of fire that widens as it rolls forward: up to 3 × 6 fire damage and sets everything alight. |
+| Eight Inner Gates Release | 50 | 60s | 20s of Strength III, Speed III, Haste, Jump Boost and Resistance; every punch blasts enemies away. Afterwards: exhaustion and −2 hearts. |
+| Lightning Style: Kirin | 80 | 20s | Aim at a spot up to 48 blocks away: storm clouds gather, then a dragon of lightning crashes down — 28 damage in 5 blocks. |
+
+Clan discounts on the new scrolls: **Uchiha** — Great Fire Annihilation, Kirin, Chidori Sharp Spear · **Sarutobi** — Great
+Fire Annihilation · **Senju** — Earth Spikes · **Hyuga** — Vacuum Bullets. All of them are sold by the Jutsu Sensei
+(unlocked from level 10 to 70) and are craftable.
 
 ## Tailed Beasts (bosses)
 
@@ -441,6 +453,9 @@ models: `resource_pack/models/entity/`.
 
 New scrolls (Blank Scroll + lapis + catalyst): Phoenix = fire charge · Water Dragon = kelp · Earth Wall = stone ·
 Chidori Current = copper ingot · Mystical Palm = glistering melon · Rasenshuriken = diamond block + feather.
+Vacuum Bullets = wind charge · Earth Spikes = pointed dripstone · Water Prison = water bucket · Thousand Needles = packed ice ·
+Chidori Sharp Spear = trident · Great Fire Annihilation = blaze powder + diamond · Eight Gates = golden apple + diamond ·
+Kirin = lightning rod + diamond.
 All are also sold by the Jutsu Sensei.
 
 Catalysts: Fireball = blaze powder · Rasengan = ender pearl · Substitution = oak log ·

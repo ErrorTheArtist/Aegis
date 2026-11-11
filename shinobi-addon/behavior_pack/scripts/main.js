@@ -12,6 +12,7 @@ import { initCompanions, handleSummonUse } from "./companions.js";
 import { initSage, sageMultiplier } from "./sage.js";
 import { initArmor, armorChakraBonus, armorRegenMultiplier, armorDamageMultiplier } from "./armor.js";
 import { impactFx, castFx, sfx, shake, chargeFx } from "./cinematic.js";
+import { makeJutsu2 } from "./jutsu2.js";
 import { initLevels, handleRecordUse, levelChakraBonus, levelRegenMultiplier, ninjutsuMultiplier, cooldownMultiplier, gainJutsuXp, getLevel, xpInfo } from "./levels.js";
 
 // ---------------------------------------------------------------------------
@@ -979,6 +980,7 @@ const npcApi = {
   add, sub, scale, norm, dot, particle, sound, knockback, hurt, isValid, canBeHit,
   getChakra, setChakra, cooldownLeft, startCooldown, anim, handPos, launchProjectile, gainJutsuXp, spawnFx, removeFx,
 };
+Object.assign(JUTSU, makeJutsu2(npcApi));
 initNpcs({ ...npcApi, spawnAkatsukiNear: (p, msg) => spawnAkatsukiNear(p, msg) });
 initEnemies(npcApi);
 initCompanions(npcApi);

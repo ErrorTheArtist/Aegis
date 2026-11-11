@@ -102,10 +102,12 @@ let api; // helpers from main.js
 
 // Clan discounts on the normal jutsu scrolls (multiplier on chakra cost).
 const JUTSU_DISCOUNTS = {
-  uchiha: { "aegis:fireball_scroll": 0.6, "aegis:chidori_scroll": 0.7, "aegis:phoenix_scroll": 0.7, "aegis:chidori_current_scroll": 0.8 },
+  uchiha: { "aegis:fireball_scroll": 0.6, "aegis:chidori_scroll": 0.7, "aegis:phoenix_scroll": 0.7, "aegis:chidori_current_scroll": 0.8,
+    "aegis:great_fire_scroll": 0.7, "aegis:kirin_scroll": 0.75, "aegis:chidori_spear_scroll": 0.75 },
   uzumaki: { "aegis:sphere_scroll": 0.7, "aegis:clone_scroll": 0.6, "aegis:rasenshuriken_scroll": 0.75 },
-  sarutobi: { "aegis:fireball_scroll": 0.7, "aegis:phoenix_scroll": 0.7 },
-  senju: { "aegis:mystical_palm_scroll": 0.6, "aegis:water_dragon_scroll": 0.8 },
+  sarutobi: { "aegis:fireball_scroll": 0.7, "aegis:phoenix_scroll": 0.7, "aegis:great_fire_scroll": 0.8 },
+  senju: { "aegis:mystical_palm_scroll": 0.6, "aegis:water_dragon_scroll": 0.8, "aegis:earth_spikes_scroll": 0.75 },
+  hyuga: { "aegis:vacuum_scroll": 0.7 },
 };
 
 export function clanJutsuCostMultiplier(player, itemId) {

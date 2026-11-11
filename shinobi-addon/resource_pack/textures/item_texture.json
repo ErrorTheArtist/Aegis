@@ -208,6 +208,30 @@
     },
     "aegis_hokage_robe": {
       "textures": "textures/items/aegis/hokage_robe"
+    },
+    "aegis_great_fire_scroll": {
+      "textures": "textures/items/aegis/great_fire_scroll"
+    },
+    "aegis_kirin_scroll": {
+      "textures": "textures/items/aegis/kirin_scroll"
+    },
+    "aegis_water_prison_scroll": {
+      "textures": "textures/items/aegis/water_prison_scroll"
+    },
+    "aegis_vacuum_scroll": {
+      "textures": "textures/items/aegis/vacuum_scroll"
+    },
+    "aegis_earth_spikes_scroll": {
+      "textures": "textures/items/aegis/earth_spikes_scroll"
+    },
+    "aegis_chidori_spear_scroll": {
+      "textures": "textures/items/aegis/chidori_spear_scroll"
+    },
+    "aegis_ice_needles_scroll": {
+      "textures": "textures/items/aegis/ice_needles_scroll"
+    },
+    "aegis_eight_gates_scroll": {
+      "textures": "textures/items/aegis/eight_gates_scroll"
     }
   }
 }

@@ -8,7 +8,7 @@ Pose-to-pose animation, like a hand-keyed rig:
   * "root" moves the whole body (hops, steps, slides) and the feet are auto-planted: whatever the legs do,
     the model is lowered so the lowest foot touches the ground — stances and lunges never float or sink
   * sampled at 30 fps, then simplified (keys a straight line would reproduce are dropped)
-First-person arms are left alone (v.is_first_person) so the camera view isn't twisted.
+Keys are plain numbers (pre-bakeable, no per-key Molang); a single blend_weight hides them in first person.
 Preview any of them with tools/anim_preview.py.  Run from the shinobi-addon folder:  python3 tools/gen_player_anims.py
 """
 import json
@@ -16,7 +16,7 @@ import math
 from pathlib import Path
 
 P = Path(__file__).resolve().parent.parent / "resource_pack" / "animations" / "aegis.animation.json"
-FP = "(v.is_first_person ? 0.0 : 1.0)"
+FP_WEIGHT = "v.is_first_person ? 0.0 : 1.0"
 FPS = 30
 BONES = ["root", "waist", "body", "head", "rightArm", "leftArm", "rightLeg", "leftLeg"]
 ALIAS = {"rt": "root", "w": "waist", "b": "body", "h": "head", "ra": "rightArm", "la": "leftArm", "rl": "rightLeg", "ll": "leftLeg"}
@@ -127,7 +127,8 @@ def anim(length, keys, plant=True, loop=False):
             ps["root"]["p"][1] -= lowest_foot(ps)
         samples.append((t, ps))
 
-    out = {"animation_length": length, "bones": {}}
+    # Hidden in first person (one Molang expression per animation instead of one per key).
+    out = {"animation_length": length, "blend_weight": FP_WEIGHT, "bones": {}}
     if loop:
         out["loop"] = True
     for bn in BONES:
@@ -140,7 +141,7 @@ def anim(length, keys, plant=True, loop=False):
     return out
 
 
-def simplify(seq, tol=0.15):
+def simplify(seq, tol=0.4):
     """Drop keys that linear interpolation between their neighbours already reproduces."""
     keep = [seq[0]]
     for i in range(1, len(seq) - 1):
@@ -157,7 +158,8 @@ def fmt(t):
 
 
 def k(v):
-    return [f"{FP} * {v[0]}", f"{FP} * {v[1]}", f"{FP} * {v[2]}"]
+    # Plain numbers: no Molang per key, so the game can pre-bake the curves (Molang in every key caused hitches).
+    return [round(v[0], 2), round(v[1], 2), round(v[2], 2)]
 
 
 def shake(t0, t1, amp, every=0.05, base=None, axis=2):

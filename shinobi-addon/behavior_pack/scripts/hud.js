@@ -3,14 +3,11 @@
 // The script sends the data to the UI through the title text, which JSON UI can read anywhere via
 // the global #hud_title_text_string binding. The vanilla title is hidden while it carries this data.
 //
-// Layout of the encoded title (fixed width so the UI can cut it apart):
-//   [0..2]   "AEG"  marker
-//   [3..4]   HP fill, 00-50 (2% steps)
-//   [5..6]   chakra fill, 00-50
-//   [7..15]  HP text, e.g. "57/80    "
-//   [16..24] chakra text, e.g. "180/240  "
-//   [25..27] level, e.g. "12 "
-//   [28..]   big title text currently on screen (may be empty)
+// Layout (fixed width, letters for the fill levels so the UI never mistakes them for numbers;
+// each bar's fill is found by comparing only the *start* of a string):
+//   title:    "AEG" + HP fill code (2) + HP text (9) + level (3) + big title text (rest)
+//   subtitle: "AEC" + chakra fill code (2) + chakra text (9)
+// Fill codes: 0..50 -> "aa".."by" (two lowercase letters).
 //
 // Everything that wants a big on-screen title must call showTitle() instead of
 // onScreenDisplay.setTitle(); subtitles are shown on the action bar.
@@ -23,7 +20,8 @@ const lastSent = new Map(); // player id -> { str, tick }
 let api;
 
 const pad = (s, n) => (s.length >= n ? s.slice(0, n) : s + " ".repeat(n - s.length));
-const bucket = (cur, max) => String(Math.max(0, Math.min(BUCKETS, Math.round((cur / Math.max(1, max)) * BUCKETS)))).padStart(2, "0");
+const code = (b) => String.fromCharCode(97 + Math.floor(b / 26)) + String.fromCharCode(97 + (b % 26));
+const bucket = (cur, max) => code(Math.max(0, Math.min(BUCKETS, Math.round((cur / Math.max(1, max)) * BUCKETS))));
 
 export function showTitle(player, text, opts = {}) {
   if (!player) return;
@@ -53,25 +51,21 @@ function encode(player) {
   const ckMax = Math.round(api.getMaxChakra(player));
   const t = titles.get(player.id);
   const tail = t && system.currentTick <= t.until ? t.text : "";
-  return (
-    "AEG" +
-    bucket(hp, hpMax) +
-    bucket(ck, ckMax) +
-    pad(`${hp}/${hpMax}`, 9) +
-    pad(`${ck}/${ckMax}`, 9) +
-    pad(String(api.getLevel(player)), 3) +
-    tail
-  );
+  return {
+    title: "AEG" + bucket(hp, hpMax) + pad(`${hp}/${hpMax}`, 9) + pad(String(api.getLevel(player)), 3) + tail,
+    subtitle: "AEC" + bucket(ck, ckMax) + pad(`${ck}/${ckMax}`, 9),
+  };
 }
 
 function send(player, force = false) {
-  const str = encode(player);
+  const { title, subtitle } = encode(player);
+  const str = title + "|" + subtitle;
   const last = lastSent.get(player.id);
   const now = system.currentTick;
   // resend unchanged data every 2s so the HUD stays alive after the title element fades
   if (!force && last && last.str === str && now - last.tick < 40) return;
   try {
-    player.onScreenDisplay.setTitle(str, { fadeInDuration: 0, stayDuration: 100, fadeOutDuration: 0 });
+    player.onScreenDisplay.setTitle(title, { subtitle, fadeInDuration: 0, stayDuration: 100, fadeOutDuration: 0 });
     lastSent.set(player.id, { str, tick: now });
   } catch {
     /* ignore */

@@ -74,7 +74,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "('Lv ' + ('%.3s' * (#hud_title_text_string - ('%.25s' * #hud_title_text_string))))",
+                    "source_property_name": "('Lv ' + ('%.3s' * (#hud_title_text_string - ('%.14s' * #hud_title_text_string))))",
                     "target_property_name": "#text"
                   }
                 ]
@@ -138,7 +138,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '01')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGab')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -166,7 +166,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '02')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGac')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -194,7 +194,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '03')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGad')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -222,7 +222,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '04')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGae')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -250,7 +250,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '05')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGaf')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -278,7 +278,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '06')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGag')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -306,7 +306,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '07')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGah')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -334,7 +334,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '08')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGai')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -362,7 +362,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '09')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGaj')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -390,7 +390,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '10')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGak')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -418,7 +418,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '11')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGal')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -446,7 +446,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '12')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGam')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -474,7 +474,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '13')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGan')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -502,7 +502,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '14')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGao')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -530,7 +530,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '15')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGap')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -558,7 +558,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '16')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGaq')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -586,7 +586,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '17')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGar')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -614,7 +614,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '18')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGas')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -642,7 +642,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '19')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGat')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -670,7 +670,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '20')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGau')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -698,7 +698,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '21')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGav')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -726,7 +726,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '22')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGaw')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -754,7 +754,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '23')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGax')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -782,7 +782,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '24')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGay')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -810,7 +810,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '25')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGaz')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -838,7 +838,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '26')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGba')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -866,7 +866,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '27')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGbb')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -894,7 +894,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '28')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGbc')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -922,7 +922,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '29')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGbd')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -950,7 +950,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '30')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGbe')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -978,7 +978,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '31')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGbf')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -1006,7 +1006,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '32')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGbg')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -1034,7 +1034,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '33')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGbh')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -1062,7 +1062,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '34')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGbi')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -1090,7 +1090,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '35')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGbj')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -1118,7 +1118,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '36')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGbk')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -1146,7 +1146,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '37')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGbl')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -1174,7 +1174,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '38')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGbm')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -1202,7 +1202,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '39')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGbn')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -1230,7 +1230,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '40')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGbo')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -1258,7 +1258,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '41')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGbp')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -1286,7 +1286,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '42')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGbq')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -1314,7 +1314,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '43')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGbr')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -1342,7 +1342,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '44')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGbs')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -1370,7 +1370,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '45')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGbt')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -1398,7 +1398,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '46')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGbu')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -1426,7 +1426,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '47')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGbv')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -1454,7 +1454,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '48')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGbw')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -1482,7 +1482,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '49')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGbx')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -1510,7 +1510,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.3s' * #hud_title_text_string))) = '50')",
+                    "source_property_name": "(('%.5s' * #hud_title_text_string) = 'AEGby')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -1541,7 +1541,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.9s' * (#hud_title_text_string - ('%.7s' * #hud_title_text_string))))",
+                    "source_property_name": "(('%.9s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))))",
                     "target_property_name": "#text"
                   }
                 ]
@@ -1600,12 +1600,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '01')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECab')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -1628,12 +1628,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '02')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECac')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -1656,12 +1656,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '03')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECad')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -1684,12 +1684,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '04')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECae')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -1712,12 +1712,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '05')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECaf')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -1740,12 +1740,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '06')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECag')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -1768,12 +1768,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '07')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECah')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -1796,12 +1796,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '08')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECai')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -1824,12 +1824,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '09')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECaj')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -1852,12 +1852,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '10')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECak')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -1880,12 +1880,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '11')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECal')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -1908,12 +1908,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '12')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECam')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -1936,12 +1936,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '13')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECan')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -1964,12 +1964,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '14')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECao')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -1992,12 +1992,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '15')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECap')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -2020,12 +2020,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '16')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECaq')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -2048,12 +2048,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '17')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECar')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -2076,12 +2076,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '18')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECas')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -2104,12 +2104,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '19')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECat')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -2132,12 +2132,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '20')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECau')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -2160,12 +2160,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '21')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECav')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -2188,12 +2188,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '22')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECaw')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -2216,12 +2216,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '23')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECax')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -2244,12 +2244,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '24')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECay')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -2272,12 +2272,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '25')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECaz')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -2300,12 +2300,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '26')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECba')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -2328,12 +2328,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '27')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECbb')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -2356,12 +2356,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '28')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECbc')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -2384,12 +2384,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '29')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECbd')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -2412,12 +2412,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '30')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECbe')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -2440,12 +2440,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '31')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECbf')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -2468,12 +2468,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '32')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECbg')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -2496,12 +2496,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '33')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECbh')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -2524,12 +2524,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '34')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECbi')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -2552,12 +2552,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '35')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECbj')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -2580,12 +2580,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '36')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECbk')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -2608,12 +2608,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '37')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECbl')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -2636,12 +2636,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '38')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECbm')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -2664,12 +2664,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '39')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECbn')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -2692,12 +2692,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '40')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECbo')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -2720,12 +2720,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '41')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECbp')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -2748,12 +2748,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '42')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECbq')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -2776,12 +2776,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '43')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECbr')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -2804,12 +2804,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '44')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECbs')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -2832,12 +2832,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '45')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECbt')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -2860,12 +2860,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '46')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECbu')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -2888,12 +2888,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '47')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECbv')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -2916,12 +2916,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '48')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECbw')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -2944,12 +2944,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '49')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECbx')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -2972,12 +2972,12 @@
                 "layer": 12,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.2s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))) = '50')",
+                    "source_property_name": "(('%.5s' * #hud_subtitle_text_string) = 'AECby')",
                     "target_property_name": "#visible"
                   }
                 ]
@@ -3003,12 +3003,12 @@
                 "localize": false,
                 "bindings": [
                   {
-                    "binding_name": "#hud_title_text_string",
+                    "binding_name": "#hud_subtitle_text_string",
                     "binding_type": "global"
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.9s' * (#hud_title_text_string - ('%.16s' * #hud_title_text_string))))",
+                    "source_property_name": "(#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))",
                     "target_property_name": "#text"
                   }
                 ]
@@ -3044,7 +3044,7 @@
             },
             {
               "binding_type": "view",
-              "source_property_name": "(#hud_title_text_string - ('%.28s' * #hud_title_text_string))",
+              "source_property_name": "(#hud_title_text_string - ('%.17s' * #hud_title_text_string))",
               "target_property_name": "#text"
             }
           ]

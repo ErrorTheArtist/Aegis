@@ -15,10 +15,25 @@ def k(v):
     return [f"{FP} * {v[0]}", f"{FP} * {v[1]}", f"{FP} * {v[2]}"]
 
 
-def track(frames, smooth=True):
+def catmull(p0, p1, p2, p3, u):
+    return 0.5 * ((2 * p1) + (-p0 + p2) * u + (2 * p0 - 5 * p1 + 4 * p2 - p3) * u * u + (-p0 + 3 * p1 - 3 * p2 + p3) * u * u * u)
+
+
+def track(frames, step=0.05):
+    """Smooth catmull-rom curve through the keyframes, pre-sampled into linear keyframes.
+    (Bedrock's own catmull-rom only accepts constant values, and ours carry the first-person switch.)"""
+    times = sorted(frames, key=float)
+    ts = [float(t) for t in times]
+    vs = [frames[t] for t in times]
     out = {}
-    for t, v in frames.items():
-        out[t] = {"post": k(v), "lerp_mode": "catmullrom"} if smooth else k(v)
+    for i in range(len(ts) - 1):
+        n = max(1, round((ts[i + 1] - ts[i]) / step))
+        for j in range(n):
+            u = j / n
+            t = ts[i] + (ts[i + 1] - ts[i]) * u
+            p0, p1, p2, p3 = vs[max(i - 1, 0)], vs[i], vs[i + 1], vs[min(i + 2, len(vs) - 1)]
+            out[f"{t:.3f}".rstrip("0").rstrip(".") or "0"] = k([round(catmull(p0[c], p1[c], p2[c], p3[c], u), 2) for c in range(3)])
+    out[f"{ts[-1]:.3f}".rstrip("0").rstrip(".") or "0"] = k(vs[-1])
     return out
 
 

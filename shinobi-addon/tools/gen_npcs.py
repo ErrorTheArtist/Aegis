@@ -300,7 +300,6 @@ entity("akatsuki", {**BASE_MOVE,
     "minecraft:knockback_resistance": {"value": 0.7},
     "minecraft:pushable": {"is_pushable": False, "is_pushable_by_piston": False},
     "minecraft:nameable": {"always_show": True},
-    "minecraft:persistent": {},
     "minecraft:fire_immune": {},
     "minecraft:damage_sensor": {"triggers": [{"cause": "fall", "deals_damage": "no"}]},
     "minecraft:loot": {"table": "loot_tables/entities/aegis_akatsuki.json"},
@@ -312,7 +311,10 @@ entity("akatsuki", {**BASE_MOVE,
         "entity_types": [{"filters": {"any_of": [{"test": "is_family", "subject": "other", "value": "player"},
                                                   {"test": "is_family", "subject": "other", "value": "ninja_companion"}]}, "max_dist": 40}]},
     "minecraft:behavior.random_stroll": {"priority": 7, "speed_multiplier": 0.7},
-    "minecraft:behavior.look_at_player": {"priority": 8, "look_distance": 16}})
+    "minecraft:behavior.look_at_player": {"priority": 8, "look_distance": 16}},
+    groups={"aegis:persistent": {"minecraft:persistent": {}}},
+    events={"minecraft:entity_spawned": {"add": {"component_groups": ["aegis:despawnable"]}},
+            "aegis:persist": {"remove": {"component_groups": ["aegis:despawnable"]}, "add": {"component_groups": ["aegis:persistent"]}}})
 client_humanoid("akatsuki", ("#141418", "#c81419"))
 
 # Recruitable genin companion
@@ -492,15 +494,35 @@ w(BP / "loot_tables" / "entities" / "aegis_akatsuki.json", {"pools": [
                              {"type": "empty", "weight": 4}]},
     {"rolls": 1, "entries": [{"type": "item", "name": "aegis:akatsuki_cloak", "weight": 1}, {"type": "item", "name": "aegis:akatsuki_hat", "weight": 1},
                              {"type": "empty", "weight": 2}]}]})
+# Rogue / Sound / Anbu ninja wander the overworld day and night (faction picked by script).
 w(BP / "spawn_rules" / "hostile_ninja.json", {"format_version": "1.8.0", "minecraft:spawn_rules": {
     "description": {"identifier": "aegis:hostile_ninja", "population_control": "monster"},
+    "conditions": [
+        {"minecraft:spawns_on_surface": {}, "minecraft:spawns_on_block_filter": ["minecraft:grass_block", "minecraft:dirt", "minecraft:sand",
+                                                                                 "minecraft:podzol", "minecraft:snow", "minecraft:coarse_dirt", "minecraft:stone"],
+         "minecraft:brightness_filter": {"min": 0, "max": 15, "adjust_for_weather": False},
+         "minecraft:difficulty_filter": {"min": "easy", "max": "hard"},
+         "minecraft:weight": {"default": 30},
+         "minecraft:herd": {"min_size": 1, "max_size": 3},
+         "minecraft:density_limit": {"surface": 6},
+         "minecraft:biome_filter": {"test": "has_biome_tag", "operator": "==", "value": "overworld"}},
+        {"minecraft:spawns_underground": {},
+         "minecraft:brightness_filter": {"min": 0, "max": 7, "adjust_for_weather": True},
+         "minecraft:difficulty_filter": {"min": "easy", "max": "hard"},
+         "minecraft:weight": {"default": 8},
+         "minecraft:herd": {"min_size": 1, "max_size": 2},
+         "minecraft:density_limit": {"underground": 2},
+         "minecraft:biome_filter": {"test": "has_biome_tag", "operator": "==", "value": "overworld"}}]}})
+# Rare Akatsuki (Itachi / Kisame / Deidara, picked by script) roaming the surface.
+w(BP / "spawn_rules" / "akatsuki.json", {"format_version": "1.8.0", "minecraft:spawn_rules": {
+    "description": {"identifier": "aegis:akatsuki", "population_control": "monster"},
     "conditions": [{
-        "minecraft:spawns_on_surface": {}, "minecraft:spawns_underground": {},
-        "minecraft:brightness_filter": {"min": 0, "max": 7, "adjust_for_weather": True},
-        "minecraft:difficulty_filter": {"min": "easy", "max": "hard"},
-        "minecraft:weight": {"default": 10},
-        "minecraft:herd": {"min_size": 1, "max_size": 3},
-        "minecraft:density_limit": {"surface": 4, "underground": 2},
+        "minecraft:spawns_on_surface": {}, "minecraft:spawns_on_block_filter": ["minecraft:grass_block", "minecraft:dirt", "minecraft:sand", "minecraft:snow"],
+        "minecraft:brightness_filter": {"min": 0, "max": 15, "adjust_for_weather": False},
+        "minecraft:difficulty_filter": {"min": "normal", "max": "hard"},
+        "minecraft:weight": {"default": 1},
+        "minecraft:herd": {"min_size": 1, "max_size": 1},
+        "minecraft:density_limit": {"surface": 1},
         "minecraft:biome_filter": {"test": "has_biome_tag", "operator": "==", "value": "overworld"}}]}})
 
 # ---------------------------------------------------------------------------
@@ -599,3 +621,9 @@ for aid, a in ANIMALS.items():
 lang_path.write_text("\n".join(lines) + "\n")
 print("Generated NPCs:", len(SKINS), "skins,", len(ANIMALS), "summon animals, spawner block.")
 print("SKIN ORDER:", [n for n, _ in SKINS])
+
+# Detailed 32x32 icons (ramen, summon scrolls…) are drawn by gen_icons.py — re-draw them last.
+import subprocess
+import sys
+
+subprocess.run([sys.executable, str(ROOT / "tools" / "gen_icons.py")], check=True)

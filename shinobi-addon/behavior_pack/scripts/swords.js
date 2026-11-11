@@ -426,6 +426,8 @@ function repairHeld(player, amount) {
 
 export function handleSwordUse(player, itemStack) {
   const s = SWORDS[itemStack.typeId];
+  if (s && (lastCast.get(player.id) ?? -99) > system.currentTick - 6 && lastCast.get(player.id) !== system.currentTick) return true;
+  if (s) lastCast.set(player.id, system.currentTick);
   if (!s) return false;
   const key = itemStack.typeId;
   const left = api.cooldownLeft(player, key);
@@ -449,8 +451,29 @@ export function handleSwordUse(player, itemStack) {
   return true;
 }
 
+// Right-click fires itemStartUse/itemUse; both route here, de-duplicated.
+const lastCast = new Map();
+function trigger(player, itemStack) {
+  if (!itemStack || !SWORDS[itemStack.typeId]) return false;
+  const now = system.currentTick;
+  if ((lastCast.get(player.id) ?? -99) > now - 6) return true;
+  lastCast.set(player.id, now);
+  return handleSwordUse(player, itemStack);
+}
+
 export function initSwords(helpers) {
   api = helpers;
+
+  world.afterEvents.itemStartUse.subscribe(({ source, itemStack }) => {
+    if (source?.typeId === "minecraft:player") trigger(source, itemStack);
+  });
+
+  // Backup trigger (works everywhere, incl. mobile): sneak + hit an enemy with the sword.
+  world.afterEvents.entityHitEntity.subscribe(({ damagingEntity, hitEntity }) => {
+    if (damagingEntity?.typeId !== "minecraft:player" || !damagingEntity.isSneaking) return;
+    const it = heldStack(damagingEntity);
+    if (it && SWORDS[it.typeId]) system.run(() => trigger(damagingEntity, it));
+  });
 
   // Passive effects + slash marks on every melee hit.
   world.afterEvents.entityHitEntity.subscribe(({ damagingEntity, hitEntity }) => {

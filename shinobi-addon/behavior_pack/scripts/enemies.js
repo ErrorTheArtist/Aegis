@@ -261,7 +261,10 @@ export function initEnemies(helpers) {
     system.runTimeout(() => {
       if (!api.isValid(entity) || entity.getDynamicProperty("aegis:role")) return;
       if (entity.typeId === "aegis:akatsuki") {
-        setupNpc(entity, { type: "akatsuki", member: "random", skin: -1, name: "", invuln: false });
+        setupNpc(entity, { type: "akatsuki", member: "random", skin: -1, name: "", invuln: false }, { natural: true });
+        for (const p of entity.dimension.getPlayers({ location: entity.location, maxDistance: 64 })) {
+          p.sendMessage(`§c${entity.nameTag}§c of the Akatsuki has been sighted nearby…`);
+        }
       } else {
         const r = Math.random();
         const type = r < 0.7 ? "rogue" : r < 0.9 ? "sound" : "anbu";

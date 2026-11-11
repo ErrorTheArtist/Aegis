@@ -277,7 +277,9 @@ for sid, sd in SWORDS.items():
             "minecraft:enchantable": {"slot": "sword", "value": 15},
             "minecraft:repairable": {"repair_items": [{"items": ["minecraft:diamond"], "repair_amount": 400}]},
             "minecraft:can_destroy_in_creative": False,
-            "minecraft:tags": {"tags": ["minecraft:is_sword"]}}}})
+            # makes right-click a real "use" so the special fires (swords are otherwise not usable)
+            "minecraft:use_modifiers": {"use_duration": 0.25, "movement_modifier": 1.0},
+            "minecraft:use_animation": "none"}}})
 
     pattern, key = sd["recipe"]
     w(BP / "recipes" / f"{sid}.json", {"format_version": "1.21.60", "minecraft:recipe_shaped": {

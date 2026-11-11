@@ -48,6 +48,9 @@
             "max_distance": 80
           }
         }
+      },
+      "aegis:persistent": {
+        "minecraft:persistent": {}
       }
     },
     "components": {
@@ -103,7 +106,6 @@
       "minecraft:nameable": {
         "always_show": true
       },
-      "minecraft:persistent": {},
       "minecraft:fire_immune": {},
       "minecraft:damage_sensor": {
         "triggers": [
@@ -208,9 +210,21 @@
           "component_groups": [
             "aegis:despawnable"
           ]
+        },
+        "add": {
+          "component_groups": [
+            "aegis:persistent"
+          ]
         }
       },
-      "aegis:talked": {}
+      "aegis:talked": {},
+      "minecraft:entity_spawned": {
+        "add": {
+          "component_groups": [
+            "aegis:despawnable"
+          ]
+        }
+      }
     }
   }
 }

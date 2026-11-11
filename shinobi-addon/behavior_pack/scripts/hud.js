@@ -1,40 +1,40 @@
-// Custom HUD: HP bar + chakra bar (top-left) and big titles, drawn by resource_pack/ui/hud_screen.json.
+// Custom HUD: HP / chakra / XP bars, level and points (top-left), drawn by resource_pack/ui/hud_screen.json.
 //
-// The script sends the data to the UI through the title text, which JSON UI can read anywhere via
-// the global #hud_title_text_string binding. The vanilla title is hidden while it carries this data.
+// The data travels in the title + subtitle text, which JSON UI reads anywhere via the global
+// #hud_title_text_string / #hud_subtitle_text_string bindings. The UI only *compares the start* of
+// these strings (the one string operation that is reliable) and shows the strings whole:
 //
-// Layout (fixed width; fill levels are two-letter codes so the UI never mistakes them for numbers):
-//   title:    "AEG" + HP fill (2) + HP text (9) + level (3) + unspent points (4) + big title text (rest)
-//   subtitle: "AEC" + chakra fill (2) + XP fill (2) + chakra text (9) + XP text (13)
-// HP and chakra fills are found by comparing only the start of a string; XP cuts its code out.
-// Fill codes: 0..50 -> "aa".."by".
+//   title:    "AEG" + HP fill code (2) + XP fill code (2) + "§f" + "HP 57/80"
+//   subtitle: "AEC" + chakra fill code (2) + "§f" + "CK 180/240\n§eLevel 12\n§f340/625\n§6Points 13"
 //
-// Everything that wants a big on-screen title must call showTitle() instead of
-// onScreenDisplay.setTitle(); subtitles are shown on the action bar.
+// The labels are black by default, so "AEGxxyy" / "AECxx" render black on a black tab at the left
+// end of each bar (invisible), and "§f" switches the rest to white. Fill codes: 0..50 -> "aa".."by".
+//
+// Big titles (level up, clan reveal…) are shown as normal Minecraft titles for their duration;
+// the HUD steps aside during that time. Always use showTitle() instead of onScreenDisplay.setTitle().
 
 import { world, system } from "@minecraft/server";
 
 const BUCKETS = 50;
-const titles = new Map(); // player id -> { text, until }
+const titles = new Map(); // player id -> { text, subtitle, until, shown }
 const lastSent = new Map(); // player id -> { str, tick }
 let api;
 
-const pad = (s, n) => (s.length >= n ? s.slice(0, n) : s + " ".repeat(n - s.length));
 const code = (b) => String.fromCharCode(97 + Math.floor(b / 26)) + String.fromCharCode(97 + (b % 26));
 const bucket = (cur, max) => code(Math.max(0, Math.min(BUCKETS, Math.round((cur / Math.max(1, max)) * BUCKETS))));
 
 export function showTitle(player, text, opts = {}) {
   if (!player) return;
-  const ticks = (opts.fadeInDuration ?? 10) + (opts.stayDuration ?? 70) + (opts.fadeOutDuration ?? 20);
-  titles.set(player.id, { text: String(text).replace(/\n/g, " "), until: system.currentTick + ticks });
-  if (opts.subtitle) {
-    try {
-      player.onScreenDisplay.setActionBar(opts.subtitle);
-    } catch {
-      /* ignore */
-    }
+  const fadeIn = opts.fadeInDuration ?? 10;
+  const stay = opts.stayDuration ?? 70;
+  const fadeOut = opts.fadeOutDuration ?? 20;
+  titles.set(player.id, { text: String(text), subtitle: opts.subtitle ?? "", until: system.currentTick + fadeIn + stay + fadeOut, fadeIn, stay, fadeOut });
+  try {
+    player.onScreenDisplay.setTitle(String(text), { subtitle: opts.subtitle ?? "", fadeInDuration: fadeIn, stayDuration: stay, fadeOutDuration: fadeOut });
+  } catch {
+    /* ignore */
   }
-  send(player, true);
+  lastSent.delete(player.id);
 }
 
 function encode(player) {
@@ -49,16 +49,18 @@ function encode(player) {
   }
   const ck = Math.floor(api.getChakra(player));
   const ckMax = Math.round(api.getMaxChakra(player));
-  const t = titles.get(player.id);
-  const tail = t && system.currentTick <= t.until ? t.text : "";
   const { xp, need, points } = api.xpInfo(player);
+  const xpCode = need > 0 ? bucket(xp, need) : code(BUCKETS);
   return {
-    title: "AEG" + bucket(hp, hpMax) + pad(`${hp}/${hpMax}`, 9) + pad(String(api.getLevel(player)), 3) + pad(String(points), 4) + tail,
-    subtitle: "AEC" + bucket(ck, ckMax) + (need > 0 ? bucket(xp, need) : code(BUCKETS)) + pad(`${ck}/${ckMax}`, 9) + pad(need > 0 ? `${xp}/${need}` : "MAX", 13),
+    title: "AEG" + bucket(hp, hpMax) + xpCode + "§f" + `HP ${hp}/${hpMax}`,
+    subtitle: "AEC" + bucket(ck, ckMax) + "§f" + `CK ${ck}/${ckMax}\n§eLevel ${api.getLevel(player)}\n§f${need > 0 ? `${xp}/${need} XP` : "MAX"}\n§6Points ${points}`,
   };
 }
 
 function send(player, force = false) {
+  const t = titles.get(player.id);
+  if (t && system.currentTick <= t.until) return; // a real title is on screen
+  if (t) titles.delete(player.id);
   const { title, subtitle } = encode(player);
   const str = title + "|" + subtitle;
   const last = lastSent.get(player.id);

@@ -83,6 +83,8 @@ export function bijuuChakraBonus(player) {
 
 // No natural chakra regen while in Tailed Beast Mode (and sneaking charges a bomb, not focus).
 const MASTERED_PROP = "aegis:bijuu_mastered";
+const DEATHS_PROP = "aegis:bijuu_deaths";
+const MAX_DEATHS = 3;
 export function isBijuuMastered(player) {
   try {
     return !!sealedBeastId(player) && player.getDynamicProperty(MASTERED_PROP) === true;
@@ -600,6 +602,7 @@ export function sealInto(player, id, sealer) {
   removeCloak(player);
   player.setDynamicProperty(BIJUU_PROP, id);
   player.setDynamicProperty(MASTERED_PROP, false);
+  player.setDynamicProperty(DEATHS_PROP, 0);
   giveCloak(player);
   showTitle(player, "§6Jinchūriki", { subtitle: `§7${b.text}${b.name}§7 is sealed within you`, fadeInDuration: 5, stayDuration: 70, fadeOutDuration: 20 });
   api.sound(player.dimension, "ui.toast.challenge_complete", player.location, 1, 0.8);
@@ -770,6 +773,36 @@ export function initBijuu(helpers) {
   }, 10);
 
   system.runInterval(tickTrials, 20);
+
+  // A Jinchūriki who dies 3 times loses their Tailed Beast: it breaks free where they fell.
+  world.afterEvents.entityDie.subscribe(({ deadEntity }) => {
+    if (deadEntity.typeId !== "minecraft:player") return;
+    const player = deadEntity;
+    const id = sealedBeastId(player);
+    if (!id || trials.has(player.id)) return;
+    const b = BEASTS[id];
+    const deaths = Number(player.getDynamicProperty(DEATHS_PROP) ?? 0) + 1;
+    if (deaths < MAX_DEATHS) {
+      player.setDynamicProperty(DEATHS_PROP, deaths);
+      player.sendMessage(`§cThe seal holding ${fullName(b)}§c weakens… §7(${deaths}/${MAX_DEATHS} deaths — at ${MAX_DEATHS} it breaks free)`);
+      return;
+    }
+    const dim = player.dimension;
+    const at = { ...player.location };
+    release(player);
+    player.setDynamicProperty(DEATHS_PROP, 0);
+    player.sendMessage(`§4The seal broke! ${fullName(b)}§4 has escaped — your Jinchūriki powers are gone.`);
+    world.sendMessage(`§c${fullName(b)}§c broke free from ${player.name}'s seal!`);
+    system.runTimeout(() => {
+      try {
+        const boss = dim.spawnEntity(`aegis:${id}`, at);
+        roar(boss, b);
+        beastAwakenFx(boss, b.color);
+      } catch {
+        /* unloaded — the beast is simply gone */
+      }
+    }, 20);
+  });
   world.afterEvents.entityDie.subscribe(({ deadEntity }) => {
     if (deadEntity.typeId === "minecraft:player" && trials.has(deadEntity.id)) endTrial(deadEntity.id, "§cYou fell. The seal closes again…");
   });
@@ -839,7 +872,7 @@ export function initBijuu(helpers) {
       player.sendMessage("§7Your Tailed Beast has been released.");
     } else if (cmd === "info") {
       const b = BEASTS[sealedBeastId(player)];
-      player.sendMessage(b ? `§7Sealed within you: ${fullName(b)}${isBijuuMastered(player) ? " §6(mastered)" : ""}` : "§7No Tailed Beast is sealed within you.");
+      player.sendMessage(b ? `§7Sealed within you: ${fullName(b)}${isBijuuMastered(player) ? " §6(mastered)" : ""} §7— seal: ${MAX_DEATHS - Number(player.getDynamicProperty(DEATHS_PROP) ?? 0)}/${MAX_DEATHS} lives left` : "§7No Tailed Beast is sealed within you.");
     } else {
       player.sendMessage(`§7Usage: /scriptevent aegis:bijuu <summon [beast] | seal <beast> | master | release | info>\n§7Beasts: ${Object.keys(BEASTS).join(", ")}`);
     }

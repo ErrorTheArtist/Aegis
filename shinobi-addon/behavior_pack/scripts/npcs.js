@@ -235,7 +235,7 @@ export function setupNpc(e, cfg, extra = {}) {
     if (cfg.name) e.nameTag = cfg.name;
     else if (member) e.nameTag = AKATSUKI[member].name;
     else if (cfg.type !== "clan_elder") e.nameTag = t.name;
-    e.triggerEvent("aegis:persist");
+    if (!extra.natural) e.triggerEvent("aegis:persist");
     if (t.tier) e.triggerEvent(`aegis:tier_${t.tier}`);
     if (t.friendly) {
       e.triggerEvent(cfg.stay ? "aegis:stay" : "aegis:wander");

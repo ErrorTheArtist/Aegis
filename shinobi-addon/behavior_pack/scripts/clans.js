@@ -12,6 +12,7 @@ import { world, system, ItemStack, ItemLockMode } from "@minecraft/server";
 import { showTitle } from "./hud.js";
 import { uzumakiSealMenu } from "./bijuu.js";
 import { getKage, KAGE_VILLAGES, isSannin } from "./armor.js";
+import { registerCast } from "./clash.js";
 import { transformCinematic, impactFx, sfx, chargeFx } from "./cinematic.js";
 import { statEffectLevels, getLevel, getRank, RANKS } from "./levels.js";
 
@@ -805,6 +806,7 @@ export function handleClanItemUse(player, itemStack) {
     return true;
   }
   if (move.cast(player) === false) return true;
+  if (move.cost) registerCast(player, `${itemStack.typeId}#${move.name}`, move.cost);
   if (move.cost) api.setChakra(player, api.getChakra(player) - move.cost);
   api.gainJutsuXp(player, move.cost);
   api.startCooldown(player, key, Math.round(move.cd * (1 - 0.1 * mastery(player))));

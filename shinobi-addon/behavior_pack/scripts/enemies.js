@@ -5,6 +5,7 @@ import { world, system } from "@minecraft/server";
 import { showTitle } from "./hud.js";
 import { NPC_TYPES, AKATSUKI, setupNpc } from "./npcs.js";
 import { initLegends, legendTick, updateLegend } from "./legends.js";
+import { registerCast, inClash } from "./clash.js";
 
 const DIMENSIONS = ["overworld", "nether", "the_end"];
 let api;
@@ -211,6 +212,7 @@ function update(e, now) {
     st = { next: now + 40, subNext: 0 };
     state.set(e.id, st);
   }
+  if (inClash(e)) return; // frozen in a jutsu clash cinematic
   const isLegend = e.typeId === "aegis:legend";
   if (isLegend) {
     try {
@@ -230,6 +232,10 @@ function update(e, now) {
     else cd = ROLE_AI[e.getDynamicProperty("aegis:role") ?? "rogue"]?.(e, found.target, found.dist) ?? 60;
   } catch {
     /* ignore */
+  }
+  if (isBoss) {
+    const who = e.getDynamicProperty("aegis:member") ?? "";
+    registerCast(e, isLegend ? `legend:${who}` : `akatsuki:${who}`, isLegend ? 50 : 40, found.target);
   }
   st.next = now + Math.round(cd * (0.8 + Math.random() * 0.4));
 }

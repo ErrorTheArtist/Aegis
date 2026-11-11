@@ -16,6 +16,7 @@ import { makeJutsu2 } from "./jutsu2.js";
 import { makeReleases } from "./releases.js";
 import { initCurrency } from "./currency.js";
 import { initQuests } from "./quests.js";
+import { initClash, registerCast, projectilesMet } from "./clash.js";
 import { initNatures, natureCostMultiplier, natureDamageMultiplier, onJutsuCast, natureTag } from "./natures.js";
 import { initLevels, handleRecordUse, levelChakraBonus, levelRegenMultiplier, ninjutsuMultiplier, cooldownMultiplier, gainJutsuXp, getLevel, xpInfo } from "./levels.js";
 
@@ -314,6 +315,7 @@ world.afterEvents.itemUse.subscribe(({ source: player, itemStack }) => {
   setChakra(player, chakra - cost);
   gainJutsuXp(player, cost);
   startCooldown(player, itemStack.typeId, jutsu.cooldown);
+  registerCast(player, itemStack.typeId, cost);
   player.onScreenDisplay.setActionBar(`§6${jutsu.name}!${natureTag(player, itemStack.typeId)}`);
 });
 
@@ -345,7 +347,24 @@ function castFireball(player, dir, animName = "animation.aegis.fireball_jutsu", 
   }, delay);
 }
 
+function clashProjectiles() {
+  for (let i = projectiles.length - 1; i >= 0; i--) {
+    for (let j = i - 1; j >= 0; j--) {
+      const a = projectiles[i];
+      const b = projectiles[j];
+      if (!a || !b || a.caster === b.caster || a.dim.id !== b.dim.id || len(sub(a.pos, b.pos)) > 1.8) continue;
+      if (!projectilesMet(a, b)) continue;
+      removeFx(a.orb);
+      removeFx(b.orb);
+      projectiles.splice(i, 1);
+      projectiles.splice(j, 1);
+      return;
+    }
+  }
+}
+
 function updateProjectiles() {
+  if (projectiles.length > 1) clashProjectiles();
   for (let i = projectiles.length - 1; i >= 0; i--) {
     const pr = projectiles[i];
     const o = pr.o;
@@ -1001,6 +1020,7 @@ Object.assign(JUTSU, makeJutsu2(npcApi));
 initNatures(npcApi);
 initCurrency(npcApi);
 initQuests(npcApi);
+initClash(npcApi);
 initNpcs({ ...npcApi, spawnAkatsukiNear: (p, msg) => spawnAkatsukiNear(p, msg) });
 initEnemies(npcApi);
 initCompanions(npcApi);

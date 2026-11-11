@@ -261,6 +261,11 @@ export function transformCinematic(player, opts) {
 }
 
 export const inCinematic = (p) => busy.has(p?.id);
+// Lets other cinematics (jutsu clashes) reserve a player so two sequences never fight over the camera.
+export function setCinematicBusy(id, on) {
+  if (on) busy.add(id);
+  else busy.delete(id);
+}
 
 // Safety: if a player leaves mid-cinematic, give everything back when they return.
 world.afterEvents.playerSpawn.subscribe(({ player }) => {

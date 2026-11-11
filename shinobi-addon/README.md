@@ -17,6 +17,40 @@ Uses the real Naruto names (Rasengan, Shadow Clone Jutsu, etc.) — personal use
 - Regenerates 4/sec. **Sneak and stand still** to *focus* (3× regen).
 - Wearing the **Hidden Leaf Headband** gives 1.5× regen. **Soldier Pills** restore 50 instantly.
 
+## Levels & Stats
+
+You start at **Level 1**; the max is **Level 200**. Each level gives **3 stat points**
+(+3 bonus at level 200, so 600 total — enough to max every stat).
+
+**XP sources**
+- Kills: 3 XP per point of the victim's max health (zombie ≈ 60, Kurama ≈ 8,250)
+- Player kills: 60 + 6 × their level
+- Casting any jutsu, clan ability or sword special: 3 + half its chakra cost
+
+XP needed per level grows: 52 XP for level 2, ~1,800 around level 60, ~12,400 for the last levels
+(about 908,000 XP total from 1 to 200).
+
+**Stats** (max 100 each) — spend points with the **Shinobi Record** (you get one on first join; craft another
+from a book + Blank Scroll), or `/scriptevent aegis:stats`:
+
+| Stat | Effect |
+|---|---|
+| Vitality | +2 hearts every 10 points (up to +20 hearts) |
+| Chakra | +2 max chakra and +0.5% chakra regen per point (+200 chakra, +50% regen at 100) |
+| Taijutsu | Strength I/II/III/IV at 25/50/75/100 (stacks with clan Strength) |
+| Ninjutsu | +1% damage for jutsu, clan abilities and sword specials per point (+100% at 100) |
+| Agility | Speed I–IV at 25/50/75/100 and −0.25% jutsu cooldowns per point (−25% at 100) |
+| Endurance | Shrug off 0.3% of all damage taken per point (30% at 100) |
+
+The menu shows your XP bar, unspent points and every stat; tap a stat and use the slider to add points.
+**Reset stats** refunds everything. Your level shows above your head and on the chakra bar.
+
+```
+/scriptevent aegis:stats
+/scriptevent aegis:level set 50
+/scriptevent aegis:level xp 5000
+```
+
 ## Clans
 
 The first time a player joins, they **roll a clan** (slot-machine animation, then a big reveal).

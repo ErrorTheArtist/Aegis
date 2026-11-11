@@ -438,6 +438,7 @@ export function handleSwordUse(player, itemStack) {
   }
   if (s.cast(player) === false) return true;
   if (s.cost) api.setChakra(player, api.getChakra(player) - s.cost);
+  api.gainJutsuXp(player, s.cost);
   api.startCooldown(player, key, s.cd);
   player.onScreenDisplay.setActionBar(`§l${s.text ?? "§b"}${s.special}!`);
   return true;

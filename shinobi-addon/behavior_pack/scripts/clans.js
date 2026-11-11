@@ -8,6 +8,7 @@
 //   /scriptevent aegis:clan mangekyo        — instantly awaken the Mangekyō (Uchiha only)
 
 import { world, system, ItemStack, ItemLockMode } from "@minecraft/server";
+import { statEffectLevels, getLevel } from "./levels.js";
 
 const CLAN_PROP = "aegis:clan";
 const MS_XP_PROP = "aegis:sharingan_xp";
@@ -150,10 +151,11 @@ function clanLabel(clan) {
   return `${clan.color}${clan.name}`;
 }
 
-function applyNameTag(player) {
+export function applyNameTag(player) {
   const clan = getClan(player);
   try {
-    player.nameTag = clan ? `${clan.color}[${clan.name}]§r ${player.name}` : player.name;
+    const lv = `§eLv.${getLevel(player)}§r`;
+    player.nameTag = clan ? `${clan.color}[${clan.name}]§r ${lv} ${player.name}` : `${lv} ${player.name}`;
   } catch {
     /* ignore */
   }
@@ -253,14 +255,21 @@ function rollClan(player, exclude) {
 // ---------------------------------------------------------------------------
 // Passive effects
 // ---------------------------------------------------------------------------
+export const refreshClanEffects = (player, force) => refreshEffects(player, force);
+
+// Clan passives + active eye effects + stat-point effects, merged into one amplifier per effect.
 function refreshEffects(player, force = false) {
   const clan = getClan(player);
-  if (!clan) return;
-  const effects = [...clan.effects];
+  const merged = new Map(); // effect id -> amplifier
+  const put = (id, amp) => merged.set(id, Math.max(merged.get(id) ?? -1, amp));
+  for (const [id, amp] of clan?.effects ?? []) put(id, amp);
   const dojutsu = activeDojutsu.get(player.id);
-  if (dojutsu) effects.push(["night_vision", 0]);
-  if (dojutsu === "mangekyo") effects.push(["strength", 0]);
-  for (const [id, amp] of effects) {
+  if (dojutsu) put("night_vision", 0);
+  if (dojutsu === "mangekyo") put("strength", 0);
+  for (const [id, lv] of Object.entries(statEffectLevels(player))) {
+    if (lv > 0) merged.set(id, (merged.has(id) ? merged.get(id) + 1 : 0) + lv - 1);
+  }
+  for (const [id, amp] of merged) {
     try {
       const cur = player.getEffect(id);
       if (!force && cur && cur.duration > 260 && cur.amplifier >= amp) continue;
@@ -716,6 +725,7 @@ export function handleClanItemUse(player, itemStack) {
   }
   if (move.cast(player) === false) return true;
   if (move.cost) api.setChakra(player, api.getChakra(player) - move.cost);
+  api.gainJutsuXp(player, move.cost);
   api.startCooldown(player, key, move.cd);
   if (move.cost) player.onScreenDisplay.setActionBar(`${CLANS[ability.clan].color}${move.name}!`);
   return true;

@@ -350,3 +350,7 @@ print("Bijuudama texture generated.")
 # --- Tailed beast items ----------------------------------------------------------
 save(draw(canvas(), scroll, {"P": (60, 40, 50, 255), "p": (40, 25, 35, 255), "R": (20, 20, 20, 255), "r": (10, 10, 10, 255), "C": (200, 30, 30, 255)}), ITEMS / "bijuu_scroll.png")
 print("Tailed beast item textures generated.")
+
+# --- Shinobi Record (stats book/scroll) -------------------------------------------
+save(draw(canvas(), scroll, {"P": PAPER, "p": PAPER_D, "R": (40, 70, 160, 255), "r": (25, 45, 110, 255), "C": (250, 200, 40, 255)}), ITEMS / "shinobi_record.png")
+print("Shinobi Record texture generated.")

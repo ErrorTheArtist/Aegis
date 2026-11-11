@@ -5,6 +5,7 @@ import { world, system, ItemStack, MolangVariableMap } from "@minecraft/server";
 import { initClans, clanMaxChakra, clanRegenMultiplier, handleClanItemUse, clanJutsuCostMultiplier } from "./clans.js";
 import { initBijuu, bijuuChakraBonus, bijuuRegenMultiplier, handleBijuuItemUse, isTransformed } from "./bijuu.js";
 import { initSwords, handleSwordUse } from "./swords.js";
+import { initLevels, handleRecordUse, levelChakraBonus, levelRegenMultiplier, ninjutsuMultiplier, cooldownMultiplier, gainJutsuXp, getLevel } from "./levels.js";
 
 // ---------------------------------------------------------------------------
 // Config
@@ -14,7 +15,7 @@ const WELCOME_PROP = "aegis:welcomed";
 const OWNER_PROP = "aegis:owner";
 
 const BASE_MAX_CHAKRA = 100;
-const getMaxChakra = (player) => clanMaxChakra(player, BASE_MAX_CHAKRA) + bijuuChakraBonus(player);
+const getMaxChakra = (player) => clanMaxChakra(player, BASE_MAX_CHAKRA) + bijuuChakraBonus(player) + levelChakraBonus(player);
 const REGEN_PER_SECOND = 4; // base regen
 const HEADBAND_REGEN_BONUS = 1.5; // multiplier while wearing the headband
 const FOCUS_REGEN_BONUS = 3; // multiplier while sneaking and standing still
@@ -84,6 +85,8 @@ function knockback(entity, dirX, dirZ, horizontal, vertical) {
 }
 
 function hurt(target, amount, attacker, cause = "entityAttack") {
+  // Ninjutsu stat boosts every scripted technique a player lands.
+  if (attacker?.typeId === "minecraft:player") amount *= ninjutsuMultiplier(attacker);
   try {
     target.applyDamage(amount, { cause, damagingEntity: attacker });
   } catch {
@@ -246,7 +249,8 @@ function cooldownLeft(player, itemId) {
 }
 
 function startCooldown(player, itemId, ticks) {
-  cooldowns.set(`${player.id}|${itemId}`, system.currentTick + ticks);
+  const mult = player?.typeId === "minecraft:player" ? cooldownMultiplier(player) : 1;
+  cooldowns.set(`${player.id}|${itemId}`, system.currentTick + Math.round(ticks * mult));
 }
 
 // ---------------------------------------------------------------------------
@@ -254,6 +258,7 @@ function startCooldown(player, itemId, ticks) {
 // ---------------------------------------------------------------------------
 world.afterEvents.itemUse.subscribe(({ source: player, itemStack }) => {
   if (!itemStack || player.typeId !== "minecraft:player") return;
+  if (handleRecordUse(player, itemStack)) return;
   if (handleClanItemUse(player, itemStack)) return;
   if (handleBijuuItemUse(player, itemStack)) return;
   if (handleSwordUse(player, itemStack)) return;
@@ -278,6 +283,7 @@ world.afterEvents.itemUse.subscribe(({ source: player, itemStack }) => {
   if (ok === false) return;
 
   setChakra(player, chakra - cost);
+  gainJutsuXp(player, cost);
   startCooldown(player, itemStack.typeId, jutsu.cooldown);
   player.onScreenDisplay.setActionBar(`§6${jutsu.name}!`);
 });
@@ -648,7 +654,7 @@ system.runInterval(() => {
     const max = getMaxChakra(player);
 
     // Regeneration
-    let rate = isTransformed(player) ? 0 : REGEN_PER_SECOND * clanRegenMultiplier(player) * bijuuRegenMultiplier(player);
+    let rate = isTransformed(player) ? 0 : REGEN_PER_SECOND * clanRegenMultiplier(player) * bijuuRegenMultiplier(player) * levelRegenMultiplier(player);
     if (wearingHeadband(player)) rate *= HEADBAND_REGEN_BONUS;
 
     const prev = lastPos.get(player.id);
@@ -675,7 +681,7 @@ system.runInterval(() => {
     // HUD — only while holding ninja gear or while recovering chakra.
     const showHud = (held && held.startsWith("aegis:")) || focusing;
     if (showHud) {
-      const label = focusing ? "§3Focusing chakra... " : "§3Chakra ";
+      const label = `§eLv${getLevel(player)} ` + (focusing ? "§3Focusing chakra... " : "§3Chakra ");
       player.onScreenDisplay.setActionBar(`${label}${chakraBar(next, max)} §f${Math.floor(next)}/${max}`);
     }
   }
@@ -704,7 +710,7 @@ world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
 // ---------------------------------------------------------------------------
 initClans({
   add, sub, scale, norm, dot, particle, sound, knockback, hurt, isValid, canBeHit, isSafeSpot,
-  getChakra, setChakra, getMaxChakra, cooldownLeft, startCooldown, castFireball,
+  getChakra, setChakra, getMaxChakra, cooldownLeft, startCooldown, castFireball, gainJutsuXp,
   anim, handPos, spawnFx, removeFx, follow, lungeStrike,
 });
 
@@ -716,5 +722,7 @@ initBijuu({
 
 initSwords({
   add, sub, scale, norm, dot, particle, sound, knockback, hurt, isValid, canBeHit,
-  getChakra, setChakra, cooldownLeft, startCooldown, anim, handPos, launchProjectile,
+  getChakra, setChakra, cooldownLeft, startCooldown, anim, handPos, launchProjectile, gainJutsuXp,
 });
+
+initLevels({ add, particle, sound, getChakra, setChakra });

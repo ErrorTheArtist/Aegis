@@ -130,6 +130,9 @@
     },
     "aegis_chakra_blades": {
       "textures": "textures/items/aegis/chakra_blades"
+    },
+    "aegis_shinobi_record": {
+      "textures": "textures/items/aegis/shinobi_record"
     }
   }
 }

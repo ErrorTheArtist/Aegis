@@ -11,6 +11,7 @@
 // Hold sneak for 1.5s while transformed to charge and fire a Tailed Beast Bomb.
 
 import { world, system, ItemStack, ItemLockMode } from "@minecraft/server";
+import { showTitle } from "./hud.js";
 
 const BIJUU_PROP = "aegis:bijuu";
 const OLD_CLOAK_ITEM = "aegis:bijuu_cloak";
@@ -410,7 +411,7 @@ function updateBoss(boss, now) {
       roar(boss, b);
       st.next = now; // attacks right away
       for (const p of playersNear(boss.dimension, boss.location, 48)) {
-        p.onScreenDisplay.setTitle(`${b.text}${b.name}`, { subtitle: "§cis enraged!", fadeInDuration: 2, stayDuration: 40, fadeOutDuration: 10 });
+        showTitle(p, `${b.text}${b.name}`, { subtitle: "§cis enraged!", fadeInDuration: 2, stayDuration: 40, fadeOutDuration: 10 });
       }
     }
   } catch {
@@ -469,7 +470,7 @@ function summonBeast(player, id) {
     }, i);
   }
   for (const p of playersNear(dim, spot, 64)) {
-    p.onScreenDisplay.setTitle("§4The seal weakens...", { subtitle: "§7a Tailed Beast stirs", fadeInDuration: 5, stayDuration: 40, fadeOutDuration: 10 });
+    showTitle(p, "§4The seal weakens...", { subtitle: "§7a Tailed Beast stirs", fadeInDuration: 5, stayDuration: 40, fadeOutDuration: 10 });
   }
   system.runTimeout(() => {
     try {
@@ -482,7 +483,7 @@ function summonBeast(player, id) {
     world.sendMessage(`§c${fullName(b)}§c has been released!`);
     try {
       for (const p of dim.getPlayers({ location: spot, maxDistance: 64 })) {
-        p.onScreenDisplay.setTitle(`${b.text}${b.name}`, { subtitle: `§7${b.title}`, fadeInDuration: 5, stayDuration: 50, fadeOutDuration: 15 });
+        showTitle(p, `${b.text}${b.name}`, { subtitle: `§7${b.title}`, fadeInDuration: 5, stayDuration: 50, fadeOutDuration: 15 });
       }
     } catch {
       /* ignore */
@@ -577,7 +578,7 @@ function sealInto(player, id) {
   removeCloak(player);
   player.setDynamicProperty(BIJUU_PROP, id);
   giveCloak(player);
-  player.onScreenDisplay.setTitle("§6Jinchūriki", { subtitle: `§7${b.text}${b.name}§7 is sealed within you`, fadeInDuration: 5, stayDuration: 70, fadeOutDuration: 20 });
+  showTitle(player, "§6Jinchūriki", { subtitle: `§7${b.text}${b.name}§7 is sealed within you`, fadeInDuration: 5, stayDuration: 70, fadeOutDuration: 20 });
   api.sound(player.dimension, "ui.toast.challenge_complete", player.location, 1, 0.8);
   api.particle(player.dimension, "aegis:beast_burst", api.add(player.location, { x: 0, y: 1, z: 0 }), b.color);
   player.sendMessage(
@@ -597,7 +598,7 @@ function startTransformation(player, b) {
   api.particle(player.dimension, "aegis:beast_burst", api.add(player.location, { x: 0, y: 1, z: 0 }), b.color);
   api.particle(player.dimension, "aegis:smoke_puff", player.location);
   api.sound(player.dimension, "mob.enderdragon.growl", player.location, 0.8, 1.3);
-  player.onScreenDisplay.setTitle(`${b.text}Tailed Beast Mode`, { subtitle: `§7${b.name}'s chakra surges`, fadeInDuration: 2, stayDuration: 30, fadeOutDuration: 10 });
+  showTitle(player, `${b.text}Tailed Beast Mode`, { subtitle: `§7${b.name}'s chakra surges`, fadeInDuration: 2, stayDuration: 30, fadeOutDuration: 10 });
 }
 
 function endTransformation(player) {

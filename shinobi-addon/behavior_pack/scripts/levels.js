@@ -11,6 +11,7 @@
 //   /scriptevent aegis:level xp 5000      — add XP
 
 import { world, system, ItemStack } from "@minecraft/server";
+import { showTitle } from "./hud.js";
 import { ActionFormData, ModalFormData, MessageFormData } from "@minecraft/server-ui";
 import { applyNameTag, refreshClanEffects } from "./clans.js";
 
@@ -119,7 +120,7 @@ export function gainJutsuXp(player, cost) {
 
 function levelUpFx(player, level, gained) {
   const max = level >= MAX_LEVEL;
-  player.onScreenDisplay.setTitle(max ? "§6§lMAX LEVEL" : `§e§lLevel ${level}`, {
+  showTitle(player, max ? "§6§lMAX LEVEL" : `§e§lLevel ${level}`, {
     subtitle: `§a+${gained} stat points §7— open your §fShinobi Record`,
     fadeInDuration: 4, stayDuration: 50, fadeOutDuration: 15,
   });

@@ -5,6 +5,7 @@ import { world, system, ItemStack, MolangVariableMap } from "@minecraft/server";
 import { initClans, clanMaxChakra, clanRegenMultiplier, handleClanItemUse, clanJutsuCostMultiplier } from "./clans.js";
 import { initBijuu, bijuuChakraBonus, bijuuRegenMultiplier, handleBijuuItemUse, isTransformed } from "./bijuu.js";
 import { initSwords, handleSwordUse } from "./swords.js";
+import { initHud } from "./hud.js";
 import { initLevels, handleRecordUse, levelChakraBonus, levelRegenMultiplier, ninjutsuMultiplier, cooldownMultiplier, gainJutsuXp, getLevel } from "./levels.js";
 
 // ---------------------------------------------------------------------------
@@ -678,12 +679,8 @@ system.runInterval(() => {
     const next = Math.min(max, chakra + rate * (HUD_INTERVAL / 20));
     if (next !== chakra) setChakra(player, next);
 
-    // HUD — only while holding ninja gear or while recovering chakra.
-    const showHud = (held && held.startsWith("aegis:")) || focusing;
-    if (showHud) {
-      const label = `§eLv${getLevel(player)} ` + (focusing ? "§3Focusing chakra... " : "§3Chakra ");
-      player.onScreenDisplay.setActionBar(`${label}${chakraBar(next, max)} §f${Math.floor(next)}/${max}`);
-    }
+    // Chakra / HP / level are drawn on the custom HUD bars (hud.js); just hint while focusing.
+    if (focusing) player.onScreenDisplay.setActionBar("§3Focusing chakra...");
   }
 }, HUD_INTERVAL);
 
@@ -726,3 +723,5 @@ initSwords({
 });
 
 initLevels({ add, particle, sound, getChakra, setChakra });
+
+initHud({ getChakra, getMaxChakra, getLevel });

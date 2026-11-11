@@ -8,6 +8,7 @@
 //   /scriptevent aegis:clan mangekyo        — instantly awaken the Mangekyō (Uchiha only)
 
 import { world, system, ItemStack, ItemLockMode } from "@minecraft/server";
+import { showTitle } from "./hud.js";
 import { statEffectLevels, getLevel } from "./levels.js";
 
 const CLAN_PROP = "aegis:clan";
@@ -226,7 +227,7 @@ function rollClan(player, exclude) {
     system.runTimeout(() => {
       if (!api.isValid(player)) return;
       const c = i === steps - 1 ? CLANS[finalId] : names[Math.floor(Math.random() * names.length)];
-      player.onScreenDisplay.setTitle(clanLabel(c), {
+      showTitle(player, clanLabel(c), {
         subtitle: "§7Awakening your bloodline...",
         fadeInDuration: 0, stayDuration: 10, fadeOutDuration: 0,
       });
@@ -239,7 +240,7 @@ function rollClan(player, exclude) {
     const clan = CLANS[finalId];
     const rarity = RARITY[clan.rarity];
     setClan(player, finalId);
-    player.onScreenDisplay.setTitle(clanLabel(clan) + " Clan", {
+    showTitle(player, clanLabel(clan) + " Clan", {
       subtitle: `${rarity.color}§l${rarity.label}`,
       fadeInDuration: 5, stayDuration: 60, fadeOutDuration: 20,
     });
@@ -861,7 +862,7 @@ function awakenMangekyo(player) {
   deactivateDojutsu(player);
   removeClanItems(player);
   giveClanItem(player);
-  player.onScreenDisplay.setTitle("§4Mangekyō Sharingan", {
+  showTitle(player, "§4Mangekyō Sharingan", {
     subtitle: "§7Your eyes have awakened...",
     fadeInDuration: 10, stayDuration: 70, fadeOutDuration: 20,
   });
@@ -896,5 +897,5 @@ function trySusanoo(player) {
     system.runTimeout(() => api.isValid(player) && api.particle(player.dimension, "aegis:susanoo_flame", player.location), t * 10);
   }
   api.sound(player.dimension, "mob.warden.emerge", player.location, 0.8, 0.8);
-  player.onScreenDisplay.setTitle("§5Susanoo", { subtitle: "§7protects you", fadeInDuration: 2, stayDuration: 30, fadeOutDuration: 10 });
+  showTitle(player, "§5Susanoo", { subtitle: "§7protects you", fadeInDuration: 2, stayDuration: 30, fadeOutDuration: 10 });
 }

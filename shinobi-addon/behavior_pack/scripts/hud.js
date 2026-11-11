@@ -3,11 +3,11 @@
 // The script sends the data to the UI through the title text, which JSON UI can read anywhere via
 // the global #hud_title_text_string binding. The vanilla title is hidden while it carries this data.
 //
-// Layout (fixed width, letters for the fill levels so the UI never mistakes them for numbers;
-// each bar's fill is found by comparing only the *start* of a string):
-//   title:    "AEG" + HP fill code (2) + HP text (9) + level (3) + big title text (rest)
-//   subtitle: "AEC" + chakra fill code (2) + chakra text (9)
-// Fill codes: 0..50 -> "aa".."by" (two lowercase letters).
+// Layout (fixed width; fill levels are two-letter codes so the UI never mistakes them for numbers):
+//   title:    "AEG" + HP fill (2) + HP text (9) + level (3) + unspent points (4) + big title text (rest)
+//   subtitle: "AEC" + chakra fill (2) + XP fill (2) + chakra text (9) + XP text (13)
+// HP and chakra fills are found by comparing only the start of a string; XP cuts its code out.
+// Fill codes: 0..50 -> "aa".."by".
 //
 // Everything that wants a big on-screen title must call showTitle() instead of
 // onScreenDisplay.setTitle(); subtitles are shown on the action bar.
@@ -51,9 +51,10 @@ function encode(player) {
   const ckMax = Math.round(api.getMaxChakra(player));
   const t = titles.get(player.id);
   const tail = t && system.currentTick <= t.until ? t.text : "";
+  const { xp, need, points } = api.xpInfo(player);
   return {
-    title: "AEG" + bucket(hp, hpMax) + pad(`${hp}/${hpMax}`, 9) + pad(String(api.getLevel(player)), 3) + tail,
-    subtitle: "AEC" + bucket(ck, ckMax) + pad(`${ck}/${ckMax}`, 9),
+    title: "AEG" + bucket(hp, hpMax) + pad(`${hp}/${hpMax}`, 9) + pad(String(api.getLevel(player)), 3) + pad(String(points), 4) + tail,
+    subtitle: "AEC" + bucket(ck, ckMax) + (need > 0 ? bucket(xp, need) : code(BUCKETS)) + pad(`${ck}/${ckMax}`, 9) + pad(need > 0 ? `${xp}/${need}` : "MAX", 13),
   };
 }
 

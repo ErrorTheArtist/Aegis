@@ -2,6 +2,7 @@
 // and a right-click special with its own attack animation, slash arcs and particles.
 
 import { world, system } from "@minecraft/server";
+import { impactFx, sfx } from "./cinematic.js";
 
 let api;
 
@@ -437,6 +438,10 @@ export function handleSwordUse(player, itemStack) {
     return true;
   }
   if (s.cast(player) === false) return true;
+  sfx(player.dimension, "aegis.slash", player.location, 1.3, 0.9 + Math.random() * 0.2);
+  if (["hiramekarei", "shibuki", "kiba", "kubikiribocho", "samehada"].includes(s.id)) {
+    system.runTimeout(() => api.isValid(player) && impactFx(player.dimension, player.location, C[s.id], 1.5), 8);
+  }
   if (s.cost) api.setChakra(player, api.getChakra(player) - s.cost);
   api.gainJutsuXp(player, s.cost);
   api.startCooldown(player, key, s.cd);

@@ -1,0 +1,22 @@
+{
+  "format_version": "1.16.100",
+  "minecraft:fog_settings": {
+    "description": {
+      "identifier": "aegis:fog_blue"
+    },
+    "distance": {
+      "air": {
+        "fog_start": 6.0,
+        "fog_end": 52.0,
+        "fog_color": "#2A62C9",
+        "render_distance_type": "fixed"
+      },
+      "weather": {
+        "fog_start": 6.0,
+        "fog_end": 52.0,
+        "fog_color": "#2A62C9",
+        "render_distance_type": "fixed"
+      }
+    }
+  }
+}

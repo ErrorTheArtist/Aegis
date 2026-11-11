@@ -11,7 +11,8 @@ import { initEnemies, spawnAkatsukiNear } from "./enemies.js";
 import { initCompanions, handleSummonUse } from "./companions.js";
 import { initSage, sageMultiplier } from "./sage.js";
 import { initArmor, armorChakraBonus, armorRegenMultiplier, armorDamageMultiplier } from "./armor.js";
-import { initLevels, handleRecordUse, levelChakraBonus, levelRegenMultiplier, ninjutsuMultiplier, cooldownMultiplier, gainJutsuXp, getLevel } from "./levels.js";
+import { impactFx, castFx, sfx, shake } from "./cinematic.js";
+import { initLevels, handleRecordUse, levelChakraBonus, levelRegenMultiplier, ninjutsuMultiplier, cooldownMultiplier, gainJutsuXp, getLevel, xpInfo } from "./levels.js";
 
 // ---------------------------------------------------------------------------
 // Config
@@ -322,6 +323,7 @@ function castFireball(player, dir = player.getViewDirection()) {
   anim(player, "animation.aegis.jutsu_breath");
   launchProjectile(player, add(player.getHeadLocation(), scale(dir, 1.5)), dir);
   sound(player.dimension, "mob.ghast.fireball", player.location, 1, 0.8);
+  sfx(player.dimension, "aegis.fire", player.location, 1.2, 1);
 }
 
 function updateProjectiles() {
@@ -378,6 +380,7 @@ function explodeProjectile(pr) {
   sound(pr.dim, o.sound, pr.pos, 1, o.radius > 4 ? 0.6 : 1.2);
   particle(pr.dim, o.burst, pr.pos, o.color);
   if (!o.noOrb) particle(pr.dim, "minecraft:huge_explosion_emitter", pr.pos);
+  impactFx(pr.dim, pr.pos, o.color ?? (o.fire ? [1, 0.45, 0.1] : [0.6, 0.8, 1]), o.power ?? o.radius / 3.5);
   if (!isValid(pr.caster)) return;
   for (const e of pr.dim.getEntities({ location: pr.pos, maxDistance: o.radius })) {
     if (!canBeHit(e, pr.caster)) continue;
@@ -410,7 +413,7 @@ function castSphere(player) {
   anim(player, "animation.aegis.rasengan_hold");
   const orb = spawnFx(dim, "aegis:jutsu_orb", "aegis:as_rasengan", handPos(player));
   follow(orb, () => (isValid(player) ? sub(handPos(player), { x: 0, y: 0.25, z: 0 }) : undefined), CHARGE + 14);
-  sound(dim, "item.trident.riptide_1", player.location, 0.7, 1.6);
+  sfx(dim, "aegis.rasengan", player.location, 1.3, 1);
   for (let i = 0; i < CHARGE + 14; i++) {
     system.runTimeout(() => {
       if (!isValid(player)) return;
@@ -429,6 +432,7 @@ function castSphere(player) {
         const center = add(target.location, { x: 0, y: 1, z: 0 });
         particle(dim, "aegis:chakra_burst", center);
         particle(dim, "minecraft:huge_explosion_emitter", center);
+        impactFx(dim, target.location, [0.4, 0.75, 1], 2);
         sound(dim, "random.explode", center, 0.7, 1.6);
         hurt(target, 14, player);
         const d = player.getViewDirection();
@@ -575,6 +579,7 @@ function castFlashStep(player) {
   }
   particle(player.dimension, "aegis:smoke_puff", player.location);
   sound(player.dimension, "mob.enderdragon.flap", player.location, 0.8, 1.6);
+  sfx(player.dimension, "aegis.whoosh", player.location, 1.2, 1.3);
 }
 
 // --- Wind Style: Great Breakthrough: blast everything in front of you away. ---
@@ -588,6 +593,9 @@ function castGalePalm(player) {
   }
   sound(dim, "mob.breeze.wind_burst", head, 1, 1);
   sound(dim, "mob.enderdragon.flap", head, 1, 0.6);
+  sfx(dim, "aegis.whoosh", head, 1.5, 0.8);
+  castFx(player, [0.6, 1, 0.75]);
+  shake(dim, head, 0.2, 0.4, 12);
 
   for (const e of dim.getEntities({ location: head, maxDistance: 9 })) {
     if (!canBeHit(e, player)) continue;
@@ -605,7 +613,7 @@ function castChidori(player) {
   const CHARGE = 14;
   anim(player, "animation.aegis.chidori_charge");
   sound(dim, "ambient.weather.thunder", player.location, 0.5, 1.8);
-  sound(dim, "mob.bee.loop", player.location, 1, 2); // the "thousand birds" chirp
+  sfx(dim, "aegis.chidori", player.location, 1.4, 1); // the "thousand birds" chirp
   for (let i = 0; i < CHARGE + 14; i++) {
     system.runTimeout(() => {
       if (!isValid(player)) return;
@@ -625,6 +633,8 @@ function castChidori(player) {
         knockback(target, kb.x, kb.z, 1.5, 0.4);
         particle(dim, "aegis:lightning_burst", add(target.location, { x: 0, y: 1, z: 0 }));
         sound(dim, "ambient.weather.lightning.impact", target.location, 0.8, 1.4);
+        sfx(dim, "aegis.lightning", target.location, 1.5, 1);
+        impactFx(dim, target.location, [0.6, 0.85, 1], 2);
       },
     });
   }, CHARGE);
@@ -648,6 +658,7 @@ function castPhoenix(player) {
       }, i * 2);
     }
     sound(player.dimension, "mob.blaze.shoot", player.location, 1, 1.2);
+    sfx(player.dimension, "aegis.fire", player.location, 1.4, 1.1);
   }, 9);
 }
 
@@ -662,7 +673,7 @@ function castWaterDragon(player) {
     const d = player.getViewDirection();
     launchProjectile(player, add(player.getHeadLocation(), scale(d, 1.8)), d, {
       orbEvent: "aegis:as_water", speed: 1.0, maxAge: 40, damage: 14, radius: 4.2, knock: 2.6, fire: 0,
-      trail: "aegis:water_splash", burst: "aegis:water_splash", hitRadius: 2, sound: "random.splash", effects: [["slowness", 60, 2]],
+      trail: "aegis:water_splash", burst: "aegis:water_splash", hitRadius: 2, sound: "random.splash", effects: [["slowness", 60, 2]], color: [0.3, 0.6, 1],
     });
     sound(player.dimension, "random.splash", player.location, 1, 0.6);
   }, 14);
@@ -697,6 +708,7 @@ function castEarthWall(player) {
     }
     particle(dim, "aegis:dust", { x: base.x + 0.5, y: base.y, z: base.z + 0.5 });
     particle(dim, "minecraft:huge_explosion_emitter", { x: base.x + 0.5, y: base.y, z: base.z + 0.5 });
+    impactFx(dim, { x: base.x + 0.5, y: base.y, z: base.z + 0.5 }, [0.6, 0.45, 0.3], 1.5);
     sound(dim, "random.explode", base, 0.6, 0.5);
     for (const e of dim.getEntities({ location: { x: base.x + 0.5, y: base.y, z: base.z + 0.5 }, maxDistance: 4 })) {
       if (!canBeHit(e, player)) continue;
@@ -735,6 +747,8 @@ function castChidoriCurrent(player) {
       }, k);
     }
     particle(dim, "aegis:lightning_burst", add(player.location, { x: 0, y: 1, z: 0 }));
+    sfx(dim, "aegis.lightning", player.location, 1.6, 0.9);
+    impactFx(dim, player.location, [0.6, 0.85, 1], 2);
     for (const e of dim.getEntities({ location: player.location, maxDistance: 5.5 })) {
       if (!canBeHit(e, player)) continue;
       hurt(e, 8, player, "lightning");
@@ -805,6 +819,8 @@ function castMysticalPalm(player) {
   }
   anim(player, "animation.aegis.heal_palms");
   sound(player.dimension, "beacon.ambient", player.location, 1, 1.6);
+  sfx(player.dimension, "aegis.seal", player.location, 1, 1.3);
+  castFx(player, [0.3, 1, 0.4]);
   for (let t = 0; t <= 20; t += 4) {
     system.runTimeout(() => {
       if (!isValid(target)) return;
@@ -941,7 +957,7 @@ initSwords({
 
 initLevels({ add, particle, sound, getChakra, setChakra });
 
-initHud({ getChakra, getMaxChakra, getLevel });
+initHud({ getChakra, getMaxChakra, getLevel, xpInfo });
 
 const npcApi = {
   add, sub, scale, norm, dot, particle, sound, knockback, hurt, isValid, canBeHit,

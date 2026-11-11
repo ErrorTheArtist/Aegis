@@ -67,6 +67,12 @@ export function xpToNext(level) {
   return Math.round(40 + 12 * level + 0.25 * level * level);
 }
 
+// For the HUD: XP into the current level, XP needed for the next one, unspent points.
+export function xpInfo(player) {
+  const level = getLevel(player);
+  return { xp: num(player, P.xp, 0), need: level >= MAX_LEVEL ? 0 : xpToNext(level), points: getPoints(player) };
+}
+
 function pointsForLevel(level) {
   return (level - 1) * POINTS_PER_LEVEL + (level >= MAX_LEVEL ? 3 : 0);
 }

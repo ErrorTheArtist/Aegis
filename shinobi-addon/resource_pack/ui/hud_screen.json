@@ -41,79 +41,29 @@
           "anchor_from": "top_left",
           "anchor_to": "top_left",
           "offset": [
-            4,
-            4
+            6,
+            6
           ],
           "size": [
-            184,
-            40
+            170,
+            70
           ],
           "controls": [
             {
-              "aegis_level": {
-                "type": "label",
+              "hp_bg": {
+                "type": "image",
+                "texture": "textures/ui/aegis/hp_bg",
+                "size": [
+                  150,
+                  13
+                ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
                   0,
                   0
                 ],
-                "text": "#text",
-                "color": [
-                  1,
-                  0.85,
-                  0.3
-                ],
-                "shadow": true,
-                "layer": 20,
-                "localize": false,
-                "bindings": [
-                  {
-                    "binding_name": "#hud_title_text_string",
-                    "binding_type": "global"
-                  },
-                  {
-                    "binding_type": "view",
-                    "source_property_name": "('Lv ' + ('%.3s' * (#hud_title_text_string - ('%.14s' * #hud_title_text_string))))",
-                    "target_property_name": "#text"
-                  }
-                ]
-              }
-            },
-            {
-              "hp_bg": {
-                "type": "image",
-                "texture": "textures/ui/aegis/bar_bg",
-                "size": [
-                  104,
-                  11
-                ],
-                "anchor_from": "top_left",
-                "anchor_to": "top_left",
-                "offset": [
-                  14,
-                  11
-                ],
                 "layer": 10
-              }
-            },
-            {
-              "hp_icon": {
-                "type": "label",
-                "text": "HP",
-                "color": [
-                  1,
-                  0.35,
-                  0.35
-                ],
-                "shadow": true,
-                "layer": 20,
-                "anchor_from": "top_left",
-                "anchor_to": "top_left",
-                "offset": [
-                  0,
-                  13
-                ]
               }
             },
             {
@@ -121,14 +71,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  2,
-                  7
+                  5,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -149,14 +99,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  4,
-                  7
+                  6,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -177,14 +127,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  6,
-                  7
+                  8,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -205,14 +155,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  8,
-                  7
+                  11,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -233,14 +183,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  10,
-                  7
+                  14,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -261,14 +211,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  12,
-                  7
+                  17,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -289,14 +239,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  14,
-                  7
+                  20,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -317,14 +267,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  16,
-                  7
+                  22,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -345,14 +295,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  18,
-                  7
+                  25,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -373,14 +323,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  20,
-                  7
+                  28,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -401,14 +351,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  22,
-                  7
+                  31,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -429,14 +379,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  24,
-                  7
+                  34,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -457,14 +407,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  26,
-                  7
+                  36,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -485,14 +435,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  28,
-                  7
+                  39,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -513,14 +463,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  30,
-                  7
+                  42,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -541,14 +491,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  32,
-                  7
+                  45,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -569,14 +519,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  34,
-                  7
+                  48,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -597,14 +547,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  36,
-                  7
+                  50,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -625,14 +575,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  38,
-                  7
+                  53,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -653,14 +603,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  40,
-                  7
+                  56,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -681,14 +631,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  42,
-                  7
+                  59,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -709,14 +659,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  44,
-                  7
+                  62,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -737,14 +687,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  46,
-                  7
+                  64,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -765,14 +715,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  48,
-                  7
+                  67,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -793,14 +743,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  50,
-                  7
+                  70,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -821,14 +771,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  52,
-                  7
+                  73,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -849,14 +799,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  54,
-                  7
+                  76,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -877,14 +827,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  56,
-                  7
+                  78,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -905,14 +855,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  58,
-                  7
+                  81,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -933,14 +883,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  60,
-                  7
+                  84,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -961,14 +911,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  62,
-                  7
+                  87,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -989,14 +939,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  64,
-                  7
+                  90,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -1017,14 +967,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  66,
-                  7
+                  92,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -1045,14 +995,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  68,
-                  7
+                  95,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -1073,14 +1023,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  70,
-                  7
+                  98,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -1101,14 +1051,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  72,
-                  7
+                  101,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -1129,14 +1079,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  74,
-                  7
+                  104,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -1157,14 +1107,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  76,
-                  7
+                  106,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -1185,14 +1135,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  78,
-                  7
+                  109,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -1213,14 +1163,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  80,
-                  7
+                  112,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -1241,14 +1191,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  82,
-                  7
+                  115,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -1269,14 +1219,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  84,
-                  7
+                  118,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -1297,14 +1247,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  86,
-                  7
+                  120,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -1325,14 +1275,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  88,
-                  7
+                  123,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -1353,14 +1303,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  90,
-                  7
+                  126,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -1381,14 +1331,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  92,
-                  7
+                  129,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -1409,14 +1359,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  94,
-                  7
+                  132,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -1437,14 +1387,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  96,
-                  7
+                  134,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -1465,14 +1415,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  98,
-                  7
+                  137,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -1493,14 +1443,14 @@
                 "type": "image",
                 "texture": "textures/ui/aegis/hp_fill",
                 "size": [
-                  100,
-                  7
+                  140,
+                  9
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  13
+                  2,
+                  2
                 ],
                 "layer": 12,
                 "bindings": [
@@ -1517,13 +1467,30 @@
               }
             },
             {
+              "hp_frame": {
+                "type": "image",
+                "texture": "textures/ui/aegis/hp_frame",
+                "size": [
+                  150,
+                  13
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  0,
+                  0
+                ],
+                "layer": 14
+              }
+            },
+            {
               "hp_text": {
                 "type": "label",
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  122,
-                  13
+                  12,
+                  3
                 ],
                 "text": "#text",
                 "color": [
@@ -1532,7 +1499,7 @@
                   1
                 ],
                 "shadow": true,
-                "layer": 20,
+                "layer": 30,
                 "localize": false,
                 "bindings": [
                   {
@@ -1541,7 +1508,7 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(('%.9s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))))",
+                    "source_property_name": "('HP ' + ('%.9s' * (#hud_title_text_string - ('%.5s' * #hud_title_text_string))))",
                     "target_property_name": "#text"
                   }
                 ]
@@ -1550,52 +1517,33 @@
             {
               "ck_bg": {
                 "type": "image",
-                "texture": "textures/ui/aegis/bar_bg",
+                "texture": "textures/ui/aegis/ck_bg",
                 "size": [
-                  104,
-                  11
+                  132,
+                  12
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  14,
-                  24
+                  0,
+                  16
                 ],
                 "layer": 10
               }
             },
             {
-              "ck_icon": {
-                "type": "label",
-                "text": "CK",
-                "color": [
-                  0.45,
-                  0.8,
-                  1
-                ],
-                "shadow": true,
-                "layer": 20,
-                "anchor_from": "top_left",
-                "anchor_to": "top_left",
-                "offset": [
-                  0,
-                  26
-                ]
-              }
-            },
-            {
               "ck_1": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  2,
-                  7
+                  5,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -1614,16 +1562,16 @@
             {
               "ck_2": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  4,
-                  7
+                  5,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -1642,16 +1590,16 @@
             {
               "ck_3": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  6,
-                  7
+                  7,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -1670,16 +1618,16 @@
             {
               "ck_4": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  8,
-                  7
+                  10,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -1698,16 +1646,16 @@
             {
               "ck_5": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  10,
-                  7
+                  12,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -1726,16 +1674,16 @@
             {
               "ck_6": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  12,
-                  7
+                  15,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -1754,16 +1702,16 @@
             {
               "ck_7": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  14,
-                  7
+                  17,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -1782,16 +1730,16 @@
             {
               "ck_8": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  16,
-                  7
+                  20,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -1810,16 +1758,16 @@
             {
               "ck_9": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  18,
-                  7
+                  22,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -1838,16 +1786,16 @@
             {
               "ck_10": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  20,
-                  7
+                  24,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -1866,16 +1814,16 @@
             {
               "ck_11": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  22,
-                  7
+                  27,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -1894,16 +1842,16 @@
             {
               "ck_12": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  24,
-                  7
+                  29,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -1922,16 +1870,16 @@
             {
               "ck_13": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  26,
-                  7
+                  32,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -1950,16 +1898,16 @@
             {
               "ck_14": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  28,
-                  7
+                  34,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -1978,16 +1926,16 @@
             {
               "ck_15": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  30,
-                  7
+                  37,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -2006,16 +1954,16 @@
             {
               "ck_16": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  32,
-                  7
+                  39,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -2034,16 +1982,16 @@
             {
               "ck_17": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  34,
-                  7
+                  41,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -2062,16 +2010,16 @@
             {
               "ck_18": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  36,
-                  7
+                  44,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -2090,16 +2038,16 @@
             {
               "ck_19": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  38,
-                  7
+                  46,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -2118,16 +2066,16 @@
             {
               "ck_20": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  40,
-                  7
+                  49,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -2146,16 +2094,16 @@
             {
               "ck_21": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  42,
-                  7
+                  51,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -2174,16 +2122,16 @@
             {
               "ck_22": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  44,
-                  7
+                  54,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -2202,16 +2150,16 @@
             {
               "ck_23": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  46,
-                  7
+                  56,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -2230,16 +2178,16 @@
             {
               "ck_24": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  48,
-                  7
+                  59,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -2258,16 +2206,16 @@
             {
               "ck_25": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  50,
-                  7
+                  61,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -2286,16 +2234,16 @@
             {
               "ck_26": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  52,
-                  7
+                  63,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -2314,16 +2262,16 @@
             {
               "ck_27": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  54,
-                  7
+                  66,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -2342,16 +2290,16 @@
             {
               "ck_28": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  56,
-                  7
+                  68,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -2370,16 +2318,16 @@
             {
               "ck_29": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  58,
-                  7
+                  71,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -2398,16 +2346,16 @@
             {
               "ck_30": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  60,
-                  7
+                  73,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -2426,16 +2374,16 @@
             {
               "ck_31": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  62,
-                  7
+                  76,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -2454,16 +2402,16 @@
             {
               "ck_32": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  64,
-                  7
+                  78,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -2482,16 +2430,16 @@
             {
               "ck_33": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  66,
-                  7
+                  81,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -2510,16 +2458,16 @@
             {
               "ck_34": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  68,
-                  7
+                  83,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -2538,16 +2486,16 @@
             {
               "ck_35": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  70,
-                  7
+                  85,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -2566,16 +2514,16 @@
             {
               "ck_36": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  72,
-                  7
+                  88,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -2594,16 +2542,16 @@
             {
               "ck_37": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  74,
-                  7
+                  90,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -2622,16 +2570,16 @@
             {
               "ck_38": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  76,
-                  7
+                  93,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -2650,16 +2598,16 @@
             {
               "ck_39": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  78,
-                  7
+                  95,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -2678,16 +2626,16 @@
             {
               "ck_40": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  80,
-                  7
+                  98,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -2706,16 +2654,16 @@
             {
               "ck_41": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  82,
-                  7
+                  100,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -2734,16 +2682,16 @@
             {
               "ck_42": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  84,
-                  7
+                  102,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -2762,16 +2710,16 @@
             {
               "ck_43": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  86,
-                  7
+                  105,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -2790,16 +2738,16 @@
             {
               "ck_44": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  88,
-                  7
+                  107,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -2818,16 +2766,16 @@
             {
               "ck_45": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  90,
-                  7
+                  110,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -2846,16 +2794,16 @@
             {
               "ck_46": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  92,
-                  7
+                  112,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -2874,16 +2822,16 @@
             {
               "ck_47": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  94,
-                  7
+                  115,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -2902,16 +2850,16 @@
             {
               "ck_48": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  96,
-                  7
+                  117,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -2930,16 +2878,16 @@
             {
               "ck_49": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  98,
-                  7
+                  120,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -2958,16 +2906,16 @@
             {
               "ck_50": {
                 "type": "image",
-                "texture": "textures/ui/aegis/chakra_fill",
+                "texture": "textures/ui/aegis/ck_fill",
                 "size": [
-                  100,
-                  7
+                  122,
+                  8
                 ],
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  16,
-                  26
+                  2,
+                  18
                 ],
                 "layer": 12,
                 "bindings": [
@@ -2984,13 +2932,30 @@
               }
             },
             {
+              "ck_frame": {
+                "type": "image",
+                "texture": "textures/ui/aegis/ck_frame",
+                "size": [
+                  132,
+                  12
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  0,
+                  16
+                ],
+                "layer": 14
+              }
+            },
+            {
               "ck_text": {
                 "type": "label",
                 "anchor_from": "top_left",
                 "anchor_to": "top_left",
                 "offset": [
-                  122,
-                  26
+                  12,
+                  18
                 ],
                 "text": "#text",
                 "color": [
@@ -2999,7 +2964,7 @@
                   1
                 ],
                 "shadow": true,
-                "layer": 20,
+                "layer": 30,
                 "localize": false,
                 "bindings": [
                   {
@@ -3008,7 +2973,1534 @@
                   },
                   {
                     "binding_type": "view",
-                    "source_property_name": "(#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))",
+                    "source_property_name": "('CK ' + ('%.9s' * (#hud_subtitle_text_string - ('%.7s' * #hud_subtitle_text_string))))",
+                    "target_property_name": "#text"
+                  }
+                ]
+              }
+            },
+            {
+              "lvl_text": {
+                "type": "label",
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  31
+                ],
+                "text": "#text",
+                "color": [
+                  1,
+                  1,
+                  1
+                ],
+                "shadow": true,
+                "layer": 30,
+                "localize": false,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_title_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "('Level ' + ('%.3s' * (#hud_title_text_string - ('%.14s' * #hud_title_text_string))))",
+                    "target_property_name": "#text"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_bg": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_bg",
+                "size": [
+                  112,
+                  10
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  0,
+                  42
+                ],
+                "layer": 10
+              }
+            },
+            {
+              "xp_1": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  4,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'ab')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_2": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  4,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'ac')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_3": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  6,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'ad')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_4": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  8,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'ae')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_5": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  10,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'af')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_6": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  12,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'ag')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_7": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  14,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'ah')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_8": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  16,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'ai')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_9": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  19,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'aj')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_10": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  21,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'ak')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_11": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  23,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'al')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_12": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  25,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'am')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_13": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  27,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'an')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_14": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  29,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'ao')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_15": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  31,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'ap')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_16": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  33,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'aq')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_17": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  35,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'ar')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_18": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  37,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'as')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_19": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  39,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'at')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_20": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  41,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'au')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_21": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  43,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'av')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_22": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  45,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'aw')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_23": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  47,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'ax')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_24": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  49,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'ay')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_25": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  52,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'az')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_26": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  54,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'ba')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_27": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  56,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'bb')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_28": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  58,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'bc')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_29": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  60,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'bd')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_30": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  62,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'be')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_31": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  64,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'bf')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_32": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  66,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'bg')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_33": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  68,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'bh')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_34": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  70,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'bi')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_35": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  72,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'bj')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_36": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  74,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'bk')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_37": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  76,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'bl')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_38": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  78,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'bm')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_39": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  80,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'bn')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_40": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  82,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'bo')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_41": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  84,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'bp')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_42": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  87,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'bq')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_43": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  89,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'br')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_44": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  91,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'bs')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_45": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  93,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'bt')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_46": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  95,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'bu')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_47": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  97,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'bv')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_48": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  99,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'bw')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_49": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  101,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'bx')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_50": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_fill",
+                "size": [
+                  103,
+                  6
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  44
+                ],
+                "layer": 12,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.2s' * (#hud_subtitle_text_string - ('%.5s' * #hud_subtitle_text_string))) = 'by')",
+                    "target_property_name": "#visible"
+                  }
+                ]
+              }
+            },
+            {
+              "xp_frame": {
+                "type": "image",
+                "texture": "textures/ui/aegis/xp_frame",
+                "size": [
+                  112,
+                  10
+                ],
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  0,
+                  42
+                ],
+                "layer": 14
+              }
+            },
+            {
+              "xp_text": {
+                "type": "label",
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  11,
+                  43
+                ],
+                "text": "#text",
+                "color": [
+                  1,
+                  1,
+                  1
+                ],
+                "shadow": true,
+                "layer": 30,
+                "localize": false,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_subtitle_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "(('%.13s' * (#hud_subtitle_text_string - ('%.16s' * #hud_subtitle_text_string))))",
+                    "target_property_name": "#text"
+                  }
+                ]
+              }
+            },
+            {
+              "pts_text": {
+                "type": "label",
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "offset": [
+                  2,
+                  55
+                ],
+                "text": "#text",
+                "color": [
+                  1,
+                  0.92,
+                  0.55
+                ],
+                "shadow": true,
+                "layer": 30,
+                "localize": false,
+                "bindings": [
+                  {
+                    "binding_name": "#hud_title_text_string",
+                    "binding_type": "global"
+                  },
+                  {
+                    "binding_type": "view",
+                    "source_property_name": "('Points ' + ('%.4s' * (#hud_title_text_string - ('%.17s' * #hud_title_text_string))))",
                     "target_property_name": "#text"
                   }
                 ]
@@ -3044,7 +4536,7 @@
             },
             {
               "binding_type": "view",
-              "source_property_name": "(#hud_title_text_string - ('%.17s' * #hud_title_text_string))",
+              "source_property_name": "(#hud_title_text_string - ('%.21s' * #hud_title_text_string))",
               "target_property_name": "#text"
             }
           ]

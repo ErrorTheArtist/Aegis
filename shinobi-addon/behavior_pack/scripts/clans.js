@@ -11,6 +11,7 @@
 import { world, system, ItemStack, ItemLockMode } from "@minecraft/server";
 import { showTitle } from "./hud.js";
 import { uzumakiSealMenu } from "./bijuu.js";
+import { transformCinematic, impactFx, sfx } from "./cinematic.js";
 import { statEffectLevels, getLevel, getRank, RANKS } from "./levels.js";
 
 const CLAN_PROP = "aegis:clan";
@@ -374,6 +375,8 @@ function amaterasu(p, pulses, dmg) {
   const t = targetInView(p, 24);
   if (!t) return noTarget(p);
   api.sound(p.dimension, "mob.wither.shoot", p.location, 0.7, 0.6);
+  sfx(p.dimension, "aegis.fire", t.location, 1.5, 0.6);
+  impactFx(p.dimension, t.location, [0.15, 0.02, 0.1], 1);
   line(p, p.getHeadLocation(), api.add(t.location, { x: 0, y: 1, z: 0 }), "aegis:amaterasu");
   for (let i = 0; i < pulses; i++) {
     system.runTimeout(() => {
@@ -457,6 +460,7 @@ const ABILITIES = {
       name: "Almighty Push", cost: 50, cd: 200,
       cast: (p) => {
         api.anim(p, "animation.aegis.both_palms");
+        impactFx(p.dimension, p.location, [0.7, 0.5, 1], 3);
         api.particle(p.dimension, "minecraft:huge_explosion_emitter", p.location);
         api.particle(p.dimension, "aegis:chakra_burst", api.add(p.location, { x: 0, y: 1, z: 0 }));
         for (let r = 1; r <= 8; r += 1.5) {
@@ -522,6 +526,8 @@ const ABILITIES = {
           api.hurt(e, 4, p);
         }
         api.sound(p.dimension, "random.anvil_land", p.location, 0.6, 1.5);
+        sfx(p.dimension, "aegis.seal", p.location, 1.2, 1);
+        impactFx(p.dimension, p.location, [1, 0.85, 0.3], 1.5);
         return true;
       },
     },
@@ -910,10 +916,7 @@ function awakenMangekyo(player) {
   deactivateDojutsu(player);
   removeClanItems(player);
   giveClanItem(player);
-  showTitle(player, "§4Mangekyō Sharingan", {
-    subtitle: "§7Your eyes have awakened...",
-    fadeInDuration: 10, stayDuration: 70, fadeOutDuration: 20,
-  });
+  transformCinematic(player, { color: [0.85, 0.05, 0.08], title: "§4Mangekyō Sharingan", subtitle: "§7Your eyes have awakened..." });
   api.sound(player.dimension, "mob.wither.spawn", player.location, 0.6, 1.2);
   api.particle(player.dimension, "aegis:susanoo_flame", player.location);
   for (let i = 0; i < 20; i++) {
@@ -931,7 +934,7 @@ export function awakenEternal(player) {
   deactivateDojutsu(player);
   removeClanItems(player);
   giveClanItem(player);
-  showTitle(player, "§5Eternal Mangekyō", { subtitle: "§7Your eyes will never dim again", fadeInDuration: 10, stayDuration: 70, fadeOutDuration: 20 });
+  transformCinematic(player, { color: [0.6, 0.1, 0.55], title: "§5Eternal Mangekyō", subtitle: "§7Your eyes will never dim again" });
   api.sound(player.dimension, "mob.wither.spawn", player.location, 0.6, 0.9);
   api.particle(player.dimension, "aegis:susanoo_flame", player.location);
   player.sendMessage("§5Eternal Mangekyō Sharingan! §7Half the chakra drain, 50% dodge, Strength II + Speed, cheaper Amaterasu, and a stronger Susanoo every 30s.");
@@ -960,5 +963,7 @@ function trySusanoo(player, eternal = false) {
     system.runTimeout(() => api.isValid(player) && api.particle(player.dimension, "aegis:susanoo_flame", player.location), t * 10);
   }
   api.sound(player.dimension, "mob.warden.emerge", player.location, 0.8, 0.8);
+  impactFx(player.dimension, player.location, [0.6, 0.2, 1], 2.5);
+  sfx(player.dimension, "aegis.roar", player.location, 1.5, 1.2);
   showTitle(player, "§5Susanoo", { subtitle: "§7protects you", fadeInDuration: 2, stayDuration: 30, fadeOutDuration: 10 });
 }

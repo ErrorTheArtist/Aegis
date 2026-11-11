@@ -8,6 +8,7 @@
 import { world, system } from "@minecraft/server";
 import { showTitle } from "./hud.js";
 import { isTransformed } from "./bijuu.js";
+import { transformCinematic, aura } from "./cinematic.js";
 
 const SAGE_PROP = "aegis:sage";
 const GATHER_TICKS = 100;
@@ -49,8 +50,7 @@ function enter(player) {
   active.set(player.id, system.currentTick + DURATION);
   gathering.delete(player.id);
   api.setChakra(player, api.getMaxChakra(player));
-  showTitle(player, "§6Sage Mode", { subtitle: "§7Natural energy flows through you", fadeInDuration: 3, stayDuration: 40, fadeOutDuration: 10 });
-  api.particle(player.dimension, "aegis:beast_burst", api.add(player.location, { x: 0, y: 1, z: 0 }), ORANGE);
+  transformCinematic(player, { color: [0.35, 0.95, 0.35], title: "§6Sage Mode", subtitle: "§7Natural energy flows through you" });
   api.sound(player.dimension, "beacon.activate", player.location, 1, 0.8);
 }
 
@@ -79,6 +79,7 @@ function tick() {
       eff(p, "resistance", 0);
       eff(p, "jump_boost", 1);
       api.particle(p.dimension, "aegis:beast_aura", loc, ORANGE);
+      if (now % 10 < 5) aura(p, [0.35, 0.95, 0.35]);
       if (now % 20 === 0) {
         // sense hostile life nearby
         for (const e of p.dimension.getEntities({ location: loc, maxDistance: 32, families: ["monster"] })) {

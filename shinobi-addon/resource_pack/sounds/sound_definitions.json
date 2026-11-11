@@ -1,0 +1,161 @@
+{
+  "format_version": "1.14.0",
+  "sound_definitions": {
+    "aegis.charge": {
+      "category": "player",
+      "min_distance": 4,
+      "max_distance": 48,
+      "sounds": [
+        {
+          "name": "sounds/aegis/charge",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "aegis.boom": {
+      "category": "player",
+      "min_distance": 4,
+      "max_distance": 48,
+      "sounds": [
+        {
+          "name": "sounds/aegis/boom",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "aegis.transform": {
+      "category": "player",
+      "min_distance": 4,
+      "max_distance": 48,
+      "sounds": [
+        {
+          "name": "sounds/aegis/transform",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "aegis.lightning": {
+      "category": "player",
+      "min_distance": 4,
+      "max_distance": 48,
+      "sounds": [
+        {
+          "name": "sounds/aegis/lightning",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "aegis.aura": {
+      "category": "player",
+      "min_distance": 4,
+      "max_distance": 48,
+      "sounds": [
+        {
+          "name": "sounds/aegis/aura",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "aegis.slash": {
+      "category": "player",
+      "min_distance": 4,
+      "max_distance": 48,
+      "sounds": [
+        {
+          "name": "sounds/aegis/slash",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "aegis.rasengan": {
+      "category": "player",
+      "min_distance": 4,
+      "max_distance": 48,
+      "sounds": [
+        {
+          "name": "sounds/aegis/rasengan",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "aegis.chidori": {
+      "category": "player",
+      "min_distance": 4,
+      "max_distance": 48,
+      "sounds": [
+        {
+          "name": "sounds/aegis/chidori",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "aegis.fire": {
+      "category": "player",
+      "min_distance": 4,
+      "max_distance": 48,
+      "sounds": [
+        {
+          "name": "sounds/aegis/fire",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "aegis.impact": {
+      "category": "player",
+      "min_distance": 4,
+      "max_distance": 48,
+      "sounds": [
+        {
+          "name": "sounds/aegis/impact",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "aegis.whoosh": {
+      "category": "player",
+      "min_distance": 4,
+      "max_distance": 48,
+      "sounds": [
+        {
+          "name": "sounds/aegis/whoosh",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "aegis.seal": {
+      "category": "player",
+      "min_distance": 4,
+      "max_distance": 48,
+      "sounds": [
+        {
+          "name": "sounds/aegis/seal",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "aegis.roar": {
+      "category": "player",
+      "min_distance": 4,
+      "max_distance": 48,
+      "sounds": [
+        {
+          "name": "sounds/aegis/roar",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    }
+  }
+}

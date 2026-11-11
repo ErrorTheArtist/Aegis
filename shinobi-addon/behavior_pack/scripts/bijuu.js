@@ -17,6 +17,7 @@
 import { world, system, ItemStack, ItemLockMode } from "@minecraft/server";
 import { ActionFormData, MessageFormData } from "@minecraft/server-ui";
 import { showTitle } from "./hud.js";
+import { transformCinematic, beastAwakenFx, impactFx, aura, sfx } from "./cinematic.js";
 import { getStat, gainXp } from "./levels.js";
 
 const BIJUU_PROP = "aegis:bijuu";
@@ -183,6 +184,8 @@ function tailedBeastBomb(boss, b, target) {
   const dim = boss.dimension;
   roarAnim(boss);
   api.sound(dim, "mob.warden.sonic_charge", boss.location, 2, 0.6);
+  sfx(dim, "aegis.charge", boss.location, 2.5, 0.8);
+  for (let t = 0; t < 28; t += 4) system.runTimeout(() => api.isValid(boss) && aura(boss, b.color, true), t);
   const CHARGE = 28;
   const orb = api.spawnFx(dim, "aegis:jutsu_orb", "aegis:as_bijuudama", mouthPos(boss));
   api.follow(orb, () => (api.isValid(boss) ? api.sub(mouthPos(boss), { x: 0, y: 0.25, z: 0 }) : undefined), CHARGE);
@@ -197,6 +200,7 @@ function tailedBeastBomb(boss, b, target) {
       speed: 1.3, maxAge: 60, damage: pw(b, 14), radius: 6, knock: 2.8, fire: 0,
       orbEvent: "aegis:as_bijuudama", trail: "aegis:beast_aura", burst: "aegis:beast_burst", color: b.color,
       hitRadius: 2, sound: "random.explode", ignoreFamily: "tailed_beast",
+      power: 3,
     });
     api.sound(dim, "mob.warden.sonic_boom", start, 2, 0.7);
   }, CHARGE);
@@ -425,6 +429,7 @@ function updateBoss(boss, now) {
       eff(boss, "resistance", 999999, 1, false);
       eff(boss, "regeneration", 200, 2, false);
       roar(boss, b);
+      beastAwakenFx(boss, b.color);
       st.next = now; // attacks right away
       for (const p of playersNear(boss.dimension, boss.location, 48)) {
         showTitle(p, `${b.text}${b.name}`, { subtitle: "§cis enraged!", fadeInDuration: 2, stayDuration: 40, fadeOutDuration: 10 });
@@ -492,6 +497,7 @@ function summonBeast(player, id) {
     try {
       const boss = dim.spawnEntity(`aegis:${id}`, spot);
       roar(boss, b);
+      beastAwakenFx(boss, b.color);
       api.particle(dim, "aegis:beast_burst", api.add(spot, { x: 0, y: 2, z: 0 }), b.color);
     } catch {
       /* ignore */
@@ -614,10 +620,12 @@ function release(player) {
 
 function startTransformation(player, b) {
   cloakActive.add(player.id);
-  api.particle(player.dimension, "aegis:beast_burst", api.add(player.location, { x: 0, y: 1, z: 0 }), b.color);
-  api.particle(player.dimension, "aegis:smoke_puff", player.location);
-  api.sound(player.dimension, "mob.enderdragon.growl", player.location, 0.8, 1.3);
-  showTitle(player, `${b.text}Tailed Beast Mode`, { subtitle: `§7${b.name}'s chakra surges`, fadeInDuration: 2, stayDuration: 30, fadeOutDuration: 10 });
+  const mastered = isBijuuMastered(player);
+  transformCinematic(player, {
+    color: mastered ? [1, 0.8, 0.25] : b.color,
+    title: `${b.text}${mastered ? "Tailed Beast Mode §6(Mastered)" : "Tailed Beast Mode"}`,
+    subtitle: `§7${b.name}'s chakra surges`,
+  });
 }
 
 function endTransformation(player) {
@@ -666,6 +674,7 @@ function updateBombCharge(player, b) {
     speed: 1.5, maxAge: 50, damage: mastered ? 45 : 32, radius: mastered ? 7 : 6, knock: 2.8, fire: 0,
     orbEvent: "aegis:as_bijuudama", trail: "aegis:beast_aura", burst: "aegis:beast_burst", color: b.color,
     hitRadius: 2, sound: "random.explode",
+    power: 3,
   });
   api.sound(player.dimension, "mob.warden.sonic_boom", player.location, 1.5, 0.9);
   player.onScreenDisplay.setActionBar("§5Tailed Beast Bomb!");
@@ -720,6 +729,7 @@ function updateCloak(player) {
   for (const [effect, amp] of CLOAK_PERKS[id] ?? []) eff(player, effect, 30, amp, false);
   api.particle(player.dimension, "aegis:beast_aura", player.location, b.color);
   if (mastered) api.particle(player.dimension, "aegis:beast_aura", player.location, [1, 0.85, 0.3]);
+  if (system.currentTick % 10 < 5) aura(player, mastered ? [1, 0.8, 0.25] : b.color);
   updateBombCharge(player, b);
 }
 
@@ -910,6 +920,7 @@ function sealRitual(sealer, beast, target) {
   api.anim(sealer, "animation.aegis.hand_signs");
   showTitle(sealer, "§6Four Symbols Seal", { subtitle: `§7Binding ${b.name}…`, fadeInDuration: 2, stayDuration: 50, fadeOutDuration: 10 });
   api.sound(dim, "random.anvil_land", beast.location, 1, 0.6);
+  sfx(dim, "aegis.seal", beast.location, 2, 0.9);
 
   const fail = (why) => {
     beingSealed.delete(beast.id);
@@ -952,6 +963,7 @@ function sealRitual(sealer, beast, target) {
       api.particle(dim, "aegis:beast_burst", mid, b.color);
       api.particle(dim, "aegis:beast_burst", mid, GOLD);
       api.sound(dim, "mob.enderdragon.growl", mid, 2, 0.6);
+      impactFx(dim, beast.location, GOLD, 3);
       beast.remove();
       api.particle(target.dimension, "aegis:beast_burst", api.add(target.location, { x: 0, y: 1, z: 0 }), GOLD);
       sealInto(target, id, sealer);
@@ -1039,7 +1051,7 @@ function masterBeast(player) {
   if (!id) return;
   const b = BEASTS[id];
   player.setDynamicProperty(MASTERED_PROP, true);
-  showTitle(player, `§6${b.name} Mastered`, { subtitle: "§7Your Tailed Beast now fights alongside you", fadeInDuration: 5, stayDuration: 80, fadeOutDuration: 20 });
+  transformCinematic(player, { color: [1, 0.8, 0.25], title: `§6${b.name} Mastered`, subtitle: "§7Your Tailed Beast now fights alongside you" });
   api.particle(player.dimension, "aegis:beast_burst", api.add(player.location, { x: 0, y: 1, z: 0 }), GOLD);
   api.particle(player.dimension, "aegis:beast_burst", api.add(player.location, { x: 0, y: 1, z: 0 }), b.color);
   api.sound(player.dimension, "ui.toast.challenge_complete", player.location, 1, 0.7);

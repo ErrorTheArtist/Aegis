@@ -572,16 +572,24 @@ All items are also in the creative inventory.
 ## Jutsu Clash
 
 When two fighters throw jutsu **at each other at the same moment** (within ~0.7 s, each aiming at the other), or two
-jutsu **projectiles collide** in mid-air, a manga-style cinematic plays — like Naruto's Rasengan meeting Sasuke's Chidori:
+jutsu **projectiles collide** in mid-air, a ~17-second manga-style cinematic plays — like Naruto's Rasengan meeting
+Sasuke's Chidori. Both fighters keep their own skins; every effect uses each jutsu's colour.
 
-1. **CLASH!** — white flash; a wide side shot of both fighters (their own skins) charging, chakra crackling in their hands
-   in their jutsu's colour (Rasengan blue, Chidori lightning, fire, water, wind, earth, Amaterasu, Wood, Ice, Lava…)
-2. close-ups over each fighter's shoulder
-3. both dash in — low wide angle
-4. **impact**: white flash, shockwave rings, lightning pillars, explosions in both colours, huge screen shake, a tinted sky
-   for everyone nearby, and a **crater** torn into the ground (cracked rim), then the camera rises over it
-5. the stronger jutsu (chakra cost, a little luck; bosses hit harder) **overpowers** the other: the loser takes 30% of
-   their health, the winner 8% — or "Even!" (20% each). Both are blasted apart.
+| Time | Beat |
+|---|---|
+| 0–2.5 s | **Standoff** — fade in from black, crane shot, howling wind and drifting dust, *"JUTSU CLASH — A vs B"* |
+| 2.5–5.5 s | **Fighter 1 powers up** — orbiting camera, tinted sky, lightning pillars, debris, chakra flames, rising charge (like the Tailed Beast transformation), their jutsu's name on screen |
+| 5.5–8.5 s | **Fighter 2 powers up** — the same in their colour |
+| 8.5–10 s | **Face-off** — both auras blazing, lightning arcing between them, heartbeats |
+| 10–10.5 s | **Cut to black** |
+| 10.5–11.5 s | **The dash** — low tracking shot, speed lines, whoosh |
+| 11.5–14 s | **The struggle** — close-up of the two jutsu grinding against each other: sparks, pulsing shockwaves, the sky flickering between both colours, rising shake |
+| 14 s | **Explosion** — long white-out, a huge boom with ringing ears, shockwave rings, pillars, fireballs, and a **crater** torn into the ground; the camera cranes up over it |
+| 15–17 s | **Aftermath** — smoke and embers, the result |
+
+The stronger jutsu (chakra cost, a little luck; bosses hit harder) **overpowers** the other: the loser takes 30% of
+their health, the winner 8% — or *"Even!"* (20% each). Both are blasted apart. Sound effects are synthesized by
+`tools/gen_clash_sounds.py` (wind, charge, heartbeat, dash, struggle, impact, ear-ring).
 
 Works between players and against the Legend and Akatsuki bosses (half the time, so boss fights aren't all cinematics).
 The same pair can clash once every 30 s; fighters are invulnerable while it plays. Craters never touch chests, other

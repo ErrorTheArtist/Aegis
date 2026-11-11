@@ -156,6 +156,90 @@
           "load_on_low_memory": true
         }
       ]
+    },
+    "aegis.clash_wind": {
+      "category": "player",
+      "min_distance": 6,
+      "max_distance": 64,
+      "sounds": [
+        {
+          "name": "sounds/aegis/clash_wind",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "aegis.clash_charge": {
+      "category": "player",
+      "min_distance": 6,
+      "max_distance": 64,
+      "sounds": [
+        {
+          "name": "sounds/aegis/clash_charge",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "aegis.clash_heartbeat": {
+      "category": "player",
+      "min_distance": 6,
+      "max_distance": 64,
+      "sounds": [
+        {
+          "name": "sounds/aegis/clash_heartbeat",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "aegis.clash_dash": {
+      "category": "player",
+      "min_distance": 6,
+      "max_distance": 64,
+      "sounds": [
+        {
+          "name": "sounds/aegis/clash_dash",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "aegis.clash_struggle": {
+      "category": "player",
+      "min_distance": 6,
+      "max_distance": 64,
+      "sounds": [
+        {
+          "name": "sounds/aegis/clash_struggle",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "aegis.clash_impact": {
+      "category": "player",
+      "min_distance": 6,
+      "max_distance": 64,
+      "sounds": [
+        {
+          "name": "sounds/aegis/clash_impact",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "aegis.clash_ring": {
+      "category": "player",
+      "min_distance": 6,
+      "max_distance": 64,
+      "sounds": [
+        {
+          "name": "sounds/aegis/clash_ring",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
     }
   }
 }

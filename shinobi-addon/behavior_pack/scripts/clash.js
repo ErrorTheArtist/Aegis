@@ -205,12 +205,19 @@ function startClash(A, castA, B, castB) {
   const perp = { x: -dir.z, y: 0, z: dir.x };
   const mid = lerp(pa0, pb0, 0.5);
   mid.y = groundY(dim, mid.x, Math.max(pa0.y, pb0.y), mid.z);
-  // where they meet (only if there's room, otherwise they stay put and their jutsu meet in the middle)
   const meetA = add(mid, mul(dir, -1.1));
   const meetB = add(mid, mul(dir, 1.1));
   const canDash = passable(dim, meetA) && passable(dim, meetB);
   const players = [A, B].filter(isPlayer);
   const all = [A, B];
+  const name = (e) => (isPlayer(e) ? e.name : e.nameTag || "???");
+  const nearby = (() => {
+    try {
+      return dim.getPlayers({ location: mid, maxDistance: 48 });
+    } catch {
+      return players;
+    }
+  })();
   const run = (fn, t) => system.runTimeout(() => {
     try {
       fn();
@@ -227,77 +234,133 @@ function startClash(A, castA, B, castB) {
       /* ignore */
     }
   };
+  // camera position around a fighter: angle (degrees) from the line toward the opponent, distance, height
+  const orbit = (e, toward, deg, d, h) => {
+    const a = (deg * Math.PI) / 180;
+    const x = toward.x * Math.cos(a) - toward.z * Math.sin(a);
+    const z = toward.x * Math.sin(a) + toward.z * Math.cos(a);
+    return { x: e.location.x + x * d, y: e.location.y + h, z: e.location.z + z * d };
+  };
+  const tagFog = `aegis_clash_${Math.floor(Math.random() * 1e6)}`;
+  const fog = (color) => {
+    for (const p of nearby) {
+      if (!ok(p)) continue;
+      cmd(p, `fog @s remove ${tagFog}`);
+      cmd(p, `fog @s push aegis:fog_${fogFor(color)} ${tagFog}`);
+    }
+  };
+  const title = (t, sub, stay = 40) => {
+    for (const p of nearby) if (ok(p)) showTitle(p, t, { subtitle: sub, fadeInDuration: 6, stayDuration: stay, fadeOutDuration: 10 });
+  };
+  const END = 340;
 
-  // --- setup ---
+  // ===== setup =====
   for (const e of all) {
-    eff(e, "resistance", 150, 4);
-    eff(e, "slowness", 90, 255);
+    eff(e, "resistance", END + 10, 4);
+    eff(e, "slowness", 210, 255);
     if (isPlayer(e)) cmd(e, "inputpermission set @s movement disabled");
   }
   face(A, B);
   face(B, A);
-  for (const p of players) cmd(p, "camera @s fade time 0.08 0.05 0.25 color 255 255 255");
-  sfx(dim, "aegis.boom", mid, 1.6, 1.4);
-  const nearby = (() => {
-    try {
-      return dim.getPlayers({ location: mid, maxDistance: 40 });
-    } catch {
-      return players;
+  // keep both locked facing each other until the dash
+  for (let t = 2; t < 205; t += 4) run(() => {
+    if (ok(A) && ok(B)) {
+      if (!isPlayer(A)) face(A, B);
+      if (!isPlayer(B)) face(B, A);
     }
-  })();
-  for (const p of nearby) showTitle(p, "§l§fCLASH!", { subtitle: `${colorCode(sa.color)}${sa.name} §7vs ${colorCode(sb.color)}${sb.name}`, fadeInDuration: 0, stayDuration: 30, fadeOutDuration: 8 });
-
-  // --- shot 1 (0–28): wide side view, both charging ---
-  for (const p of players) {
-    camera(p, up(add(mid, mul(perp, 10.5)), 2.4), up(mid, 1.2));
-    run(() => camera(p, up(add(mid, mul(perp, 8)), 2.0), up(mid, 1.2), 1.3), 1);
-  }
-  for (const [e, s] of [[A, sa], [B, sb]]) {
-    api.anim(e, s.anim);
-    sfx(dim, s.sound, e.location, 1.6, 1);
-  }
-  for (let t = 0; t < 64; t += 2) {
-    run(() => {
-      for (const [e, s, other] of [[A, sa, B], [B, sb, A]]) {
-        if (!ok(e)) continue;
-        const d = api.norm({ x: other.location.x - e.location.x, y: 0, z: other.location.z - e.location.z });
-        const pp = { x: -d.z, y: 0, z: d.x };
-        const h = handOf(e, d, pp);
-        api.particle(dim, s.hand, h, s.color);
-        if (t % 6 === 0) api.particle(dim, "aegis:cine_swirl", e.location, s.color);
-        if (t % 8 === 0) api.particle(dim, "aegis:cine_bolt", h, s.color);
-        if (t % 4 === 0 && !isPlayer(e)) face(e, other); // keep bosses locked on
-      }
-    }, t);
-  }
-  run(() => shake(dim, mid, 0.18, 2.8, 24), 4);
-  // ground cracks under their feet from the build-up of chakra
-  for (const t of [10, 24, 40]) run(() => {
-    api.particle(dim, "aegis:dust", A.location);
-    api.particle(dim, "aegis:dust", B.location);
   }, t);
 
-  // --- shot 2 (28–46): over A's shoulder toward B ---
-  run(() => {
-    for (const p of players) {
-      const from = up(add(add(A.location, mul(dir, -2.5)), mul(perp, 1.05)), 1.85);
-      camera(p, from, chest(B));
-      camera(p, up(add(add(A.location, mul(dir, -2.0)), mul(perp, 0.9)), 1.75), chest(B), 0.9);
-    }
-    sfx(dim, sa.sound, A.location, 1.8, 1.05);
-  }, 28);
-  // --- shot 3 (46–64): over B's shoulder toward A ---
-  run(() => {
-    for (const p of players) {
-      camera(p, up(add(add(B.location, mul(dir, 2.5)), mul(perp, -1.05)), 1.85), chest(A));
-      camera(p, up(add(add(B.location, mul(dir, 2.0)), mul(perp, -0.9)), 1.75), chest(A), 0.9);
-    }
-    sfx(dim, sb.sound, B.location, 1.8, 1.05);
-  }, 46);
+  // ===== 0–50: the standoff =====
+  for (const p of players) {
+    cmd(p, "camera @s fade time 0 0.5 0.9 color 0 0 0");
+    camera(p, up(add(mid, mul(perp, 15)), 7), up(mid, 1));
+    run(() => camera(p, up(add(mid, mul(perp, 10.5)), 2.4), up(mid, 1.2), 2.4), 2);
+  }
+  sfx(dim, "aegis.clash_wind", mid, 2.5, 1);
+  run(() => title("§l§fJUTSU CLASH", `${colorCode(sa.color)}${name(A)} §7vs ${colorCode(sb.color)}${name(B)}`, 45), 8);
+  for (let t = 0; t < 50; t += 5) run(() => {
+    const u = Math.random();
+    api.particle(dim, "aegis:dust", lerp(A.location, B.location, u));
+    api.particle(dim, "aegis:wind_gust", up(lerp(A.location, B.location, Math.random()), 0.4));
+  }, t);
 
-  // --- shot 4 (64–80): low wide angle, they dash in ---
+  // ===== 50–170: each fighter powers up (like the Tailed Beast transformation) =====
+  const powerUp = (e, other, s, t0) => {
+    const toward = () => api.norm({ x: other.location.x - e.location.x, y: 0, z: other.location.z - e.location.z });
+    run(() => {
+      fog(s.color);
+      title(`${colorCode(s.color)}§l${s.name}`, `§7${name(e)}`, 45);
+      sfx(dim, "aegis.clash_charge", e.location, 2.2, 1);
+      sfx(dim, s.sound, e.location, 1.6, 1);
+      for (const p of players) {
+        camera(p, orbit(e, toward(), 40, 5, 1.9), chest(e));
+        camera(p, orbit(e, toward(), -15, 4, 1.4), chest(e), 1.4);
+      }
+    }, t0);
+    run(() => {
+      for (const p of players) camera(p, orbit(e, toward(), -70, 3.3, 1.0), up(e.location, 1.5), 1.3);
+    }, t0 + 30);
+    for (let k = 0; k < 4; k++) run(() => api.anim(e, s.anim), t0 + k * 16);
+    run(() => shake(dim, e.location, 0.25, 3, 24), t0 + 4);
+    for (let t = 0; t < 60; t += 3) {
+      run(() => {
+        const c = e.location;
+        const h = handOf(e, toward(), { x: -toward().z, y: 0, z: toward().x });
+        for (let n = 0; n < 2; n++) {
+          const a = Math.random() * Math.PI * 2;
+          const r = 1.8 + Math.random() * 2;
+          api.particle(dim, "aegis:cine_pillar", add(c, { x: Math.cos(a) * r, y: 0, z: Math.sin(a) * r }), s.color);
+        }
+        api.particle(dim, "aegis:cine_bolt", up(c, 1.1), s.color);
+        api.particle(dim, s.hand, h, s.color);
+        api.particle(dim, "aegis:beast_aura", c, s.color);
+        if (t % 6 === 0) api.particle(dim, "aegis:cine_swirl", c, s.color);
+        if (t % 9 === 0) api.particle(dim, "aegis:cine_debris", c, [0.6, 0.55, 0.5]);
+        if (t === 12 || t === 30 || t === 48) api.particle(dim, "aegis:cine_flame", up(c, 1), s.color);
+        if (t % 12 === 0) sfx(dim, "aegis.lightning", c, 1.2, 0.9 + Math.random() * 0.3);
+      }, t0 + t);
+    }
+    run(() => {
+      api.particle(dim, "aegis:beast_burst", up(e.location, 1.1), s.color);
+      api.particle(dim, "aegis:cine_ring", e.location, s.color);
+      sfx(dim, "aegis.transform", e.location, 2, 1);
+    }, t0 + 56);
+  };
+  powerUp(A, B, sa, 50);
+  powerUp(B, A, sb, 110);
+
+  // ===== 170–195: face-off — both blazing, lightning arcs between them, heartbeats =====
   run(() => {
-    for (const p of players) camera(p, up(add(add(mid, mul(perp, 6.5)), mul(dir, -1.2)), 0.7), up(mid, 1.4), 0);
+    fog(mixColor(sa.color, sb.color));
+    for (const p of players) {
+      camera(p, up(add(mid, mul(perp, 11)), 2.2), up(mid, 1.3));
+      camera(p, up(add(mid, mul(perp, 7)), 1.6), up(mid, 1.3), 1.25);
+    }
+    sfx(dim, "aegis.clash_heartbeat", mid, 2.5, 1);
+    shake(dim, mid, 0.5, 1.4, 32);
+  }, 170);
+  run(() => sfx(dim, "aegis.clash_heartbeat", mid, 2.8, 0.95), 184);
+  for (let t = 170; t < 195; t += 2) run(() => {
+    for (const [e, s] of [[A, sa], [B, sb]]) {
+      api.particle(dim, "aegis:beast_aura", e.location, s.color);
+      api.particle(dim, s.hand, up(e.location, 1.2), s.color);
+    }
+    const u = Math.random();
+    api.particle(dim, "aegis:cine_bolt", up(lerp(A.location, B.location, u), 1.2), u < 0.5 ? sa.color : sb.color);
+  }, t);
+
+  // ===== 195–205: cut to black =====
+  run(() => {
+    for (const p of players) cmd(p, "camera @s fade time 0.15 0.35 0.2 color 0 0 0");
+    sfx(dim, "aegis.clash_heartbeat", mid, 3, 0.9);
+  }, 195);
+
+  // ===== 205–225: the dash =====
+  run(() => {
+    for (const p of players) {
+      camera(p, up(add(add(mid, mul(perp, 7.5)), mul(dir, -3)), 0.6), up(mid, 1.3));
+      camera(p, up(add(mid, mul(perp, 6)), 0.8), up(mid, 1.3), 1.0);
+    }
     for (const e of all) {
       api.anim(e, "animation.aegis.ram_strike");
       try {
@@ -306,56 +369,93 @@ function startClash(A, castA, B, castB) {
         /* ignore */
       }
     }
-    sfx(dim, "aegis.whoosh", mid, 2, 0.8);
-  }, 64);
+    sfx(dim, "aegis.clash_dash", mid, 2.5, 1);
+  }, 205);
   const startA = { ...pa0 };
   const startB = { ...pb0 };
-  for (let i = 1; i <= 14; i++) {
+  for (let i = 1; i <= 20; i++) {
     run(() => {
-      const u = 1 - (1 - i / 14) ** 2; // fast start, slowing into the hit
+      const u = i / 20;
+      const k = u < 0.5 ? 2 * u * u : 1 - (-2 * u + 2) ** 2 / 2;
       for (const [e, from, to, s, other] of [[A, startA, meetA, sa, B], [B, startB, meetB, sb, A]]) {
         if (!ok(e)) continue;
-        const target = canDash ? to : from;
-        const pos = lerp(from, target, u);
+        const pos = lerp(from, canDash ? to : from, k);
         try {
           e.teleport(pos, { facingLocation: up(other.location, 1.3) });
         } catch {
           /* ignore */
         }
         api.particle(dim, s.hand, up(pos, 1.1), s.color);
-        if (i % 3 === 0) api.particle(dim, "aegis:wind_gust", up(pos, 0.6));
+        api.particle(dim, "aegis:fire_trail", up(pos, 0.9), s.color);
+        if (i % 2 === 0) api.particle(dim, "aegis:wind_gust", up(pos, 0.6));
+        if (i % 4 === 0) api.particle(dim, "aegis:dust", pos);
       }
-    }, 64 + i);
+    }, 205 + i);
   }
 
-  // --- impact (80) ---
-  run(() => impact(dim, mid, sa, sb, players, nearby), 80);
-
-  // --- aftermath (80–124): camera rises over the crater ---
+  // ===== 225–275: the struggle — the two jutsu grind against each other =====
+  const clashPt = up(mid, 1.25);
   run(() => {
     for (const p of players) {
-      camera(p, up(add(mid, mul(perp, 7)), 2), up(mid, 0.5));
-      camera(p, up(add(mid, mul(perp, 3.5)), 13), mid, 2.0);
+      cmd(p, "camera @s fade time 0.03 0.08 0.25 color 255 255 255");
+      camera(p, add(up(add(mid, mul(perp, 4.2)), 1.7), mul(dir, 0.3)), clashPt);
+      camera(p, add(up(add(mid, mul(perp, 2.8)), 1.4), mul(dir, 0.2)), clashPt, 2.4);
     }
-  }, 81);
-  for (let t = 84; t < 120; t += 6) run(() => {
-    api.particle(dim, "aegis:dust", up(mid, 0.5));
-    api.particle(dim, "aegis:smoke_puff", add(mid, { x: (Math.random() - 0.5) * 6, y: 0.5, z: (Math.random() - 0.5) * 6 }));
+    sfx(dim, "aegis.clash_struggle", mid, 3, 1);
+    sfx(dim, "aegis.impact", mid, 2.5, 1.2);
+    api.particle(dim, "aegis:cine_ring", up(mid, 0.1), sa.color);
+  }, 225);
+  for (const t of [225, 240, 255]) run(() => {
+    for (const e of all) api.anim(e, "animation.aegis.palm_thrust");
   }, t);
-  run(() => resolve(A, castA, B, castB, dir, nearby), 84);
+  for (let t = 226; t < 275; t += 2) {
+    run(() => {
+      const sideA = add(clashPt, mul(dir, -0.25));
+      const sideB = add(clashPt, mul(dir, 0.25));
+      api.particle(dim, sa.hand, sideA, sa.color);
+      api.particle(dim, sb.hand, sideB, sb.color);
+      api.particle(dim, "aegis:chidori", clashPt);
+      if (t % 4 === 0) api.particle(dim, "aegis:beast_aura", up(mid, 0.2), t % 8 ? sa.color : sb.color);
+      if (t % 6 === 0) api.particle(dim, "aegis:cine_bolt", clashPt, t % 12 ? sa.color : sb.color);
+      if (t % 10 === 0) api.particle(dim, "aegis:cine_ring", up(mid, 0.1), t % 20 ? sb.color : sa.color);
+      if (t % 10 === 0) shake(dim, mid, 0.3 + (t - 226) / 60, 0.6, 32);
+      if (t % 12 === 0) fog(t % 24 ? sb.color : sa.color);
+      if (t % 8 === 0) api.particle(dim, "aegis:cine_debris", up(mid, 0.2), [0.6, 0.55, 0.5]);
+    }, t);
+  }
 
-  // --- finish (124) ---
+  // ===== 275: EXPLOSION =====
+  run(() => impact(dim, mid, sa, sb, players, nearby, tagFog), 275);
+  run(() => {
+    for (const p of players) {
+      camera(p, up(add(mid, mul(perp, 12)), 3), up(mid, 1));
+      camera(p, up(add(mid, mul(perp, 4)), 16), mid, 3.2);
+    }
+  }, 277);
+  run(() => resolve(A, castA, B, castB, dir, nearby), 280);
+  for (let t = 284; t < 335; t += 5) run(() => {
+    api.particle(dim, "aegis:smoke_puff", add(mid, { x: (Math.random() - 0.5) * 7, y: 0.4, z: (Math.random() - 0.5) * 7 }));
+    api.particle(dim, "aegis:dust", up(mid, 0.4));
+    if (t % 10 === 4) api.particle(dim, "aegis:fire_trail", add(mid, { x: (Math.random() - 0.5) * 5, y: 0.3, z: (Math.random() - 0.5) * 5 }));
+  }, t);
+
+  // ===== finish =====
   system.runTimeout(() => {
+    for (const p of nearby) if (ok(p)) cmd(p, `fog @s remove ${tagFog}`);
     for (const e of all) {
       active.delete(e.id);
       if (!isPlayer(e)) continue;
       setCinematicBusy(e.id, false);
       if (!ok(e)) continue;
-      cmd(e, "camera @s fade time 0.15 0.1 0.3 color 0 0 0");
-      system.runTimeout(() => ok(e) && cmd(e, "camera @s clear"), 4);
+      cmd(e, "camera @s fade time 0.2 0.15 0.4 color 0 0 0");
+      system.runTimeout(() => ok(e) && cmd(e, "camera @s clear"), 5);
       cmd(e, "inputpermission set @s movement enabled");
     }
-  }, 124);
+  }, END);
+}
+
+function mixColor(a, b) {
+  return [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2];
 }
 
 function colorCode([r, g, b]) {
@@ -367,39 +467,42 @@ function colorCode([r, g, b]) {
   return "§e";
 }
 
-function impact(dim, mid, sa, sb, players, nearby) {
-  for (const p of players) cmd(p, "camera @s fade time 0.05 0.25 0.6 color 255 255 255");
-  for (const p of nearby) if (!players.includes(p)) cmd(p, "camera @s fade time 0.02 0.05 0.3 color 255 255 255");
+function impact(dim, mid, sa, sb, players, nearby, tagFog) {
+  for (const p of players) cmd(p, "camera @s fade time 0.05 0.6 1.3 color 255 255 255");
+  for (const p of nearby) if (!players.includes(p)) cmd(p, "camera @s fade time 0.03 0.15 0.5 color 255 255 255");
   const c = up(mid, 1.3);
-  sfx(dim, "aegis.boom", mid, 4, 0.6);
-  sfx(dim, "aegis.lightning", mid, 3, 0.7);
-  sfx(dim, "aegis.impact", mid, 3, 0.8);
-  api.sound(dim, "random.explode", mid, 3, 0.6);
-  shake(dim, mid, 2.2, 2.2, 48);
-  for (const s of [sa, sb]) {
-    api.particle(dim, "aegis:beast_burst", c, s.color);
-    api.particle(dim, "aegis:cine_flame", c, s.color);
+  sfx(dim, "aegis.clash_impact", mid, 5, 1);
+  sfx(dim, "aegis.clash_ring", mid, 2.5, 1);
+  sfx(dim, "aegis.boom", mid, 3, 0.55);
+  api.sound(dim, "random.explode", mid, 3, 0.5);
+  shake(dim, mid, 2.6, 2.6, 56);
+  for (const p of nearby) {
+    if (!api.isValid(p)) continue;
+    cmd(p, `fog @s remove ${tagFog}`);
+    cmd(p, `fog @s push aegis:fog_${fogFor(mixColor(sa.color, sb.color))} ${tagFog}`);
   }
-  for (let k = 0; k < 3; k++) {
+  for (let k = 0; k < 8; k++) {
     system.runTimeout(() => {
-      api.particle(dim, "aegis:cine_ring", up(mid, 0.1), k % 2 ? sb.color : sa.color);
-      api.particle(dim, "aegis:cine_swirl", up(mid, 0.05), k % 2 ? sa.color : sb.color);
+      const col = k % 2 ? sb.color : sa.color;
+      api.particle(dim, "aegis:cine_ring", up(mid, 0.1 + k * 0.05), col);
+      if (k < 4) {
+        api.particle(dim, "aegis:beast_burst", c, col);
+        api.particle(dim, "aegis:fire_burst", c);
+      }
+      api.particle(dim, "aegis:cine_flame", up(c, k * 0.4), col);
+      api.particle(dim, "aegis:cine_swirl", up(mid, 0.05), col);
       for (let i = 0; i < 4; i++) {
         const a = Math.random() * Math.PI * 2;
-        api.particle(dim, "aegis:cine_pillar", add(mid, { x: Math.cos(a) * 2.5, y: 0, z: Math.sin(a) * 2.5 }), i % 2 ? sa.color : sb.color);
+        const r = 1.5 + Math.random() * 4;
+        api.particle(dim, "aegis:cine_pillar", add(mid, { x: Math.cos(a) * r, y: 0, z: Math.sin(a) * r }), col);
       }
       api.particle(dim, "aegis:cine_debris", up(mid, 0.3), [0.6, 0.55, 0.5]);
       api.particle(dim, "aegis:lightning_burst", c);
       api.particle(dim, "aegis:dust", up(mid, 0.2));
-    }, k * 4);
+      api.particle(dim, "aegis:smoke_puff", up(mid, 0.5));
+    }, k * 3);
   }
-  // fog flash for everyone watching
-  const tag = `aegis_clash_${Math.floor(Math.random() * 1e6)}`;
-  for (const p of nearby) cmd(p, `fog @s push aegis:fog_${fogFor(sa.color)} ${tag}`);
-  system.runTimeout(() => {
-    for (const p of nearby) if (api.isValid(p)) cmd(p, `fog @s remove ${tag}`);
-  }, 50);
-  if (destructionOn()) crater(dim, mid, 4.2, 2.4);
+  if (destructionOn()) crater(dim, mid, 4.6, 2.6);
 }
 
 // Carve a crater, a few layers per tick so it never spikes the server. Protected blocks and containers are skipped;

@@ -67,12 +67,49 @@ Your clan shows above your head, e.g. `[Uchiha] Steve`.
 | Uchiha | Epic | 6% | 140 | Fire Resistance | **Sharingan**: toggle (night vision, 30% dodge, drains chakra) / **Amaterasu** (needs Sharingan on) |
 | Uzumaki | Epic | 7% | 200 | +2 hearts, 1.5× regen | Adamantine Sealing Chains (freeze everything nearby) / **Four Symbols Seal** (seal Tailed Beasts alive, master your own) |
 | Hyuga | Epic | 8% | 130 | — | **Byakugan**: toggle (see all life within 40 blocks, Gentle Fist bonus damage) / **Palm Rotation** |
-| Sarutobi | Rare | 9% | 120 | Fire Resistance | Fire Style: Flame Bullet (3 fireballs) |
-| Nara | Rare | 11% | 110 | — | Shadow Possession Jutsu (freeze a target for 6s) |
-| Akimichi | Rare | 11% | 120 | +2 hearts | Expansion Jutsu (Strength II, Resistance II, extra hearts) |
-| Aburame | Rare | 10% | 110 | — | Parasitic Insect Swarm (poison, steals chakra) |
-| Inuzuka | Common | 17% | 100 | Speed, Night Vision | Fang Over Fang dash / **Summon Ninja Hound** (tamed wolf) |
-| Yamanaka | Common | 17% | 100 | — | Mind Body Disturbance (nausea, blindness, slow) |
+| Yuki | Epic | 5% | 150 | Resistance | **Ice Release**: Demonic Mirroring Ice Crystals / **Ice Dome** (freeze everything nearby) |
+| Terumi | Epic | 4% | 160 | Fire Resistance | **Lava Release**: Melting Apparition (lava cone) / **Boil Release: Skilled Mist** (acid cloud) |
+| Hōzuki | Rare | 6% | 120 | Water breathing, fast swimming | Water Gun / **Hydrification** (attacks pass through you for 6s) |
+| Sarutobi | Rare | 7% | 120 | Fire Resistance | Fire Style: Flame Bullet (3 fireballs) |
+| Nara | Rare | 9% | 110 | — | Shadow Possession Jutsu (freeze a target for 6s) |
+| Akimichi | Rare | 9% | 120 | +2 hearts | Expansion Jutsu (Strength II, Resistance II, extra hearts) |
+| Aburame | Rare | 9% | 110 | — | Parasitic Insect Swarm (poison, steals chakra) |
+| Inuzuka | Common | 13% | 100 | Speed, Night Vision | Fang Over Fang dash / **Summon Ninja Hound** (tamed wolf) |
+| Yamanaka | Common | 13% | 100 | — | Mind Body Disturbance (nausea, blindness, slow) |
+
+### Chakra natures (basic releases)
+
+Everyone rolls a **chakra nature** a few seconds after their first join (older players get one on their next join):
+🔥 **Fire**, 🌪️ **Wind**, ⚡ **Lightning**, 🪨 **Earth** or 🌊 **Water Release**. Jutsu of a release you have
+**cost 25% less chakra** and **deal 25% more damage** (the action bar shows *(affinity)*). Anyone can still cast every
+basic jutsu — affinity just makes them better.
+
+| Release | Jutsu |
+|---|---|
+| Fire | Fireball, Phoenix Sage Fire, Great Fire Annihilation |
+| Wind | Great Breakthrough, Vacuum Bullets, Rasenshuriken |
+| Lightning | Chidori, Chidori Current, Chidori Sharp Spear, Kirin |
+| Earth | Earth Wall, Earth Spikes |
+| Water | Water Dragon Bullet, Water Prison |
+
+Learn more releases at the **Jutsu Sensei** (*Chakra Nature Training*): 2nd release Lv 25 / 24 emeralds, 3rd Lv 50 / 40,
+4th Lv 90 / 56, 5th Lv 140 / 64. `/scriptevent aegis:nature info|reroll|add <nature>|set <nature>` for testing.
+
+### Kekkei genkai releases (clan-bound)
+
+These scrolls can **only be cast by their clan** (anyone else gets *"Only the Senju Clan can use Wood Release"*).
+They aren't craftable — a **Clan Elder** of that clan sells them to its members.
+
+| Clan | Release scroll | Chakra / cd | Effect |
+|---|---|---|---|
+| Senju | **Wood Release: Deep Forest Emergence** | 50 / 15s | Trees and roots burst from the ground around you (for 12s); everything within 9 blocks takes 8 dmg and is bound in place for 3.5s |
+| Senju | **Wood Release: Wood Dragon** | 60 / 18s | A wooden dragon snakes to your target: 14 dmg, binds it, and **drains 40 chakra** from players (heals you vs mobs) |
+| Uchiha | **Blaze Release: Kagutsuchi Spears** | 45 / 8s | Three spears of black flame: 9 dmg each and long-burning fire |
+| Uchiha | **Blaze Release: Black Flame Barrier** | 55 / 20s | A ring of black flames around you for 6s burns and pushes back anything inside it; you get Fire Resistance |
+| Yuki | **Ice Release: Thousand Needles of Death** | 45 / 8s | A ring of ice needles closes in on the target: 16 dmg + slow |
+| Yuki | **Ice Release: Black Dragon Blizzard** | 50 / 12s | An ice dragon crashes into the target: 18 dmg in a big area, Slowness IV, Mining Fatigue |
+| Terumi | **Lava Release: Lava Globs** | 45 / 9s | Three globs of lava: 10 dmg each, sets on fire, weakens |
+| Terumi | **Boil Release: Unrivalled Strength** | 40 / 30s | 15s of Strength II + Resistance; every punch bursts with steam (+3 burn dmg, big knockback) |
 
 ### Mangekyō Sharingan (Uchiha)
 
@@ -155,13 +192,12 @@ Clan odds, stats and abilities are all in `behavior_pack/scripts/clans.js`.
 | Wind Style: Vacuum Bullets | 30 | 3s | Five compressed air bullets in quick succession: 6 damage + strong knockback each. |
 | Earth Style: Earth Spikes | 35 | 5s | A 14-block line of stone spikes rips out of the ground: 10 damage, launches and slows (spikes crumble after 4s). |
 | Water Style: Water Prison | 35 | 12s | Trap the target you look at (12 blocks) in a sphere of water for 5s (2s on bosses): can't move, 3 drowning damage per second. |
-| Ice Style: Thousand Needles of Death | 45 | 8s | A ring of ice needles forms around your target, then closes in: 16 damage, Slowness IV and Mining Fatigue. |
 | Lightning Style: Chidori Sharp Spear | 40 | 5s | The Chidori stretches into a 16-block lightning blade that pierces everything in line: 12 damage + stun. |
 | Fire Style: Great Fire Annihilation | 55 | 10s | A huge wall of fire that widens as it rolls forward: up to 3 × 6 fire damage and sets everything alight. |
 | Eight Inner Gates Release | 50 | 60s | 20s of Strength III, Speed III, Haste, Jump Boost and Resistance; every punch blasts enemies away. Afterwards: exhaustion and −2 hearts. |
 | Lightning Style: Kirin | 80 | 20s | Aim at a spot up to 48 blocks away: storm clouds gather, then a dragon of lightning crashes down — 28 damage in 5 blocks. |
 
-Clan discounts on the new scrolls: **Uchiha** — Great Fire Annihilation, Kirin, Chidori Sharp Spear · **Sarutobi** — Great
+Thousand Needles of Death is now a **Yuki-only Ice Release** (see Clans). Clan discounts on the new scrolls: **Uchiha** — Great Fire Annihilation, Kirin, Chidori Sharp Spear · **Sarutobi** — Great
 Fire Annihilation · **Senju** — Earth Spikes · **Hyuga** — Vacuum Bullets. All of them are sold by the Jutsu Sensei
 (unlocked from level 10 to 70) and are craftable.
 
@@ -495,7 +531,7 @@ models: `resource_pack/models/entity/`.
 
 New scrolls (Blank Scroll + lapis + catalyst): Phoenix = fire charge · Water Dragon = kelp · Earth Wall = stone ·
 Chidori Current = copper ingot · Mystical Palm = glistering melon · Rasenshuriken = diamond block + feather.
-Vacuum Bullets = wind charge · Earth Spikes = pointed dripstone · Water Prison = water bucket · Thousand Needles = packed ice ·
+Vacuum Bullets = wind charge · Earth Spikes = pointed dripstone · Water Prison = water bucket ·
 Chidori Sharp Spear = trident · Great Fire Annihilation = blaze powder + diamond · Eight Gates = golden apple + diamond ·
 Kirin = lightning rod + diamond.
 All are also sold by the Jutsu Sensei.

@@ -144,7 +144,6 @@ SCROLLS = {
     "vacuum_scroll": ("Wind Style: Vacuum Bullets", "minecraft:wind_charge"),
     "earth_spikes_scroll": ("Earth Style: Earth Spikes", "minecraft:pointed_dripstone"),
     "chidori_spear_scroll": ("Lightning Style: Chidori Sharp Spear", "minecraft:trident"),
-    "ice_needles_scroll": ("Ice Style: Thousand Needles of Death", "minecraft:packed_ice"),
     "eight_gates_scroll": ("Eight Inner Gates Release", "minecraft:golden_apple"),
 }
 atlas_p = RP / "textures" / "item_texture.json"; atlas = rj(atlas_p)

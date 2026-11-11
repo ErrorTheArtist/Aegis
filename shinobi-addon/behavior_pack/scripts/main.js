@@ -2,7 +2,7 @@
 // Chakra system, jutsu scrolls and ninja tools, driven by @minecraft/server.
 
 import { world, system, ItemStack, MolangVariableMap } from "@minecraft/server";
-import { initClans, applyNameTag, clanMaxChakra, clanRegenMultiplier, handleClanItemUse, clanJutsuCostMultiplier } from "./clans.js";
+import { initClans, applyNameTag, registerClanAbilities, getClanId, CLANS, clanMaxChakra, clanRegenMultiplier, handleClanItemUse, clanJutsuCostMultiplier } from "./clans.js";
 import { initBijuu, bijuuChakraBonus, bijuuRegenMultiplier, handleBijuuItemUse, isTransformed, isBijuuMastered } from "./bijuu.js";
 import { initSwords, handleSwordUse } from "./swords.js";
 import { initHud } from "./hud.js";
@@ -13,6 +13,8 @@ import { initSage, sageMultiplier } from "./sage.js";
 import { initArmor, armorChakraBonus, armorRegenMultiplier, armorDamageMultiplier } from "./armor.js";
 import { impactFx, castFx, sfx, shake, chargeFx } from "./cinematic.js";
 import { makeJutsu2 } from "./jutsu2.js";
+import { makeReleases } from "./releases.js";
+import { initNatures, natureCostMultiplier, natureDamageMultiplier, onJutsuCast, natureTag } from "./natures.js";
 import { initLevels, handleRecordUse, levelChakraBonus, levelRegenMultiplier, ninjutsuMultiplier, cooldownMultiplier, gainJutsuXp, getLevel, xpInfo } from "./levels.js";
 
 // ---------------------------------------------------------------------------
@@ -100,7 +102,7 @@ function knockback(entity, dirX, dirZ, horizontal, vertical) {
 
 function hurt(target, amount, attacker, cause = "entityAttack") {
   // Ninjutsu stat boosts every scripted technique a player lands.
-  if (attacker?.typeId === "minecraft:player") amount *= ninjutsuMultiplier(attacker) * sageMultiplier(attacker) * armorDamageMultiplier(attacker);
+  if (attacker?.typeId === "minecraft:player") amount *= ninjutsuMultiplier(attacker) * sageMultiplier(attacker) * armorDamageMultiplier(attacker) * natureDamageMultiplier(attacker);
   try {
     target.applyDamage(amount, { cause, damagingEntity: attacker });
   } catch {
@@ -282,12 +284,19 @@ world.afterEvents.itemUse.subscribe(({ source: player, itemStack }) => {
   const jutsu = JUTSU[itemStack.typeId];
   if (!jutsu) return;
 
+  // Kekkei genkai releases belong to one clan.
+  if (jutsu.clan && getClanId(player) !== jutsu.clan) {
+    const c = CLANS[jutsu.clan];
+    player.onScreenDisplay.setActionBar(`§cOnly the ${c.color}${c.name} Clan§c can use ${jutsu.name.split(":")[0]}.`);
+    sound(player.dimension, "note.bass", player.location, 0.6, 0.6);
+    return;
+  }
   const left = cooldownLeft(player, itemStack.typeId);
   if (left > 0) {
     player.onScreenDisplay.setActionBar(`§7${jutsu.name} ready in §f${(left / 20).toFixed(1)}s`);
     return;
   }
-  const cost = Math.round(jutsu.cost * clanJutsuCostMultiplier(player, itemStack.typeId));
+  const cost = Math.round(jutsu.cost * clanJutsuCostMultiplier(player, itemStack.typeId) * natureCostMultiplier(player, itemStack.typeId));
   const chakra = getChakra(player);
   if (chakra < cost) {
     player.onScreenDisplay.setActionBar(`§cNot enough chakra! §7(${Math.floor(chakra)}/${cost})`);
@@ -296,13 +305,14 @@ world.afterEvents.itemUse.subscribe(({ source: player, itemStack }) => {
   }
 
   // cast() returns false if the jutsu fizzled (e.g. no target) — no cost then.
+  onJutsuCast(player, itemStack.typeId); // affinity damage boost starts before the jutsu lands
   const ok = jutsu.cast(player);
   if (ok === false) return;
 
   setChakra(player, chakra - cost);
   gainJutsuXp(player, cost);
   startCooldown(player, itemStack.typeId, jutsu.cooldown);
-  player.onScreenDisplay.setActionBar(`§6${jutsu.name}!`);
+  player.onScreenDisplay.setActionBar(`§6${jutsu.name}!${natureTag(player, itemStack.typeId)}`);
 });
 
 // --- Scripted projectiles (Fireball Jutsu, Flame Bullet, Tailed Beast Bombs). ---
@@ -981,6 +991,12 @@ const npcApi = {
   getChakra, setChakra, cooldownLeft, startCooldown, anim, handPos, launchProjectile, gainJutsuXp, spawnFx, removeFx,
 };
 Object.assign(JUTSU, makeJutsu2(npcApi));
+{
+  const rel = makeReleases(npcApi);
+  Object.assign(JUTSU, rel.jutsu);
+  registerClanAbilities(rel.abilities);
+}
+initNatures(npcApi);
 initNpcs({ ...npcApi, spawnAkatsukiNear: (p, msg) => spawnAkatsukiNear(p, msg) });
 initEnemies(npcApi);
 initCompanions(npcApi);

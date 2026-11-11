@@ -41,13 +41,13 @@ export const CLANS = {
     name: "Senju", color: "§2", rarity: "legendary", weight: 3,
     maxChakra: 180, regen: 1.6, effects: [["regeneration", 0], ["health_boost", 1]],
     item: "aegis:wood_style",
-    perks: "Wood Style (Wood Wall / sneak: Healing), 180 chakra, Regeneration, +4 hearts",
+    perks: "Wood Style (Wood Wall / sneak: Healing), Wood Release scrolls (Deep Forest Emergence, Wood Dragon), 180 chakra, Regeneration, +4 hearts",
   },
   uchiha: {
     name: "Uchiha", color: "§c", rarity: "epic", weight: 6,
     maxChakra: 140, regen: 1.2, effects: [["fire_resistance", 0]],
     item: "aegis:sharingan",
-    perks: "Sharingan (toggle: night vision + 30% dodge / sneak: Amaterasu), awakens the Mangekyō with kills, cheaper Fireball & Chidori, 140 chakra",
+    perks: "Sharingan (toggle: night vision + 30% dodge / sneak: Amaterasu), awakens the Mangekyō with kills, Blaze Release scrolls (Kagutsuchi Spears, Black Flame Barrier), cheaper Fireball & Chidori, 140 chakra",
   },
   uzumaki: {
     name: "Uzumaki", color: "§6", rarity: "epic", weight: 7,
@@ -61,38 +61,56 @@ export const CLANS = {
     item: "aegis:byakugan",
     perks: "Byakugan (toggle: see all life nearby + Gentle Fist / sneak: Rotation), 130 chakra",
   },
+  yuki: {
+    name: "Yuki", color: "§b", rarity: "epic", weight: 5,
+    maxChakra: 150, regen: 1.2, effects: [["resistance", 0]],
+    item: "aegis:ice_mirrors",
+    perks: "Ice Release: Demonic Mirroring Ice Crystals (sneak: Ice Dome), Ice Release scrolls (Thousand Needles, Black Dragon Blizzard), 150 chakra, Resistance",
+  },
+  terumi: {
+    name: "Terumi", color: "§6", rarity: "epic", weight: 4,
+    maxChakra: 160, regen: 1.3, effects: [["fire_resistance", 0]],
+    item: "aegis:lava_boil",
+    perks: "Lava Release: Melting Apparition (sneak: Boil Release: Skilled Mist), Lava & Boil Release scrolls, 160 chakra, Fire Resistance",
+  },
+  hozuki: {
+    name: "Hōzuki", color: "§9", rarity: "rare", weight: 6,
+    maxChakra: 120, regen: 1.2, effects: [["water_breathing", 0], ["dolphins_grace", 0]],
+    item: "aegis:hydrification",
+    perks: "Water Gun (sneak: Hydrification — attacks pass through you for 6s), breathe underwater, swim fast, 120 chakra",
+  },
   sarutobi: {
-    name: "Sarutobi", color: "§4", rarity: "rare", weight: 9,
+    name: "Sarutobi", color: "§4", rarity: "rare", weight: 7,
     maxChakra: 120, regen: 1.2, effects: [["fire_resistance", 0]],
     item: "aegis:flame_bullet",
     perks: "Fire Style: Flame Bullet (triple fireball), cheaper Fireball, 120 chakra, Fire Resistance",
   },
   nara: {
-    name: "Nara", color: "§8", rarity: "rare", weight: 11,
+    name: "Nara", color: "§8", rarity: "rare", weight: 9,
     maxChakra: 110, regen: 1.1, effects: [],
     item: "aegis:shadow_possession",
     perks: "Shadow Possession Jutsu (freeze a target), 110 chakra",
   },
   akimichi: {
-    name: "Akimichi", color: "§e", rarity: "rare", weight: 11,
+    name: "Akimichi", color: "§e", rarity: "rare", weight: 9,
     maxChakra: 120, regen: 1.0, effects: [["health_boost", 0]],
     item: "aegis:expansion",
     perks: "Expansion Jutsu (Strength + Resistance + hearts), 120 chakra, +2 hearts",
   },
   aburame: {
-    name: "Aburame", color: "§a", rarity: "rare", weight: 10,
+    name: "Aburame", color: "§a", rarity: "rare", weight: 9,
     maxChakra: 110, regen: 1.1, effects: [],
     item: "aegis:insect_swarm",
     perks: "Parasitic Insect Swarm (poison + chakra drain), 110 chakra",
   },
   inuzuka: {
-    name: "Inuzuka", color: "§b", rarity: "common", weight: 17,
+    name: "Inuzuka", color: "§b", rarity: "common", weight: 13,
     maxChakra: 100, regen: 1.0, effects: [["speed", 0], ["night_vision", 0]],
     item: "aegis:fang_over_fang",
     perks: "Fang Over Fang (sneak: summon ninja hound), Speed, Night Vision",
   },
   yamanaka: {
-    name: "Yamanaka", color: "§3", rarity: "common", weight: 17,
+    name: "Yamanaka", color: "§3", rarity: "common", weight: 13,
     maxChakra: 100, regen: 1.1, effects: [],
     item: "aegis:mind_transfer",
     perks: "Mind Body Disturbance (confuse & stun a target)",
@@ -754,6 +772,11 @@ function useRerollScroll(player) {
     inv.setItem(slot, it);
   } else inv.setItem(slot, undefined);
   rollClan(player, getClanId(player)); // always a different clan
+}
+
+// Extra clan-item abilities from other modules (releases.js).
+export function registerClanAbilities(map) {
+  Object.assign(ABILITIES, map);
 }
 
 export function handleClanItemUse(player, itemStack) {

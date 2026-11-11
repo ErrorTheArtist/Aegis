@@ -13,6 +13,8 @@ import { CLANS, getClanId, setClanPublic, applyNameTag } from "./clans.js";
 import { getLevel, gainXp, getRank, setRank, addPoints, RANKS } from "./levels.js";
 import { hasSageTraining, grantSage } from "./sage.js";
 import { hasEternalMangekyo, awakenEternal } from "./clans.js";
+import { natureTraining } from "./natures.js";
+import { RELEASE_SCROLLS } from "./releases.js";
 
 const SPAWNER = "aegis:npc_spawner";
 const INDEX_PROP = "aegis:spawners";
@@ -438,7 +440,6 @@ const SHOPS = {
     ["aegis:vacuum_scroll", 1, "Vacuum Bullets", 14, 10],
     ["aegis:earth_spikes_scroll", 1, "Earth Spikes", 16, 15],
     ["aegis:water_prison_scroll", 1, "Water Prison", 18, 20],
-    ["aegis:ice_needles_scroll", 1, "Thousand Needles of Death", 22, 30],
     ["aegis:chidori_spear_scroll", 1, "Chidori Sharp Spear", 24, 35],
     ["aegis:great_fire_scroll", 1, "Great Fire Annihilation", 32, 45],
     ["aegis:eight_gates_scroll", 1, "Eight Inner Gates Release", 36, 55],
@@ -448,6 +449,7 @@ const SHOPS = {
     ["aegis:summon_snake_scroll", 1, "Summoning: Snake", 20, 20],
     ["aegis:blank_scroll", 4, "Blank Scroll ×4", 2, 1],
     ["__sage", 0, "Sage Training (learn Sage Mode)", 48, 60],
+    ["__nature", 0, "Chakra Nature Training (learn another release)", 0, 1],
   ],
   weaponsmith: [
     ["aegis:kunai", 8, "Kunai ×8", 3, 1],
@@ -485,14 +487,16 @@ async function shop(player, npc, cfg, list, title) {
   const f = new ActionFormData().title(title).body(`§7${cfg?.greeting || NPC_TYPES[cfg?.type ?? npc.getDynamicProperty("aegis:role")]?.greeting || ""}\n\n§aYour emeralds: §f${ems}`);
   for (const [, , label, base, req] of list) {
     const p = priceOf(base, cfg);
-    f.button(`${lvl < req ? "§8" : ems >= p ? "§2" : "§c"}${label}\n§r§7${p} emeralds${lvl < req ? ` · Lv ${req}` : ""}`);
+    f.button(base === 0 ? `§5${label}\n§r§7price depends on how many you know` : `${lvl < req ? "§8" : ems >= p ? "§2" : "§c"}${label}\n§r§7${p} emeralds${lvl < req ? ` · Lv ${req}` : ""}`);
   }
   const r = await f.show(player);
   if (r.canceled || r.selection === undefined) return;
   const [id, amount, label, base, req] = list[r.selection];
   const price = priceOf(base, cfg);
   if (lvl < req) player.sendMessage(`§cYou need to be level ${req} for that.`);
-  else if (id === "__sage") {
+  else if (id === "__nature") {
+    return natureTraining(player, (n) => priceOf(n, cfg), takeItem, getLevel);
+  } else if (id === "__sage") {
     if (hasSageTraining(player)) player.sendMessage("§7You've already mastered Sage Mode.");
     else if (!takeItem(player, "minecraft:emerald", price)) player.sendMessage(`§cYou need ${price} emeralds.`);
     else return grantSage(player);
@@ -701,6 +705,10 @@ async function clanElder(player, npc, cfg) {
       f.button(`§2Train Clan Mastery ${mastery + 1}\n§r§7${priceOf(next.ems, cfg)} emeralds · Lv ${next.lvl}`);
       opts.push("train");
     }
+    for (const [item, label, ems, lvl] of RELEASE_SCROLLS[clanId] ?? []) {
+      f.button(`${clan.color}${label}\n§r§7${priceOf(ems, cfg)} emeralds · Lv ${lvl}`);
+      opts.push(["release", item, label, ems, lvl]);
+    }
     if (clanId === "uchiha" && player.getDynamicProperty("aegis:mangekyo") === true && !hasEternalMangekyo(player)) {
       f.button(`§5Awaken the Eternal Mangekyō\n§r§7${priceOf(64, cfg)} emeralds · Lv 100`);
       opts.push("eternal");
@@ -715,6 +723,14 @@ async function clanElder(player, npc, cfg) {
   const r = await f.show(player);
   if (r.canceled || r.selection === undefined) return;
   const c = opts[r.selection];
+  if (Array.isArray(c) && c[0] === "release") {
+    const [, item, label, ems, lvl] = c;
+    if (getLevel(player) < lvl) return player.sendMessage(`§cReach level ${lvl} first.`);
+    if (!takeItem(player, "minecraft:emerald", priceOf(ems, cfg))) return player.sendMessage(`§cYou need ${priceOf(ems, cfg)} emeralds.`);
+    giveItem(player, item, 1);
+    api.sound(player.dimension, "random.orb", player.location, 1, 1.2);
+    return player.sendMessage(`§aThe elder entrusts you with ${clan.color}${label}§a.`);
+  }
   if (c === "train") {
     const next = MASTERY[mastery + 1];
     if (getLevel(player) < next.lvl) return player.sendMessage(`§cReach level ${next.lvl} first.`);

@@ -322,6 +322,36 @@
     },
     "aegis_orochimaru_sandals": {
       "textures": "textures/items/aegis/orochimaru_sandals"
+    },
+    "aegis_wood_forest_scroll": {
+      "textures": "textures/items/aegis/wood_forest_scroll"
+    },
+    "aegis_wood_dragon_scroll": {
+      "textures": "textures/items/aegis/wood_dragon_scroll"
+    },
+    "aegis_blaze_spears_scroll": {
+      "textures": "textures/items/aegis/blaze_spears_scroll"
+    },
+    "aegis_blaze_barrier_scroll": {
+      "textures": "textures/items/aegis/blaze_barrier_scroll"
+    },
+    "aegis_ice_dragon_scroll": {
+      "textures": "textures/items/aegis/ice_dragon_scroll"
+    },
+    "aegis_lava_globs_scroll": {
+      "textures": "textures/items/aegis/lava_globs_scroll"
+    },
+    "aegis_boil_strength_scroll": {
+      "textures": "textures/items/aegis/boil_strength_scroll"
+    },
+    "aegis_ice_mirrors": {
+      "textures": "textures/items/aegis/ice_mirrors"
+    },
+    "aegis_lava_boil": {
+      "textures": "textures/items/aegis/lava_boil"
+    },
+    "aegis_hydrification": {
+      "textures": "textures/items/aegis/hydrification"
     }
   }
 }

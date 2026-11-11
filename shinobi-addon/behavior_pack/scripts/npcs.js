@@ -11,6 +11,8 @@ import { ActionFormData, ModalFormData, MessageFormData } from "@minecraft/serve
 import { showTitle } from "./hud.js";
 import { CLANS, getClanId, setClanPublic, applyNameTag } from "./clans.js";
 import { getLevel, gainXp, getRank, setRank, addPoints, RANKS } from "./levels.js";
+import { hasSageTraining, grantSage } from "./sage.js";
+import { hasEternalMangekyo, awakenEternal } from "./clans.js";
 
 const SPAWNER = "aegis:npc_spawner";
 const INDEX_PROP = "aegis:spawners";
@@ -420,6 +422,7 @@ const SHOPS = {
     ["aegis:summon_slug_scroll", 1, "Summoning: Slug", 20, 20],
     ["aegis:summon_snake_scroll", 1, "Summoning: Snake", 20, 20],
     ["aegis:blank_scroll", 4, "Blank Scroll ×4", 2, 1],
+    ["__sage", 0, "Sage Training (learn Sage Mode)", 48, 60],
   ],
   weaponsmith: [
     ["aegis:kunai", 8, "Kunai ×8", 3, 1],
@@ -455,7 +458,11 @@ async function shop(player, npc, cfg, list, title) {
   const [id, amount, label, base, req] = list[r.selection];
   const price = priceOf(base, cfg);
   if (lvl < req) player.sendMessage(`§cYou need to be level ${req} for that.`);
-  else if (id === "__repair") {
+  else if (id === "__sage") {
+    if (hasSageTraining(player)) player.sendMessage("§7You've already mastered Sage Mode.");
+    else if (!takeItem(player, "minecraft:emerald", price)) player.sendMessage(`§cYou need ${price} emeralds.`);
+    else return grantSage(player);
+  } else if (id === "__repair") {
     const inv = container(player);
     const it = inv?.getItem(player.selectedSlotIndex);
     const dur = it?.getComponent("minecraft:durability");
@@ -661,6 +668,10 @@ async function clanElder(player, npc, cfg) {
       f.button(`§2Train Clan Mastery ${mastery + 1}\n§r§7${priceOf(next.ems, cfg)} emeralds · Lv ${next.lvl}`);
       opts.push("train");
     }
+    if (clanId === "uchiha" && player.getDynamicProperty("aegis:mangekyo") === true && !hasEternalMangekyo(player)) {
+      f.button(`§5Awaken the Eternal Mangekyō\n§r§7${priceOf(64, cfg)} emeralds · Lv 100`);
+      opts.push("eternal");
+    }
   } else {
     f.body(`§7You are not of the ${clan.color}${clan.name}§7. But blood can be… arranged.\n§7Perks of our clan: §f${clan.perks}`);
     f.button(`§5Bloodline transfer: join the ${clan.name}\n§r§7${priceOf(64, cfg)} emeralds · Lv 30 · replaces your clan`);
@@ -678,6 +689,10 @@ async function clanElder(player, npc, cfg) {
     player.setDynamicProperty("aegis:clan_mastery", mastery + 1);
     showTitle(player, `${clan.color}Clan Mastery ${mastery + 1}`, { subtitle: "§7Your bloodline grows stronger", stayDuration: 50 });
     api.sound(player.dimension, "random.levelup", player.location, 1, 0.8);
+  } else if (c === "eternal") {
+    if (getLevel(player) < 100) return player.sendMessage("§cReach level 100 first.");
+    if (!takeItem(player, "minecraft:emerald", priceOf(64, cfg))) return player.sendMessage(`§cYou need ${priceOf(64, cfg)} emeralds.`);
+    awakenEternal(player);
   } else if (c === "join") {
     if (getLevel(player) < 30) return player.sendMessage("§cReach level 30 first.");
     const ok = await new MessageFormData().title("Bloodline transfer").body(`Replace your clan with the ${clan.name}? Clan Mastery and Mangekyō progress are lost.`).button1("§5Transfer").button2("Cancel").show(player);

@@ -148,6 +148,9 @@
     },
     "aegis_summon_snake_scroll": {
       "textures": "textures/items/aegis/summon_snake_scroll"
+    },
+    "aegis_eternal_mangekyo": {
+      "textures": "textures/items/aegis/eternal_mangekyo"
     }
   }
 }

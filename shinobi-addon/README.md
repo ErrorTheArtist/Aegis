@@ -84,6 +84,30 @@ it awakens into the **Mangekyō Sharingan** (replaces your Sharingan item):
 
 Check your progress with `/scriptevent aegis:clan info`.
 
+### Eternal Mangekyō Sharingan (Uchiha)
+
+Uchiha with the Mangekyō can awaken the **Eternal Mangekyō** at an **Uchiha Clan Elder** (Lv 100, 64 emeralds).
+It replaces your Mangekyō item:
+
+- half the chakra drain (1.5/sec), **50% dodge**, Strength II + Speed while active
+- cheaper, stronger **Amaterasu** (30 chakra, 7s cooldown, 8 pulses)
+- **Susanoo** every 30s instead of 60s, with longer Resistance IV
+
+`/scriptevent aegis:clan eternal` awakens it instantly for testing.
+
+### Sage Mode
+
+Learn it from a **Jutsu Sensei** (Sage Training: Lv 60, 48 emeralds). Then **hold sneak and stand still for 5 seconds**
+to gather natural energy (a green bar fills on the action bar) and enter **Sage Mode** for 60 seconds:
+
+- **full chakra** on entering
+- Strength II, Speed II, Resistance, Jump Boost II
+- **+50% damage** for all jutsu, clan abilities and sword specials (stacks with Ninjutsu)
+- you **sense hostile mobs** within 32 blocks (glowing markers)
+
+2 minute cooldown after it ends. Can't be gathered while in Tailed Beast Mode.
+`/scriptevent aegis:sage learn` teaches it instantly for testing.
+
 ### Clan jutsu discounts
 
 | Clan | Cheaper jutsu |
@@ -248,12 +272,12 @@ Friendly NPCs are leashed to their spawner; breaking the spawner removes its NPC
 
 | NPC | What they do |
 |---|---|
-| **Jutsu Sensei** | Sells jutsu scrolls (Fireball → Rasengan/Chidori) and Summoning scrolls; level requirements apply |
+| **Jutsu Sensei** | Sells jutsu scrolls (Fireball → Rasengan/Chidori), Summoning scrolls and **Sage Training** (Lv 60); level requirements apply |
 | **Weaponsmith** | Kunai, shuriken, headbands, all 8 legendary swords (Lv 15–35), repairs the item in your hand |
 | **Ramen Shop** | Ichiraku Ramen (heal + 60 chakra + regen), Miso Ramen (+30 chakra + speed), Soldier Pills |
 | **Hokage (Mission Desk)** | D/C/B/A/S missions (kill mobs, ninja, a Tailed Beast, an Akatsuki member) for XP, emeralds and items |
 | **Exam Proctor** | Rank exams: **Chūnin** (Lv 20, beat 4 rogue ninja in 90 s), **Jōnin** (Lv 60, 3 Anbu + 3 Sound in 2 min), **Kage** (Lv 120, beat an Akatsuki in 3 min). Ranks show on your name tag and give +5/+10/+20 stat points |
-| **Clan Elder** | For their clan: **Clan Mastery** 1–3 (+10% clan max chakra, −10% clan ability cooldowns each). Others: **Bloodline transfer** into that clan (64 emeralds, Lv 30) |
+| **Clan Elder** | For their clan: **Clan Mastery** 1–3 (+10% clan max chakra, −10% clan ability cooldowns each); the Uchiha Elder also awakens the **Eternal Mangekyō**. Others: **Bloodline transfer** into that clan (64 emeralds, Lv 30) |
 | **Leaf Shinobi** | Chatter and tips |
 | **Genin** | Recruit for 15 emeralds — follows you, fights, levels up to 10 (Strength, Resistance, hearts). Talk to toggle follow/stay or dismiss |
 

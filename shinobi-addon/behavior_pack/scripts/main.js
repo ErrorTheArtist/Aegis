@@ -10,6 +10,7 @@ import { initNpcs } from "./npcs.js";
 import { initEnemies, spawnAkatsukiNear } from "./enemies.js";
 import { initCompanions, handleSummonUse } from "./companions.js";
 import { initVillages } from "./villages.js";
+import { initSage, sageMultiplier } from "./sage.js";
 import { initLevels, handleRecordUse, levelChakraBonus, levelRegenMultiplier, ninjutsuMultiplier, cooldownMultiplier, gainJutsuXp, getLevel } from "./levels.js";
 
 // ---------------------------------------------------------------------------
@@ -91,7 +92,7 @@ function knockback(entity, dirX, dirZ, horizontal, vertical) {
 
 function hurt(target, amount, attacker, cause = "entityAttack") {
   // Ninjutsu stat boosts every scripted technique a player lands.
-  if (attacker?.typeId === "minecraft:player") amount *= ninjutsuMultiplier(attacker);
+  if (attacker?.typeId === "minecraft:player") amount *= ninjutsuMultiplier(attacker) * sageMultiplier(attacker);
   try {
     target.applyDamage(amount, { cause, damagingEntity: attacker });
   } catch {
@@ -741,3 +742,4 @@ initNpcs({ ...npcApi, spawnAkatsukiNear: (p, msg) => spawnAkatsukiNear(p, msg) }
 initEnemies(npcApi);
 initCompanions(npcApi);
 initVillages(npcApi);
+initSage({ ...npcApi, getMaxChakra });

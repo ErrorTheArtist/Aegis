@@ -6,6 +6,7 @@
 //   /scriptevent aegis:clan set uchiha      — set your clan directly
 //   /scriptevent aegis:clan info            — show your clan
 //   /scriptevent aegis:clan mangekyo        — instantly awaken the Mangekyō (Uchiha only)
+//   /scriptevent aegis:clan eternal         — instantly awaken the Eternal Mangekyō (Uchiha only)
 
 import { world, system, ItemStack, ItemLockMode } from "@minecraft/server";
 import { showTitle } from "./hud.js";
@@ -14,6 +15,7 @@ import { statEffectLevels, getLevel, getRank, RANKS } from "./levels.js";
 const CLAN_PROP = "aegis:clan";
 const MS_XP_PROP = "aegis:sharingan_xp";
 const MS_PROP = "aegis:mangekyo";
+const EMS_PROP = "aegis:eternal_mangekyo";
 const MANGEKYO_XP = 100; // mob kill = 1, player kill = 10 (with Sharingan active)
 const REROLL_ITEM = "aegis:reroll_scroll";
 
@@ -108,10 +110,12 @@ export function clanJutsuCostMultiplier(player, itemId) {
 }
 
 const hasMangekyo = (player) => getClanId(player) === "uchiha" && player.getDynamicProperty(MS_PROP) === true;
+export const hasEternalMangekyo = (player) => hasMangekyo(player) && player.getDynamicProperty(EMS_PROP) === true;
 
 function clanItemFor(player) {
   const clan = getClan(player);
   if (!clan) return undefined;
+  if (hasEternalMangekyo(player)) return "aegis:eternal_mangekyo";
   return hasMangekyo(player) ? "aegis:mangekyo" : clan.item;
 }
 
@@ -203,7 +207,7 @@ function giveClanItem(player) {
 function removeClanItems(player) {
   const inv = player.getComponent("minecraft:inventory")?.container;
   if (!inv) return;
-  const ids = new Set([...Object.values(CLANS).map((c) => c.item), "aegis:mangekyo"]);
+  const ids = new Set([...Object.values(CLANS).map((c) => c.item), "aegis:mangekyo", "aegis:eternal_mangekyo"]);
   for (let i = 0; i < inv.size; i++) {
     const it = inv.getItem(i);
     if (it && ids.has(it.typeId)) inv.setItem(i, undefined);
@@ -219,6 +223,7 @@ function setClan(player, id) {
     // a new bloodline starts from scratch
     player.setDynamicProperty(MS_XP_PROP, 0);
     player.setDynamicProperty(MS_PROP, false);
+    player.setDynamicProperty(EMS_PROP, false);
     player.setDynamicProperty("aegis:clan_mastery", 0);
   }
   player.setDynamicProperty(CLAN_PROP, id);
@@ -281,6 +286,10 @@ function refreshEffects(player, force = false) {
   const dojutsu = activeDojutsu.get(player.id);
   if (dojutsu) put("night_vision", 0);
   if (dojutsu === "mangekyo") put("strength", 0);
+  if (dojutsu === "eternal") {
+    put("strength", 1);
+    put("speed", 0);
+  }
   for (const [id, lv] of Object.entries(statEffectLevels(player))) {
     if (lv > 0) merged.set(id, (merged.has(id) ? merged.get(id) + 1 : 0) + lv - 1);
   }
@@ -352,7 +361,8 @@ function deactivateDojutsu(player) {
   }
 }
 
-const isSharinganActive = (p) => ["sharingan", "mangekyo"].includes(activeDojutsu.get(p.id));
+const isSharinganActive = (p) => ["sharingan", "mangekyo", "eternal"].includes(activeDojutsu.get(p.id));
+const isMangekyoActive = (p) => ["mangekyo", "eternal"].includes(activeDojutsu.get(p.id));
 
 function amaterasu(p, pulses, dmg) {
   if (!isSharinganActive(p)) {
@@ -404,6 +414,11 @@ const ABILITIES = {
     clan: "uchiha",
     use: { name: "Sharingan", cost: 0, cd: 10, cast: (p) => toggleDojutsu(p, "sharingan", "Sharingan") },
     sneak: { name: "Amaterasu", cost: 50, cd: 300, cast: (p) => amaterasu(p, 6, 3) },
+  },
+  "aegis:eternal_mangekyo": {
+    clan: "uchiha",
+    use: { name: "Eternal Mangekyō Sharingan", cost: 0, cd: 10, cast: (p) => toggleDojutsu(p, "eternal", "Eternal Mangekyō Sharingan") },
+    sneak: { name: "Amaterasu", cost: 30, cd: 140, cast: (p) => amaterasu(p, 8, 5) },
   },
   "aegis:mangekyo": {
     clan: "uchiha",
@@ -768,8 +783,8 @@ export function initClans(helpers) {
   world.afterEvents.entityHurt.subscribe(({ hurtEntity, damage }) => {
     if (hurtEntity.typeId !== "minecraft:player") return;
     const kind = activeDojutsu.get(hurtEntity.id);
-    if (kind === "mangekyo") trySusanoo(hurtEntity);
-    if (!isSharinganActive(hurtEntity) || Math.random() > (kind === "mangekyo" ? 0.4 : 0.3)) return;
+    if (isMangekyoActive(hurtEntity)) trySusanoo(hurtEntity, kind === "eternal");
+    if (!isSharinganActive(hurtEntity) || Math.random() > ({ mangekyo: 0.4, eternal: 0.5 }[kind] ?? 0.3)) return;
     try {
       const health = hurtEntity.getComponent("minecraft:health");
       health.setCurrentValue(Math.min(health.effectiveMax, health.currentValue + damage));
@@ -812,7 +827,7 @@ export function initClans(helpers) {
       if (!getClanId(player)) continue;
       const kind = activeDojutsu.get(player.id);
       if (kind) {
-        const drain = { sharingan: 2, mangekyo: 3, byakugan: 1.5 }[kind] ?? 2; // per second
+        const drain = { sharingan: 2, mangekyo: 3, eternal: 1.5, byakugan: 1.5 }[kind] ?? 2; // per second
         const c = api.getChakra(player) - drain * 0.25;
         api.setChakra(player, c);
         if (c <= 0) {
@@ -844,8 +859,15 @@ export function initClans(helpers) {
       if (old) {
         player.setDynamicProperty(MS_XP_PROP, 0);
         player.setDynamicProperty(MS_PROP, false);
+        player.setDynamicProperty(EMS_PROP, false);
       }
       rollClan(player);
+    } else if (cmd === "eternal") {
+      if (getClanId(player) !== "uchiha") player.sendMessage("§7Only the Uchiha can awaken the Eternal Mangekyō.");
+      else {
+        if (!hasMangekyo(player)) awakenMangekyo(player);
+        awakenEternal(player);
+      }
     } else if (cmd === "mangekyo") {
       if (getClanId(player) !== "uchiha") player.sendMessage("§7Only the Uchiha can awaken the Mangekyō.");
       else awakenMangekyo(player);
@@ -856,13 +878,15 @@ export function initClans(helpers) {
       const clan = getClan(player);
       let text = clan ? `§7Clan: ${clanLabel(clan)} §7(${RARITY[clan.rarity].color}${RARITY[clan.rarity].label}§7)\n§7Perks: §f${clan.perks}` : "§7No clan yet.";
       if (getClanId(player) === "uchiha") {
-        text += hasMangekyo(player)
-          ? "\n§cMangekyō Sharingan: §fawakened"
+        text += hasEternalMangekyo(player)
+          ? "\n§5Eternal Mangekyō Sharingan: §fawakened"
+          : hasMangekyo(player)
+          ? "\n§cMangekyō Sharingan: §fawakened §7(the Uchiha Elder can awaken the Eternal Mangekyō at Lv 100)"
           : `\n§cMangekyō progress: §f${player.getDynamicProperty(MS_XP_PROP) ?? 0}/${MANGEKYO_XP}`;
       }
       player.sendMessage(text);
     } else {
-      player.sendMessage(`§7Usage: /scriptevent aegis:clan <reroll | info | mangekyo | set <${Object.keys(CLANS).join("|")}>>`);
+      player.sendMessage(`§7Usage: /scriptevent aegis:clan <reroll | info | mangekyo | eternal | set <${Object.keys(CLANS).join("|")}>>`);
     }
   });
 }
@@ -890,7 +914,22 @@ function awakenMangekyo(player) {
   world.sendMessage(`§e${player.name} has awakened the §4Mangekyō Sharingan§e!`);
 }
 
-function trySusanoo(player) {
+// Eternal Mangekyō: the next stage after the Mangekyō (trained at the Uchiha Clan Elder).
+export function awakenEternal(player) {
+  if (!hasMangekyo(player) || hasEternalMangekyo(player)) return false;
+  player.setDynamicProperty(EMS_PROP, true);
+  deactivateDojutsu(player);
+  removeClanItems(player);
+  giveClanItem(player);
+  showTitle(player, "§5Eternal Mangekyō", { subtitle: "§7Your eyes will never dim again", fadeInDuration: 10, stayDuration: 70, fadeOutDuration: 20 });
+  api.sound(player.dimension, "mob.wither.spawn", player.location, 0.6, 0.9);
+  api.particle(player.dimension, "aegis:susanoo_flame", player.location);
+  player.sendMessage("§5Eternal Mangekyō Sharingan! §7Half the chakra drain, 50% dodge, Strength II + Speed, cheaper Amaterasu, and a stronger Susanoo every 30s.");
+  world.sendMessage(`§e${player.name} has awakened the §5Eternal Mangekyō Sharingan§e!`);
+  return true;
+}
+
+function trySusanoo(player, eternal = false) {
   try {
     const h = player.getComponent("minecraft:health");
     if (h.currentValue > h.effectiveMax * 0.3) return;
@@ -899,8 +938,8 @@ function trySusanoo(player) {
   }
   if (api.cooldownLeft(player, "susanoo") > 0 || api.getChakra(player) < 30) return;
   api.setChakra(player, api.getChakra(player) - 30);
-  api.startCooldown(player, "susanoo", 1200); // 60s
-  eff(player, "resistance", 120, 3);
+  api.startCooldown(player, "susanoo", eternal ? 600 : 1200); // 30s / 60s
+  eff(player, "resistance", eternal ? 200 : 120, 3);
   eff(player, "absorption", 300, 4);
   eff(player, "strength", 300, 1);
   eff(player, "regeneration", 100, 1);

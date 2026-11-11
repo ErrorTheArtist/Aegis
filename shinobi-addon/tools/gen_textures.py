@@ -354,3 +354,14 @@ print("Tailed beast item textures generated.")
 # --- Shinobi Record (stats book/scroll) -------------------------------------------
 save(draw(canvas(), scroll, {"P": PAPER, "p": PAPER_D, "R": (40, 70, 160, 255), "r": (25, 45, 110, 255), "C": (250, 200, 40, 255)}), ITEMS / "shinobi_record.png")
 print("Shinobi Record texture generated.")
+
+# --- Eternal Mangekyō: red iris with a six-pointed black star ---------------------
+ems = eye((210, 25, 25, 255), (90, 0, 0, 255), (10, 10, 10, 255))
+for k in range(6):
+    a = k * math.pi / 3
+    for r in (1.2, 2.0, 2.8, 3.6):
+        w_ = 0.9 if r < 3 else 0.4
+        for off in (-w_, 0, w_):
+            ems.putpixel((round(7.5 + math.cos(a + off * 0.25) * r), round(7.5 + math.sin(a + off * 0.25) * r)), (10, 10, 10, 255))
+save(ems, ITEMS / "eternal_mangekyo.png")
+print("Eternal Mangekyō texture generated.")

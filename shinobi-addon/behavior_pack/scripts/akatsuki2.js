@@ -11,6 +11,25 @@ const SKIN = { hidan: 23, hidan_jashin: 24, zetsu: 27 };
 const curse = new Map(); // hidan id -> { target, until }
 const ritual = new Map(); // hidan id -> end tick
 const immortalUsed = new Set();
+const solid = new Map(); // tobi id -> tick his solid window ends
+const PURPLE = [0.6, 0.3, 0.9];
+
+// Tobi phased (true) = untouchable (damage_sensor blocks everything); false = solid and can be hurt.
+function phase(e, on) {
+  try {
+    e.triggerEvent(on ? "aegis:invulnerable" : "aegis:vulnerable");
+  } catch {
+    /* ignore */
+  }
+}
+
+function solidWindow(e, ticks) {
+  solid.set(e.id, system.currentTick + ticks);
+  phase(e, false);
+  api.particle(e.dimension, "aegis:cine_ring", e.location, [1, 0.55, 0.15]);
+  sfx(e.dimension, "aegis.whoosh", e.location, 1.2, 1.8);
+  for (const p of playersNear(e.dimension, e.location, 24)) p.onScreenDisplay?.setActionBar("§6§lTobi is solid — strike NOW!");
+}
 
 const member = (e) => {
   try {
@@ -376,19 +395,21 @@ export const MORE_MEMBER_AI = {
   },
 
   // ---- Tobi ----
+  // Kamui: Tobi is phased out of this world — nothing can touch him — except in the moment he turns solid to attack.
   tobi(e, t, dist) {
+    if (!solid.has(e.id)) phase(e, true);
     const r = Math.random();
-    if (r < 0.35) {
-      // Kamui: warp the target away
+    if (r < 0.3) {
+      // Kamui: warp the target away (he stays intangible for this one)
       const spot = { ...t.location };
       showTitle(t, "§6Kamui", { subtitle: "§7Space twists around you…", fadeInDuration: 0, stayDuration: 25, fadeOutDuration: 6 });
-      for (let k = 0; k < 18; k += 3) system.runTimeout(() => api.particle(e.dimension, "aegis:cine_swirl", spot, [0.6, 0.3, 0.9]), k);
+      for (let k = 0; k < 18; k += 3) system.runTimeout(() => api.particle(e.dimension, "aegis:cine_swirl", spot, PURPLE), k);
       sfx(e.dimension, "aegis.charge", spot, 1.4, 1.3);
       system.runTimeout(() => {
         if (!api.isValid(t) || !api.isValid(e)) return;
         if (Math.hypot(t.location.x - spot.x, t.location.z - spot.z) > 2.5) return; // dodged
-        const a = Math.random() * Math.PI * 2;
-        const to = { x: t.location.x + Math.cos(a) * 9, y: t.location.y + 1, z: t.location.z + Math.sin(a) * 9 };
+        const a2 = Math.random() * Math.PI * 2;
+        const to = { x: t.location.x + Math.cos(a2) * 9, y: t.location.y + 1, z: t.location.z + Math.sin(a2) * 9 };
         try {
           const b1 = t.dimension.getBlock(to);
           const b2 = t.dimension.getBlock(up(to, 1));
@@ -396,27 +417,46 @@ export const MORE_MEMBER_AI = {
         } catch {
           /* ignore */
         }
-        api.particle(t.dimension, "aegis:cine_swirl", t.location, [0.6, 0.3, 0.9]);
+        api.particle(t.dimension, "aegis:cine_swirl", t.location, PURPLE);
         api.hurt(t, 9, e, "magic");
         eff(t, "nausea", 100, 0);
       }, 18);
-      return 140;
+      return 120;
     }
-    if (r < 0.55 && dist > 4) {
-      // warps right next to the target
-      api.particle(e.dimension, "aegis:cine_swirl", e.location, [0.6, 0.3, 0.9]);
+    if (dist > 4 && r < 0.6) {
+      // warps right beside the target and strikes — solid for the hit
+      api.particle(e.dimension, "aegis:cine_swirl", e.location, PURPLE);
       try {
         const d = flatDir(t, e);
         e.teleport(add(t.location, api.scale(d, 2)), { facingLocation: t.location });
       } catch {
         /* ignore */
       }
-      api.particle(e.dimension, "aegis:cine_swirl", e.location, [0.6, 0.3, 0.9]);
-      api.anim(e, "animation.aegis.palm_thrust");
-      api.hurt(t, 7, e);
-      return 60;
+      api.particle(e.dimension, "aegis:cine_swirl", e.location, PURPLE);
+      solidWindow(e, 34);
+      system.runTimeout(() => {
+        if (!api.isValid(e) || !api.isValid(t)) return;
+        api.anim(e, "animation.aegis.palm_thrust");
+        api.hurt(t, 8, e);
+      }, 8);
+      return 70;
     }
-    // Great Fireball
+    if (dist <= 4) {
+      // grabs the target to drag them into Kamui — has to be solid to touch them
+      solidWindow(e, 34);
+      api.anim(e, "animation.aegis.pull");
+      eff(t, "slowness", 30, 4);
+      system.runTimeout(() => {
+        if (!api.isValid(e) || !api.isValid(t)) return;
+        api.hurt(t, 7, e);
+        api.particle(t.dimension, "aegis:cine_swirl", t.location, PURPLE);
+        const d = flatDir(e, t);
+        api.knockback(t, d.x, d.z, 2.2, 0.4);
+      }, 10);
+      return 70;
+    }
+    // Great Fireball — solid while he breathes it out
+    solidWindow(e, 34);
     api.anim(e, "animation.aegis.fireball_jutsu");
     chargeFx(e, [1, 0.45, 0.1], 12);
     system.runTimeout(() => api.isValid(e) && api.isValid(t) && throwAt(e, t, { speed: 1.2, damage: 12, radius: 4, knock: 1, fire: 6 }), 12);
@@ -502,22 +542,43 @@ export function initAkatsuki2(helpers) {
           showTitle(p, "§2Kakuzu", { subtitle: `§7consumes a heart… §f${left - 1}§7 left`, fadeInDuration: 0, stayDuration: 30, fadeOutDuration: 8 });
         }
       }
-    } else if (who === "tobi" && attacker && Math.random() < 0.4) {
-      // Kamui: the attack passes straight through him
-      try {
-        const h = hurtEntity.getComponent("minecraft:health");
-        h.setCurrentValue(Math.min(h.effectiveMax, h.currentValue + damage));
-      } catch {
-        /* ignore */
-      }
-      api.particle(hurtEntity.dimension, "aegis:cine_swirl", hurtEntity.location, [0.6, 0.3, 0.9]);
-      if (attacker.typeId === "minecraft:player") attacker.onScreenDisplay?.setActionBar("§6Your attack passed right through him…");
     }
+  });
+
+  // Tobi: attacks pass straight through him while he's phased
+  world.afterEvents.entityHitEntity.subscribe(({ damagingEntity, hitEntity }) => {
+    if (hitEntity?.typeId !== "aegis:akatsuki" || member(hitEntity) !== "tobi" || solid.has(hitEntity.id)) return;
+    api.particle(hitEntity.dimension, "aegis:cine_swirl", hitEntity.location, PURPLE);
+    if (damagingEntity?.typeId === "minecraft:player") damagingEntity.onScreenDisplay?.setActionBar("§7Your attack passes right through him… §8(wait until he turns solid to attack)");
+  });
+  // solid windows close; while solid he flickers orange
+  system.runInterval(() => {
+    const now = system.currentTick;
+    for (const [id, until] of [...solid]) {
+      const e = world.getEntity(id);
+      if (!e || !api.isValid(e)) {
+        solid.delete(id);
+        continue;
+      }
+      if (now >= until) {
+        solid.delete(id);
+        phase(e, true);
+        api.particle(e.dimension, "aegis:cine_swirl", e.location, PURPLE);
+      } else {
+        api.particle(e.dimension, "aegis:beast_aura", e.location, [1, 0.55, 0.15]);
+      }
+    }
+  }, 4);
+  // every Tobi starts phased
+  world.afterEvents.entitySpawn.subscribe(({ entity }) => {
+    if (entity.typeId !== "aegis:akatsuki") return;
+    system.runTimeout(() => api.isValid(entity) && member(entity) === "tobi" && phase(entity, true), 5);
   });
 
   world.afterEvents.entityDie.subscribe(({ deadEntity }) => {
     if (deadEntity.typeId !== "aegis:akatsuki") return;
     curse.delete(deadEntity.id);
+    solid.delete(deadEntity.id);
     ritual.delete(deadEntity.id);
     immortalUsed.delete(deadEntity.id);
     for (const tag of [`aegis_puppet_${deadEntity.id}`, `aegis_spore_${deadEntity.id}`]) {

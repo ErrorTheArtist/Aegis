@@ -500,8 +500,9 @@ Shops use **Ryō** — see *Ryō currency* below.
   second form inside a blood circle and **every wound he takes — even when he stabs himself — appears on you**; he
   survives one killing blow), **Kakuzu** (fire, wind and lightning masks; **five hearts** — he comes back from the brink
   four times), **Sasori** (poisoned senbon, a puppet army, telegraphed Iron Sand), **Zetsu** (sinks into the ground and
-  resurfaces behind you, White Zetsu spore clones, a chakra-draining grab) and **Tobi** (**Kamui**: 40% of attacks pass
-  straight through him, warps you away, appears beside you, Great Fireball). They **rarely roam the world** (Normal/Hard difficulty — you get a "sighted nearby"
+  resurfaces behind you, White Zetsu spore clones, a chakra-draining grab) and **Tobi** (**Kamui**: he's phased out of this
+  world and **nothing can hurt him** — except in the ~1.5 s he turns **solid to attack** (his strike, his grab and his
+  Great Fireball; you get a *"Tobi is solid — strike NOW!"* cue and he flickers orange). He also warps you away with Kamui. They **rarely roam the world** (Normal/Hard difficulty — you get a "sighted nearby"
   warning), **hunt Jinchūriki** (every 5 min, 35% chance) and appear for S-rank missions. ~1,500 XP each.
 
 ### Legendary bosses (NPC Spawner only)

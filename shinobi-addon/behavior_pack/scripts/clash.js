@@ -1,7 +1,10 @@
 // Jutsu Clash — when two fighters throw jutsu at each other at the same moment (or two jutsu projectiles collide),
-// a manga-style cinematic plays (like Naruto's Rasengan meeting Sasuke's Chidori): a wide shot of both charging,
-// close-ups over each shoulder, the dash, a white flash at the collision, and a crater torn into the ground.
-// Works for players (their own skins) and the Legend / Akatsuki bosses.
+// a cinematic plays, staged like Naruto's Rasengan meeting Sasuke's Chidori:
+//   the standoff → each fighter gathers their jutsu (hero shot, then close on the hand) → the eyes, cutting faster →
+//   black → both sprint (tracking shots) → they leap → the jutsu meet in mid-air → a dome of chakra swells around
+//   them as they strain against each other → it bursts, hurls them apart and tears a crater → who is left standing.
+// The choreography and every camera position live in clash_shots.js and are storyboarded offline with
+// tools/cine_preview.py. Works for players (their own skins) and the Legend / Akatsuki bosses.
 //
 //   /scriptevent aegis:clash destruction off|on   — turn the crater on/off for the whole world
 //   /scriptevent aegis:clash test                  — clash with the nearest player / boss you're looking at
@@ -10,6 +13,7 @@ import { world, system } from "@minecraft/server";
 import { showTitle } from "./hud.js";
 import { sfx, shake, fogFor, setCinematicBusy, inCinematic } from "./cinematic.js";
 import { JUTSU_NATURE } from "./natures.js";
+import { STAGE, T, PATH, ANIMS, FAMILY_ANIMS, POSES, SHOTS } from "./clash_shots.js";
 
 let api;
 const recent = new Map(); // entity id -> { tick, kind, target id, cost }
@@ -26,18 +30,18 @@ const PROTECTED = /bedrock|barrier|command_block|structure_block|structure_void|
 // What each kind of jutsu looks like in the clash
 // ---------------------------------------------------------------------------
 const STYLES = {
-  lightning: { color: [0.6, 0.85, 1], hand: "aegis:chidori", anim: "animation.aegis.chidori_charge", sound: "aegis.chidori", name: "Chidori" },
-  rasengan: { color: [0.4, 0.75, 1], hand: "aegis:rasengan", anim: "animation.aegis.rasengan_form", sound: "aegis.rasengan", name: "Rasengan" },
-  fire: { color: [1, 0.45, 0.1], hand: "aegis:fire_trail", anim: "animation.aegis.rasengan_form", sound: "aegis.fire", name: "Fire Release" },
-  water: { color: [0.3, 0.6, 1], hand: "aegis:water_splash", anim: "animation.aegis.rasengan_form", sound: "aegis.charge", name: "Water Release" },
-  wind: { color: [0.75, 1, 0.85], hand: "aegis:wind_gust", anim: "animation.aegis.rasengan_form", sound: "aegis.whoosh", name: "Wind Release" },
-  earth: { color: [0.65, 0.5, 0.3], hand: "aegis:dust", anim: "animation.aegis.rasengan_form", sound: "aegis.charge", name: "Earth Release" },
-  blaze: { color: [0.35, 0.05, 0.45], hand: "aegis:amaterasu", anim: "animation.aegis.chidori_charge", sound: "aegis.fire", name: "Blaze Release" },
-  ice: { color: [0.75, 0.92, 1], hand: "aegis:slash", anim: "animation.aegis.rasengan_form", sound: "aegis.charge", name: "Ice Release" },
-  wood: { color: [0.5, 0.8, 0.3], hand: "aegis:chakra_aura", anim: "animation.aegis.rasengan_form", sound: "aegis.charge", name: "Wood Release" },
-  lava: { color: [1, 0.32, 0.05], hand: "aegis:fire_trail", anim: "animation.aegis.rasengan_form", sound: "aegis.fire", name: "Lava Release" },
-  beast: { color: [1, 0.5, 0.1], hand: "aegis:beast_aura", anim: "animation.aegis.rasengan_form", sound: "aegis.charge", name: "Tailed Beast chakra" },
-  chakra: { color: [0.5, 0.8, 1], hand: "aegis:chakra_aura", anim: "animation.aegis.rasengan_form", sound: "aegis.charge", name: "Chakra" },
+  lightning: { color: [0.6, 0.85, 1], hand: "aegis:chidori", family: "chidori", sound: "aegis.chidori", name: "Chidori" },
+  rasengan: { color: [0.4, 0.75, 1], hand: "aegis:rasengan", family: "orb", sound: "aegis.rasengan", name: "Rasengan" },
+  fire: { color: [1, 0.45, 0.1], hand: "aegis:fire_trail", family: "orb", sound: "aegis.fire", name: "Fire Release" },
+  water: { color: [0.3, 0.6, 1], hand: "aegis:water_splash", family: "orb", sound: "aegis.charge", name: "Water Release" },
+  wind: { color: [0.75, 1, 0.85], hand: "aegis:wind_gust", family: "orb", sound: "aegis.whoosh", name: "Wind Release" },
+  earth: { color: [0.65, 0.5, 0.3], hand: "aegis:dust", family: "orb", sound: "aegis.charge", name: "Earth Release" },
+  blaze: { color: [0.35, 0.05, 0.45], hand: "aegis:amaterasu", family: "chidori", sound: "aegis.fire", name: "Blaze Release" },
+  ice: { color: [0.75, 0.92, 1], hand: "aegis:slash", family: "orb", sound: "aegis.charge", name: "Ice Release" },
+  wood: { color: [0.5, 0.8, 0.3], hand: "aegis:chakra_aura", family: "orb", sound: "aegis.charge", name: "Wood Release" },
+  lava: { color: [1, 0.32, 0.05], hand: "aegis:fire_trail", family: "orb", sound: "aegis.fire", name: "Lava Release" },
+  beast: { color: [1, 0.5, 0.1], hand: "aegis:beast_aura", family: "orb", sound: "aegis.charge", name: "Tailed Beast chakra" },
+  chakra: { color: [0.5, 0.8, 1], hand: "aegis:chakra_aura", family: "orb", sound: "aegis.charge", name: "Chakra" },
 };
 
 export function styleOf(kind = "") {
@@ -181,22 +185,27 @@ export function projectilesMet(a, b) {
 // ---------------------------------------------------------------------------
 // The cinematic
 // ---------------------------------------------------------------------------
-function handOf(e, dir, perp, style) {
-  if (style?.anim === "animation.aegis.chidori_charge" && api.chidoriHand) {
+const EASES = { lin: (u) => u, in: (u) => u * u, out: (u) => 1 - (1 - u) ** 2, io: (u) => 0.5 - 0.5 * Math.cos(Math.PI * u) };
+
+// Who wins is settled the moment the jutsu are thrown (the final shot needs to know); the damage lands at the burst.
+function decide(A, castA, B, castB) {
+  const power = (e, c) => (c.cost ?? 30) * (1 + (isPlayer(e) ? 0 : 0.4)) * (0.85 + Math.random() * 0.3);
+  const pa = power(A, castA);
+  const pb = power(B, castB);
+  const even = Math.abs(pa - pb) / Math.max(pa, pb) < 0.1;
+  return { even, win: pa >= pb ? "A" : "B", lose: pa >= pb ? "B" : "A" };
+}
+
+function clearColumn(dim, at, from, to) {
+  for (let y = from; y <= to; y++) {
     try {
-      return api.chidoriHand(e);
+      const b = dim.getBlock({ x: at.x, y: at.y + y, z: at.z });
+      if (b && !b.isAir && !b.isLiquid) return false;
     } catch {
-      /* fall through */
+      return false;
     }
   }
-  if (isPlayer(e)) {
-    try {
-      return api.handPos(e);
-    } catch {
-      /* fall through */
-    }
-  }
-  return add(add(e.location, mul(dir, 0.55)), add(mul(perp, -0.35), { x: 0, y: 1.15, z: 0 }));
+  return true;
 }
 
 function startClash(A, castA, B, castB) {
@@ -206,21 +215,81 @@ function startClash(A, castA, B, castB) {
   const pb0 = { ...B.location };
   const dist = Math.hypot(pb0.x - pa0.x, pb0.z - pa0.z);
   if (dist > 26 || dist < 1) return;
-  for (const e of [A, B]) {
+  const F = { A, B };
+  const S = { A: STYLES[styleOf(castA.kind)], B: STYLES[styleOf(castB.kind)] };
+  const all = [A, B];
+  const players = all.filter(isPlayer);
+  for (const e of all) {
     active.add(e.id);
     if (isPlayer(e)) setCinematicBusy(e.id, true);
   }
-  const sa = STYLES[styleOf(castA.kind)];
-  const sb = STYLES[styleOf(castB.kind)];
+  const outcome = decide(A, castA, B, castB);
+
+  // ----- the stage -----
   const dir = api.norm({ x: pb0.x - pa0.x, y: 0, z: pb0.z - pa0.z }); // A → B
-  const perp = { x: -dir.z, y: 0, z: dir.x };
+  const perp = { x: -dir.z, y: 0, z: dir.x }; // the camera's side (A's right hand)
   const mid = lerp(pa0, pb0, 0.5);
   mid.y = groundY(dim, mid.x, Math.max(pa0.y, pb0.y), mid.z);
-  const meetA = add(mid, mul(dir, -1.1));
-  const meetB = add(mid, mul(dir, 1.1));
-  const canDash = passable(dim, meetA) && passable(dim, meetB);
-  const players = [A, B].filter(isPlayer);
-  const all = [A, B];
+  const sign = { A: -1, B: 1 };
+  const spotAt = (who, d) => {
+    const p = add(mid, mul(dir, sign[who] * d));
+    p.y = groundY(dim, p.x, mid.y + 1, p.z);
+    return p;
+  };
+  const standable = (p) => Math.abs(p.y - mid.y) <= 2 && passable(dim, p);
+  const start = dist / 2;
+  const canMeet = passable(dim, spotAt("A", STAGE.strike)) && passable(dim, spotAt("B", STAGE.strike));
+  let H = Math.max(start, STAGE.half);
+  if (!canMeet || !standable(spotAt("A", H)) || !standable(spotAt("B", H))) H = start; // no room to spring apart
+  const air = canMeet && clearColumn(dim, mid, 1, Math.ceil(STAGE.air + 3)) ? STAGE.air : 0;
+  const back = standable(spotAt("A", STAGE.back)) && standable(spotAt("B", STAGE.back)) ? STAGE.back : H;
+  const baseY = { A: spotAt("A", H).y, B: spotAt("B", H).y };
+  const val = (v) => (v === "start" ? start : v === "H" ? H : v === "air" ? air : v === "back" ? back : v);
+
+  // where a fighter is at a tick: distance from the middle and height (clash_shots.js PATH)
+  const pathAt = (tick) => {
+    if (!canMeet) return { d: tick < T.apart ? start + (H - start) * (tick / T.apart) : H, h: 0 };
+    if (tick <= PATH[0].t) return { d: val(PATH[0].d), h: val(PATH[0].h) };
+    for (let i = 1; i < PATH.length; i++) {
+      const a = PATH[i - 1];
+      const b = PATH[i];
+      if (tick > b.t) continue;
+      const u = (tick - a.t) / (b.t - a.t);
+      const e = EASES[b.ease ?? "lin"](u);
+      return { d: val(a.d) + (val(b.d) - val(a.d)) * e, h: val(a.h) + (val(b.h) - val(a.h)) * e + (b.arc ?? 0) * 4 * u * (1 - u) };
+    }
+    const z = PATH[PATH.length - 1];
+    return { d: val(z.d), h: val(z.h) };
+  };
+  const feet = (who, tick) => {
+    const { d, h } = pathAt(tick);
+    const p = add(mid, mul(dir, sign[who] * d));
+    p.y = mid.y + (baseY[who] - mid.y) * Math.min(1, d / Math.max(H, 0.01)) + h;
+    return p;
+  };
+  // which pose a fighter is in at a tick (for the hand / head anchors)
+  const poseAt = (who, tick) => {
+    let key = "ready";
+    for (const [t, target, k] of ANIMS) {
+      if (t > tick) continue;
+      if (target === "both" || target === who || (!outcome.even && ((target === "W" && who === outcome.win) || (target === "L" && who === outcome.lose)))) key = k;
+    }
+    if (!canMeet && ["run", "leap", "recoil", "land", "rise", "kneel"].includes(key)) key = "hold";
+    return FAMILY_ANIMS.includes(key) ? `${key}_${S[who].family}` : key;
+  };
+  // an anchor from the shot list → a point in the world
+  const anchor = (a, tick) => {
+    const [name, f, p, h0, airK] = a;
+    const h = h0 + (airK ?? 0) * air;
+    if (name === "M") return add(add(mid, mul(dir, f)), add(mul(perp, p), { x: 0, y: h, z: 0 }));
+    const who = name[0] === "W" ? outcome.win : name[0] === "L" ? outcome.lose : name[0];
+    const part = name.slice(1);
+    const off = part ? (POSES[poseAt(who, tick)]?.[part] ?? [0, 0, 1]) : [0, 0, 0];
+    const base = feet(who, tick);
+    return add(add(base, mul(dir, -sign[who] * (f + off[0]))), add(mul(perp, p + off[1]), { x: 0, y: h + off[2], z: 0 }));
+  };
+  const handAt = (who, tick) => anchor([`${who}hand`, 0, 0, 0], tick);
+
   const name = (e) => (isPlayer(e) ? e.name : e.nameTag || "???");
   const nearby = (() => {
     try {
@@ -235,23 +304,8 @@ function startClash(A, castA, B, castB) {
     } catch {
       /* a participant left — the finish step still runs */
     }
-  }, t);
+  }, Math.max(1, t));
   const ok = (e) => api.isValid(e);
-  const chest = (e) => up(e.location, 1.2);
-  const face = (e, other) => {
-    try {
-      e.teleport(e.location, { facingLocation: up(other.location, 1.4) });
-    } catch {
-      /* ignore */
-    }
-  };
-  // camera position around a fighter: angle (degrees) from the line toward the opponent, distance, height
-  const orbit = (e, toward, deg, d, h) => {
-    const a = (deg * Math.PI) / 180;
-    const x = toward.x * Math.cos(a) - toward.z * Math.sin(a);
-    const z = toward.x * Math.sin(a) + toward.z * Math.cos(a);
-    return { x: e.location.x + x * d, y: e.location.y + h, z: e.location.z + z * d };
-  };
   const tagFog = `aegis_clash_${Math.floor(Math.random() * 1e6)}`;
   const fog = (color) => {
     for (const p of nearby) {
@@ -261,208 +315,233 @@ function startClash(A, castA, B, castB) {
     }
   };
   const title = (t, sub, stay = 40) => {
-    for (const p of nearby) if (ok(p)) showTitle(p, t, { subtitle: sub, fadeInDuration: 6, stayDuration: stay, fadeOutDuration: 10 });
+    for (const p of nearby) if (ok(p)) showTitle(p, t, { subtitle: sub, fadeInDuration: 4, stayDuration: stay, fadeOutDuration: 10 });
   };
-  const END = 340;
+  const clashPt = add(mid, { x: 0, y: air + STAGE.hit, z: 0 });
+  const mixed = mixColor(S.A.color, S.B.color);
 
   // ===== setup =====
   for (const e of all) {
-    eff(e, "resistance", END + 10, 4);
-    eff(e, "slowness", 210, 255);
-    if (isPlayer(e)) cmd(e, "inputpermission set @s movement disabled");
+    eff(e, "resistance", T.end + 10, 4);
+    eff(e, "slowness", T.run, 255);
+    if (!isPlayer(e)) continue;
+    cmd(e, "inputpermission set @s movement disabled");
+    cmd(e, "inputpermission set @s camera disabled");
+    cmd(e, "hud @s hide all");
+    cmd(e, "camera @s fade time 0 0.3 0.7 color 0 0 0");
   }
-  face(A, B);
-  face(B, A);
-  // keep both locked facing each other until the dash
-  for (let t = 2; t < 205; t += 4) run(() => {
-    if (ok(A) && ok(B)) {
-      if (!isPlayer(A)) face(A, B);
-      if (!isPlayer(B)) face(B, A);
-    }
-  }, t);
 
-  // ===== 0–50: the standoff =====
-  for (const p of players) {
-    cmd(p, "camera @s fade time 0 0.5 0.9 color 0 0 0");
-    camera(p, up(add(mid, mul(perp, 15)), 7), up(mid, 1));
-    run(() => camera(p, up(add(mid, mul(perp, 10.5)), 2.4), up(mid, 1.2), 2.4), 2);
-  }
-  sfx(dim, "aegis.clash_wind", mid, 2.5, 1);
-  run(() => title("§l§fJUTSU CLASH", `${colorCode(sa.color)}${name(A)} §7vs ${colorCode(sb.color)}${name(B)}`, 45), 8);
-  for (let t = 0; t < 50; t += 5) run(() => {
-    const u = Math.random();
-    api.particle(dim, "aegis:dust", lerp(A.location, B.location, u));
-    api.particle(dim, "aegis:wind_gust", up(lerp(A.location, B.location, Math.random()), 0.4));
-  }, t);
-
-  // ===== 50–170: each fighter powers up (like the Tailed Beast transformation) =====
-  const powerUp = (e, other, s, t0) => {
-    const toward = () => api.norm({ x: other.location.x - e.location.x, y: 0, z: other.location.z - e.location.z });
-    run(() => {
-      fog(s.color);
-      title(`${colorCode(s.color)}§l${s.name}`, `§7${name(e)}`, 45);
-      sfx(dim, "aegis.clash_charge", e.location, 2.2, 1);
-      sfx(dim, s.sound, e.location, 1.6, 1);
-      for (const p of players) {
-        camera(p, orbit(e, toward(), 40, 5, 1.9), chest(e));
-        camera(p, orbit(e, toward(), -15, 4, 1.4), chest(e), 1.4);
-      }
-    }, t0);
-    run(() => {
-      for (const p of players) camera(p, orbit(e, toward(), -70, 3.3, 1.0), up(e.location, 1.5), 1.3);
-    }, t0 + 30);
-    for (let k = 0; k < 4; k++) run(() => api.anim(e, s.anim), t0 + k * 16);
-    run(() => shake(dim, e.location, 0.25, 3, 24), t0 + 4);
-    for (let t = 0; t < 60; t += 3) {
-      run(() => {
-        const c = e.location;
-        const h = handOf(e, toward(), { x: -toward().z, y: 0, z: toward().x }, s);
-        for (let n = 0; n < 2; n++) {
-          const a = Math.random() * Math.PI * 2;
-          const r = 1.8 + Math.random() * 2;
-          api.particle(dim, "aegis:cine_pillar", add(c, { x: Math.cos(a) * r, y: 0, z: Math.sin(a) * r }), s.color);
-        }
-        api.particle(dim, "aegis:cine_bolt", up(c, 1.1), s.color);
-        api.particle(dim, s.hand, h, s.color);
-        api.particle(dim, "aegis:beast_aura", c, s.color);
-        if (t % 6 === 0) api.particle(dim, "aegis:cine_swirl", c, s.color);
-        if (t % 9 === 0) api.particle(dim, "aegis:cine_debris", c, [0.6, 0.55, 0.5]);
-        if (t === 12 || t === 30 || t === 48) api.particle(dim, "aegis:cine_flame", up(c, 1), s.color);
-        if (t % 12 === 0) sfx(dim, "aegis.lightning", c, 1.2, 0.9 + Math.random() * 0.3);
-      }, t0 + t);
-    }
-    run(() => {
-      api.particle(dim, "aegis:beast_burst", up(e.location, 1.1), s.color);
-      api.particle(dim, "aegis:cine_ring", e.location, s.color);
-      sfx(dim, "aegis.transform", e.location, 2, 1);
-    }, t0 + 56);
-  };
-  powerUp(A, B, sa, 50);
-  powerUp(B, A, sb, 110);
-
-  // ===== 170–195: face-off — both blazing, lightning arcs between them, heartbeats =====
-  run(() => {
-    fog(mixColor(sa.color, sb.color));
-    for (const p of players) {
-      camera(p, up(add(mid, mul(perp, 11)), 2.2), up(mid, 1.3));
-      camera(p, up(add(mid, mul(perp, 7)), 1.6), up(mid, 1.3), 1.25);
-    }
-    sfx(dim, "aegis.clash_heartbeat", mid, 2.5, 1);
-    shake(dim, mid, 0.5, 1.4, 32);
-  }, 170);
-  run(() => sfx(dim, "aegis.clash_heartbeat", mid, 2.8, 0.95), 184);
-  for (let t = 170; t < 195; t += 2) run(() => {
-    for (const [e, s] of [[A, sa], [B, sb]]) {
-      api.particle(dim, "aegis:beast_aura", e.location, s.color);
-      api.particle(dim, s.hand, up(e.location, 1.2), s.color);
-    }
-    const u = Math.random();
-    api.particle(dim, "aegis:cine_bolt", up(lerp(A.location, B.location, u), 1.2), u < 0.5 ? sa.color : sb.color);
-  }, t);
-
-  // ===== 195–205: cut to black =====
-  run(() => {
-    for (const p of players) cmd(p, "camera @s fade time 0.15 0.35 0.2 color 0 0 0");
-    sfx(dim, "aegis.clash_heartbeat", mid, 3, 0.9);
-  }, 195);
-
-  // ===== 205–225: the dash =====
-  run(() => {
-    for (const p of players) {
-      camera(p, up(add(add(mid, mul(perp, 7.5)), mul(dir, -3)), 0.6), up(mid, 1.3));
-      camera(p, up(add(mid, mul(perp, 6)), 0.8), up(mid, 1.3), 1.0);
-    }
-    for (const e of all) {
-      api.anim(e, "animation.aegis.ram_strike");
+  // ===== the fighters: positions every tick while they move, animations from the list =====
+  const place = (tick) => {
+    for (const who of ["A", "B"]) {
+      const e = F[who];
+      if (!ok(e)) continue;
+      const other = feet(who === "A" ? "B" : "A", tick);
       try {
-        e.removeEffect("slowness");
+        e.teleport(feet(who, tick), { facingLocation: { x: other.x, y: other.y + 1.5, z: other.z }, keepVelocity: false });
       } catch {
         /* ignore */
       }
     }
-    sfx(dim, "aegis.clash_dash", mid, 2.5, 1);
-  }, 205);
-  const startA = { ...pa0 };
-  const startB = { ...pb0 };
-  for (let i = 1; i <= 20; i++) {
-    run(() => {
-      const u = i / 20;
-      const k = u < 0.5 ? 2 * u * u : 1 - (-2 * u + 2) ** 2 / 2;
-      for (const [e, from, to, s, other] of [[A, startA, meetA, sa, B], [B, startB, meetB, sb, A]]) {
-        if (!ok(e)) continue;
-        const pos = lerp(from, canDash ? to : from, k);
-        try {
-          e.teleport(pos, { facingLocation: up(other.location, 1.3) });
-        } catch {
-          /* ignore */
-        }
-        api.particle(dim, s.hand, up(pos, 1.1), s.color);
-        api.particle(dim, "aegis:fire_trail", up(pos, 0.9), s.color);
-        if (i % 2 === 0) api.particle(dim, "aegis:wind_gust", up(pos, 0.6));
-        if (i % 4 === 0) api.particle(dim, "aegis:dust", pos);
-      }
-    }, 205 + i);
+  };
+  place(0);
+  for (let t = 1; t <= T.land + 2; t++) {
+    const moving = t <= T.apart + 1 || (canMeet && t >= T.run);
+    if (moving || t % 5 === 0) run(() => place(t), t);
+  }
+  if (canMeet && air > 0) run(() => all.forEach((e) => eff(e, "slow_falling", T.land - T.leap + 20, 0)), T.leap - 2);
+  run(() => all.forEach((e) => {
+    try {
+      e.removeEffect("slowness");
+    } catch {
+      /* ignore */
+    }
+  }), T.run - 1);
+  for (const [t, target, key] of ANIMS) {
+    for (const who of ["A", "B"]) {
+      const mine = target === "both" || target === who || (!outcome.even && ((target === "W" && who === outcome.win) || (target === "L" && who === outcome.lose)));
+      if (!mine) continue;
+      if (!canMeet && ["run", "leap", "recoil", "land", "rise", "kneel"].includes(key)) continue;
+      const id = `animation.aegis.clash_${FAMILY_ANIMS.includes(key) ? `${key}_${S[who].family}` : key}${who === "B" ? "_m" : ""}`;
+      run(() => ok(F[who]) && api.anim(F[who], id), t);
+    }
   }
 
-  // ===== 225–275: the struggle — the two jutsu grind against each other =====
-  const clashPt = up(mid, 1.25);
-  run(() => {
-    for (const p of players) {
-      cmd(p, "camera @s fade time 0.03 0.08 0.25 color 255 255 255");
-      camera(p, add(up(add(mid, mul(perp, 4.2)), 1.7), mul(dir, 0.3)), clashPt);
-      camera(p, add(up(add(mid, mul(perp, 2.8)), 1.4), mul(dir, 0.2)), clashPt, 2.4);
-    }
-    sfx(dim, "aegis.clash_struggle", mid, 3, 1);
-    sfx(dim, "aegis.impact", mid, 2.5, 1.2);
-    api.particle(dim, "aegis:cine_ring", up(mid, 0.1), sa.color);
-  }, 225);
-  for (const t of [225, 240, 255]) run(() => {
-    for (const e of all) api.anim(e, "animation.aegis.palm_thrust");
+  // ===== the camera (participants only) =====
+  for (let i = 0; i < SHOTS.length; i++) {
+    const shot = outcome.even && SHOTS[i].even ? { ...SHOTS[i], ...SHOTS[i].even } : SHOTS[i];
+    const next = SHOTS[i + 1]?.t ?? T.release;
+    const go = (tick, ease) => {
+      const pos = anchor(shot.pos, tick);
+      const look = anchor(shot.look, tick);
+      for (const p of players) if (ok(p)) cmd(p, `camera @s set minecraft:free${ease ? ` ease ${ease} in_out_sine` : ""} pos ${f3(pos)} facing ${f3(look)}`);
+    };
+    if (shot.t === 0) go(0, 0);
+    else run(() => go(shot.t + (shot.ease ? Math.round(shot.ease * 20) : 0), shot.ease), shot.t);
+    if (shot.track) for (let t = shot.t + 2; t < next; t += 2) run(() => go(t + 2, 0.1), t);
+  }
+
+  // ===== 1. the standoff =====
+  sfx(dim, "aegis.clash_wind", mid, 2.5, 1);
+  run(() => title("§l§fJUTSU CLASH", `${colorCode(S.A.color)}${name(A)} §7vs ${colorCode(S.B.color)}${name(B)}`, 22), 6);
+  for (let t = 0; t < T.chargeA; t += 4) run(() => {
+    api.particle(dim, "aegis:dust", lerp(feet("A", t), feet("B", t), Math.random()));
+    api.particle(dim, "aegis:wind_gust", up(lerp(feet("A", t), feet("B", t), Math.random()), 0.4));
+    if (t < T.apart) for (const who of ["A", "B"]) api.particle(dim, "aegis:dust", feet(who, t));
   }, t);
-  for (let t = 226; t < 275; t += 2) {
+
+  // ===== 2–5. each gathers their jutsu =====
+  const gather = (who, t0) => {
+    const s = S[who];
     run(() => {
-      const sideA = add(clashPt, mul(dir, -0.25));
-      const sideB = add(clashPt, mul(dir, 0.25));
-      api.particle(dim, sa.hand, sideA, sa.color);
-      api.particle(dim, sb.hand, sideB, sb.color);
+      fog(s.color);
+      title(`${colorCode(s.color)}§l${s.name}`, `§7${name(F[who])}`, 30);
+      sfx(dim, "aegis.clash_charge", feet(who, t0), 2.2, 1);
+      sfx(dim, s.sound, feet(who, t0), 1.6, 1);
+      shake(dim, feet(who, t0), 0.25, 2.2, 24);
+    }, t0);
+    for (let t = 6; t < 45; t += 3) {
+      run(() => {
+        const c = feet(who, t0 + t);
+        for (let n = 0; n < 2; n++) {
+          const a = Math.random() * Math.PI * 2;
+          const r = 1.6 + Math.random() * 2;
+          api.particle(dim, "aegis:cine_pillar", add(c, { x: Math.cos(a) * r, y: 0, z: Math.sin(a) * r }), s.color);
+        }
+        api.particle(dim, "aegis:cine_bolt", up(c, 1.1), s.color);
+        api.particle(dim, "aegis:beast_aura", c, s.color);
+        if (t % 6 === 0) api.particle(dim, "aegis:cine_swirl", c, s.color);
+        if (t % 9 === 0) api.particle(dim, "aegis:cine_debris", c, [0.6, 0.55, 0.5]);
+        if (t % 12 === 0) sfx(dim, "aegis.lightning", c, 1.1, 0.9 + Math.random() * 0.3);
+      }, t0 + t);
+    }
+    run(() => {
+      api.particle(dim, "aegis:beast_burst", handAt(who, t0 + 40), s.color);
+      api.particle(dim, "aegis:cine_ring", feet(who, t0 + 40), s.color);
+      sfx(dim, "aegis.transform", feet(who, t0 + 40), 1.6, 1.1);
+    }, t0 + 40);
+    // from now until the burst the jutsu burns in their hand
+    for (let t = t0 + 8; t < T.burst; t += 2) {
+      run(() => {
+        const h = handAt(who, t);
+        api.particle(dim, s.hand, h, s.color);
+        if (t % 4 === 0) api.particle(dim, "aegis:chakra_aura", h, s.color);
+        if (t % 6 === 0 && t < T.run) api.particle(dim, "aegis:beast_aura", feet(who, t), s.color);
+      }, t);
+    }
+  };
+  gather("A", T.chargeA);
+  gather("B", T.chargeB);
+
+  // ===== 6–9. the eyes =====
+  run(() => fog(mixed), T.eyes);
+  for (const [dt, vol, pitch] of [[0, 2.4, 1], [11, 2.6, 1], [20, 2.8, 0.97], [26, 3, 0.94]]) run(() => sfx(dim, "aegis.clash_heartbeat", mid, vol, pitch), T.eyes + dt);
+  run(() => {
+    for (const p of players) cmd(p, "camera @s fade time 0.1 0.15 0.15 color 0 0 0");
+  }, T.black);
+
+  // ===== 10–12. the charge and the leap =====
+  if (canMeet) {
+    run(() => {
+      sfx(dim, "aegis.clash_dash", mid, 2.5, 1);
+      shake(dim, mid, 0.3, 1.4, 32);
+    }, T.run);
+    for (let t = T.run; t < T.impact; t += 2) {
+      run(() => {
+        for (const who of ["A", "B"]) {
+          const p = feet(who, t);
+          api.particle(dim, "aegis:fire_trail", up(p, 0.9), S[who].color);
+          api.particle(dim, "aegis:wind_gust", up(p, 0.6));
+          if (t < T.leap) api.particle(dim, "aegis:dust", { x: p.x, y: mid.y, z: p.z });
+        }
+      }, t);
+    }
+    run(() => {
+      sfx(dim, "aegis.whoosh", mid, 2.5, 0.7);
+      for (const who of ["A", "B"]) {
+        const p = feet(who, T.leap);
+        api.particle(dim, "aegis:cine_ring", p, S[who].color);
+        api.particle(dim, "aegis:cine_debris", p, [0.6, 0.55, 0.5]);
+      }
+    }, T.leap);
+  }
+
+  // ===== 13–15. impact: the dome swells while they strain =====
+  run(() => {
+    for (const p of players) cmd(p, "camera @s fade time 0.03 0.06 0.2 color 255 255 255");
+    sfx(dim, "aegis.clash_struggle", clashPt, 3, 1);
+    sfx(dim, "aegis.impact", clashPt, 2.5, 1.2);
+    shake(dim, mid, 0.9, 0.5, 32);
+    api.particle(dim, "aegis:beast_burst", clashPt, mixed);
+    api.particle(dim, "aegis:cine_ring", up(mid, 0.1), S.A.color);
+    try {
+      const orb = dim.spawnEntity("aegis:clash_orb", clashPt);
+      orb.setProperty("aegis:cr", Math.min(1, mixed[0] + 0.15));
+      orb.setProperty("aegis:cg", Math.min(1, mixed[1] + 0.15));
+      orb.setProperty("aegis:cb", Math.min(1, mixed[2] + 0.15));
+      system.runTimeout(() => api.isValid(orb) && orb.remove(), T.burst - T.impact + 7);
+    } catch {
+      /* ignore */
+    }
+  }, T.impact);
+  run(() => sfx(dim, "aegis.clash_dash", clashPt, 2, 0.6), T.impact + 15); // the dome surges out
+  for (let t = T.impact + 1; t < T.burst; t += 2) {
+    run(() => {
+      const k = (t - T.impact) / (T.burst - T.impact);
       api.particle(dim, "aegis:chidori", clashPt);
-      if (t % 4 === 0) api.particle(dim, "aegis:beast_aura", up(mid, 0.2), t % 8 ? sa.color : sb.color);
-      if (t % 6 === 0) api.particle(dim, "aegis:cine_bolt", clashPt, t % 12 ? sa.color : sb.color);
-      if (t % 10 === 0) api.particle(dim, "aegis:cine_ring", up(mid, 0.1), t % 20 ? sb.color : sa.color);
-      if (t % 10 === 0) shake(dim, mid, 0.3 + (t - 226) / 60, 0.6, 32);
-      if (t % 12 === 0) fog(t % 24 ? sb.color : sa.color);
+      if (t % 4 === 0) api.particle(dim, "aegis:cine_bolt", clashPt, t % 8 ? S.A.color : S.B.color);
+      if (t % 6 === 0) api.particle(dim, "aegis:lightning_burst", clashPt);
+      if (t % 8 === 0) api.particle(dim, "aegis:cine_ring", up(mid, 0.1), t % 16 ? S.B.color : S.A.color);
       if (t % 8 === 0) api.particle(dim, "aegis:cine_debris", up(mid, 0.2), [0.6, 0.55, 0.5]);
+      if (t % 10 === 0) shake(dim, mid, 0.3 + k * 0.9, 0.6, 32);
+      if (t % 12 === 0) fog(t % 24 ? S.B.color : S.A.color);
     }, t);
   }
+  run(() => sfx(dim, "aegis.clash_heartbeat", mid, 3, 0.9), T.burst - 12);
 
-  // ===== 275: EXPLOSION =====
-  run(() => impact(dim, mid, sa, sb, players, nearby, tagFog), 275);
-  run(() => {
-    for (const p of players) {
-      camera(p, up(add(mid, mul(perp, 12)), 3), up(mid, 1));
-      camera(p, up(add(mid, mul(perp, 4)), 16), mid, 3.2);
-    }
-  }, 277);
-  run(() => resolve(A, castA, B, castB, dir, nearby), 280);
-  for (let t = 284; t < 335; t += 5) run(() => {
+  // ===== 16. the burst =====
+  run(() => impact(dim, mid, clashPt, S.A, S.B, players, nearby, tagFog), T.burst);
+  run(() => resolve(A, B, outcome), T.burst + 3);
+  for (let t = T.burst + 8; t < T.release; t += 5) run(() => {
     api.particle(dim, "aegis:smoke_puff", add(mid, { x: (Math.random() - 0.5) * 7, y: 0.4, z: (Math.random() - 0.5) * 7 }));
     api.particle(dim, "aegis:dust", up(mid, 0.4));
-    if (t % 10 === 4) api.particle(dim, "aegis:fire_trail", add(mid, { x: (Math.random() - 0.5) * 5, y: 0.3, z: (Math.random() - 0.5) * 5 }));
+    if (t % 10 === 3) api.particle(dim, "aegis:fire_trail", add(mid, { x: (Math.random() - 0.5) * 5, y: 0.3, z: (Math.random() - 0.5) * 5 }));
   }, t);
+  if (canMeet) run(() => {
+    for (const who of ["A", "B"]) {
+      const p = feet(who, T.land);
+      api.particle(dim, "aegis:dust", p);
+      api.particle(dim, "aegis:cine_debris", p, [0.6, 0.55, 0.5]);
+      api.sound(dim, "dig.gravel", p, 1.5, 0.6);
+    }
+    shake(dim, mid, 0.35, 0.3, 32);
+  }, T.land);
+
+  // ===== 17. who is left standing =====
+  run(() => {
+    const [w, l] = [F[outcome.win], F[outcome.lose]];
+    for (const p of nearby) {
+      if (!ok(p)) continue;
+      showTitle(p, outcome.even ? "§fEven!" : `§e${name(w)}`, { subtitle: outcome.even ? "§7Neither jutsu gives way" : `§7overpowers ${name(l)}!`, fadeInDuration: 4, stayDuration: 26, fadeOutDuration: 8 });
+    }
+  }, T.result + 2);
 
   // ===== finish =====
   system.runTimeout(() => {
     for (const p of nearby) if (ok(p)) cmd(p, `fog @s remove ${tagFog}`);
     for (const e of all) {
       active.delete(e.id);
+      if (ok(e)) api.anim(e, "animation.aegis.rest");
       if (!isPlayer(e)) continue;
       setCinematicBusy(e.id, false);
       if (!ok(e)) continue;
-      cmd(e, "camera @s fade time 0.2 0.15 0.4 color 0 0 0");
-      system.runTimeout(() => ok(e) && cmd(e, "camera @s clear"), 5);
+      cmd(e, "camera @s fade time 0.15 0.1 0.35 color 0 0 0");
+      system.runTimeout(() => ok(e) && cmd(e, "camera @s clear"), 4);
       cmd(e, "inputpermission set @s movement enabled");
+      cmd(e, "inputpermission set @s camera enabled");
+      cmd(e, "hud @s reset");
     }
-  }, END);
+  }, T.release);
 }
 
 function mixColor(a, b) {
@@ -478,10 +557,9 @@ function colorCode([r, g, b]) {
   return "§e";
 }
 
-function impact(dim, mid, sa, sb, players, nearby, tagFog) {
-  for (const p of players) cmd(p, "camera @s fade time 0.05 0.6 1.3 color 255 255 255");
+function impact(dim, mid, c, sa, sb, players, nearby, tagFog) {
+  for (const p of players) cmd(p, "camera @s fade time 0.05 0.35 0.9 color 255 255 255");
   for (const p of nearby) if (!players.includes(p)) cmd(p, "camera @s fade time 0.03 0.15 0.5 color 255 255 255");
-  const c = up(mid, 1.3);
   sfx(dim, "aegis.clash_impact", mid, 5, 1);
   sfx(dim, "aegis.clash_ring", mid, 2.5, 1);
   sfx(dim, "aegis.boom", mid, 3, 0.55);
@@ -558,42 +636,27 @@ function crater(dim, c, R, D) {
   });
 }
 
-function resolve(A, castA, B, castB, dir, nearby) {
-  const power = (e, c) => (c.cost ?? 30) * (1 + (isPlayer(e) ? 0 : 0.4)) * (0.85 + Math.random() * 0.3);
-  const pa = power(A, castA);
-  const pb = power(B, castB);
-  const even = Math.abs(pa - pb) / Math.max(pa, pb) < 0.1;
-  const [win, lose] = pa >= pb ? [A, B] : [B, A];
+// The burst lands: the loser takes the worst of it (both do when it's even). The fighters stay protected until the
+// cinematic lets them go.
+function resolve(A, B, outcome) {
+  const F = { A, B };
   const hit = (e, frac) => {
     if (!api.isValid(e)) return;
     try {
+      e.removeEffect("resistance");
       const h = e.getComponent("minecraft:health");
       api.hurt(e, Math.min(isPlayer(e) ? 16 : 120, h.effectiveMax * frac), undefined, "entityExplosion");
     } catch {
       /* ignore */
     }
+    eff(e, "resistance", T.release - T.burst + 10, 4);
   };
-  for (const e of [A, B]) {
-    try {
-      e.removeEffect("resistance");
-    } catch {
-      /* ignore */
-    }
-  }
-  if (even) {
+  if (outcome.even) {
     hit(A, 0.2);
     hit(B, 0.2);
   } else {
-    hit(lose, 0.3);
-    hit(win, 0.08);
-  }
-  const push = (e, s) => api.isValid(e) && api.knockback(e, dir.x * s, dir.z * s, 2.8, 0.7);
-  push(A, -1);
-  push(B, 1);
-  const name = (e) => (isPlayer(e) ? e.name : e.nameTag || "the enemy");
-  for (const p of nearby) {
-    if (!api.isValid(p)) continue;
-    showTitle(p, even ? "§fEven!" : `§e${name(win)}`, { subtitle: even ? "§7Neither jutsu gives way" : `§7overpowers ${name(lose)}!`, stayDuration: 40, fadeOutDuration: 10 });
+    hit(F[outcome.lose], 0.3);
+    hit(F[outcome.win], 0.08);
   }
 }
 

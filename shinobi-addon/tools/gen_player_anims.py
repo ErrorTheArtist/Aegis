@@ -104,25 +104,24 @@ def anim(length, keys, plant=True, loop=False):
     if tracks[-1][0] < length:
         tracks.append((length, "lin", tracks[-1][2]))
 
-    # sample times: 30 fps inside segments that move, endpoints only for holds
-    times = []
-    for (t0, _, a), (t1, _, b) in zip(tracks, tracks[1:]):
-        times.append(t0)
+    # sample every segment at 30 fps (endpoints only for holds). A "cut" key is an instant jump: the pose before it
+    # holds right up to the key, which is then written as a pre/post keyframe.
+    def lerp(a, b, u):
+        return {bn: {ch: [a[bn][ch][i] + (b[bn][ch][i] - a[bn][ch][i]) * u for i in range(3)] for ch in ("r", "p")} for bn in BONES}
+
+    raw = [(tracks[0][0], tracks[0][2])]
+    for (t0, _, a), (t1, e, b) in zip(tracks, tracks[1:]):
+        if e == "cut":
+            raw += [(t1, a), (t1, b)]
+            continue
         if a != b:
             n = max(1, round((t1 - t0) * FPS))
-            times += [t0 + (t1 - t0) * i / n for i in range(1, n)]
-    times.append(tracks[-1][0])
-
-    def pose_at(t):
-        for (t0, _, a), (t1, e, b) in zip(tracks, tracks[1:]):
-            if t0 <= t <= t1:
-                u = EASE[e](0 if t1 == t0 else (t - t0) / (t1 - t0))
-                return {bn: {ch: [a[bn][ch][i] + (b[bn][ch][i] - a[bn][ch][i]) * u for i in range(3)] for ch in ("r", "p")} for bn in BONES}
-        return tracks[-1][2]
+            raw += [(t0 + (t1 - t0) * i / n, lerp(a, b, EASE[e](i / n))) for i in range(1, n)]
+        raw.append((t1, b))
 
     samples = []
-    for t in times:
-        ps = pose_at(t)
+    for t, ps in raw:
+        ps = json.loads(json.dumps(ps))
         if plant:
             ps["root"]["p"][1] -= lowest_foot(ps)
         samples.append((t, ps))
@@ -130,14 +129,32 @@ def anim(length, keys, plant=True, loop=False):
     # Hidden in first person (one Molang expression per animation instead of one per key).
     out = {"animation_length": length, "blend_weight": FP_WEIGHT, "bones": {}}
     if loop:
-        out["loop"] = True
+        out["loop"] = "hold_on_last_frame" if loop == "hold" else True
     for bn in BONES:
         for ch, chname in (("r", "rotation"), ("p", "position")):
             seq = [(t, [round(v, 2) for v in ps[bn][ch]]) for t, ps in samples]
             if all(max(abs(v) for v in val) < 0.01 for _, val in seq):
                 continue
-            seq = simplify(seq)
-            out["bones"].setdefault(bn, {})[chname] = {fmt(t): k(val) for t, val in seq}
+            # split at cuts (two samples at the same time), simplify each run, write the joins as pre/post keys
+            runs, cur = [], [seq[0]]
+            for a, b in zip(seq, seq[1:]):
+                if b[0] == a[0]:
+                    runs.append(cur)
+                    cur = [b]
+                else:
+                    cur.append(b)
+            runs.append(cur)
+            keys = {}
+            for i, run in enumerate(runs):
+                run = simplify(run) if len(run) > 2 else run
+                for j, (t, val) in enumerate(run):
+                    if j == 0 and i > 0:
+                        pre = keys[fmt(t)]
+                        if pre != k(val):
+                            keys[fmt(t)] = {"pre": pre, "post": k(val)}
+                    else:
+                        keys[fmt(t)] = k(val)
+            out["bones"].setdefault(bn, {})[chname] = keys
     return out
 
 
@@ -216,49 +233,66 @@ def seal_run(t0, names, step, bob=1.0):
 
 
 # ===========================================================================
-# Core jutsu motions
+# Jutsu choreography (v3). Every motion is: anticipation with the whole body → a strike on a fixed frame (the
+# scripts launch their effects on that frame — don't move it) → a finishing pose that is HELD for a beat → recovery.
+# Leaps, lunges and spins come from "rt" (root); a 360° spin is unwound with an invisible "cut" key.
 # ===========================================================================
-A["animation.aegis.hand_signs"] = anim(0.75, [
-    (0.08, "out", {**STANCE_READY, **seal("ram", h=[14, 0, 0])}),
-    *seal_run(0.2, ["tiger", "snake", "ram"], 0.13),
-    (0.66, "io", {"w": HIPS(4, drop=0.5)}),
-    (0.75, "io", REST),
+def R(y=0, f=0, pitch=0, spin=0, roll=0, x=0):
+    """Root: height, forward travel, lean, spin."""
+    return ([pitch, spin, roll], [x, y, -f])
+
+
+WIDE = {"rl": [0, 0, 16], "ll": [0, 0, -16]}
+
+
+def tremble(t0, t1, bone, base, amp=2, every=0.05, axis=2):
+    return [(round(t, 3), "lin", {bone: v}) for t, v in shake(t0, t1, amp, every, base, axis)]
+
+
+A["animation.aegis.hand_signs"] = anim(1.0, [
+    (0.08, "out", {**WIDE, **seal("ram", h=[14, 0, 0]), "w": HIPS(10, drop=2)}),
+    (0.2, "snap", seal("tiger", h=[10, -6, 0], w=HIPS(8, -8, drop=2.4))),
+    (0.33, "snap", seal("snake", h=[16, 6, 0], w=HIPS(12, 8, drop=2.8))),
+    (0.46, "snap", seal("ram", h=[8, 0, 0], w=HIPS(6, 0, drop=2.2))),
+    (0.54, "back", {"w": HIPS(8, drop=2.5)}),
+    (0.8, "io", {"w": HIPS(7, drop=2.3)}),
+    (1.0, "io", REST),
 ])
 
+_orbit = lambda i, r=1.0: [-72 + 16 * r * math.sin(i * 1.3), 36 + 18 * r * math.cos(i * 1.3), -12 * r * math.sin(i * 1.3)]
 A["animation.aegis.rasengan_hold"] = anim(0.9, [
-    (0.15, "out", {**STANCE_LOW, "ra": [-62, -12, 14], "la": [-58, 46, 0], "h": [16, 8, 0], "b": [0, -16, 0]}),
-    (0.45, "io", {"la": [-74, 34, -8], "ra": [-66, -10, 16]}),
-    (0.75, "io", {"la": [-60, 46, 4], "ra": [-62, -12, 14]}),
-    (0.9, "io", {"la": [-70, 38, -6]}),
-], loop=False)
+    (0.15, "out", {**STANCE_LOW, "ra": [-58, -8, 18], "la": [-58, 46, 0], "h": [18, 10, 0], "b": [0, -14, 0], "w": HIPS(20, -8, drop=3)}),
+    *[(round(0.2 + i * 0.07, 3), "io", {"la": _orbit(i)}) for i in range(10)],
+])
 
 # Chidori: Sasuke's stance — crouched low, the lightning hand held down at his side, the other hand gripping the wrist.
 # (Pose solved with the preview rig so the left hand really reaches the right wrist; the script spawns the lightning at
-#  CHIDORI_HAND in main.js, which matches where this hand ends up.)
+#  CHIDORI_HAND in main.js, which matches where this hand ends up — keep the right arm where it is.)
 CHIDORI_POSE = {"w": HIPS(24, 6, drop=3), "b": [0, 12, 0], "ra": [-30, 10, 0], "la": [-25, 70, 40],
                 "rl": [30, 0, 14], "ll": [-40, 0, -12], "h": [-22, -10, 0]}
 A["animation.aegis.chidori_charge"] = anim(0.8, [
-    (0.12, "out", CHIDORI_POSE),
-    *[(round(t, 3), "lin", {"ra": v}) for t, v in shake(0.18, 0.78, 3, 0.04, [-30, 10, 0])],
+    (0.06, "out", {"ra": [-150, -20, 0], "la": [-120, 30, 0], "w": HIPS(-6, drop=0.5), "h": [-10, 0, 0]}),        # the arm sweeps up…
+    (0.14, "snap", CHIDORI_POSE),                                                                                 # …and is driven down
+    *tremble(0.18, 0.78, "ra", [-30, 10, 0], 3, 0.04),
     (0.8, "lin", {"ra": [-30, 10, 0]}),
 ])
 
-A["animation.aegis.palm_thrust"] = anim(0.55, [
-    (0.09, "in", {"w": HIPS(2, 28, drop=1), "ra": [22, 28, 18], "la": [-40, 40, 0], "rl": [10, 0, 6], "ll": [-8, 0, -6], "h": [6, -10, 0]}),
-    (0.16, "snap", {**LUNGE_R, "w": HIPS(18, -24, drop=2.2), "ra": ([-98, -6, 0], [0, 0, -3]), "la": [36, 0, -24],
-                    "rt": (Z, [0, 0, -2]), "h": [-6, 14, 0]}),
-    (0.24, "back", {"w": HIPS(16, -20, drop=2)}),
-    (0.38, "io", {"ra": ([-94, -4, 0], [0, 0, -2])}),
-    (0.55, "io", REST),
+A["animation.aegis.palm_thrust"] = anim(0.8, [
+    (0.09, "in", {"w": HIPS(4, 32, drop=1.6), "ra": [26, 30, 22], "la": [-50, 44, 0], "rl": [12, 0, 8], "ll": [-10, 0, -8], "h": [6, -14, 0]}),
+    (0.16, "snap", {**LUNGE_R, "w": HIPS(22, -28, drop=2.6), "ra": ([-98, -6, 0], [0, 0, -3.5]), "la": [42, 0, -28],
+                    "rt": R(f=2.5), "h": [-12, 18, 0]}),
+    (0.24, "back", {"w": HIPS(19, -24, drop=2.3), "rt": R(f=2)}),
+    (0.55, "io", {"ra": ([-95, -5, 0], [0, 0, -2.5]), "w": HIPS(17, -22, drop=2.1)}),
+    (0.8, "io", REST),
 ])
 
-A["animation.aegis.both_palms"] = anim(0.65, [
-    (0.12, "in", {"w": HIPS(-4, drop=1.2), "ra": [-52, -52, 8], "la": [-52, 52, -8], "h": [8, 0, 0], **{"rl": [6, 0, 10], "ll": [-6, 0, -10]}}),
-    (0.21, "snap", {"w": HIPS(16, drop=2.4), "ra": ([-92, -8, 0], [0, 0, -2]), "la": ([-92, 8, 0], [0, 0, -2]), "rl": [-30, 0, 10], "ll": [26, 0, -10],
-                    "rt": (Z, [0, 0, -1.5]), "h": [-8, 0, 0]}),
-    (0.3, "back", {"w": HIPS(13, drop=2)}),
-    (0.5, "io", {"ra": ([-90, -6, 0], [0, 0, -1]), "la": ([-90, 6, 0], [0, 0, -1])}),
-    (0.65, "io", REST),
+A["animation.aegis.both_palms"] = anim(0.95, [
+    (0.12, "in", {"w": HIPS(4, 30, drop=2), "ra": [-30, -40, 20], "la": [-50, 62, 0], "h": [6, -22, 0], "rl": [8, 0, 12], "ll": [-8, 0, -12]}),  # coil at the hip
+    (0.21, "snap", {"w": HIPS(20, 0, drop=2.8), "ra": ([-92, -8, 0], [0, 0, -2.5]), "la": ([-92, 8, 0], [0, 0, -2.5]),
+                    "rl": [-36, 0, 10], "ll": [30, 0, -10], "rt": R(f=2), "h": [-14, 0, 0]}),
+    (0.3, "back", {"w": HIPS(17, 0, drop=2.5), "rt": R(f=1.6)}),
+    (0.7, "io", {"w": HIPS(15, drop=2.3)}),
+    (0.95, "io", REST),
 ])
 
 A["animation.aegis.ninja_run"] = anim(0.6, [
@@ -267,51 +301,62 @@ A["animation.aegis.ninja_run"] = anim(0.6, [
     (0.6, "io", {"ra": [72, 0, 12], "la": [72, 0, -12], "w": HIPS(32, drop=1)}),
 ], plant=False, loop=True)
 
-A["animation.aegis.jutsu_breath"] = anim(0.8, [
-    (0.12, "out", {**seal("mouth"), "w": HIPS(2, drop=1), "rl": [-8, 0, 8], "ll": [8, 0, -8]}),
-    (0.38, "in", {"w": HIPS(-16, drop=0.5), "h": [-24, 0, 0], "ra": [-132, -48, 0], "la": [-50, 20, -14]}),     # inhale
-    (0.48, "snap", {"w": HIPS(18, drop=2.4), "h": [8, 0, 0], "ra": [-112, -40, 0], "la": [-20, 0, -36],
-                    "rl": [-26, 0, 8], "ll": [24, 0, -8], "rt": (Z, [0, 0, -1])}),                              # blow!
-    (0.62, "io", {"w": HIPS(14, drop=2)}),
-    (0.8, "io", REST),
+# A breath jutsu: the chest fills as the body arches back onto the toes, then everything whips forward.
+_INHALE = {"ra": [-138, -50, 0], "la": [30, 0, -34], "w": HIPS(-30, 10, drop=0.3), "h": [-38, 0, 0], "rl": [14, 0, 8], "ll": [-10, 0, -8],
+           "rt": R(y=1.2, f=-1.5)}
+_BLOW = {"ra": [-120, -44, 0], "la": [44, 0, -40], "w": HIPS(34, -8, drop=3.2), "h": [-26, 0, 0], "rl": [-44, 0, 8], "ll": [34, 0, -8], "rt": R(f=2.5)}
+A["animation.aegis.jutsu_breath"] = anim(1.15, [
+    (0.1, "out", {**seal("mouth"), **WIDE, "w": HIPS(6, drop=1.5)}),
+    (0.38, "in", _INHALE),
+    (0.48, "snap", _BLOW),
+    (0.56, "back", {"w": HIPS(30, -8, drop=3)}),
+    *tremble(0.6, 0.86, "b", Z, 1.2, 0.05, axis=0),
+    (0.9, "io", {"b": Z, "w": HIPS(26, -6, drop=2.6)}),
+    (1.15, "io", REST),
 ])
 
-A["animation.aegis.earth_slam"] = anim(0.85, [
-    (0.08, "in", {"w": HIPS(10, drop=2.5), "ra": [-20, 0, 20], "la": [-20, 0, -20], "rl": [-14, 0, 10], "ll": [14, 0, -10]}),  # crouch to jump
-    (0.2, "out", {"rt": (Z, [0, 7, 0]), "w": HIPS(-10, drop=0), "ra": [-172, 0, -14], "la": [-172, 0, 14], "rl": [-20, 0, 6], "ll": [16, 0, -6],
-                  "h": [-16, 0, 0]}),                                                                                  # leap, arms up
-    (0.33, "in", {"rt": (Z, [0, 0, 0]), "w": HIPS(38, drop=4.5), "ra": [-36, 0, 12], "la": [-36, 0, -12], "rl": [-34, 0, 18], "ll": [30, 0, -18],
-                  "h": [-30, 0, 0]}),                                                                                  # SLAM
-    (0.42, "elastic", {"w": HIPS(34, drop=3.6)}),
-    (0.68, "io", {"w": HIPS(30, drop=3.4)}),
-    (0.85, "io", REST),
+A["animation.aegis.earth_slam"] = anim(1.15, [
+    (0.08, "in", {"w": HIPS(14, drop=3.5), "ra": [30, 0, 24], "la": [30, 0, -24], "rl": [-20, 0, 10], "ll": [18, 0, -10], "h": [10, 0, 0]}),   # coil
+    (0.2, "out", {"rt": R(y=9), "w": HIPS(-16), "ra": [-178, 0, -10], "la": [-178, 0, 10], "rl": [-46, 0, 8], "ll": [34, 0, -8],
+                  "h": [-22, 0, 0]}),                                                                                   # leap, fists overhead
+    (0.27, "io", {"rt": R(y=9.5), "w": HIPS(-20)}),
+    (0.33, "in", {"rt": R(), "w": HIPS(44, drop=5.2), "ra": [-30, 0, 8], "la": [-30, 0, -8], "rl": [-58, 0, 14], "ll": [34, 0, -14],
+                  "h": [-32, 0, 0]}),                                                                                   # SLAM to one knee
+    (0.41, "elastic", {"w": HIPS(40, drop=4.6)}),
+    (0.85, "io", {"w": HIPS(38, drop=4.4), "h": [-36, 0, 0]}),
+    (1.15, "io", REST),
 ])
 
-A["animation.aegis.throw_overhead"] = anim(1.4, [
-    (0.2, "out", {"ra": [-176, 0, -6], "la": [-40, 0, -30], "w": HIPS(-4, 8, drop=1), "rl": [-10, 0, 8], "ll": [10, 0, -8], "h": [-18, 0, 0]}),
-    (0.6, "io", {"ra": [-180, 4, -4], "w": HIPS(-6, 12, drop=1.2)}),
-    (0.95, "in", {"ra": [-205, 0, 0], "la": [-50, 0, -40], "w": HIPS(-16, 24, drop=1.5), "rl": [16, 0, 8], "ll": [-18, 0, -8], "h": [-24, -10, 0]}),  # wind back
-    (1.07, "snap", {"ra": [-58, 12, 0], "la": [26, 0, -24], "w": HIPS(26, -26, drop=2.4), "rl": [-40, 0, 8], "ll": [34, 0, -8], "h": [4, 18, 0],
-                    "rt": (Z, [0, 0, -2])}),                                                                          # hurl
-    (1.17, "back", {"w": HIPS(22, -22, drop=2)}),
-    (1.4, "io", REST),
+A["animation.aegis.throw_overhead"] = anim(1.65, [
+    (0.2, "out", {"ra": [-176, 0, -6], "la": [-60, 30, -10], "w": HIPS(-4, 8, drop=1.5), **WIDE, "h": [-22, 0, 0]}),          # the disc held high
+    *tremble(0.28, 0.8, "ra", [-176, 0, -6], 2, 0.05),
+    (0.95, "in", {"ra": [-210, 0, 0], "la": [-70, 0, -40], "w": HIPS(-22, 30, drop=1.5), "rl": [20, 0, 8], "ll": [-22, 0, -8],
+                  "h": [-26, -14, 0], "rt": R(y=1.5, f=-1.5)}),                                                         # wind back
+    (1.07, "snap", {"ra": [-52, 14, 0], "la": [30, 0, -28], "w": HIPS(32, -30, drop=3), "rl": [-48, 0, 8], "ll": [38, 0, -8],
+                    "h": [-14, 20, 0], "rt": R(f=3)}),                                                                  # hurl
+    (1.16, "back", {"w": HIPS(28, -26, drop=2.6), "rt": R(f=2.5)}),
+    (1.4, "io", {"w": HIPS(24, -22, drop=2.4)}),
+    (1.65, "io", REST),
 ])
 
-A["animation.aegis.heal_palms"] = anim(1.0, [
-    (0.15, "out", {"w": HIPS(12, drop=2), "ra": [-62, -20, 0], "la": [-62, 20, 0], "h": [18, 0, 0], "rl": [-18, 0, 10], "ll": [14, 0, -10]}),
-    (0.4, "io", {"ra": [-68, -16, 0], "la": [-68, 16, 0], "w": HIPS(13, drop=2.3)}),
-    (0.65, "io", {"ra": [-60, -20, 0], "la": [-60, 20, 0], "w": HIPS(12, drop=2)}),
-    (0.85, "io", {"ra": [-66, -17, 0], "la": [-66, 17, 0]}),
-    (1.0, "io", REST),
+_KNEEL_HEAL = {"w": HIPS(30, drop=4.5), "rl": [-56, 0, 10], "ll": [30, 0, -10], "ra": [-48, -18, 0], "la": [-48, 18, 0], "h": [8, 0, 0]}
+A["animation.aegis.heal_palms"] = anim(1.2, [
+    (0.18, "out", _KNEEL_HEAL),
+    (0.42, "io", {"ra": [-54, -14, 0], "la": [-54, 14, 0], "w": HIPS(32, drop=4.7)}),
+    (0.66, "io", {"ra": [-46, -19, 0], "la": [-46, 19, 0], "w": HIPS(30, drop=4.5)}),
+    (0.9, "io", {"ra": [-53, -15, 0], "la": [-53, 15, 0]}),
+    (1.2, "io", REST),
 ])
 
-A["animation.aegis.lightning_burst"] = anim(0.75, [
-    (0.15, "in", {"w": HIPS(22, drop=3), "ra": [-62, -52, 0], "la": [-62, 52, 0], "h": [18, 0, 0], "rl": [-10, 0, 14], "ll": [10, 0, -14]}),
-    (0.24, "snap", {"w": HIPS(-14, drop=0.5), "rt": (Z, [0, 2, 0]), "ra": [-24, 0, 108], "la": [-24, 0, -108], "h": [-28, 0, 0],
-                    "rl": [0, 0, 18], "ll": [0, 0, -18]}),
-    (0.34, "back", {"rt": (Z, Z), "w": HIPS(-10, drop=1.5)}),
-    (0.58, "io", {"ra": [-20, 0, 102], "la": [-20, 0, -102]}),
-    (0.75, "io", REST),
+A["animation.aegis.lightning_burst"] = anim(1.05, [
+    (0.15, "in", {"w": HIPS(28, drop=4), "ra": [-66, -56, 0], "la": [-66, 56, 0], "h": [24, 0, 0], "rl": [-14, 0, 14], "ll": [12, 0, -14]}),
+    (0.24, "snap", {"w": HIPS(-20), "rt": R(y=3.5), "ra": [-20, 0, 112], "la": [-20, 0, -112], "h": [-34, 0, 0],
+                    "rl": [8, 0, 20], "ll": [8, 0, -20]}),                                                              # burst: thrown open, off the ground
+    (0.32, "back", {"rt": R(y=3)}),
+    *tremble(0.36, 0.7, "b", Z, 2, 0.05),
+    (0.74, "lin", {"b": Z}),
+    (0.86, "in", {"rt": R(), "w": HIPS(12, drop=2.5), "ra": [-10, 0, 40], "la": [-10, 0, -40], "h": Z, "rl": [-10, 0, 12], "ll": [10, 0, -12]}),
+    (1.05, "io", REST),
 ])
 
 _tremble = []
@@ -332,240 +377,274 @@ A["animation.aegis.power_up"] = anim(3.8, [
 # ===========================================================================
 # Per-jutsu motions
 # ===========================================================================
-A["animation.aegis.fireball_jutsu"] = anim(1.0, [
-    (0.06, "out", {**STANCE_READY}),
-    *seal_run(0.06, ["snake", "ram", "tiger"], 0.1),
-    (0.44, "in", {**seal("mouth"), "w": HIPS(-20, drop=0.6), "h": [-34, 0, 0], "ra": [-136, -48, 0], "la": [-64, 24, -12]}),  # deep inhale
-    (0.58, "snap", {"ra": [-116, -40, 0], "la": [-24, 0, -40], "w": HIPS(22, drop=2.6), "h": [12, 0, 0],
-                    "rl": [-32, 0, 6], "ll": [28, 0, -6], "rt": (Z, [0, 0, -1.5])}),                                     # BLOW
-    (0.7, "back", {"w": HIPS(18, drop=2.2)}),
-    (0.86, "io", {"ra": [-100, -30, 0]}),
-    (1.0, "io", REST),
+A["animation.aegis.fireball_jutsu"] = anim(1.35, [
+    (0.06, "out", {**WIDE, **seal("snake", h=[12, 0, 0]), "w": HIPS(10, drop=2)}),
+    (0.16, "snap", seal("ram", h=[14, -5, 0], w=HIPS(12, -6, drop=2.4))),
+    (0.26, "snap", seal("tiger", h=[10, 5, 0], w=HIPS(10, 6, drop=2.2))),
+    (0.36, "io", {"w": HIPS(8, drop=2)}),
+    (0.5, "in", _INHALE),                                                                                               # the chest fills
+    (0.58, "snap", _BLOW),                                                                                              # BLOW
+    (0.66, "back", {"w": HIPS(30, -8, drop=3)}),
+    *tremble(0.7, 1.0, "b", Z, 1.2, 0.05, axis=0),
+    (1.05, "io", {"b": Z, "w": HIPS(26, -6, drop=2.8)}),
+    (1.35, "io", REST),
 ])
 
-A["animation.aegis.phoenix_breath"] = anim(1.1, [
-    (0.14, "out", {**seal("mouth"), **STANCE_WIDE, "w": HIPS(-10, 26, drop=1.5), "h": [-20, 18, 0]}),
-    (0.45, "io", {"w": HIPS(14, 18, drop=2), "h": [10, 22, 0]}),
-    (0.72, "io", {"w": HIPS(14, -20, drop=2), "h": [10, -24, 0]}),
-    (0.95, "io", {"w": HIPS(10, -28, drop=1.8), "h": [8, -30, 0]}),
-    (1.1, "io", REST),
+# Phoenix Flower: leaps and spits the volley down across the field, then lands low.
+A["animation.aegis.phoenix_breath"] = anim(1.3, [
+    (0.1, "in", {**seal("mouth"), "w": HIPS(16, 24, drop=3.5), "rl": [-20, 0, 12], "ll": [16, 0, -12], "h": [-10, 16, 0]}),
+    (0.3, "out", {"rt": R(y=7), "w": HIPS(-6, 26), "rl": [-50, 0, 10], "ll": [24, 0, -10], "h": [14, 20, 0], "la": [20, 0, -50]}),
+    (0.62, "io", {"rt": R(y=8.5), "w": HIPS(8, -20), "h": [16, -22, 0], "rl": [-30, 0, 10], "ll": [40, 0, -10]}),
+    (0.95, "in", {"rt": R(), "w": HIPS(26, -28, drop=4), "h": [4, -26, 0], "rl": [-40, 0, 14], "ll": [30, 0, -14], "la": [30, 0, -40]}),
+    (1.03, "elastic", {"w": HIPS(22, -24, drop=3.4)}),
+    (1.3, "io", REST),
 ])
 
-_circle = [(round(0.24 + i * 0.065, 3), "io", {"la": [-70 + 12 * math.sin(i * 1.3), 36 + 14 * math.cos(i * 1.3), -10 * math.sin(i * 1.3)]})
-           for i in range(10)]
+# Rasengan: the palm held out low, the other hand whipping the chakra round faster and faster — then drawn back to strike.
 A["animation.aegis.rasengan_form"] = anim(0.95, [
-    (0.18, "out", {**STANCE_LOW, "w": HIPS(18, -16, drop=2.8), "ra": [-64, -10, 16], "la": [-56, 42, 0], "h": [18, 12, 0]}),
-    *_circle,
-    (0.95, "io", {"ra": [-66, -8, 16], "la": [-62, 42, 0]}),
+    (0.16, "out", {**STANCE_LOW, "w": HIPS(20, -18, drop=3.2), "ra": [-58, -8, 18], "la": [-70, 40, 0], "h": [20, 14, 0], "b": [0, -10, 0]}),
+    *[(round(0.2 + i * 0.068, 3), "io", {"la": _orbit(i, 1 + i * 0.06), "ra": [-58 + (i % 2) * 3, -8, 18 - (i % 2) * 2]}) for i in range(9)],
+    (0.86, "in", {"ra": [14, 10, 26], "la": [-60, 36, -6], "w": HIPS(24, 26, drop=3.4), "h": [-8, -18, 0], "b": [0, 10, 0]}),
+    (0.95, "io", {"ra": [20, 12, 28]}),
 ])
 
-A["animation.aegis.ram_strike"] = anim(0.6, [
-    (0.0, "lin", {**SPRINT, "ra": [-60, 0, 10]}),
-    (0.09, "in", {"ra": [24, 12, 22], "la": [-52, 30, -10], "w": HIPS(26, 28, drop=2.4), "h": [-18, -20, 0]}),             # pull back
-    (0.2, "snap", {"ra": ([-104, -10, 0], [0, 0, -5]), "la": [48, 0, -26], "w": HIPS(26, -30, drop=2.8), "h": [-20, 24, 0],
-                   "rl": [-56, 0, 4], "ll": [44, 0, -4], "rt": (Z, [0, 0, -4])}),                                        # DRIVE
-    (0.3, "back", {"rt": (Z, [0, 0, -3]), "w": HIPS(24, -28, drop=2.4)}),
-    (0.45, "io", {"ra": ([-98, -8, 0], [0, 0, -4])}),
-    (0.6, "io", REST),
+A["animation.aegis.ram_strike"] = anim(0.95, [
+    (0.0, "lin", {**SPRINT, "ra": [20, 12, 26], "la": [-50, 30, -10], "w": HIPS(32, 24, drop=2.4)}),
+    (0.1, "in", {"ra": [34, 16, 30], "w": HIPS(30, 34, drop=2.6), "h": [-22, -22, 0]}),                                   # drawn right back
+    (0.2, "snap", {"ra": ([-100, -12, 0], [0, 0, -5]), "la": [52, 0, -30], "w": HIPS(30, -34, drop=3), "h": [-24, 26, 0],
+                   "rl": [-58, 0, 4], "ll": [46, 0, -4], "rt": R(f=5)}),                                                 # DRIVE
+    (0.28, "back", {"rt": R(f=4.2), "w": HIPS(27, -30, drop=2.7)}),
+    *[(round(t, 3), "lin", {"ra": (v, [0, 0, -5])}) for t, v in shake(0.32, 0.62, 2.5, 0.04, [-100, -12, 0])],             # grinding it in
+    (0.66, "lin", {"ra": ([-100, -12, 0], [0, 0, -5])}),
+    (0.74, "snap", {"ra": ([-96, -8, 0], [0, 0, -7]), "w": HIPS(34, -38, drop=3.2)}),                                    # the final shove
+    (0.95, "io", REST),
 ])
 
 A["animation.aegis.substitution"] = anim(0.5, [
-    (0.07, "snap", {**seal("ram"), "w": HIPS(26, drop=4), "h": [22, 0, 0], "rl": [-30, 0, 12], "ll": [24, 0, -12]}),
-    (0.32, "io", {"w": HIPS(24, drop=4.2)}),
+    (0.07, "snap", {"ra": [-118, -34, 0], "la": [30, 0, -20], "w": HIPS(28, drop=4.2), "h": [18, 0, 0], "rl": [-34, 0, 12], "ll": [26, 0, -12]}),
+    (0.32, "io", {"w": HIPS(26, drop=4.4)}),
     (0.5, "io", REST),
 ])
 
-A["animation.aegis.clone_seal"] = anim(0.9, [
-    (0.12, "snap", {**seal("cross"), **STANCE_WIDE, "h": [10, 0, 0]}),
-    (0.5, "io", {"w": HIPS(8, drop=1.8)}),
-    (0.62, "in", {"w": HIPS(10, drop=2.2), "ra": [-98, -38, 8]}),
-    (0.7, "snap", {"ra": [-30, 0, 84], "la": [-30, 0, -84], "w": HIPS(-10, drop=0.8), "h": [-16, 0, 0], "rt": (Z, [0, 1.2, 0])}),
-    (0.78, "back", {"rt": (Z, Z)}),
-    (0.9, "io", REST),
+A["animation.aegis.clone_seal"] = anim(1.1, [
+    (0.12, "snap", {**seal("cross"), **WIDE, "w": HIPS(10, drop=2.4), "h": [12, 0, 0]}),
+    (0.2, "back", {"w": HIPS(8, drop=2)}),
+    *tremble(0.25, 0.55, "b", Z, 1.5, 0.05),
+    (0.62, "in", {"b": Z, "w": HIPS(16, drop=3.2), "h": [18, 0, 0]}),
+    (0.7, "snap", {"ra": [-34, 0, 92], "la": [-34, 0, -92], "w": HIPS(-12, drop=0.6), "h": [-18, 0, 0], "rt": R(y=1.5)}),
+    (0.78, "back", {"rt": R()}),
+    (0.95, "io", {"ra": [-30, 0, 84], "la": [-30, 0, -84]}),
+    (1.1, "io", REST),
 ])
 
 A["animation.aegis.body_flicker"] = anim(0.5, [
-    (0.07, "snap", {**SPRINT, "w": HIPS(40, drop=3.2), "ra": [72, 0, 16], "la": [72, 0, -16], "rt": ([8, 0, 0], [0, 0, -1])}),
-    (0.38, "io", {"ra": [78, 0, 18], "la": [78, 0, -18], "rt": ([10, 0, 0], [0, 0, -2])}),
+    (0.07, "snap", {**SPRINT, "w": HIPS(42, drop=3.4), "ra": [-116, -34, 0], "la": [74, 0, -16], "rt": R(pitch=8, f=1)}),
+    (0.38, "io", {"la": [80, 0, -18], "rt": R(pitch=10, f=2)}),
     (0.5, "io", REST),
 ])
 
-A["animation.aegis.wind_palm"] = anim(0.7, [
-    (0.15, "in", {"w": HIPS(-4, 42, drop=1.5), "ra": [-40, 52, 42], "la": [-62, 32, -10], "rl": [12, 0, 10], "ll": [-12, 0, -10], "h": [0, -24, 0]}),
-    (0.25, "snap", {**LUNGE_R, "w": HIPS(18, -12, drop=2.4), "ra": ([-94, 0, -18], [0, 0, -2]), "la": ([-94, 0, 18], [0, 0, -2]),
-                    "h": [-6, 6, 0], "rt": (Z, [0, 0, -2])}),
-    (0.34, "back", {"w": HIPS(15, -10, drop=2)}),
-    (0.55, "io", {"rt": (Z, [0, 0, -1.5])}),
-    (0.7, "io", REST),
+# Great Breakthrough: a full spin gathers the wind, both palms release it.
+A["animation.aegis.wind_palm"] = anim(0.9, [
+    (0.08, "in", {"w": HIPS(6, 30, drop=2), "ra": [-30, 40, 50], "la": [-50, 40, -10], "rl": [10, 0, 12], "ll": [-10, 0, -12]}),
+    (0.22, "lin", {"rt": ([0, -360, 0], [0, 1, 0]), "ra": [-60, 20, 70], "la": [-60, -20, -70], "w": HIPS(8, 0, drop=1.5)}),
+    (0.22, "cut", {"rt": (Z, [0, 1, 0])}),
+    (0.25, "snap", {**LUNGE_R, "w": HIPS(22, -12, drop=2.8), "ra": ([-94, 0, -18], [0, 0, -2.5]), "la": ([-94, 0, 18], [0, 0, -2.5]),
+                    "h": [-12, 6, 0], "rt": R(f=2.5)}),
+    (0.34, "back", {"w": HIPS(18, -10, drop=2.4)}),
+    (0.7, "io", {"rt": R(f=2)}),
+    (0.9, "io", REST),
 ])
 
-_flow = seal_run(0.05, ["boar", "dog", "bird", "snake", "tiger", "ram"], 0.11, bob=0.6)
+_flow = seal_run(0.05, ["boar", "dog", "bird", "snake", "tiger", "ram"], 0.11, bob=0.8)
 for i, (t, e, p) in enumerate(_flow):
-    p["w"] = HIPS(6, (12, -12)[i % 2], drop=1.2)
+    p["w"] = HIPS(8, (16, -16)[i % 2], (4, -4)[i % 2], drop=1.6)
+    p.update(WIDE)
 A["animation.aegis.water_seals"] = anim(0.8, [*_flow, (0.8, "io", {"ra": [-80, -30, 0], "la": [-80, 30, 0], "w": HIPS(6, drop=1.2)})])
 
-A["animation.aegis.summon_slam"] = anim(1.0, [
+A["animation.aegis.summon_slam"] = anim(1.3, [
     (0.14, "out", {"ra": [-150, -42, 0], "la": [-20, 0, -22], "h": [20, -20, 0], "w": HIPS(10, 10, drop=1)}),                # bite the thumb
-    (0.38, "in", {"ra": [-180, 0, 12], "la": [-30, 0, -40], "w": HIPS(-12, drop=0.5), "h": [-14, 0, 0], "rt": (Z, [0, 3, 0])}),  # rise
+    (0.38, "in", {"ra": [-184, 0, 12], "la": [-30, 0, -44], "w": HIPS(-16, drop=0.3), "h": [-18, 0, 0], "rt": R(y=4)}),        # rise
     (0.52, "in", {"ra": [-26, 0, 10], "la": [14, 0, -44], "w": HIPS(46, drop=5), "h": [-34, 0, 0], "rl": [-56, 0, 12], "ll": [36, 0, -12],
-                  "rt": (Z, Z)}),                                                                                          # SLAM
+                  "rt": R()}),                                                                                         # SLAM
     (0.6, "elastic", {"w": HIPS(42, drop=4.4)}),
-    (0.88, "io", {"w": HIPS(40, drop=4.2)}),
-    (1.0, "io", REST),
+    (1.05, "io", {"w": HIPS(40, drop=4.2)}),
+    (1.3, "io", REST),
 ])
 
-A["animation.aegis.eye_activate"] = anim(0.6, [
-    (0.12, "out", {"ra": [-142, -56, 0], "la": [8, 0, -14], "h": [26, 0, 0], "w": HIPS(12, drop=1.2)}),                      # hand over the eyes
-    (0.3, "io", {"h": [28, 0, 0]}),
-    (0.4, "snap", {"ra": [-56, 22, 34], "h": [-16, 0, 0], "w": HIPS(-6, drop=0.4)}),                                       # snap open
-    (0.48, "back", {"h": [-12, 0, 0]}),
-    (0.6, "io", REST),
+A["animation.aegis.eye_activate"] = anim(0.9, [
+    (0.12, "out", {"ra": [-142, -56, 0], "la": [8, 0, -14], "h": [30, 0, 0], "w": HIPS(16, drop=1.6)}),                      # hand over the eyes
+    (0.3, "io", {"h": [34, 0, 0], "w": HIPS(18, drop=1.8)}),
+    (0.4, "snap", {"ra": [-50, 24, 40], "la": [10, 0, -24], "h": [-14, 0, 0], "w": HIPS(-8, drop=0.4)}),                    # torn away: the eyes open
+    (0.48, "back", {"h": [-10, 0, 0]}),
+    (0.7, "io", {"ra": [-44, 22, 36]}),
+    (0.9, "io", REST),
 ])
 
-A["animation.aegis.almighty_push"] = anim(0.8, [
-    (0.2, "in", {"w": HIPS(16, drop=2.5), "ra": [-58, 0, 26], "la": [-58, 0, -26], "h": [16, 0, 0], "rl": [-8, 0, 14], "ll": [8, 0, -14]}),
-    (0.3, "snap", {"w": HIPS(-16, drop=0.6), "ra": [-62, 0, 114], "la": [-62, 0, -114], "h": [-22, 0, 0], "rt": (Z, [0, 1.5, 0]),
-                   "rl": [0, 0, 18], "ll": [0, 0, -18]}),
-    (0.42, "back", {"rt": (Z, Z), "w": HIPS(-12, drop=1)}),
-    (0.65, "io", {"ra": [-60, 0, 108], "la": [-60, 0, -108]}),
-    (0.8, "io", REST),
+A["animation.aegis.almighty_push"] = anim(1.1, [
+    (0.2, "in", {"w": HIPS(20, drop=3), "ra": [-62, -30, 10], "la": [-62, 30, -10], "h": [20, 0, 0], "rl": [-10, 0, 14], "ll": [10, 0, -14]}),
+    (0.3, "snap", {"w": HIPS(-18, drop=0.4), "ra": [-66, 0, 116], "la": [-66, 0, -116], "h": [-26, 0, 0], "rt": R(y=2.5),
+                   "rl": [4, 0, 20], "ll": [4, 0, -20]}),
+    (0.4, "back", {"rt": R(y=2)}),
+    (0.8, "io", {"rt": R(y=1.6), "ra": [-62, 0, 110], "la": [-62, 0, -110]}),
+    (0.92, "in", {"rt": R(), "w": HIPS(8, drop=1.5)}),
+    (1.1, "io", REST),
 ])
 
-A["animation.aegis.pull"] = anim(0.6, [
-    (0.12, "out", {"ra": [-102, -10, 0], "la": [-92, 10, 0], **LUNGE_R, "rl": [-46, 0, 12], "ll": [38, 0, -12], "w": HIPS(18, drop=2),
-                   "rt": (Z, [0, 0, -1])}),   # reach
+A["animation.aegis.pull"] = anim(0.9, [
+    (0.12, "out", {"ra": [-102, -10, 0], "la": [10, 0, -20], **LUNGE_R, "rl": [-46, 0, 12], "ll": [38, 0, -12], "w": HIPS(18, -14, drop=2),
+                   "rt": R(f=1)}),                                                                                     # reach
     (0.24, "io", {"ra": [-104, -8, 0]}),
-    (0.36, "snap", {"ra": [-26, 32, 34], "la": [-18, -22, -32], "w": HIPS(-16, drop=1.5), "rl": [24, 0, 14], "ll": [-28, 0, -14],
-                    "rt": (Z, [0, 0, 1.5]), "h": [-10, 0, 0]}),                                                            # YANK
-    (0.44, "back", {"w": HIPS(-12, drop=1.2)}),
-    (0.6, "io", REST),
+    (0.36, "snap", {"ra": [-30, 34, 36], "la": [-20, -22, -32], "w": HIPS(-18, 20, drop=1.5), "rl": [24, 0, 14], "ll": [-28, 0, -14],
+                    "rt": R(f=-1.5), "h": [-10, -10, 0]}),                                                             # YANK
+    (0.44, "back", {"w": HIPS(-14, 18, drop=1.2)}),
+    (0.7, "io", {"w": HIPS(-12, 16, drop=1.2)}),
+    (0.9, "io", REST),
 ])
 
 A["animation.aegis.shadow_seal"] = anim(1.2, [
-    (0.12, "snap", {**seal("boar"), "w": HIPS(22, drop=3), "h": [-12, 0, 0], "rl": [-30, 0, 16], "ll": [22, 0, -16]}),
-    (0.6, "io", {"w": HIPS(24, drop=3.3), "ra": [-74, -40, 0], "la": [-74, 40, 0]}),
-    (1.05, "io", {"w": HIPS(22, drop=3)}),
+    (0.12, "snap", {**seal("boar"), "w": HIPS(30, drop=4.6), "h": [-22, 0, 0], "rl": [-58, 0, 10], "ll": [30, 0, -10]}),      # kneels, rat seal
+    *tremble(0.2, 1.0, "b", Z, 1, 0.07),
+    (1.05, "io", {"b": Z, "w": HIPS(28, drop=4.4)}),
     (1.2, "io", REST),
 ])
 
 A["animation.aegis.mind_seal"] = anim(0.9, [
-    (0.15, "snap", {"ra": [-96, -24, 0], "la": [-96, 24, 0], "w": HIPS(6, drop=1), "h": [-6, 0, 0], **{"rl": [-14, 0, 6], "ll": [10, 0, -6]}}),
-    (0.5, "io", {"ra": [-98, -26, 0], "la": [-98, 26, 0]}),
-    (0.75, "io", {"ra": [-96, -24, 0], "la": [-96, 24, 0]}),
+    (0.15, "snap", {"ra": [-94, -16, 0], "la": [-94, 16, 0], "w": HIPS(8, drop=1.4), "h": [-8, 0, 0], "rl": [-18, 0, 8], "ll": [14, 0, -8]}),
+    (0.24, "back", {"w": HIPS(6, drop=1.2)}),
+    (0.6, "io", {"ra": [-96, -18, 0], "la": [-96, 18, 0]}),
+    (0.75, "io", {"h": [30, 0, 0], "w": HIPS(14, drop=1.8)}),                                                              # the mind leaves: the head drops
     (0.9, "io", REST),
 ])
 
-A["animation.aegis.expansion"] = anim(0.9, [
-    (0.18, "in", {"w": HIPS(16, drop=2.5), "ra": [-30, 0, 70], "la": [-30, 0, -70], "rl": [0, 0, 16], "ll": [0, 0, -16]}),
-    (0.32, "back2", {"w": HIPS(-12, drop=1.2), "ra": [-122, 0, 62], "la": [-122, 0, -62], "h": [-26, 0, 0], "rt": (Z, [0, 1, 0]),
-                     "rl": [0, 0, 22], "ll": [0, 0, -22]}),
-    (0.75, "io", {"ra": [-118, 0, 58], "la": [-118, 0, -58], "rt": (Z, Z)}),
-    (0.9, "io", REST),
+A["animation.aegis.expansion"] = anim(1.1, [
+    (0.18, "in", {"w": HIPS(18, drop=3), "ra": [-30, 0, 70], "la": [-30, 0, -70], "rl": [0, 0, 16], "ll": [0, 0, -16]}),
+    (0.32, "back2", {"w": HIPS(-14, drop=1), "ra": [-126, 0, 64], "la": [-126, 0, -64], "h": [-28, 0, 0], "rt": R(y=1.5),
+                     "rl": [0, 0, 24], "ll": [0, 0, -24]}),
+    (0.5, "in", {"rt": R(), "w": HIPS(6, drop=2.4), "ra": [-20, 0, 60], "la": [-20, 0, -60]}),                              # the stomp
+    (0.58, "elastic", {"w": HIPS(4, drop=1.8)}),
+    (0.9, "io", {"ra": [-24, 0, 56], "la": [-24, 0, -56]}),
+    (1.1, "io", REST),
 ])
 
-A["animation.aegis.insect_release"] = anim(0.8, [
-    (0.15, "in", {"ra": [-42, -32, -22], "la": [-42, 32, 22], "w": HIPS(12, drop=1.5)}),
-    (0.28, "snap", {"ra": [-82, 32, 62], "la": [-82, -32, -62], "w": HIPS(-8, drop=1), **STANCE_WIDE}),
+A["animation.aegis.insect_release"] = anim(1.0, [
+    (0.15, "in", {"ra": [-42, -32, -22], "la": [-42, 32, 22], "w": HIPS(14, drop=2), "h": [14, 0, 0]}),
+    (0.28, "snap", {"ra": [-82, 32, 62], "la": [-82, -32, -62], "w": HIPS(-8, drop=1), **WIDE, "h": [-8, 0, 0]}),
     (0.38, "back", {"w": HIPS(-6, drop=1.2)}),
-    (0.65, "io", {"ra": [-78, 30, 58], "la": [-78, -30, -58]}),
-    (0.8, "io", REST),
+    (0.6, "io", {"ra": [-88, 28, 56], "la": [-76, -34, -64]}),
+    (0.8, "io", {"ra": [-78, 30, 58], "la": [-84, -30, -58]}),
+    (1.0, "io", REST),
 ])
 
 A["animation.aegis.fang_drill"] = anim(0.7, [
     (0.1, "in", {"ra": [-162, 0, 10], "la": [-162, 0, -10], "w": HIPS(30, drop=2.5), "rl": [-20, 0, 8], "ll": [20, 0, -8], "rt": (Z, [0, 0, 0])}),
     (0.16, "out", {"rt": ([28, 180, 0], [0, 5, -2]), "w": HIPS(18, drop=0), "rl": [10, 0, 4], "ll": [10, 0, -4], "h": [-20, 0, 0]}),
     (0.58, "lin", {"rt": ([32, 1260, 0], [0, 6, -3])}),                                                                     # spinning drill
+    (0.58, "cut", {"rt": ([32, 180, 0], [0, 6, -3])}),
     (0.7, "out", REST),
 ], plant=False)
 
-A["animation.aegis.chains_cast"] = anim(0.9, [
-    (0.14, "snap", {"ra": [-96, -14, -22], "la": [-96, 14, 22], **LUNGE_R, "w": HIPS(12, drop=2)}),
+A["animation.aegis.chains_cast"] = anim(1.05, [
+    (0.14, "snap", {"ra": [-96, -14, -22], "la": [-96, 14, 22], **LUNGE_R, "w": HIPS(14, drop=2.2), "rt": R(f=1.5)}),
+    (0.22, "back", {"w": HIPS(12, drop=2)}),
     (0.45, "io", {"ra": [-98, -12, -20], "la": [-98, 12, 20]}),
-    (0.58, "snap", {"ra": [-96, 32, 22], "la": [-96, -32, -22], "w": HIPS(8, 16, drop=2)}),                                 # twist the seal
-    (0.66, "back", {"w": HIPS(8, 14, drop=2)}),
-    (0.9, "io", REST),
+    (0.58, "snap", {"ra": [-96, 32, 22], "la": [-96, -32, -22], "w": HIPS(10, 18, drop=2.4)}),                              # twist the seal shut
+    (0.66, "back", {"w": HIPS(9, 15, drop=2.2)}),
+    (0.85, "io", {"w": HIPS(8, 14, drop=2)}),
+    (1.05, "io", REST),
 ])
 
-A["animation.aegis.kirin_call"] = anim(1.6, [
-    (0.2, "out", {"ra": [-62, 0, 22], "la": [-82, 32, 0], "w": HIPS(4, drop=1)}),
-    (0.42, "back", {"ra": [-182, 0, 10], "la": [-20, 0, -36], "w": HIPS(-14, drop=0.5), "h": [-42, 0, 0], "rl": [0, 0, 14], "ll": [0, 0, -14]}),
-    *[(round(t, 3), "lin", {"ra": v}) for t, v in shake(0.5, 1.2, 2, 0.05, [-182, 0, 10])],
-    (1.3, "in", {"ra": [-206, 0, 0], "w": HIPS(-18, drop=0.3), "h": [-46, 0, 0]}),
-    (1.43, "snap", {"ra": [-48, 0, 0], "la": [-10, 0, -22], "w": HIPS(24, drop=3), "h": [10, 0, 0], "rl": [-30, 0, 8], "ll": [24, 0, -8]}),  # bring it down
-    (1.5, "back", {"w": HIPS(20, drop=2.6)}),
-    (1.6, "io", REST),
+# Kirin: the hand raised to the storm, held trembling — then the sky is brought down, to one knee.
+A["animation.aegis.kirin_call"] = anim(2.0, [
+    (0.2, "out", {"ra": [-62, 0, 22], "la": [-82, 32, 0], "w": HIPS(8, drop=1.5)}),
+    (0.42, "back", {"ra": [-182, 0, 8], "la": [-20, 0, -36], "w": HIPS(-16, drop=0.5), "h": [-44, 0, 0], **WIDE}),
+    *tremble(0.5, 1.2, "ra", [-182, 0, 8], 2, 0.05),
+    (1.3, "in", {"ra": [-208, 0, 0], "w": HIPS(-22, drop=0.2), "h": [-48, 0, 0], "rt": R(y=2.5)}),
+    (1.43, "snap", {"ra": [-40, 0, 0], "la": [-10, 0, -30], "w": HIPS(34, drop=4.4), "h": [-20, 0, 0], "rl": [-54, 0, 10], "ll": [32, 0, -10],
+                    "rt": R()}),
+    (1.51, "elastic", {"w": HIPS(30, drop=4)}),
+    (1.8, "io", {"w": HIPS(28, drop=3.8)}),
+    (2.0, "io", REST),
 ])
 
-A["animation.aegis.chidori_spear"] = anim(0.95, [
+A["animation.aegis.chidori_spear"] = anim(1.2, [
     (0.15, "out", CHIDORI_POSE),
-    *[(round(t, 3), "lin", {"ra": v}) for t, v in shake(0.2, 0.46, 2.5, 0.04, [-30, 10, 0])],
-    (0.52, "snap", {"ra": ([-94, -8, 0], [0, 0, -3]), "la": [22, 0, -30], "w": HIPS(18, -20, drop=2.4), "rl": [-48, 0, 8], "ll": [38, 0, -8],
-                    "h": [-14, 20, 0], "b": [0, -6, 0], "rt": (Z, [0, 0, -3])}),
-    (0.6, "back", {"w": HIPS(16, -20, drop=2.2)}),
-    (0.82, "io", {"ra": ([-90, -6, 0], [0, 0, -2])}),
-    (0.95, "io", REST),
+    *tremble(0.2, 0.46, "ra", [-30, 10, 0], 2.5, 0.04),
+    (0.52, "snap", {"ra": ([-94, -8, 0], [0, 0, -3]), "la": [26, 0, -34], "w": HIPS(22, -24, drop=2.8), "rl": [-52, 0, 8], "ll": [42, 0, -8],
+                    "h": [-18, 22, 0], "b": [0, -6, 0], "rt": R(f=3.5)}),
+    (0.6, "back", {"w": HIPS(19, -22, drop=2.5), "rt": R(f=3)}),
+    *[(round(t, 3), "lin", {"ra": (v, [0, 0, -3])}) for t, v in shake(0.64, 0.92, 1.5, 0.04, [-94, -8, 0])],
+    (0.96, "lin", {"ra": ([-94, -8, 0], [0, 0, -3])}),
+    (1.2, "io", REST),
 ])
 
 A["animation.aegis.ice_seal"] = anim(1.0, [
-    (0.15, "snap", {"ra": [-102, -26, 0], "la": [-20, 0, -16], "w": HIPS(4, -10, drop=1), "h": [6, 0, 0], "rl": [-10, 0, 6], "ll": [10, 0, -6]}),
-    (0.6, "io", {"ra": [-104, -28, 0], "w": HIPS(5, -12, drop=1.2)}),
-    (0.7, "snap", {"ra": [-86, 12, 0], "w": HIPS(8, 10, drop=1.5), "h": [-6, 0, 0]}),                                     # open the hand
-    (0.78, "back", {"w": HIPS(7, 8, drop=1.4)}),
+    (0.15, "snap", {"ra": [-104, -28, 0], "la": [-30, 0, -40], "w": HIPS(6, -12, drop=1.4), "h": [8, 0, 0], "rl": [-12, 0, 8], "ll": [12, 0, -8]}),
+    (0.23, "back", {"w": HIPS(5, -10, drop=1.2)}),
+    (0.6, "io", {"ra": [-106, -30, 0], "w": HIPS(6, -13, drop=1.4)}),
+    (0.7, "snap", {"ra": [-88, 14, 0], "la": [-40, 0, -60], "w": HIPS(10, 12, drop=1.8), "h": [-8, 0, 0]}),                  # the hand opens
+    (0.78, "back", {"w": HIPS(8, 10, drop=1.6)}),
     (1.0, "io", REST),
 ])
 
-_strain = [(round(t, 3), "lin", {"b": v}) for t, v in shake(0.22, 0.62, 2, 0.05)]
-A["animation.aegis.gates_release"] = anim(1.2, [
-    (0.18, "in", {"ra": [-72, -42, 32], "la": [-72, 42, -32], "w": HIPS(24, drop=3.5), "h": [22, 0, 0], "rl": [-22, 0, 14], "ll": [22, 0, -14]}),
-    *_strain,
-    (0.66, "in", {"ra": [-76, -46, 34], "la": [-76, 46, -34], "w": HIPS(28, drop=4), "b": Z}),
-    (0.74, "snap", {"ra": [-22, 0, 72], "la": [-22, 0, -72], "w": HIPS(-16, drop=0.5), "h": [-36, 0, 0], "rt": (Z, [0, 2.5, 0]),
-                    "rl": [0, 0, 18], "ll": [0, 0, -18]}),
-    (0.86, "back", {"rt": (Z, Z), "w": HIPS(-12, drop=1)}),
-    (1.05, "io", {"ra": [-18, 0, 66], "la": [-18, 0, -66]}),
-    (1.2, "io", REST),
+A["animation.aegis.gates_release"] = anim(1.6, [
+    (0.18, "in", {"ra": [-72, -42, 32], "la": [-72, 42, -32], "w": HIPS(26, drop=3.8), "h": [24, 0, 0], "rl": [-22, 0, 14], "ll": [22, 0, -14]}),
+    *tremble(0.22, 0.62, "b", Z, 2.2, 0.05),
+    (0.66, "in", {"ra": [-76, -46, 34], "la": [-76, 46, -34], "w": HIPS(30, drop=4.2), "b": Z}),
+    (0.74, "snap", {"ra": [-22, 0, 76], "la": [-22, 0, -76], "w": HIPS(-18, drop=0.3), "h": [-38, 0, 0], "rt": R(y=3),
+                    "rl": [0, 0, 20], "ll": [0, 0, -20]}),                                                              # the gates open
+    (0.86, "back", {"rt": R(y=2.2)}),
+    *tremble(0.9, 1.3, "b", Z, 1.6, 0.05),
+    (1.34, "lin", {"b": Z}),
+    (1.45, "in", {"rt": R(), "w": HIPS(10, drop=2), "ra": [-18, 0, 40], "la": [-18, 0, -40]}),
+    (1.6, "io", REST),
 ])
 
 # ===========================================================================
 # Swords
 # ===========================================================================
-A["animation.aegis.sword_slash"] = anim(0.55, [
-    (0.1, "in", {"ra": [-112, 80, 32], "la": [-34, 0, -30], "w": HIPS(2, 36, drop=1.5), "rl": [10, 0, 8], "ll": [-10, 0, -8], "h": [0, -16, 0]}),
-    (0.2, "snap", {"ra": [-94, -86, -16], "la": [22, 0, -36], "w": HIPS(12, -42, drop=2.4), "rl": [-28, 0, 6], "ll": [22, 0, -6], "h": [0, 20, 0],
-                   "rt": (Z, [0, 0, -1.5])}),
-    (0.3, "back", {"ra": [-80, -100, -16], "w": HIPS(10, -46, drop=2.2)}),
-    (0.55, "io", REST),
+A["animation.aegis.sword_slash"] = anim(0.8, [
+    (0.1, "in", {"ra": [-112, 80, 32], "la": [-34, 0, -30], "w": HIPS(2, 40, drop=1.8), "rl": [10, 0, 8], "ll": [-10, 0, -8], "h": [0, -18, 0]}),
+    (0.2, "snap", {"ra": [-94, -86, -16], "la": [26, 0, -40], "w": HIPS(14, -46, drop=2.8), "rl": [-34, 0, 6], "ll": [26, 0, -6], "h": [0, 22, 0],
+                   "rt": R(f=2)}),
+    (0.3, "back", {"ra": [-80, -100, -16], "w": HIPS(12, -50, drop=2.5)}),
+    (0.55, "io", {"w": HIPS(11, -46, drop=2.4)}),
+    (0.8, "io", REST),
 ])
 
-A["animation.aegis.sword_overhead"] = anim(0.65, [
-    (0.2, "out", {"ra": [-186, 10, 0], "la": [-172, -14, 0], "w": HIPS(-14, drop=0.5), "h": [-12, 0, 0], "rl": [-6, 0, 8], "ll": [6, 0, -8]}),
-    (0.31, "in", {"ra": [-196, 10, 0], "la": [-184, -14, 0], "w": HIPS(-18, drop=0.3)}),
-    (0.39, "snap", {"ra": [-30, 0, 0], "la": [-36, 26, 0], "w": HIPS(28, drop=3), "h": [-22, 0, 0], "rl": [-38, 0, 6], "ll": [28, 0, -6],
-                    "rt": (Z, [0, 0, -2])}),
-    (0.47, "elastic", {"w": HIPS(24, drop=2.6)}),
-    (0.65, "io", REST),
+A["animation.aegis.sword_overhead"] = anim(0.95, [
+    (0.2, "out", {"ra": [-186, 10, 0], "la": [-172, -14, 0], "w": HIPS(-14, drop=0.5), "h": [-12, 0, 0], "rl": [-30, 0, 8], "ll": [20, 0, -8],
+                  "rt": R(y=5)}),                                                                                       # leaps, blade overhead
+    (0.31, "in", {"ra": [-198, 10, 0], "la": [-186, -14, 0], "w": HIPS(-20), "rt": R(y=6)}),
+    (0.39, "snap", {"ra": [-30, 0, 0], "la": [-36, 26, 0], "w": HIPS(32, drop=3.6), "h": [-24, 0, 0], "rl": [-44, 0, 6], "ll": [30, 0, -6],
+                    "rt": R(f=2)}),                                                                                     # comes down with it
+    (0.47, "elastic", {"w": HIPS(27, drop=3)}),
+    (0.72, "io", {"w": HIPS(25, drop=2.8)}),
+    (0.95, "io", REST),
 ])
 
-A["animation.aegis.sword_thrust"] = anim(0.5, [
-    (0.1, "in", {"ra": ([-60, -30, 0], [0, 0, 3]), "w": HIPS(0, 30, drop=1.2), "rl": [8, 0, 6], "ll": [-8, 0, -6]}),
-    (0.17, "snap", {"ra": ([-98, 5, 0], [0, 0, -4]), "la": [32, 0, -26], **LUNGE_R, "w": HIPS(16, -26, drop=2.4), "rt": (Z, [0, 0, -3])}),
-    (0.25, "back", {"w": HIPS(14, -24, drop=2.2)}),
-    (0.36, "io", {"ra": ([-96, 5, 0], [0, 0, -3])}),
-    (0.5, "io", REST),
+A["animation.aegis.sword_thrust"] = anim(0.75, [
+    (0.1, "in", {"ra": ([-60, -30, 0], [0, 0, 3]), "w": HIPS(0, 34, drop=1.4), "rl": [10, 0, 6], "ll": [-10, 0, -6], "la": [-40, 30, 0]}),
+    (0.17, "snap", {"ra": ([-98, 5, 0], [0, 0, -4]), "la": [36, 0, -30], **LUNGE_R, "w": HIPS(20, -30, drop=2.8), "rt": R(f=3.5)}),
+    (0.25, "back", {"w": HIPS(17, -27, drop=2.5), "rt": R(f=3)}),
+    (0.52, "io", {"ra": ([-96, 5, 0], [0, 0, -3])}),
+    (0.75, "io", REST),
 ])
 
-A["animation.aegis.sword_spin"] = anim(0.6, [
-    (0.08, "in", {"ra": [-90, 0, 72], "la": [-20, 0, -72], "w": HIPS(8, 30, drop=2), "rl": [0, 0, 14], "ll": [0, 0, -14]}),
-    (0.5, "out", {"rt": ([0, -360, 0], [0, 0.8, 0]), "w": HIPS(8, 0, drop=2)}),                                              # whole-body spin
-    (0.6, "io", REST),
+A["animation.aegis.sword_spin"] = anim(0.75, [
+    (0.08, "in", {"ra": [-90, 0, 76], "la": [-20, 0, -72], "w": HIPS(10, 30, drop=2.4), "rl": [0, 0, 16], "ll": [0, 0, -16]}),
+    (0.5, "out", {"rt": ([0, -720, 0], [0, 1, 0]), "w": HIPS(10, 0, drop=2.4)}),                                              # two full turns
+    (0.5, "cut", {"rt": (Z, [0, 1, 0])}),
+    (0.58, "back", {"rt": R(), "w": HIPS(12, -20, drop=2.8), "ra": [-80, -30, 60]}),
+    (0.75, "io", REST),
 ])
 
-A["animation.aegis.sword_raise"] = anim(0.9, [
-    (0.18, "back", {"ra": [-186, 0, 0], "la": [-20, 0, -40], "w": HIPS(-12, drop=0.5), "h": [-30, 0, 0], "rl": [0, 0, 10], "ll": [0, 0, -10]}),
-    *[(round(t, 3), "lin", {"ra": v}) for t, v in shake(0.24, 0.58, 1.5, 0.06, [-186, 0, 0])],
-    (0.68, "snap", {"ra": [-68, 0, 0], "w": HIPS(18, drop=2.2), "h": [4, 0, 0], "rl": [-24, 0, 8], "ll": [18, 0, -8]}),
-    (0.76, "back", {"w": HIPS(15, drop=2)}),
-    (0.9, "io", REST),
+A["animation.aegis.sword_raise"] = anim(1.1, [
+    (0.18, "back", {"ra": [-186, 0, 0], "la": [-20, 0, -40], "w": HIPS(-12, drop=0.5), "h": [-30, 0, 0], "rl": [0, 0, 12], "ll": [0, 0, -12]}),
+    *tremble(0.24, 0.58, "ra", [-186, 0, 0], 1.5, 0.06),
+    (0.68, "snap", {"ra": [-64, 0, 0], "w": HIPS(22, drop=2.8), "h": [0, 0, 0], "rl": [-30, 0, 8], "ll": [22, 0, -8], "rt": R(f=1.5)}),
+    (0.76, "back", {"w": HIPS(19, drop=2.5)}),
+    (0.95, "io", {"w": HIPS(18, drop=2.4)}),
+    (1.1, "io", REST),
 ])
 
 # ===========================================================================
@@ -608,6 +687,134 @@ A["animation.aegis.edo_awaken"] = anim(3.0, [
     (2.3, "io", {"h": [-7, 0, 0], "ra": [-6, 0, 4], "la": [-6, 0, -4], "w": HIPS(0)}),
     (3.0, "io", REST),
 ])
+
+# ===========================================================================
+# Jutsu Clash cinematic (timed against behavior_pack/scripts/clash_shots.js — check with tools/cine_preview.py clash)
+# Two families: "chidori" (the jutsu held low at the side, gripped at the wrist) and "orb" (a sphere in the palm).
+# ===========================================================================
+A["animation.aegis.rest"] = anim(0.2, [(0.1, "io", {"h": [0.6, 0, 0]}), (0.2, "io", REST)])
+
+_READY = {**STANCE_READY, "w": HIPS(10, 12, drop=1.5), "ra": [-40, -20, 10], "la": [-62, 30, 0], "h": [-4, -10, 0]}
+A["animation.aegis.clash_ready"] = anim(1.6, [
+    (0.0, "lin", _READY),
+    (0.8, "io", {"w": HIPS(12, 12, drop=1.9), "ra": [-44, -20, 10], "la": [-58, 30, 0]}),
+    (1.6, "io", _READY),
+], loop=True)
+
+_CH_HOLD = {**CHIDORI_POSE, "w": HIPS(28, 6, drop=3.6), "h": [-30, -10, 0]}
+A["animation.aegis.clash_charge_chidori"] = anim(2.3, [
+    (0.12, "out", {"ra": [-160, -10, 0], "la": [-140, 30, 0], "w": HIPS(-8, drop=0.5), "h": [-16, 0, 0], **WIDE}),            # the hand is raised…
+    (0.3, "io", {"ra": [-166, -8, 0]}),
+    (0.4, "snap", CHIDORI_POSE),                                                                                        # …and driven down, gripped at the wrist
+    *[(round(0.46 + i * 0.05, 3), "lin", {"ra": [-30 + (1.5 + i * 0.07) * (1 if i % 2 else -1), 10, (1 + i * 0.05) * (1 if i % 2 else -1)]}) for i in range(36)],
+    (2.3, "lin", _CH_HOLD),
+])
+A["animation.aegis.clash_hold_chidori"] = anim(0.4, [
+    (0.0, "lin", _CH_HOLD),
+    *tremble(0.05, 0.38, "ra", [-30, 10, 0], 3.5, 0.05),
+    (0.4, "lin", _CH_HOLD),
+], loop=True)
+
+_ORB_FORM = {**STANCE_LOW, "w": HIPS(20, -18, drop=3.2), "ra": [-58, -8, 18], "la": [-70, 40, 0], "h": [20, 14, 0], "b": [0, -10, 0]}
+_ORB_HOLD = {**STANCE_LOW, "w": HIPS(24, 22, drop=3.4), "ra": [14, 10, 34], "la": [-64, 30, 0], "h": [-20, -18, 0], "b": [0, 8, 0]}
+A["animation.aegis.clash_charge_orb"] = anim(2.3, [
+    (0.16, "out", _ORB_FORM),
+    *[(round(0.22 + 1.4 * (i / 20) ** 0.8, 3), "io", {"la": _orbit(i * 1.4, 1 + i * 0.03), "ra": [-58 + (i % 2) * 3, -8, 18 - (i % 2) * 2]}) for i in range(21)],
+    (1.72, "io", {"la": [-70, 40, 0]}),
+    (2.0, "back", _ORB_HOLD),                                                                                           # drawn back to the hip, ready to run
+    (2.3, "io", {"w": HIPS(25, 22, drop=3.5)}),
+])
+A["animation.aegis.clash_hold_orb"] = anim(0.5, [
+    (0.0, "lin", _ORB_HOLD),
+    *tremble(0.05, 0.47, "ra", [14, 10, 34], 2.5, 0.06),
+    (0.5, "lin", _ORB_HOLD),
+], loop=True)
+
+
+def _run(arms):
+    a = {"w": HIPS(40, drop=2), "h": [-36, 0, 0], **arms}
+    return anim(0.4, [
+        (0.0, "lin", {**a, "rl": [-52, 0, 4], "ll": [48, 0, -4]}),
+        (0.2, "io", {**a, "rl": [48, 0, 4], "ll": [-52, 0, -4], "w": HIPS(42, drop=2.4)}),
+        (0.4, "io", {**a, "rl": [-52, 0, 4], "ll": [48, 0, -4]}),
+    ], loop=True)
+
+
+A["animation.aegis.clash_run_chidori"] = _run({"ra": [34, 0, 14], "la": [70, 0, -14]})        # the lightning hand low, tearing along the ground
+A["animation.aegis.clash_run_orb"] = _run({"ra": [62, 10, 26], "la": [72, 0, -12]})          # the sphere trailing behind
+
+_COCKED = {"w": HIPS(18, 30), "ra": [50, 20, 30], "la": [-70, 20, -10], "rl": [-60, 0, 6], "ll": [40, 0, -6], "h": [-24, -26, 0],
+           "rt": R(pitch=14)}
+A["animation.aegis.clash_leap"] = anim(1.0, [
+    (0.0, "lin", {"w": HIPS(30, drop=4), "rl": [-30, 0, 10], "ll": [26, 0, -10], "ra": [40, 10, 26], "la": [-40, 20, 0], "h": [-20, 0, 0]}),
+    (0.14, "out", _COCKED),                                                                                             # launched, the strike arm cocked back
+    (1.0, "io", {"w": HIPS(22, 34), "ra": [58, 22, 32]}),
+], plant=False, loop="hold")
+
+_STRIKE = {"ra": ([-152, -14, 0], [0, 0, -3]), "la": [60, 0, -34], "w": HIPS(34, -36), "h": [-56, 28, 0], "rl": [30, 0, 6], "ll": [50, 0, -6],
+           "rt": R(pitch=24)}
+A["animation.aegis.clash_strike"] = anim(3.0, [
+    (0.0, "lin", _COCKED),
+    (0.1, "snap", _STRIKE),
+    (0.2, "back", {"w": HIPS(31, -33)}),
+    *[(round(0.26 + i * 0.05, 3), "lin", {"ra": ([-152 + (1.2 + i * 0.05) * (1 if i % 2 else -1), -14, (1 + i * 0.04) * (1 if i % 2 else -1)], [0, 0, -3]),
+                                          "w": HIPS(31 + i * 0.14, -33)}) for i in range(54)],
+    (3.0, "lin", {"ra": ([-152, -14, 0], [0, 0, -3])}),
+], plant=False, loop="hold")
+
+_DOWN = {"w": HIPS(30, drop=4.6), "rl": [-58, 0, 10], "ll": [30, 0, -10], "ra": [-22, 0, 14], "la": [20, 0, -30], "h": [-8, 0, 0], "rt": R()}
+def _tumble(pitch, cy=16):
+    """Root transform that pitches the whole body about its centre (not its feet)."""
+    q = _ap(_rot(pitch, 0, 0), (0, cy, 0))
+    return ([pitch, 0, 0], [q[0], cy - q[1], -q[2]])
+
+
+_HURLED = {"w": HIPS(-28), "ra": [-120, 0, 40], "la": [-120, 0, -40], "rl": [-50, 0, 10], "ll": [-30, 0, -10], "h": [20, 0, 0]}
+A["animation.aegis.clash_recoil"] = anim(1.0, [
+    (0.0, "lin", _HURLED),
+    *[(round(0.9 * i / 12, 3), "lin", {"rt": _tumble(-390 * i / 12), "rl": [-50 - 2 * i, 0, 10], "ll": [-30 - 3 * i, 0, -10]}) for i in range(1, 13)],   # hurled back, tumbling
+    (1.0, "lin", {"rt": _tumble(-400)}),
+], plant=False, loop="hold")
+
+A["animation.aegis.clash_land"] = anim(0.6, [
+    (0.0, "lin", {"w": HIPS(10, drop=1), "rl": [-30, 0, 10], "ll": [10, 0, -10], "ra": [-60, 0, 30], "la": [-40, 0, -40], "h": [10, 0, 0]}),
+    (0.1, "in", _DOWN),                                                                                                 # lands on one knee, a hand on the ground
+    (0.18, "elastic", {"w": HIPS(26, drop=4.2)}),
+    (0.6, "io", {"h": [16, 0, 0], "w": HIPS(32, drop=4.7)}),
+], loop="hold")
+
+A["animation.aegis.clash_kneel"] = anim(1.2, [
+    (0.0, "lin", {**_DOWN, "h": [16, 0, 0], "w": HIPS(32, drop=4.7)}),
+    (0.6, "io", {"w": HIPS(35, drop=4.9), "h": [20, 0, 0]}),
+    (1.2, "io", {"w": HIPS(32, drop=4.7), "h": [16, 0, 0]}),
+], loop=True)
+
+A["animation.aegis.clash_rise"] = anim(1.2, [
+    (0.0, "lin", {**_DOWN, "h": [16, 0, 0], "w": HIPS(32, drop=4.7)}),
+    (0.5, "io", {"w": HIPS(20, 6, drop=2.5), "rl": [-30, 0, 8], "ll": [16, 0, -8], "ra": [-8, 0, 8], "la": [6, 0, -10], "h": [0, 0, 0]}),
+    (1.0, "io", {"w": HIPS(2, 12), "rl": [0, 0, 5], "ll": [0, 0, -5], "ra": [0, 0, 7], "la": [0, 0, -7], "h": [-8, -12, 0]}),   # stands over them
+    (1.2, "io", {"w": HIPS(1, 12)}),
+], loop="hold")
+
+
+
+def mirrored(a):
+    """The same motion for the other hand: left and right limbs swapped, turns and sideways moves reversed."""
+    swap = {"rightArm": "leftArm", "leftArm": "rightArm", "rightLeg": "leftLeg", "leftLeg": "rightLeg"}
+    flip = lambda v, idx: {"pre": flip(v["pre"], idx), "post": flip(v["post"], idx)} if isinstance(v, dict) else [(-x if i in idx else x) for i, x in enumerate(v)]
+    out = {k: v for k, v in a.items() if k != "bones"}
+    out["bones"] = {}
+    for bone, chans in a["bones"].items():
+        nb = {}
+        for ch, keys in chans.items():
+            idx = (1, 2) if ch == "rotation" else (0,)
+            nb[ch] = {t: flip(v, idx) for t, v in keys.items()}
+        out["bones"][swap.get(bone, bone)] = nb
+    return out
+
+
+for _n in [n for n in A if ".clash_" in n]:
+    A[_n + "_m"] = mirrored(A[_n])
 
 d = json.loads(P.read_text())
 d["animations"].update(A)

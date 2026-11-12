@@ -1,0 +1,28 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "aegis:clash_orb",
+      "materials": {
+        "default": "entity_alphablend"
+      },
+      "textures": {
+        "default": "textures/entity/aegis/clash_orb"
+      },
+      "geometry": {
+        "default": "geometry.aegis.clash_orb"
+      },
+      "animations": {
+        "play": "animation.aegis.clash_orb"
+      },
+      "scripts": {
+        "animate": [
+          "play"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.aegis.clash_orb"
+      ]
+    }
+  }
+}

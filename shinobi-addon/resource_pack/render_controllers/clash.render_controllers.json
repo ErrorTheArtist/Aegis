@@ -1,0 +1,23 @@
+{
+  "format_version": "1.8.0",
+  "render_controllers": {
+    "controller.render.aegis.clash_orb": {
+      "geometry": "Geometry.default",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.default"
+      ],
+      "ignore_lighting": true,
+      "color": {
+        "r": "q.property('aegis:cr')",
+        "g": "q.property('aegis:cg')",
+        "b": "q.property('aegis:cb')",
+        "a": "1.0"
+      }
+    }
+  }
+}

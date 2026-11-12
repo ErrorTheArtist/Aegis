@@ -37,19 +37,21 @@ def num(v):
 
 
 def sample(chan, t):
-    """Linear sample of a Bedrock channel (dict of time → [x,y,z], or a constant)."""
+    """Linear sample of a Bedrock channel (dict of time → [x,y,z] or {"pre","post"}, or a constant)."""
     if chan is None:
         return (0.0, 0.0, 0.0)
     if isinstance(chan, list):
         return tuple(num(c) for c in chan)
-    keys = sorted(((float(k), tuple(num(c) for c in v)) for k, v in chan.items()), key=lambda kv: kv[0])
-    if t <= keys[0][0]:
+    vec = lambda v: tuple(num(c) for c in v)
+    keys = sorted(((float(k), vec(v["pre"]) if isinstance(v, dict) else vec(v), vec(v["post"]) if isinstance(v, dict) else vec(v))
+                   for k, v in chan.items()), key=lambda kv: kv[0])
+    if t < keys[0][0]:
         return keys[0][1]
-    for (t0, a), (t1, b) in zip(keys, keys[1:]):
-        if t0 <= t <= t1:
-            u = 0 if t1 == t0 else (t - t0) / (t1 - t0)
+    for (t0, _, a), (t1, b, _) in zip(keys, keys[1:]):
+        if t0 <= t < t1:
+            u = (t - t0) / (t1 - t0)
             return tuple(x + (y - x) * u for x, y in zip(a, b))
-    return keys[-1][1]
+    return keys[-1][2]
 
 
 def rot_matrix(rx, ry, rz):

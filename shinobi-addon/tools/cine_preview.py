@@ -100,7 +100,7 @@ def cube_faces(c):
                 yield face, geo[face], rect
 
 
-def model_quads(model, anim, t, place):
+def model_quads(model, anim, t, place, tint=None):
     """Every visible texel as a world-space quad: [(4 points, rgb)]."""
     xf = bone_xforms(model, anim, t)
     out = []
@@ -120,7 +120,9 @@ def model_quads(model, anim, t, place):
                             continue
                         pts = [place(f(at(a_, b_)), model.scale) for a_, b_ in
                                ((i / nu, j / nv), ((i + 1) / nu, j / nv), ((i + 1) / nu, (j + 1) / nv), (i / nu, (j + 1) / nv))]
-                        out.append((pts, (r, g, bl), face))
+                        if tint:
+                            r, g, bl = int(r * tint[0]), int(g * tint[1]), int(bl * tint[2])
+                        out.append((pts, (r, g, bl), face, a))
     return out
 
 
@@ -180,7 +182,7 @@ LIGHT = norm((0.35, 0.85, -0.4))
 def render(cam, layers, sky=((16, 14, 22), (46, 40, 50)), ground=(58, 62, 52), dark=0.0):
     """layers: list of quad lists; earlier layers are always behind later ones (ground decals), the rest depth-sorted."""
     img = Image.new("RGB", (cam.w, cam.h))
-    dr = ImageDraw.Draw(img)
+    dr = ImageDraw.Draw(img, "RGBA")
     for y in range(cam.h):
         u = y / cam.h
         dr.line([(0, y), (cam.w, y)], fill=tuple(int(sky[0][i] + (sky[1][i] - sky[0][i]) * u) for i in range(3)))
@@ -190,10 +192,10 @@ def render(cam, layers, sky=((16, 14, 22), (46, 40, 50)), ground=(58, 62, 52), d
         for gz in range(-14, 10):
             pts = [(gx, 0, gz), (gx + 1, 0, gz), (gx + 1, 0, gz + 1), (gx, 0, gz + 1)]
             k = 1.0 if (gx + gz) % 2 else 0.9
-            tiles.append((pts, tuple(int(c * k) for c in ground), "up"))
+            tiles.append((pts, tuple(int(c * k) for c in ground), "up", 255))
     for li, quads in enumerate([tiles] + layers):
         drawn = []
-        for pts, col, face in quads:
+        for pts, col, face, alpha in quads:
             pp = [cam.project(p) for p in pts]
             if any(p is None for p in pp):
                 continue
@@ -204,7 +206,10 @@ def render(cam, layers, sky=((16, 14, 22), (46, 40, 50)), ground=(58, 62, 52), d
             depth = sum(p[2] for p in pp) / 4
             fogk = max(0.0, min(1.0, (depth - 6) / 30)) * 0.6
             c = tuple(int((ch * shade) * (1 - dark) * (1 - fogk) + sky[1][i] * fogk) for i, ch in enumerate(col))
-            drawn.append((depth, [(p[0], p[1]) for p in pp], c))
+            if alpha >= 250:
+                drawn.append((depth, [(p[0], p[1]) for p in pp], c + (255,)))
+            else:   # glowing translucent things ignore the lighting
+                drawn.append((depth, [(p[0], p[1]) for p in pp], tuple(col) + (alpha,)))
         drawn.sort(key=lambda d: -d[0])
         for _, pp, c in drawn:
             dr.polygon(pp, fill=c)
@@ -214,8 +219,8 @@ def render(cam, layers, sky=((16, 14, 22), (46, 40, 50)), ground=(58, 62, 52), d
 # ---------------------------------------------------------------------------
 # The Edo Tensei cinematic (reads the real shot list from behavior_pack/scripts/edo_shots.js)
 # ---------------------------------------------------------------------------
-def load_shots():
-    src = (ROOT / "behavior_pack" / "scripts" / "edo_shots.js").read_text()
+def load_shots(name="edo_shots.js"):
+    src = (ROOT / "behavior_pack" / "scripts" / name).read_text()
     with tempfile.TemporaryDirectory() as tmp:
         (Path(tmp) / "shots.mjs").write_text(src)
         (Path(tmp) / "dump.mjs").write_text('import * as m from "./shots.mjs"; console.log(JSON.stringify(m));')
@@ -281,21 +286,156 @@ def edo_assets(skin="naruto", fig="madara"):
             load_geo(RP / "models" / "entity" / "edo_seal.geo.json", ent / "edo_seal.png"))
 
 
+# ---------------------------------------------------------------------------
+# The Jutsu Clash cinematic (reads behavior_pack/scripts/clash_shots.js)
+# ---------------------------------------------------------------------------
+EASES = {"lin": lambda u: u, "in": lambda u: u * u, "out": lambda u: 1 - (1 - u) ** 2, "io": ease_io}
+
+
+def path_at(E, tick, start, H):
+    """(distance from the middle, height) of a fighter — the same interpolation clash.js does."""
+    S = E["STAGE"]
+    val = lambda v: {"start": start, "H": H, "air": S["air"], "back": S["back"]}.get(v, v)
+    P = E["PATH"]
+    if tick <= P[0]["t"]:
+        return val(P[0]["d"]), val(P[0]["h"])
+    for a, b in zip(P, P[1:]):
+        if a["t"] <= tick <= b["t"]:
+            u = (tick - a["t"]) / (b["t"] - a["t"])
+            e = EASES[b.get("ease", "lin")](u)
+            return (val(a["d"]) + (val(b["d"]) - val(a["d"])) * e,
+                    val(a["h"]) + (val(b["h"]) - val(a["h"])) * e + b.get("arc", 0) * 4 * u * (1 - u))
+    return val(P[-1]["d"]), val(P[-1]["h"])
+
+
+def clash_frame(E, tick, assets, w=480, h=270, start=3.0, even=False):
+    anims, models, orb = assets
+    H = max(start, E["STAGE"]["half"])
+    fam = {"A": "orb", "B": "chidori"}
+    state, pose = {}, {}
+    for who in "AB":
+        d, hh = path_at(E, tick, start, H)
+        key, t0 = "ready", 0
+        for t, target, k in E["ANIMS"]:
+            if t <= tick and (target == "both" or target == who or (target == "W" and who == "A" and not even) or (target == "L" and who == "B" and not even)):
+                key, t0 = k, t
+        pk = f"{key}_{fam[who]}" if key in E["FAMILY_ANIMS"] else key
+        state[who] = (d, hh)
+        pose[who] = (pk, (tick - t0) / 20)
+
+    def anchor(a):
+        name, f, p, hh = a[0], a[1], a[2], a[3]
+        hh += (a[4] if len(a) > 4 else 0) * E["STAGE"]["air"]
+        if name == "M":
+            return scene_pt(f, p, hh)
+        who = {"W": "A", "L": "B"}.get(name[0], name[0])
+        d, fh = state[who]
+        off = E["POSES"][pose[who][0]][name[1:]] if len(name) > 1 else [0, 0, 0]
+        sign = 1 if who == "A" else -1
+        return scene_pt(sign * (-d + f + off[0]), p + off[1], fh + hh + off[2])
+
+    shots = [dict(s, **s["even"]) if even and s.get("even") else s for s in E["SHOTS"]]
+    # camera: replay the commands (tracked shots follow their anchor every tick)
+    pos = look = None
+    name = ""
+    cmds = [s for s in shots if s["t"] <= tick]
+    for i, s in enumerate(cmds):
+        until = cmds[i + 1]["t"] if i + 1 < len(cmds) else tick
+        tp, tl = anchor(s["pos"]), anchor(s["look"])
+        if s.get("ease") and pos is not None:
+            u = ease_io((until - s["t"]) / (s["ease"] * 20))
+            pos = tuple(a + (b - a) * u for a, b in zip(pos, tp))
+            look = tuple(a + (b - a) * u for a, b in zip(look, tl))
+        else:
+            pos, look = tp, tl
+        name = s.get("name", name)
+    solid = []
+    glow = []
+    for who in "AB":
+        d, fh = state[who]
+        pk, t = pose[who]
+        a = anims["animation.aegis.clash_" + pk + ("_m" if who == "B" else "")]
+        L = a.get("animation_length", 1)
+        t = t % L if a.get("loop") is True else min(t, L)
+        solid += model_quads(models[who], a, t, placer(-d if who == "A" else d, 0, fh, who == "B"))
+        if tick >= E["T"]["chargeA" if who == "A" else "chargeB"] + 8 and tick < E["T"]["burst"]:
+            off = E["POSES"][pk]["hand"]
+            sign = 1 if who == "A" else -1
+            glow.append((scene_pt(sign * (-d + off[0]), off[1], fh + off[2]), (90, 190, 255) if who == "A" else (190, 230, 255)))
+    if E["T"]["impact"] <= tick < E["T"]["burst"] + 8:
+        c = scene_pt(0, 0, E["STAGE"]["air"] + E["STAGE"]["hit"])
+        solid += model_quads(orb, anims["animation.aegis.clash_orb"], (tick - E["T"]["impact"]) / 20,
+                             lambda q, s, c=c: (q[0] * PX + c[0], q[1] * PX + c[1], q[2] * PX + c[2]), tint=(0.55, 0.75, 1.0))
+    cam = Camera(pos, look, w, h)
+    img = render(cam, [[], solid])
+    d = ImageDraw.Draw(img, "RGBA")
+    for pt_, col in glow:   # where the jutsu burns in each hand
+        pp = cam.project(pt_)
+        if pp:
+            r = max(3, cam.focal * 0.22 / pp[2])
+            d.ellipse([pp[0] - r, pp[1] - r, pp[0] + r, pp[1] + r], fill=col + (150,))
+            d.ellipse([pp[0] - r / 2, pp[1] - r / 2, pp[0] + r / 2, pp[1] + r / 2], fill=(255, 255, 255, 220))
+    d.rectangle([0, 0, w, 13], fill=(0, 0, 0, 255))
+    d.text((4, 1), f"t={tick:3d} ({tick / 20:.2f}s)  {name}", fill=(235, 235, 235, 255))
+    return img
+
+
+def clash_assets():
+    anims = {}
+    for f in ("aegis.animation.json", "clash.animation.json"):
+        anims.update(json.loads((RP / "animations" / f).read_text())["animations"])
+    ent = RP / "textures" / "entity" / "aegis"
+    return (anims, {"A": humanoid(NPC / "naruto.png"), "B": humanoid(NPC / "sasuke.png")},
+            load_geo(RP / "models" / "entity" / "clash_orb.geo.json", ent / "clash_orb.png"))
+
+
+def anim_sheet(names, out, frames=10, cell=170, skin="naruto", view=(2.7, 1.6, 1.5)):
+    """One row per animation: `frames` evenly spaced poses, textured, from a 3/4 front view."""
+    anims = json.loads((RP / "animations" / "aegis.animation.json").read_text())["animations"]
+    model = humanoid(NPC / f"{skin}.png")
+    sheet = Image.new("RGB", (cell * frames, (cell + 14) * len(names)), (0, 0, 0))
+    d = ImageDraw.Draw(sheet)
+    for row, n in enumerate(names):
+        a = anims[n if n.startswith("animation.") else f"animation.aegis.{n}"]
+        L = a.get("animation_length", 1.0)
+        for i in range(frames):
+            t = L * i / (frames - 1)
+            cam = Camera(scene_pt(*view), scene_pt(0.2, 0, 1.1), cell, cell, fov=52)
+            img = render(cam, [[], model_quads(model, a, t, placer(0, 0, 0))])
+            sheet.paste(img, (i * cell, row * (cell + 14) + 14))
+            d.text((i * cell + 3, row * (cell + 14) + 15), f"{t:.2f}", fill=(255, 255, 255))
+        d.text((3, row * (cell + 14) + 1), f"{n}  ({L}s)", fill=(255, 230, 120))
+    sheet.save(out)
+
+
 def main():
+    if len(sys.argv) > 1 and sys.argv[1] == "anim":
+        ap = argparse.ArgumentParser()
+        ap.add_argument("what")
+        ap.add_argument("names", nargs="+")
+        ap.add_argument("-o", "--out", required=True)
+        ap.add_argument("--frames", type=int, default=10)
+        ap.add_argument("--cell", type=int, default=170)
+        a = ap.parse_args()
+        anim_sheet(a.names, a.out, a.frames, a.cell)
+        print("wrote", a.out)
+        return
     ap = argparse.ArgumentParser()
-    ap.add_argument("what", choices=["edo"])
+    ap.add_argument("what", choices=["edo", "clash"])
     ap.add_argument("-o", "--out", required=True)
     ap.add_argument("--tick", type=int)
     ap.add_argument("--ticks", type=str, help="comma-separated ticks for the sheet")
     ap.add_argument("--gif", action="store_true")
     ap.add_argument("--cols", type=int, default=4)
     args = ap.parse_args()
-    E = load_shots()
-    assets = edo_assets()
+    if args.what == "clash":
+        E, assets, frame = load_shots("clash_shots.js"), clash_assets(), clash_frame
+    else:
+        E, assets, frame = load_shots(), edo_assets(), edo_frame
     if args.tick is not None:
-        edo_frame(E, args.tick, assets, 960, 540).save(args.out)
+        frame(E, args.tick, assets, 960, 540).save(args.out)
     elif args.gif:
-        frames = [edo_frame(E, t, assets, 384, 216) for t in range(0, E["T"]["end"] + 1, 2)]
+        frames = [frame(E, t, assets, 384, 216) for t in range(0, E["T"]["end"] + 1, 2)]
         frames[0].save(args.out, save_all=True, append_images=frames[1:], duration=100, loop=0)
     else:
         ticks = [int(x) for x in args.ticks.split(",")] if args.ticks else E["STORYBOARD"]
@@ -303,7 +443,7 @@ def main():
         rows = (len(ticks) + cols - 1) // cols
         sheet = Image.new("RGB", (cols * 480, rows * 270), (0, 0, 0))
         for i, t in enumerate(ticks):
-            sheet.paste(edo_frame(E, t, assets), ((i % cols) * 480, (i // cols) * 270))
+            sheet.paste(frame(E, t, assets), ((i % cols) * 480, (i // cols) * 270))
         sheet.save(args.out)
     print("wrote", args.out)
 

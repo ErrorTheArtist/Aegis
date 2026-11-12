@@ -132,16 +132,9 @@ export function gainJutsuXp(player, cost) {
   gainXp(player, 3 + cost * 0.5, true);
 }
 
-function levelUpFx(player, level, gained) {
-  const max = level >= MAX_LEVEL;
-  showTitle(player, max ? "§6§lMAX LEVEL" : `§e§lLevel ${level}`, {
-    subtitle: `§a+${gained} stat points §7— open your §fShinobi Record`,
-    fadeInDuration: 4, stayDuration: 50, fadeOutDuration: 15,
-  });
-  api.sound(player.dimension, max ? "ui.toast.challenge_complete" : "random.levelup", player.location, 1, 1);
-  api.particle(player.dimension, "aegis:chakra_aura", player.location);
-  api.particle(player.dimension, "minecraft:totem_particle", api.add(player.location, { x: 0, y: 1, z: 0 }));
-  if (level % 25 === 0 || max) world.sendMessage(`§e${player.name} reached §6Level ${level}§e!`);
+// Levelling up is silent: nothing in chat, nothing across the screen — the level and XP bars (and the level in the
+// name tag) simply update. The new stat points wait in the Shinobi Record.
+function levelUpFx(player) {
   applyNameTag(player);
 }
 

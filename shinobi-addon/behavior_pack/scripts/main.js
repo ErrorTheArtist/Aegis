@@ -22,6 +22,7 @@ import { initVillages, sameVillage, handleGourdUse } from "./villages.js";
 import { animSfx } from "./sfx.js";
 import { initM1 } from "./m1.js";
 import { spawnLayered } from "./particles.js";
+import { initLagClear } from "./lagclear.js";
 import { initStarter, startStarterQuests, noteCast } from "./starter.js";
 import { initEdoTensei, handleEdoUse } from "./edotensei.js";
 import { beginNatureRoll } from "./natures.js";
@@ -1047,6 +1048,7 @@ initKamui(npcApi, breakTobiPhase);
 initStarter(npcApi);
 initEdoTensei(npcApi);
 initM1(npcApi);
+initLagClear();
 // new shinobi: choose a village → teleport + starter kit → clan roll → chakra nature → starter quests
 initVillages({ ...npcApi, refreshName: applyNameTag }, (player) => {
   system.runTimeout(() => isValid(player) && beginClanRoll(player), 30);

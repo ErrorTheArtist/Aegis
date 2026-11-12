@@ -501,7 +501,7 @@ abilities live in `behavior_pack/scripts/swords.js`.
 
 The vanilla hearts are replaced by a custom HUD in the **top-left corner**, in a slanted-bar style:
 **HP bar** (red) and **Chakra bar** (blue) with their values, **Level**, the **XP bar** (yellow, `xp/needed XP`) and
-**Points** (unspent stat points). Big titles (level up, clan reveal, Tailed Beasts…) show as normal Minecraft titles;
+**Points** (unspent stat points). Levelling up is silent — no chat line, no title; the bars and your name tag just update. Big titles (clan reveal, Tailed Beasts…) show as normal Minecraft titles;
 the HUD steps aside for those few seconds.
 
 How it works: `behavior_pack/scripts/hud.js` sends the data in the title/subtitle text and
@@ -824,6 +824,24 @@ effects are spawned. Preview any effect with all its layers, without opening Min
 ```
 python3 tools/gen_particles.py --preview fire_burst ice_burst heal -o sheet.png
 ```
+
+## Lag clear
+
+- **Every 10 minutes** all dropped items lying on the ground are removed. Chat warns 60 seconds and 10 seconds before,
+  then reports how many were removed.
+- **Every 30 minutes** hostile mobs are cleared (a chat line says how many); they simply spawn again.
+- Never touched: players, animals and villagers, pets and anything tamed or name-tagged, shop NPCs, companions,
+  summons, reanimated shinobi, bosses (Akatsuki, legends, Tailed Beasts), and anything made by a quest, an exam or an
+  NPC Spawner.
+
+```
+/scriptevent aegis:lag            (when the next clears are due)
+/scriptevent aegis:lag items      (clear dropped items now)
+/scriptevent aegis:lag mobs       (clear hostile mobs now)
+/scriptevent aegis:lag off        (stop the automatic clears; "on" resumes them)
+```
+
+The timers start when the server starts. Intervals are the two constants at the top of `behavior_pack/scripts/lagclear.js`.
 
 ## Stability notes (v1.30)
 

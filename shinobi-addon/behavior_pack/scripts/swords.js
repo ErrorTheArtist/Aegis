@@ -2,6 +2,7 @@
 // and a right-click special with its own attack animation, slash arcs and particles.
 
 import { world, system } from "@minecraft/server";
+import { sameVillage } from "./villages.js";
 import { impactFx, sfx } from "./cinematic.js";
 
 let api;
@@ -479,7 +480,7 @@ export function initSwords(helpers) {
   world.afterEvents.entityHitEntity.subscribe(({ damagingEntity, hitEntity }) => {
     if (damagingEntity?.typeId !== "minecraft:player") return;
     const s = SWORDS[heldStack(damagingEntity)?.typeId];
-    if (!s || !api.isValid(hitEntity)) return;
+    if (!s || !api.isValid(hitEntity) || sameVillage(damagingEntity, hitEntity)) return;
     hitMark(damagingEntity, hitEntity, C[s.id]);
     api.sound(damagingEntity.dimension, "item.trident.hit", hitEntity.location, 0.5, 1.4);
     try {

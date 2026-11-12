@@ -271,7 +271,10 @@ export function initEnemies(helpers) {
       }
       for (const e of list) update(e, now);
     }
+    // forget despawned / unloaded ninja (natural spawns come and go all day on a server)
+    if (now % 1200 < 10) for (const id of [...state.keys()]) if (!world.getEntity(id)) state.delete(id);
   }, 10);
+  world.afterEvents.entityDie.subscribe(({ deadEntity }) => state.delete(deadEntity.id));
 
   // Natural spawns: pick a faction; Akatsuki without a member get one.
   world.afterEvents.entitySpawn.subscribe(({ entity }) => {

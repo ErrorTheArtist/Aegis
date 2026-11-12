@@ -183,9 +183,23 @@ function giveSet(player, setId) {
 }
 
 // Gives the full set for a village and records the title. Returns false if the village is unknown.
+// World record of who holds each Kage title (shown on the village leaderboard).
+function recordKage(player, village) {
+  let k;
+  try {
+    k = JSON.parse(world.getDynamicProperty("aegis:kages") ?? "{}");
+  } catch {
+    k = {};
+  }
+  for (const [t, h] of Object.entries(k)) if (h.id === player.id) delete k[t];
+  if (village) k[village] = { id: player.id, name: player.name };
+  world.setDynamicProperty("aegis:kages", JSON.stringify(k));
+}
+
 export function giveKageSet(player, village) {
   if (!KAGE_VILLAGES[village]) return false;
   player.setDynamicProperty(KAGE_PROP, village);
+  recordKage(player, village);
   giveSet(player, village);
   return true;
 }
@@ -193,6 +207,7 @@ export function giveKageSet(player, village) {
 function setKage(player, village) {
   if (village) player.setDynamicProperty(KAGE_PROP, village);
   else player.setDynamicProperty(KAGE_PROP, undefined);
+  recordKage(player, village);
   api.refreshName?.(player);
 }
 

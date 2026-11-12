@@ -1,4 +1,4 @@
-// Legendary bosses: Naruto, Sasuke, Tsunade, Sarutobi (Third Hokage) and Minato.
+// Legendary bosses: Naruto, Sasuke, Tsunade, Sarutobi (Third Hokage), Minato — and the reanimated Madara Uchiha.
 // They never spawn naturally — place an NPC Spawner and choose them. Each has a signature moveset and a
 // second phase at half health. Called from enemies.js for entities of type aegis:legend.
 
@@ -17,7 +17,12 @@ export const LEGENDS = {
     drops: [["aegis:phoenix_scroll", 1, 1], ["aegis:great_fire_scroll", 1, 0.3], ["aegis:shuriken", 32, 1]] },
   minato: { name: "§eMinato Namikaze", skin: 20, color: [1, 0.9, 0.4], phase: "Flying Raijin Barrage",
     drops: [["aegis:flash_scroll", 1, 1], ["aegis:kunai", 16, 1], ["aegis:sphere_scroll", 1, 0.3]] },
+  madara: { name: "§4Madara Uchiha §8[Edo Tensei]", skin: 29, color: [0.35, 0.45, 1], phase: "Perfect Susanoo", entrance: "§7returns from the dead!",
+    drops: [["aegis:great_fire_scroll", 1, 1], ["aegis:ryo", 64, 1], ["aegis:ryo", 64, 1], ["aegis:phoenix_scroll", 1, 0.5],
+      ["aegis:wood_dragon_scroll", 1, 0.35], ["aegis:edo_tensei_scroll", 1, 0.15]] },
 };
+const WOOD = [0.45, 0.32, 0.18];
+const reformed = new Set(); // Edo Madara: his body reforms once
 
 let api;
 const phase2 = new Set(); // entity ids that entered their second phase
@@ -55,9 +60,9 @@ function playersAround(dim, pos, r) {
   }
 }
 
-function blast(boss, pos, r, dmg, knock = 1.5, extra) {
+function blast(boss, pos, r, dmg, knock = 1.5, extra, skip) {
   for (const e of boss.dimension.getEntities({ location: pos, maxDistance: r })) {
-    if (!api.canBeHit(e, boss) || e.typeId === "aegis:legend" || e.typeId === "aegis:hostile_ninja") continue;
+    if (!api.canBeHit(e, boss) || e.typeId === "aegis:legend" || e.typeId === "aegis:hostile_ninja" || skip?.has(e.id)) continue;
     api.hurt(e, dmg, boss);
     const d = api.norm({ x: e.location.x - pos.x, y: 0, z: e.location.z - pos.z });
     api.knockback(e, d.x, d.z, knock, 0.5);
@@ -316,6 +321,35 @@ const AI = {
     return 90;
   },
 
+  madara(boss, t, dist, p2) {
+    const r = Math.random();
+    if (p2 && r < 0.22) {
+      meteor(boss, t);
+      return 160;
+    }
+    if (dist < 4.5 && r < 0.6) {
+      // Uchiha Return: the gunbai sweeps everything away
+      api.anim(boss, "animation.aegis.sword_spin");
+      system.runTimeout(() => {
+        if (!api.isValid(boss)) return;
+        impactFx(boss.dimension, boss.location, [0.85, 0.85, 0.95], 2);
+        api.particle(boss.dimension, "aegis:wind_gust", add(boss.location, { x: 0, y: 1, z: 0 }));
+        blast(boss, boss.location, 5, p2 ? 18 : 14, 3.2);
+      }, 6);
+      return 60;
+    }
+    if (r < 0.45) {
+      woodLine(boss, t);
+      return 100;
+    }
+    if (r < 0.75 && dist > 5) {
+      fireAnnihilation(boss, t, p2);
+      return 110;
+    }
+    susanooSlash(boss, t, p2);
+    return 70;
+  },
+
   minato(boss, t, dist, p2) {
     const r = Math.random();
     if (p2 && r < 0.35) {
@@ -350,6 +384,123 @@ const AI = {
   },
 };
 
+// --- Madara ------------------------------------------------------------------
+// Great Fire Annihilation: a wall of flame in a wide fan.
+function fireAnnihilation(boss, t, p2) {
+  api.anim(boss, "animation.aegis.phoenix_breath");
+  chargeFx(boss, [1, 0.45, 0.1], 16, "aegis.charge");
+  for (const p of playersAround(boss.dimension, boss.location, 32)) showTitle(p, "§cGreat Fire Annihilation", { subtitle: "§7Get behind cover!", fadeInDuration: 0, stayDuration: 20, fadeOutDuration: 5 });
+  system.runTimeout(() => {
+    if (!api.isValid(boss) || !api.isValid(t)) return;
+    sfx(boss.dimension, "aegis.fire", boss.location, 2.5, 0.5);
+    const d = dirTo(boss, t);
+    const n = p2 ? 9 : 7;
+    for (let i = 0; i < n; i++) {
+      const a = (i - (n - 1) / 2) * 0.16;
+      const dir = { x: d.x * Math.cos(a) - d.z * Math.sin(a), y: -0.03, z: d.x * Math.sin(a) + d.z * Math.cos(a) };
+      api.launchProjectile(boss, add(boss.getHeadLocation(), dir), dir, { speed: 0.9, maxAge: 40, damage: 7, radius: 2.4, knock: 1.1, fire: 5, ignoreFamily: "ninja" });
+    }
+  }, 16);
+}
+
+// Wood Release: roots burst out of the ground in a line toward the target and bind whoever they catch.
+function woodLine(boss, t) {
+  api.anim(boss, "animation.aegis.earth_slam");
+  chargeFx(boss, [0.4, 0.8, 0.3], 12, "aegis.seal");
+  const o = { ...boss.location };
+  const d = dirTo(boss, t);
+  const dim = boss.dimension;
+  const caught = new Set(); // the roots grab each target once
+  for (let i = 2; i <= 16; i += 2) system.runTimeout(() => api.particle(dim, "aegis:cine_ring", add(o, { x: d.x * i, y: 0.1, z: d.z * i }), [0.4, 0.8, 0.3]), i);
+  for (let i = 2; i <= 16; i += 2) {
+    system.runTimeout(() => {
+      if (!api.isValid(boss)) return;
+      const at = add(o, { x: d.x * i, y: 0, z: d.z * i });
+      for (let y = 0; y < 3; y += 0.7) api.particle(dim, "aegis:cine_debris", add(at, { x: 0, y, z: 0 }), WOOD);
+      api.particle(dim, "aegis:dust", at);
+      if (i % 4 === 0) sfx(dim, "aegis.impact", at, 1, 0.6);
+      blast(boss, at, 2.2, 13, 0.6, (e) => {
+        caught.add(e.id);
+        eff(e, "slowness", 50, 6);
+        if (e.typeId === "minecraft:player") e.onScreenDisplay?.setActionBar("§2Wood Release — the roots bind you!");
+      }, caught);
+    }, 20 + i);
+  }
+}
+
+// Tengai Shinsei: a meteor falls on the target's position. Telegraphed for 3 seconds.
+function meteor(boss, t) {
+  const dim = boss.dimension;
+  const spot = { ...t.location };
+  api.anim(boss, "animation.aegis.sword_raise");
+  sfx(dim, "aegis.charge", boss.location, 2.5, 0.5);
+  for (const p of playersAround(dim, spot, 48)) showTitle(p, "§4Tengai Shinsei", { subtitle: "§7A meteor is falling — RUN!", fadeInDuration: 0, stayDuration: 40, fadeOutDuration: 10 });
+  const sky = add(spot, { x: 14, y: 34, z: 10 });
+  for (let k = 0; k < 60; k += 3) {
+    system.runTimeout(() => {
+      const f = k / 60;
+      const at = { x: sky.x + (spot.x - sky.x) * f, y: sky.y + (spot.y - sky.y) * f, z: sky.z + (spot.z - sky.z) * f };
+      api.particle(dim, "aegis:cine_flame", at, [1, 0.45, 0.1]);
+      api.particle(dim, "aegis:beast_aura", at, [0.5, 0.4, 0.35]);
+      api.particle(dim, "aegis:cine_debris", at, [0.4, 0.35, 0.3]);
+      if (k % 6 === 0) api.particle(dim, "aegis:cine_ring", spot, [1, 0.3, 0.15]);
+    }, k);
+  }
+  system.runTimeout(() => sfx(dim, "aegis.whoosh", spot, 3, 0.4), 40);
+  system.runTimeout(() => {
+    if (!api.isValid(boss)) return;
+    impactFx(dim, spot, [1, 0.5, 0.2], 4);
+    for (let y = 0; y < 10; y += 2) api.particle(dim, "aegis:cine_pillar", add(spot, { x: 0, y, z: 0 }), [1, 0.5, 0.2]);
+    sfx(dim, "random.explode", spot, 4, 0.5);
+    shake(dim, spot, 1, 2, 40);
+    blast(boss, spot, 8, 30, 3, (e) => {
+      try {
+        e.setOnFire(5, true);
+      } catch {
+        /* ignore */
+      }
+    });
+  }, 60);
+}
+
+// Susanoo blade: a giant chakra sword comes down on the target.
+function susanooSlash(boss, t, p2) {
+  api.anim(boss, "animation.aegis.sword_slash");
+  const spot = { ...t.location };
+  api.particle(boss.dimension, "aegis:cine_ring", spot, [0.35, 0.45, 1]);
+  sfx(boss.dimension, "aegis.slash", boss.location, 1.5, 0.6);
+  system.runTimeout(() => {
+    if (!api.isValid(boss)) return;
+    for (let y = 0; y < 6; y += 1.5) api.particle(boss.dimension, "aegis:susanoo_flame", add(spot, { x: 0, y, z: 0 }), [0.35, 0.45, 1]);
+    api.particle(boss.dimension, "aegis:slash", add(spot, { x: 0, y: 1.2, z: 0 }), [0.35, 0.45, 1]);
+    impactFx(boss.dimension, spot, [0.35, 0.45, 1], 2);
+    blast(boss, spot, 3.5, p2 ? 22 : 16, 2);
+  }, 10);
+}
+
+// The reanimated body reforms once from the brink of death.
+function edoReform(boss) {
+  reformed.add(boss.id);
+  const dim = boss.dimension;
+  try {
+    const h = boss.getComponent("minecraft:health");
+    h.setCurrentValue(h.effectiveMax * 0.45);
+  } catch {
+    /* ignore */
+  }
+  for (let k = 0; k < 30; k += 3) {
+    system.runTimeout(() => {
+      if (!api.isValid(boss)) return;
+      api.particle(dim, "aegis:slash", add(boss.location, { x: (Math.random() - 0.5) * 2, y: Math.random() * 2, z: (Math.random() - 0.5) * 2 }), [0.8, 0.78, 0.74]);
+      api.particle(dim, "aegis:dust", boss.location);
+    }, k);
+  }
+  sfx(dim, "aegis.seal", boss.location, 2, 0.6);
+  for (const p of playersAround(dim, boss.location, 48)) {
+    showTitle(p, "§8The body reforms…", { subtitle: "§7Ash and paper rebuild the reanimated Madara", fadeInDuration: 2, stayDuration: 40, fadeOutDuration: 10 });
+  }
+}
+
 // Second phase at half health.
 function enterPhase2(boss, id) {
   const L = LEGENDS[id];
@@ -372,7 +523,7 @@ function enterPhase2(boss, id) {
       /* ignore */
     }
   }
-  if (id === "sasuke") {
+  if (id === "sasuke" || id === "madara") {
     const model = api.spawnFx(boss.dimension, "aegis:susanoo", undefined, boss.location);
     if (model) susanoo.set(boss.id, model);
   }
@@ -391,6 +542,7 @@ export function legendTick(boss) {
     /* ignore */
   }
   if (!phase2.has(boss.id) && hp <= 0.5) enterPhase2(boss, id);
+  if (id === "madara" && hp <= 0.12 && !reformed.has(boss.id)) edoReform(boss);
   if (phase2.has(boss.id)) aura(boss, L.color, id === "naruto");
 }
 
@@ -437,7 +589,7 @@ export function initLegends(helpers) {
       impactFx(entity.dimension, entity.location, L.color, 2.5);
       sfx(entity.dimension, "aegis.transform", entity.location, 2, 1.1);
       for (const p of playersAround(entity.dimension, entity.location, 48)) {
-        showTitle(p, L.name, { subtitle: "§7has appeared!", fadeInDuration: 3, stayDuration: 40, fadeOutDuration: 10 });
+        showTitle(p, L.name, { subtitle: L.entrance ?? "§7has appeared!", fadeInDuration: 3, stayDuration: 40, fadeOutDuration: 10 });
       }
     }, 3);
   });
@@ -468,6 +620,7 @@ export function initLegends(helpers) {
     }
     const L = LEGENDS[id];
     phase2.delete(deadEntity.id);
+    reformed.delete(deadEntity.id);
     const model = susanoo.get(deadEntity.id);
     if (model) api.removeFx(model);
     susanoo.delete(deadEntity.id);

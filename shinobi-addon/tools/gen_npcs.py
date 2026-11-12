@@ -130,8 +130,19 @@ def humanoid(o):
             s.rect(head["front"][0], head["front"][1] + 2, 1, 5, hair)
     x, y, _, _ = head["front"]
     eye = o.get("eyes", (40, 40, 60))
-    s.px(x + 1, y + 4, (250, 250, 250)); s.px(x + 2, y + 4, eye)
-    s.px(x + 5, y + 4, eye); s.px(x + 6, y + 4, (250, 250, 250))
+    white = o.get("sclera", (250, 250, 250))
+    s.px(x + 1, y + 4, white); s.px(x + 2, y + 4, eye)
+    s.px(x + 5, y + 4, eye); s.px(x + 6, y + 4, white)
+    if o.get("edo"):  # Edo Tensei: cracked, ashen face
+        crack = (95, 88, 82)
+        for px_, py_ in ((0, 3), (1, 3), (1, 5), (0, 6), (6, 3), (7, 3), (6, 5), (7, 6), (2, 6), (5, 6), (4, 7)):
+            s.px(x + px_, y + py_, crack)
+    if o.get("marks"):  # Tobirama's red face markings
+        red = (190, 35, 40)
+        for px_, py_ in ((1, 5), (1, 6), (6, 5), (6, 6), (3, 7), (4, 7)):
+            s.px(x + px_, y + py_, red)
+    if o.get("lock"):  # a lock of hair over one eye (Madara)
+        s.rect(x + 5, y + 2, 3, 3, hair)
     if not o.get("cloak") and not o.get("mask"):
         s.rect(x + 3, y + 6, 2, 1, (150, 90, 80))
     if o.get("hat"):
@@ -184,6 +195,29 @@ def humanoid(o):
                     lx_, ly_, lw_, lh_ = s.part(leg)[face]
                     for i in range(lw_):
                         s.px(lx_ + i, ly_ + 5 - (i % 2), hem)
+    if o.get("armor"):  # Warring States samurai armour: chest plate, shoulder guards, skirt plates
+        col, trim = o["armor"]
+        for face in ("front", "back", "left", "right"):
+            bx, by, bw, bh = s.part("body")[face]
+            s.rect(bx, by + 1, bw, 8, col)
+            for yy in (3, 5, 7):
+                s.rect(bx, by + yy, bw, 1, trim)
+        for arm in ("rarm", "larm"):
+            s.fill(arm, col, rows=(0, 3))
+            for face in ("front", "back", "left", "right"):
+                ax, ay, aw, ah = s.part(arm)[face]
+                s.rect(ax, ay + 3, aw, 1, trim)
+        for leg in ("rleg", "lleg"):
+            s.fill(leg, col, faces=("front", "back", "left", "right"), rows=(0, 5))
+            for face in ("front", "back", "left", "right"):
+                lx, ly, lw, lh = s.part(leg)[face]
+                s.rect(lx, ly + 2, lw, 1, trim)
+    if o.get("fur"):  # Tobirama's white fur collar
+        for face in ("front", "back", "left", "right"):
+            bx, by, bw, bh = s.part("body")[face]
+            s.rect(bx, by, bw, 2, o["fur"])
+        for arm in ("rarm", "larm"):
+            s.fill(arm, o["fur"], rows=(0, 1))
     if o.get("rope"):  # Sound ninja purple rope belt
         for face in ("front", "back", "left", "right"):
             bx, by, bw, bh = s.part("body")[face]
@@ -228,6 +262,14 @@ SKINS = [
     ("sasori", dict(hair=(30, 30, 30), cloak=True, top=(20, 20, 25), pants=(30, 30, 50))),
     ("zetsu", dict(hair=(30, 30, 30), cloak=True, top=(20, 20, 25), pants=(30, 30, 50))),
     ("tobi", dict(hair=(30, 30, 30), cloak=True, top=(20, 20, 25), pants=(30, 30, 50))),
+    # Edo Tensei: the founders (reanimated — ashen, cracked skin, black sclera)
+    ("madara", dict(sleeve_len=11, skin=(196, 186, 176), edo=True, sclera=(25, 22, 24), eyes=(210, 25, 30), hair=(22, 20, 26), long_hair=True, hair_back=8,
+                    hair_side=7, bangs=3, lock=True, top=(40, 40, 70), pants=(40, 40, 70), armor=((150, 30, 30), (95, 15, 20)), shoes=(35, 30, 30))),
+    ("hashirama", dict(sleeve_len=11, skin=(198, 186, 172), edo=True, sclera=(25, 22, 24), eyes=(90, 60, 40), hair=(55, 38, 28), long_hair=True, hair_back=8,
+                       hair_side=7, top=(40, 40, 70), pants=(40, 40, 70), armor=((165, 40, 35), (100, 20, 20)), band=((40, 60, 140), STEEL))),
+    ("tobirama", dict(sleeve_len=11, skin=(200, 192, 182), edo=True, sclera=(25, 22, 24), eyes=(190, 30, 40), hair=(225, 228, 232), hair_side=4, bangs=3,
+                      top=(30, 30, 45), pants=(30, 30, 45), armor=((45, 75, 150), (25, 40, 90)), fur=(240, 240, 240), marks=True,
+                      band=((40, 60, 140), STEEL))),
 ]
 (RP / "textures" / "entity" / "aegis" / "npc").mkdir(parents=True, exist_ok=True)
 for name, o in SKINS:
@@ -361,7 +403,7 @@ entity("akatsuki", {**BASE_MOVE,
 client_humanoid("akatsuki", ("#141418", "#c81419"))
 
 # Legendary bosses — only ever created by an NPC Spawner (no spawn rules).
-LEGEND_HP = {"naruto": 900, "sasuke": 850, "tsunade": 950, "sarutobi": 800, "minato": 750}
+LEGEND_HP = {"naruto": 900, "sasuke": 850, "tsunade": 950, "sarutobi": 800, "minato": 750, "madara": 1800}
 entity("legend", {**BASE_MOVE,
     "minecraft:type_family": {"family": ["legend", "ninja", "monster", "mob"]},
     "minecraft:health": {"value": 800, "max": 800},

@@ -44,7 +44,39 @@ An automatic chain — progress on the action bar, rewards paid instantly, shown
 | 5 | The Chūnin Exam | pass the Chūnin exam | 5,000 Ryō, Leaf Flak Jacket |
 | 6 | Akatsuki Sighting | defeat any Akatsuki member | 10,000 Ryō, 5,000 XP, Rasengan scroll |
 
-`/scriptevent aegis:starter` shows your current quest.
+`/scriptevent aegis:starter` shows your current quests.
+
+### Village quest lines
+
+Every village has its own 4-quest line that runs **alongside** the starter quests (it starts when you choose your
+village, and restarts if you ever change village). Patrol → master your village's release → hunt its enemies →
+reach level 25 for its **signature reward**:
+
+| Village | Quests | Release scroll (quest 1) | Enemies (quest 3) | Signature reward (quest 4) |
+|---|---|---|---|---|
+| Leaf | Konoha Patrol · The Fire Within · Snakes in the Grass · The Will of Fire | Fireball | 5 Sound Ninja | **Toad Summoning** scroll |
+| Sand | Desert Patrol · Desert Winds · Puppet Thieves · The Sand's Shield | Great Breakthrough | 5 Rogue Ninja | **Sand Gourd** |
+| Mist | Fog Patrol · The Hidden Mist · Hunter-nin · The Seven Swordsmen | Water Dragon | 5 Rogue Anbu | **Kubikiribōchō** |
+| Cloud | Mountain Patrol · Storm Training · Kumo's Rivals · Lightning Armor | Chidori | 5 enemy ninja | **Chidori Current** scroll |
+| Stone | Quarry Patrol · Solid as Rock · Border Skirmish · The Unmovable Stone | Earth Wall | 5 enemy ninja | **Earth Spikes** scroll |
+| Rain | Rain Patrol · Endless Rain · Orphans of War · The God of Rain | Water Prison | 5 Rogue Ninja | **Akatsuki cloak** |
+
+Quest 2 is "cast 5 jutsu of your village's release". Rewards along the way: 1,000 / 2,000 / 3,000 / 5,000 Ryō, XP and pills.
+
+**Sand Gourd** — right-click: **Sand Coffin** (sand wraps the enemy you look at, holds them and crushes them for 14;
+30 chakra, 10s). Sneak + right-click: **Sand Shield** (sand swirls around you, damage reduced for 4s; 20 chakra, 20s).
+
+### Village loyalty
+
+- **Village tag** over every player's head: `[Leaf] [Uchiha] Chūnin Lv.12 Name`.
+- **No friendly fire** — village-mates can't hurt each other with weapons, jutsu, arrows or summons.
+  For an event (tournament, exam fights): `/scriptevent aegis:village friendlyfire on` / `off`.
+- **Village menu** — Shinobi Record → *Village*:
+  - **Village chat** — a message only your village sees.
+  - **Village leaderboard** — the villages ranked by **Village Honor**, with member counts, the current Kage and the top 3 shinobi.
+  - **Return Home** — teleport to your village (10 min cooldown, not while in a fight).
+- **Village Honor** — every kill earns honor for you and your village: mob 1, enemy ninja 3, Akatsuki 25,
+  legend 40, Tailed Beast 60 (companions' and summons' kills count for their owner). `/scriptevent aegis:village honor` prints the board.
 
 ## Chakra
 
@@ -237,9 +269,10 @@ Fire Annihilation · **Senju** — Earth Spikes · **Hyuga** — Vacuum Bullets.
 ### Forbidden: Reanimation Jutsu (Edo Tensei)
 
 Sold by the Jutsu Sensei (Lv 60, 9,000 Ryō; using it needs Lv 40, 100 chakra, 5 min cooldown). Choose a fallen shinobi —
-**Hiruzen Sarutobi, Minato Namikaze, Itachi Uchiha, Nagato, Deidara, Sasori or Kakuzu** — a coffin rises from the earth
-and they fight beside you for **60 seconds** with their own jutsu (Fire Dragon, Flying Raijin + Rasengan, Amaterasu,
-Shinra Tensei + Banshō Ten'in, clay bombs, poison senbon, fire & wind masks). Their jutsu are cast in your name — they
+**Hiruzen Sarutobi, Minato Namikaze, Itachi Uchiha, Nagato, Deidara, Sasori, Kakuzu, Hashirama Senju or Tobirama Senju**
+— a coffin rises from the earth and they fight beside you for **60 seconds** with their own jutsu (Fire Dragon, Flying
+Raijin + Rasengan, Amaterasu, Shinra Tensei + Banshō Ten'in, clay bombs, poison senbon, fire & wind masks, Wood Release
+roots + healing you, Water Dragon + Flying Raijin). Their jutsu are cast in your name — they
 never hit you or your companions, and kills count for you. Then their soul returns to the afterlife and the body crumbles.
 One reanimation at a time.
 
@@ -555,7 +588,7 @@ Shops use **Ryō** — see *Ryō currency* below.
 
 ### Legendary bosses (NPC Spawner only)
 
-These five **never spawn on their own** — place an **NPC Spawner**, choose *Legend: …* as the NPC type, and they
+These **never spawn on their own** — place an **NPC Spawner**, choose *Legend: …* as the NPC type, and they
 appear (default respawn: 5 minutes). Each has a boss bar, its own moveset, and a **second phase at half health**
 (+Strength, Speed, Resistance and a chakra aura). Defeating one announces it to the server, counts toward
 S-rank missions and gives big XP.
@@ -567,6 +600,7 @@ S-rank missions and gives big XP.
 | **Tsunade** | 950 | Chakra-enhanced punch (huge knockback), heel-drop leap, Mystical Palm heal | **Creation Rebirth** — heals half her HP once | Mystical Palm, Slug summon, Earth Wall |
 | **Hiruzen Sarutobi** | 800 | Fire Dragon (triple fireball), Shuriken Shadow Clone storm, Enma staff sweep | **Reaper Death Seal** — weakness, slowness & nausea | Phoenix Flower, Great Fire Annihilation, 32 shuriken |
 | **Minato Namikaze** | 750 | Flying Raijin teleport-slash, kunai volley, Rasengan from behind | **Flying Raijin barrage** — 5 blinks + Rasengan | Body Flicker scroll, 16 kunai, Rasengan |
+| **Madara Uchiha [Edo Tensei]** (raid boss) | 1800 | Great Fire Annihilation (a wall of 7–9 fireballs), Wood Release roots racing along the ground (bind), Susanoo blade, gunbai sweep | **Perfect Susanoo** + **Tengai Shinsei** — a meteor falls on your spot after 3s (radius 8, 30 dmg — run!). His **Edo body reforms once** from 12% back to 45% HP | Great Fire Annihilation, 12,800 Ryō, Phoenix Flower (50%), Wood Dragon (35%), **Edo Tensei scroll (15%)** |
 
 All also drop 1,600–3,200 Ryō, diamonds and pills.
 
@@ -694,6 +728,13 @@ lighter on weak devices. Preview them without Minecraft:
 ```
 python3 tools/gen_particles.py --preview fire_burst smoke_puff cine_ring -o particles.png
 ```
+
+## Stability notes (v1.30)
+
+- Enemy AI state is cleaned up when ninja die or despawn, and expired cooldowns are pruned every minute, so memory no
+  longer creeps up on servers that stay online for days.
+- Friendly fire is blocked at the source: scripted jutsu damage, sword on-hit effects and armor procs (Raikage lightning,
+  Orochimaru venom…) never touch a village-mate.
 
 ## Project layout
 

@@ -54,6 +54,7 @@ export const NPC_TYPES = {
   tsunade_boss: { label: "§aLegend: Tsunade (boss)", entity: "aegis:legend", skin: 18, name: "§aTsunade", boss: true, legend: "tsunade" },
   sarutobi_boss: { label: "§cLegend: Hiruzen Sarutobi (boss)", entity: "aegis:legend", skin: 19, name: "§cHiruzen Sarutobi", boss: true, legend: "sarutobi" },
   minato_boss: { label: "§eLegend: Minato Namikaze (boss)", entity: "aegis:legend", skin: 20, name: "§eMinato Namikaze", boss: true, legend: "minato" },
+  madara_boss: { label: "§4Legend: Edo Madara Uchiha (raid boss)", entity: "aegis:legend", skin: 29, name: "§4Madara Uchiha §8[Edo Tensei]", boss: true, legend: "madara" },
 };
 const TYPE_IDS = Object.keys(NPC_TYPES);
 export const AKATSUKI = {

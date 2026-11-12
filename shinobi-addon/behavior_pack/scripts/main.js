@@ -18,7 +18,7 @@ import { initCurrency } from "./currency.js";
 import { initQuests } from "./quests.js";
 import { initClash, registerCast, projectilesMet } from "./clash.js";
 import { initKamui, handleKamuiUse } from "./kamui.js";
-import { initVillages } from "./villages.js";
+import { initVillages, sameVillage, handleGourdUse } from "./villages.js";
 import { initStarter, startStarterQuests, noteCast } from "./starter.js";
 import { initEdoTensei, handleEdoUse } from "./edotensei.js";
 import { beginNatureRoll } from "./natures.js";
@@ -110,6 +110,7 @@ function knockback(entity, dirX, dirZ, horizontal, vertical) {
 }
 
 function hurt(target, amount, attacker, cause = "entityAttack") {
+  if (sameVillage(target, attacker)) return; // no friendly fire between village-mates
   // Ninjutsu stat boosts every scripted technique a player lands.
   if (attacker?.typeId === "minecraft:player") amount *= ninjutsuMultiplier(attacker) * sageMultiplier(attacker) * armorDamageMultiplier(attacker) * natureDamageMultiplier(attacker);
   try {
@@ -137,6 +138,8 @@ function canBeHit(e, caster) {
   if (e.typeId === "aegis:jutsu_orb" || e.typeId === "aegis:susanoo") return false;
   // never hit friendly village NPCs with a player's techniques, nor your own clones / companions / summons
   if (e.typeId === "aegis:npc" && caster.typeId === "minecraft:player") return false;
+  // no friendly fire between village-mates
+  if (sameVillage(e, caster)) return false;
   if (e.typeId.startsWith("aegis:")) {
     try {
       if (e.getDynamicProperty(OWNER_PROP) === caster.id) return false;
@@ -302,6 +305,7 @@ world.afterEvents.itemUse.subscribe(({ source: player, itemStack }) => {
   if (handleSummonUse(player, itemStack)) return;
   if (handleKamuiUse(player, itemStack)) return;
   if (handleEdoUse(player, itemStack)) return;
+  if (handleGourdUse(player, itemStack)) return;
   const jutsu = JUTSU[itemStack.typeId];
   if (!jutsu) return;
 
@@ -334,7 +338,7 @@ world.afterEvents.itemUse.subscribe(({ source: player, itemStack }) => {
   gainJutsuXp(player, cost);
   startCooldown(player, itemStack.typeId, jutsu.cooldown);
   registerCast(player, itemStack.typeId, cost);
-  noteCast(player);
+  noteCast(player, itemStack.typeId);
   player.onScreenDisplay.setActionBar(`§6${jutsu.name}!${natureTag(player, itemStack.typeId)}`);
 });
 
@@ -943,6 +947,8 @@ world.afterEvents.projectileHitBlock.subscribe((ev) => {
 system.runInterval(() => {
   updateProjectiles();
   updateFollowers();
+  // drop expired cooldowns once a minute
+  if (system.currentTick % 1200 === 0) for (const [k, t] of cooldowns) if (t < system.currentTick) cooldowns.delete(k);
 }, 1);
 
 const lastPos = new Map();
@@ -1046,7 +1052,7 @@ initKamui(npcApi, breakTobiPhase);
 initStarter(npcApi);
 initEdoTensei(npcApi);
 // new shinobi: choose a village → teleport + starter kit → clan roll → chakra nature → starter quests
-initVillages(npcApi, (player) => {
+initVillages({ ...npcApi, refreshName: applyNameTag }, (player) => {
   system.runTimeout(() => isValid(player) && beginClanRoll(player), 30);
   system.runTimeout(() => isValid(player) && beginNatureRoll(player), 260);
   system.runTimeout(() => isValid(player) && startStarterQuests(player), 400);

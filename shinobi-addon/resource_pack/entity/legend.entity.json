@@ -35,7 +35,10 @@
         "s25": "textures/entity/aegis/npc/kakuzu",
         "s26": "textures/entity/aegis/npc/sasori",
         "s27": "textures/entity/aegis/npc/zetsu",
-        "s28": "textures/entity/aegis/npc/tobi"
+        "s28": "textures/entity/aegis/npc/tobi",
+        "s29": "textures/entity/aegis/npc/madara",
+        "s30": "textures/entity/aegis/npc/hashirama",
+        "s31": "textures/entity/aegis/npc/tobirama"
       },
       "geometry": {
         "default": "geometry.humanoid.custom"

@@ -15,7 +15,7 @@ import { showTitle } from "./hud.js";
 import { ActionFormData, ModalFormData, MessageFormData } from "@minecraft/server-ui";
 import { applyNameTag, refreshClanEffects } from "./clans.js";
 import { getRyo, fmtRyo, walletMenu } from "./currency.js";
-import { getVillage, villageLabel } from "./villages.js";
+import { getVillage, villageLabel, villageMenu } from "./villages.js";
 import { starterLine } from "./starter.js";
 
 export const MAX_LEVEL = 200;
@@ -186,11 +186,13 @@ export async function openStats(player) {
   for (const id of ids) form.button(`${STATS[id].color}${STATS[id].name}  §r§8${getStat(player, id)}/${STAT_CAP}`);
   form.button("§cReset stats");
   form.button("§6Ryō Wallet\n§r§7pay players · exchange emeralds");
+  form.button("§aVillage\n§r§7chat · leaderboard · return home");
 
   const res = await form.show(player);
   if (res.canceled || res.selection === undefined) return;
   if (res.selection === ids.length) return confirmReset(player);
   if (res.selection === ids.length + 1) return walletMenu(player);
+  if (res.selection === ids.length + 2) return villageMenu(player);
   const id = ids[res.selection];
   const room = Math.min(getPoints(player), STAT_CAP - getStat(player, id));
   if (room <= 0) {

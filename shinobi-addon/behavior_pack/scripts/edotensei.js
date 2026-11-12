@@ -23,6 +23,8 @@ const FIGURES = {
   deidara: { name: "Deidara", skin: 14, color: [1, 0.85, 0.5], moves: ["clay", "clay"] },
   sasori: { name: "Sasori", skin: 26, color: [0.6, 0.3, 0.7], moves: ["senbon", "senbon"] },
   kakuzu: { name: "Kakuzu", skin: 25, color: [0.4, 0.75, 0.4], moves: ["fireball", "wind"] },
+  hashirama: { name: "Hashirama Senju", skin: 30, color: [0.4, 0.8, 0.3], moves: ["wood", "wood", "heal"] },
+  tobirama: { name: "Tobirama Senju", skin: 31, color: [0.3, 0.6, 1], moves: ["waterDragon", "flash"] },
 };
 const IDS = Object.keys(FIGURES);
 
@@ -157,6 +159,43 @@ const MOVES = {
           trail: "aegis:slash", burst: "aegis:slash", color: [0.55, 0.25, 0.7], hitRadius: 1.0, power: 0.3, effects: [["poison", 100, 1]] });
       }, k * 2);
     }
+  },
+  // Wood Release: roots erupt under every enemy near the target and bind them
+  wood(b, o, t) {
+    api.anim(b, "animation.aegis.earth_slam");
+    const dim = b.dimension;
+    system.runTimeout(() => {
+      if (!api.isValid(t)) return;
+      for (const e of dim.getEntities({ location: t.location, maxDistance: 5, families: ["monster"] })) {
+        if (!api.canBeHit(e, o) || e.id === b.id) continue;
+        for (let y = 0; y < 2.5; y += 0.6) api.particle(dim, "aegis:cine_debris", up(e.location, y), [0.45, 0.32, 0.18]);
+        api.hurt(e, 9, o);
+        eff(e, "slowness", 60, 6);
+      }
+      api.particle(dim, "aegis:dust", t.location);
+      sfx(dim, "aegis.impact", t.location, 1, 0.6);
+    }, 10);
+  },
+  // Hashirama's healing: patches up the summoner
+  heal(b, o, t, c) {
+    api.anim(b, "animation.aegis.heal_palms");
+    api.particle(o.dimension, "aegis:heal", o.location);
+    try {
+      const h = o.getComponent("minecraft:health");
+      h.setCurrentValue(Math.min(h.effectiveMax, h.currentValue + 6));
+    } catch {
+      /* ignore */
+    }
+    MOVES.wood(b, o, t, c);
+  },
+  // Water Release: Water Dragon Bullet
+  waterDragon(b, o, t) {
+    api.anim(b, "animation.aegis.hand_signs");
+    system.runTimeout(() => {
+      if (!api.isValid(b) || !api.isValid(t)) return;
+      api.launchProjectile(o, add(up(b.location, 1.5), dirTo(b, t)), dirTo(b, t), { noOrb: true, speed: 1.1, maxAge: 36, damage: 12, radius: 3.2, knock: 1.6, fire: 0,
+        trail: "aegis:water_splash", burst: "aegis:water_splash", color: [0.3, 0.6, 1], hitRadius: 1.6 });
+    }, 12);
   },
   wind(b, o, t) {
     api.anim(b, "animation.aegis.both_palms");

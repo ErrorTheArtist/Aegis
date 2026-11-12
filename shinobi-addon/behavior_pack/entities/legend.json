@@ -11,7 +11,7 @@
           "type": "int",
           "range": [
             0,
-            28
+            31
           ],
           "default": 0,
           "client_sync": true
@@ -77,6 +77,12 @@
         "minecraft:health": {
           "value": 750,
           "max": 750
+        }
+      },
+      "aegis:legend_madara": {
+        "minecraft:health": {
+          "value": 1800,
+          "max": 1800
         }
       }
     },
@@ -273,6 +279,13 @@
         "add": {
           "component_groups": [
             "aegis:legend_minato"
+          ]
+        }
+      },
+      "aegis:legend_madara": {
+        "add": {
+          "component_groups": [
+            "aegis:legend_madara"
           ]
         }
       }

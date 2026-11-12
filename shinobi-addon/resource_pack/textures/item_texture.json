@@ -361,6 +361,9 @@
     },
     "aegis_edo_tensei_scroll": {
       "textures": "textures/items/aegis/edo_tensei_scroll"
+    },
+    "aegis_sand_gourd": {
+      "textures": "textures/items/aegis/sand_gourd"
     }
   }
 }

@@ -13,8 +13,9 @@ import { showTitle } from "./hud.js";
 import { uzumakiSealMenu } from "./bijuu.js";
 import { getKage, KAGE_VILLAGES, isSannin } from "./armor.js";
 import { registerCast } from "./clash.js";
-import { getVillage } from "./villages.js";
+
 import { noteCast } from "./starter.js";
+import { getVillage, villageTag } from "./villages.js";
 import { transformCinematic, impactFx, sfx, chargeFx } from "./cinematic.js";
 import { statEffectLevels, getLevel, getRank, RANKS } from "./levels.js";
 
@@ -201,7 +202,8 @@ export function applyNameTag(player) {
     // titles chosen by the server owner take priority: Kage > Sannin > exam rank
     const title = kage ? `${KAGE_VILLAGES[kage].title} ` : isSannin(player) ? "§aSannin " : rank ? `§7${RANKS[rank]} ` : "";
     const lv = `${title}§eLv.${getLevel(player)}§r`;
-    player.nameTag = clan ? `${clan.color}[${clan.name}]§r ${lv} ${player.name}` : `${lv} ${player.name}`;
+    const vt = villageTag(getVillage(player));
+    player.nameTag = clan ? `${vt}${clan.color}[${clan.name}]§r ${lv} ${player.name}` : `${vt}${lv} ${player.name}`;
   } catch {
     /* ignore */
   }

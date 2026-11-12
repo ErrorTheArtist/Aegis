@@ -1,0 +1,22 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:item": {
+    "description": {
+      "identifier": "aegis:sand_gourd",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "aegis_sand_gourd"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "§6Sand Gourd §7(right-click: Sand Coffin · sneak: Sand Shield)"
+      },
+      "minecraft:max_stack_size": 1
+    }
+  }
+}

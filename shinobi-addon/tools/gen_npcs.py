@@ -234,6 +234,7 @@ w(RP / "render_controllers" / "npc.render_controllers.json", {"format_version": 
 
 HUMANOID_ANIMS = {"humanoid_base_pose": "animation.humanoid.base_pose", "look_at_target": "animation.humanoid.look_at_target.default",
                   "move": "animation.humanoid.move", "attack.rotations": "animation.humanoid.attack.rotations", "bob": "animation.humanoid.bob"}
+WALK_PRE = ["variable.tcos0 = (math.cos(query.modified_distance_moved * 38.17) * query.modified_move_speed) * 57.3;"]
 SKIN_PROP = {"aegis:skin": {"type": "int", "range": [0, len(SKINS) - 1], "default": 0, "client_sync": True}}
 
 
@@ -241,7 +242,8 @@ def client_humanoid(ident, egg):
     w(RP / "entity" / f"{ident}.entity.json", {"format_version": "1.10.0", "minecraft:client_entity": {"description": {
         "identifier": f"aegis:{ident}", "materials": {"default": "entity_alphatest"}, "textures": skin_tex,
         "geometry": {"default": "geometry.humanoid.custom"}, "animations": HUMANOID_ANIMS,
-        "scripts": {"animate": list(HUMANOID_ANIMS)}, "render_controllers": ["controller.render.aegis.npc"],
+        # the vanilla walk cycle reads variable.tcos0 — mobs have to compute it themselves, or the legs never move
+        "scripts": {"pre_animation": WALK_PRE, "animate": list(HUMANOID_ANIMS)}, "render_controllers": ["controller.render.aegis.npc"],
         "enable_attachables": True, "spawn_egg": {"base_color": egg[0], "overlay_color": egg[1]}}}})
 
 

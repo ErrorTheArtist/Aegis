@@ -26,6 +26,9 @@
           "move",
           "attack.rotations",
           "bob"
+        ],
+        "pre_animation": [
+          "variable.tcos0 = (math.cos(query.modified_distance_moved * 38.17) * query.modified_move_speed) * 57.3;"
         ]
       },
       "render_controllers": [

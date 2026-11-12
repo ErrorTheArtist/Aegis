@@ -568,6 +568,47 @@ A["animation.aegis.sword_raise"] = anim(0.9, [
     (0.9, "io", REST),
 ])
 
+# ===========================================================================
+# Edo Tensei cinematic (timed against behavior_pack/scripts/edo_shots.js — check with tools/cine_preview.py)
+# ===========================================================================
+_KNEEL = {"ra": [-26, 0, 10], "la": [-26, 0, -10], "w": HIPS(46, drop=5), "h": [-30, 0, 0], "rl": [-56, 0, 12], "ll": [36, 0, -12]}
+A["animation.aegis.edo_tensei"] = anim(9.7, [
+    (0.25, "out", {**STANCE_WIDE, "ra": [-60, -30, 0], "la": [-60, 30, 0], "h": [10, 0, 0]}),                               # hands come up
+    (0.55, "io", {"ra": [-84, -38, 0], "la": [-84, 38, 0]}),
+    (0.65, "snap", {"ra": [-112, -30, -6], "la": [-112, 30, 6], "h": [6, 0, 0], "w": HIPS(4, drop=1.5)}),                   # TIGER: high, at the face
+    (0.74, "back", {"w": HIPS(6, drop=1.9)}),
+    (1.05, "snap", {"ra": [-70, -48, 8], "la": [-70, 48, -8], "h": [18, -5, 0], "w": HIPS(10, -7, drop=2.5)}),              # SERPENT: low, elbows wide
+    (1.14, "back", {"w": HIPS(11, -7, drop=2.8)}),
+    (1.45, "snap", {"ra": [-78, -36, 0], "la": [-100, 40, 10], "h": [14, 6, 0], "w": HIPS(8, 8, drop=1.8)}),                # DOG: palm over fist
+    (1.54, "back", {"w": HIPS(9, 8, drop=2.1)}),
+    (1.85, "snap", {"ra": ([-92, -20, 0], [0, 0, -1.5]), "la": ([-92, 20, 0], [0, 0, -1.5]), "h": [2, 0, 0], "w": HIPS(15, 0, drop=2.3)}),  # DRAGON: thrust forward
+    (2.2, "io", {"w": HIPS(13, drop=2)}),
+    (2.48, "out", {"ra": ([-152, -60, 0], Z), "la": ([-152, 60, 0], Z), "w": HIPS(-12, drop=0.4), "h": [-18, 0, 0]}),       # arms thrown wide
+    (2.6, "snap", {"ra": [-96, -36, 0], "la": [-96, 36, 0], "w": HIPS(6, drop=1.2), "h": [8, 0, 0]}),                       # CLAP
+    (2.76, "io", {"ra": [-100, -36, 0], "la": [-100, 36, 0], "w": HIPS(0, drop=0.6)}),
+    (2.9, "in", _KNEEL),                                                                                                   # SLAM: both palms on the ground
+    (2.98, "elastic", {"w": HIPS(42, drop=4.4)}),
+    *[(round(t, 3), "lin", {"ra": v, "la": [v[0], 0, -v[2]]}) for t, v in shake(3.1, 5.2, 1.6, 0.07, [-26, 0, 10], axis=0)],   # straining
+    (5.3, "lin", {"ra": [-26, 0, 10], "la": [-26, 0, -10]}),
+    (5.9, "io", {"h": [-46, 0, 0]}),                                                                                        # looks up at the coffin
+    (8.7, "io", {"w": HIPS(40, drop=4.2), "h": [-42, 0, 0]}),
+    (9.4, "io", {"w": HIPS(4, drop=0.5), "ra": [-8, 0, 4], "la": [-8, 0, -4], "h": [-4, 0, 0], "rl": [0, 0, 6], "ll": [0, 0, -6]}),   # stands
+    (9.7, "io", REST),
+])
+
+# The reanimated body in its coffin: dead still, head bowed — a twitch, the head lifts (tilted), then snaps straight.
+A["animation.aegis.edo_awaken"] = anim(3.0, [
+    (0.0, "lin", {"h": [44, 0, 0], "ra": [4, 0, 3], "la": [4, 0, -3], "w": HIPS(-3)}),
+    (0.85, "lin", {"h": [44, 0, 0]}),
+    (0.92, "snap", {"h": [38, 0, 10], "ra": [0, 0, 7]}),
+    (1.0, "io", {"ra": [4, 0, 3]}),
+    (1.6, "io", {"h": [4, 0, 12]}),
+    (1.72, "lin", {"h": [4, 0, 12]}),
+    (1.78, "snap", {"h": [-2, 0, 0]}),
+    (2.3, "io", {"h": [-7, 0, 0], "ra": [-6, 0, 4], "la": [-6, 0, -4], "w": HIPS(0)}),
+    (3.0, "io", REST),
+])
+
 d = json.loads(P.read_text())
 d["animations"].update(A)
 P.write_text(json.dumps(d, indent=1) + "\n")

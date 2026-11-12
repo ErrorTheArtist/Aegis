@@ -272,4 +272,7 @@ world.afterEvents.playerSpawn.subscribe(({ player }) => {
   busy.delete(player.id);
   cmd(player, "camera @s clear");
   cmd(player, "inputpermission set @s movement enabled");
+  cmd(player, "inputpermission set @s camera enabled");
+  cmd(player, "hud @s reset");
+  cmd(player, "fog @s remove aegis_edo");
 });

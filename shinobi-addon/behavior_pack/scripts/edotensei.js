@@ -8,6 +8,7 @@ import { ActionFormData } from "@minecraft/server-ui";
 import { showTitle } from "./hud.js";
 import { impactFx, sfx, shake, inCinematic, setCinematicBusy } from "./cinematic.js";
 import { getLevel } from "./levels.js";
+import { SPOT, T, SHOTS, TEXT } from "./edo_shots.js";
 
 export const EDO_ITEM = "aegis:edo_tensei_scroll";
 const COST = 100;
@@ -30,6 +31,7 @@ const IDS = Object.keys(FIGURES);
 
 let api;
 const bodies = new Map(); // entity id -> { owner, fig, end, next }
+const pending = new Set(); // bodies still inside their coffin (mid-cinematic)
 
 const add = (a, b) => ({ x: a.x + b.x, y: a.y + b.y, z: a.z + b.z });
 const up = (a, h) => ({ x: a.x, y: a.y + h, z: a.z });
@@ -241,15 +243,19 @@ async function chooseAndReanimate(player) {
 }
 
 // ---------------------------------------------------------------------------
-// The summoning cinematic (caster's camera):
-//   hand seals Tiger → Serpent → Dog → Dragon (close on the hands) → palms slam the ground, talismans spread →
-//   ゴゴゴ the coffin rises from the earth → push in on the coffin → the lid falls → the reanimated shinobi stands
-//   inside, ashen and cracked → pull back over the summoner's shoulder.
-// Everyone nearby sees the coffin rise and open for real; only the caster's camera is taken over.
+// The summoning cinematic. The shot list (camera, timing, text) lives in edo_shots.js and is storyboarded offline
+// with tools/cine_preview.py; this function plays it and drives everything that happens in the world:
+//
+//   hand seals Tiger → Serpent → Dog → Dragon, one cut per seal → the clap → both palms hit the ground and the
+//   summoning formula races across it (aegis:edo_seal) → the earth cracks and the coffin heaves out in three jerks,
+//   rubble flying (aegis:edo_coffin) → stillness → the lid creaks, falls and crashes down → cut to black → the
+//   reanimated shinobi, head bowed in the dark of the coffin, twitches, lifts their head → pull back.
+//
+// Everyone nearby sees and hears all of it; only the caster's camera is taken over (and only if no other cinematic
+// already has it). The caster can't move and can't be hurt until it ends.
 // ---------------------------------------------------------------------------
-const SEALS = [["Tiger", "寅"], ["Serpent", "巳"], ["Dog", "戌"], ["Dragon", "辰"]];
 const PAPER = [0.86, 0.82, 0.72];
-const LID_FALLS = 62; // ticks after the coffin appears (matches animation.aegis.edo_coffin)
+const SEAL_PITCH = [1.0, 0.9, 1.1, 0.8];
 
 function cmd(p, c) {
   try {
@@ -259,8 +265,15 @@ function cmd(p, c) {
   }
 }
 const f3 = (v) => `${v.x.toFixed(2)} ${v.y.toFixed(2)} ${v.z.toFixed(2)}`;
-function cam(p, pos, facing, ease = 0) {
-  cmd(p, `camera @s set minecraft:free${ease > 0 ? ` ease ${ease} in_out_sine` : ""} pos ${f3(pos)} facing ${f3(facing)}`);
+
+function endFilm(player) {
+  setCinematicBusy(player.id, false);
+  if (!api.isValid(player)) return;
+  cmd(player, "camera @s clear");
+  cmd(player, "inputpermission set @s movement enabled");
+  cmd(player, "inputpermission set @s camera enabled");
+  cmd(player, "hud @s reset");
+  cmd(player, "fog @s remove aegis_edo");
 }
 
 function reanimate(player, fig) {
@@ -271,103 +284,122 @@ function reanimate(player, fig) {
   const d = player.getViewDirection();
   const fwd = api.norm({ x: d.x, y: 0, z: d.z });
   const right = { x: -fwd.z, y: 0, z: fwd.x };
-  const at = (f, r, h, o = base) => ({ x: o.x + fwd.x * f + right.x * r, y: o.y + h, z: o.z + fwd.z * f + right.z * r });
-  const spot = at(3.8, 0, 0); // far enough that the falling lid lands just short of the summoner
+  const at = (f, r, h) => ({ x: base.x + fwd.x * f + right.x * r, y: base.y + h, z: base.z + fwd.z * f + right.z * r });
+  const spot = at(SPOT, 0, 0);
   const film = !inCinematic(player); // never fight another cinematic over the camera
-  const run = (fn, t) => system.runTimeout(() => api.isValid(player) && fn(), t);
-  const T = film ? { slam: 34, coffin: 38 } : { slam: 0, coffin: 4 };
-  const open = T.coffin + LID_FALLS;
+  const run = (fn, t) => system.runTimeout(() => api.isValid(player) && fn(), Math.max(1, t));
+  const world_ = (fn, t) => system.runTimeout(fn, Math.max(1, t)); // world effects finish even if the caster leaves
+  let coffin;
+  let body;
 
+  // ---- the caster ----
+  api.anim(player, "animation.aegis.edo_tensei");
+  eff(player, "resistance", T.release + 10, 4); // untouchable while the jutsu is woven
   if (film) {
     setCinematicBusy(player.id, true);
     cmd(player, "inputpermission set @s movement disabled");
-    eff(player, "resistance", open + 40, 4); // untouchable while the camera is away
-    // 1) the hand seals, close on the hands
-    api.anim(player, "animation.aegis.hand_signs");
-    cam(player, at(1.5, 0.35, 1.55), at(0.2, 0, 1.25));
-    run(() => cam(player, at(1.15, -0.45, 1.45), at(0.2, 0, 1.3), 1.4), 1);
-    SEALS.forEach(([name, kanji], i) =>
-      run(() => {
-        showTitle(player, `§l§f${name}`, { subtitle: `§8${kanji}`, fadeInDuration: 0, stayDuration: 7, fadeOutDuration: 2 });
-        sfx(dim, "aegis.seal", base, 0.9, 0.8 + i * 0.12);
-        api.particle(dim, "aegis:chakra_aura", at(0.5, 0, 1.2));
-      }, 2 + i * 8));
+    cmd(player, "inputpermission set @s camera disabled");
+    cmd(player, "hud @s hide all");
+    cmd(player, "fog @s push aegis:fog_dark aegis_edo");
+    try {
+      player.playSound("aegis.edo_drone", { volume: 0.9 });
+    } catch {
+      /* ignore */
+    }
+    for (const s of SHOTS) {
+      const go = () => cmd(player, `camera @s set minecraft:free${s.ease ? ` ease ${s.ease} in_out_sine` : ""} pos ${f3(at(...s.pos))} facing ${f3(at(...s.look))}`);
+      if (s.t === 0) go();
+      else run(go, s.t);
+    }
+    for (const x of TEXT) {
+      run(() => showTitle(player, x.title, { subtitle: x.subtitle.replace("{name}", F.name), fadeInDuration: x.t < T.seal ? 0 : 3, stayDuration: x.stay, fadeOutDuration: x.t < T.seal ? 2 : 10 }), x.t);
+    }
+    run(() => cmd(player, "camera @s fade time 0.05 0.1 0.25 color 0 0 0"), T.thud); // cut to black as the lid lands
+    system.runTimeout(() => endFilm(player), T.release);
+  } else {
+    showTitle(player, "§8Reanimation Jutsu", { subtitle: `§7Edo Tensei — ${F.name}`, fadeInDuration: 4, stayDuration: 50, fadeOutDuration: 10 });
   }
 
-  // 2) palms to the ground: talismans spread toward the spot
+  // ---- hand seals + clap ----
+  T.seals.forEach((t, i) =>
+    run(() => {
+      sfx(dim, "aegis.edo_seal", base, 1.1, SEAL_PITCH[i]);
+      api.particle(dim, "aegis:chakra_aura", at(0.45, 0, 1.25));
+    }, t));
   run(() => {
-    api.anim(player, "animation.aegis.summon_slam");
-    if (film) {
-      cam(player, at(1.6, 3.4, 0.6), at(1.8, 0, 0.9));
-      showTitle(player, "§l§8Summoning", { subtitle: "§7Impure World Reincarnation", fadeInDuration: 2, stayDuration: 30, fadeOutDuration: 8 });
-    }
-    sfx(dim, "aegis.seal", base, 2, 0.55);
-    shake(dim, base, 0.3, 0.6, 16);
-    for (let k = 0; k <= 10; k++) {
-      const f = k / 10;
-      system.runTimeout(() => {
-        const p = { x: base.x + (spot.x - base.x) * f, y: base.y + 0.1, z: base.z + (spot.z - base.z) * f };
-        api.particle(dim, "aegis:slash", p, PAPER);
-        api.particle(dim, "aegis:cine_ring", p, [0.25, 0.22, 0.2]);
-      }, k);
-    }
-  }, T.slam);
+    sfx(dim, "aegis.edo_clap", base, 1.4, 1);
+    api.particle(dim, "aegis:chakra_burst", at(0.5, 0, 1.3), [0.75, 0.7, 0.85]);
+  }, T.clap);
 
-  // 3) ゴゴゴ — the coffin rises from the earth
-  run(() => {
-    let coffin;
+  // ---- palms hit the ground: the formula spreads ----
+  world_(() => {
+    try {
+      const seal = dim.spawnEntity("aegis:edo_seal", { x: base.x, y: base.y, z: base.z });
+      seal.teleport(base, { facingLocation: { x: spot.x, y: base.y, z: spot.z } });
+      world_(() => api.isValid(seal) && seal.remove(), 176);
+    } catch {
+      /* ignore */
+    }
+    sfx(dim, "aegis.edo_gong", base, 1.6, 1);
+    sfx(dim, "aegis.impact", base, 1, 0.7);
+    shake(dim, base, 0.5, 0.7, 20);
+    api.particle(dim, "aegis:dust", at(0.6, 0, 0));
+    api.particle(dim, "aegis:cine_ring", at(0.4, 0, 0.05), [0.2, 0.18, 0.2]);
+    for (let k = 1; k <= 8; k++) world_(() => api.particle(dim, "aegis:slash", at((SPOT * k) / 8, (Math.random() - 0.5) * 0.8, 0.15), PAPER), k);
+  }, T.seal);
+
+  // ---- the coffin heaves out of the earth (three jerks, then it settles) ----
+  world_(() => {
     try {
       coffin = dim.spawnEntity("aegis:edo_coffin", spot);
       coffin.teleport(spot, { facingLocation: { x: base.x, y: spot.y, z: base.z } });
     } catch {
       coffin = undefined;
     }
-    if (film) showTitle(player, " ", { subtitle: "§8ゴ  ゴ  ゴ  ゴ", fadeInDuration: 0, stayDuration: 30, fadeOutDuration: 10 });
-    sfx(dim, "aegis.charge", spot, 2, 0.45);
-    shake(dim, spot, 0.45, 1.6, 20);
-    for (let t = 0; t < 32; t += 3) {
-      system.runTimeout(() => {
+    sfx(dim, "aegis.edo_rumble", spot, 2.2, 1);
+    for (const [t, power] of [[3, 0.55], [16, 0.5], [29, 0.6]]) {
+      world_(() => {
+        shake(dim, spot, power, 0.45, 24);
         api.particle(dim, "aegis:dust", spot);
-        api.particle(dim, "aegis:cine_debris", spot, [0.35, 0.28, 0.22]);
-        if (t % 6 === 0) api.sound(dim, "dig.stone", spot, 1.2, 0.5);
+        api.particle(dim, "aegis:cine_debris", spot, [0.36, 0.3, 0.24]);
+        api.particle(dim, "aegis:smoke_puff", { x: spot.x, y: spot.y + 0.3, z: spot.z });
+        api.sound(dim, "dig.gravel", spot, 1.4, 0.5);
       }, t);
     }
-    // the coffin crumbles back to dust a while after it opened
-    system.runTimeout(() => {
+    for (let t = 3; t < 44; t += 4) world_(() => api.particle(dim, "aegis:dust", spot), t);
+    world_(() => {
+      shake(dim, spot, 0.4, 0.3, 20);
+      for (const [f, r] of [[0.9, 0], [-0.9, 0], [0, 0.9], [0, -0.9]]) api.particle(dim, "aegis:dust", { x: spot.x + fwd.x * f + right.x * r, y: spot.y, z: spot.z + fwd.z * f + right.z * r });
+    }, T.risen - T.coffin);
+    // much later it sinks back into the ground
+    world_(() => {
+      sfx(dim, "aegis.edo_rumble", spot, 1.2, 1.25);
+      for (let t = 0; t < 28; t += 4) world_(() => api.particle(dim, "aegis:dust", spot), t);
+    }, 180);
+    world_(() => {
       try {
-        if (coffin && api.isValid(coffin)) {
-          api.particle(dim, "aegis:dust", spot);
-          api.particle(dim, "aegis:cine_debris", spot, [0.4, 0.3, 0.2]);
-          coffin.remove();
-        }
+        if (coffin && api.isValid(coffin)) coffin.remove();
       } catch {
         /* ignore */
       }
-    }, LID_FALLS + 100);
+    }, 210);
   }, T.coffin);
 
-  if (film) {
-    // over the shoulder as it rises, then push in on the coffin
-    run(() => cam(player, at(-1.4, 0.9, 2.1), at(3.8, 0, 1.4), 0.6), T.coffin + 4);
-    run(() => cam(player, at(1.0, 1.9, 1.7), at(3.8, 0, 1.4), 2.6), T.coffin + 16);
-    run(() => cam(player, at(2.0, 1.9, 1.3), at(3.8, 0, 1.5)), T.coffin + 50); // front diagonal: the lid falls past, not through, the lens
-    run(() => cam(player, at(1.8, 2.3, 1.4), at(3.8, 0, 1.5), 1.2), T.coffin + 51);
-  }
+  // ---- the lid ----
+  world_(() => sfx(dim, "aegis.edo_creak", spot, 1.6, 0.9), T.creak);
+  world_(() => sfx(dim, "aegis.edo_creak", spot, 1.3, 1.15), T.creak + 7);
 
-  // 4) the lid falls: the reanimated shinobi stands inside
+  // the reanimated body appears behind the lid just before it falls, dead still
   run(() => {
-    sfx(dim, "random.anvil_land", spot, 0.7, 0.5);
-    sfx(dim, "aegis.impact", spot, 1.2, 0.6);
-    api.particle(dim, "aegis:dust", at(1.6, 0, 0.1));
-    api.particle(dim, "aegis:dust", at(2.6, 0, 0.1));
-    api.particle(dim, "aegis:smoke_puff", at(2.6, 0, 0.6));
-    let b;
     try {
-      b = dim.spawnEntity("aegis:genin", spot);
-      b.teleport(spot, { facingLocation: { x: base.x, y: spot.y + 1.6, z: base.z } });
+      body = dim.spawnEntity("aegis:genin", spot);
+      body.teleport(spot, { facingLocation: { x: base.x, y: spot.y + 1.6, z: base.z } });
     } catch {
+      body = undefined;
       return;
     }
+    const b = body;
+    pending.add(b.id);
     b.setDynamicProperty("aegis:owner", player.id);
     b.setDynamicProperty("aegis:reanimated", fig);
     b.setDynamicProperty("aegis:no_xp", true);
@@ -385,42 +417,45 @@ function reanimate(player, fig) {
     } catch {
       /* ignore */
     }
-    b.nameTag = `§8[Edo Tensei] §f${F.name}`;
-    eff(b, "slowness", 30, 255); // a moment of stillness in the coffin
-    eff(b, "health_boost", LIFETIME, 4);
-    eff(b, "regeneration", LIFETIME, 1);
-    eff(b, "strength", LIFETIME, 2);
-    eff(b, "resistance", LIFETIME, 1);
-    eff(b, "fire_resistance", LIFETIME, 0);
-    eff(b, "speed", LIFETIME, 0);
+    eff(b, "slowness", T.release - T.body + 12, 255); // stands in the coffin until the cinematic ends
+    eff(b, "resistance", T.release - T.body + 12, 4);
+    eff(b, "health_boost", LIFETIME + 100, 4);
+    eff(b, "regeneration", LIFETIME + 100, 1);
+    eff(b, "strength", LIFETIME + 100, 2);
+    eff(b, "fire_resistance", LIFETIME + 100, 0);
     try {
       const hc = b.getComponent("minecraft:health");
       hc.setCurrentValue(hc.effectiveMax);
     } catch {
       /* ignore */
     }
-    for (let k = 0; k < 20; k += 2) system.runTimeout(() => api.isValid(b) && api.particle(dim, "aegis:slash", up(b.location, 0.4 + Math.random() * 1.6), PAPER), k);
-    bodies.set(b.id, { owner: player.id, fig, end: system.currentTick + LIFETIME, next: system.currentTick + 40 });
-    world.sendMessage(`§8${player.name} used the forbidden Reanimation Jutsu — §f${F.name}§8 walks again.`);
-  }, open);
+    system.runTimeout(() => api.isValid(b) && api.anim(b, "animation.aegis.edo_awaken"), 2);
+  }, T.body - 2);
 
-  if (film) {
-    run(() => {
-      showTitle(player, "§l§8EDO TENSEI", { subtitle: `§f${F.name} §7returns from the dead`, fadeInDuration: 3, stayDuration: 45, fadeOutDuration: 12 });
-      impactFx(dim, spot, F.color, 1.2);
-      sfx(dim, "aegis.transform", spot, 1.4, 0.6);
-    }, open + 6);
-    run(() => cam(player, at(-2.4, 1.0, 2.5), at(3.0, 0, 1.2), 1.0), open + 22);
-    const finish = () => {
-      setCinematicBusy(player.id, false);
-      if (!api.isValid(player)) return;
-      cmd(player, "camera @s clear");
-      cmd(player, "inputpermission set @s movement enabled");
-    };
-    system.runTimeout(finish, open + 40);
-  } else {
-    showTitle(player, "§8Reanimation Jutsu", { subtitle: `§7Edo Tensei — ${F.name}`, fadeInDuration: 4, stayDuration: 50, fadeOutDuration: 10 });
-  }
+  world_(() => {
+    sfx(dim, "aegis.edo_thud", at(SPOT - 1.6, 0, 0), 2.2, 1);
+    shake(dim, spot, 0.7, 0.5, 24);
+    for (const f of [0.9, 1.8, 2.7]) {
+      api.particle(dim, "aegis:dust", at(SPOT - 0.6 - f, 0.7, 0));
+      api.particle(dim, "aegis:dust", at(SPOT - 0.6 - f, -0.7, 0));
+    }
+    api.particle(dim, "aegis:smoke_puff", at(SPOT - 2, 0, 0.2));
+  }, T.thud);
+
+  // ---- the reveal ----
+  world_(() => {
+    const b = body;
+    if (!b || !api.isValid(b)) return;
+    pending.delete(b.id);
+    if (!api.isValid(player)) return b.remove(); // the summoner is gone: so is the soul
+    b.nameTag = `§8[Edo Tensei] §f${F.name}`;
+    eff(b, "resistance", LIFETIME, 1);
+    eff(b, "speed", LIFETIME, 0);
+    sfx(dim, "aegis.edo_gong", spot, 1.3, 1.5);
+    for (let k = 0; k < T.release - T.reveal; k += 4) system.runTimeout(() => api.isValid(b) && api.particle(dim, "aegis:edo_ash", b.location), k);
+    bodies.set(b.id, { owner: player.id, fig, end: system.currentTick + LIFETIME, next: system.currentTick + (T.release - T.reveal) + 8 });
+    world.sendMessage(`§8${player.name} used the forbidden Reanimation Jutsu — §f${F.name}§8 walks again.`);
+  }, T.reveal);
 }
 
 export function handleEdoUse(player, itemStack) {
@@ -453,7 +488,7 @@ export function initEdoTensei(helpers) {
         crumble(id, `§7The soul of §f${FIGURES[st.fig].name}§7 returns to the afterlife.`);
         continue;
       }
-      if (now % 20 === 0) api.particle(b.dimension, "aegis:slash", up(b.location, 0.6 + Math.random() * 1.4), [0.8, 0.78, 0.74]);
+      if (now % 20 === 0) api.particle(b.dimension, "aegis:edo_ash", b.location);
       if (now < st.next) continue;
       const t = enemyNear(b, o);
       if (!t) {
@@ -470,6 +505,27 @@ export function initEdoTensei(helpers) {
       st.next = now + 50 + Math.floor(Math.random() * 30);
     }
   }, 10);
+
+  // a reanimated body nobody is holding here any more (server restarted, summoner vanished mid-jutsu) turns to dust
+  system.runInterval(() => {
+    for (const p of world.getAllPlayers()) {
+      let list = [];
+      try {
+        list = p.dimension.getEntities({ type: "aegis:genin", location: p.location, maxDistance: 64 });
+      } catch {
+        continue;
+      }
+      for (const e of list) {
+        try {
+          if (!e.getDynamicProperty("aegis:reanimated") || bodies.has(e.id) || pending.has(e.id)) continue;
+          api.particle(e.dimension, "aegis:dust", e.location);
+          e.remove();
+        } catch {
+          /* ignore */
+        }
+      }
+    }
+  }, 100);
 
   // a destroyed body crumbles instead of dropping anything
   world.afterEvents.entityDie.subscribe(({ deadEntity }) => {

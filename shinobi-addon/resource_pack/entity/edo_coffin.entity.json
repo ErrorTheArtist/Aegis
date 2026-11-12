@@ -1,28 +1,28 @@
 {
-  "format_version": "1.10.0",
-  "minecraft:client_entity": {
-    "description": {
-      "identifier": "aegis:edo_coffin",
-      "materials": {
-        "default": "entity_alphatest"
-      },
-      "textures": {
-        "default": "textures/entity/aegis/edo_coffin"
-      },
-      "geometry": {
-        "default": "geometry.aegis.edo_coffin"
-      },
-      "animations": {
-        "rise": "animation.aegis.edo_coffin"
-      },
-      "scripts": {
-        "animate": [
-          "rise"
-        ]
-      },
-      "render_controllers": [
-        "controller.render.aegis.coffin"
-      ]
-    }
+ "format_version": "1.10.0",
+ "minecraft:client_entity": {
+  "description": {
+   "identifier": "aegis:edo_coffin",
+   "materials": {
+    "default": "entity_alphatest"
+   },
+   "textures": {
+    "default": "textures/entity/aegis/edo_coffin"
+   },
+   "geometry": {
+    "default": "geometry.aegis.edo_coffin"
+   },
+   "animations": {
+    "play": "animation.aegis.edo_coffin"
+   },
+   "scripts": {
+    "animate": [
+     "play"
+    ]
+   },
+   "render_controllers": [
+    "controller.render.aegis.coffin"
+   ]
   }
+ }
 }

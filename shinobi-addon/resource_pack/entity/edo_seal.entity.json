@@ -1,0 +1,28 @@
+{
+ "format_version": "1.10.0",
+ "minecraft:client_entity": {
+  "description": {
+   "identifier": "aegis:edo_seal",
+   "materials": {
+    "default": "entity_alphatest"
+   },
+   "textures": {
+    "default": "textures/entity/aegis/edo_seal"
+   },
+   "geometry": {
+    "default": "geometry.aegis.edo_seal"
+   },
+   "animations": {
+    "play": "animation.aegis.edo_seal"
+   },
+   "scripts": {
+    "animate": [
+     "play"
+    ]
+   },
+   "render_controllers": [
+    "controller.render.aegis.coffin"
+   ]
+  }
+ }
+}

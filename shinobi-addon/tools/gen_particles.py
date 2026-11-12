@@ -347,6 +347,10 @@ P = {
     "dust": dict(tex="smoke", mat="blend", n=12, shape=("box", [1.2, 0.2, 1.2], [0, 0.2, 0], "outwards"), life=(0.9, 1.5), speed=(0.8, 2.4),
                  drag=2.5, accel=[0, 0.5, 0], size=(0.7, 0.45, [(0, 0.55), (1, 1.6)]), spin=(-40, 40),
                  color=colfix([(0, (0.68, 0.56, 0.42, 0.85)), (0.6, (0.6, 0.5, 0.38, 0.55)), (1, (0.5, 0.42, 0.32, 0))])),
+    # Edo Tensei: flakes of ash and paper drifting off a reanimated body
+    "edo_ash": dict(tex="debris", mat="alpha", n=9, shape=("box", [0.45, 0.95, 0.45], [0, 0.95, 0], "outwards"), life=(1.3, 2.4), speed=(0.15, 0.7),
+                    drag=1.2, accel=[0, 0.45, 0], size=(0.06, 0.09, [(0, 0.6), (0.2, 1), (0.8, 1), (1, 0)]), spin=(-220, 220), lit=True,
+                    color=colfix([(0, (0.82, 0.8, 0.74, 1)), (0.6, (0.62, 0.6, 0.57, 1)), (1, (0.4, 0.38, 0.36, 1))])),
     "amaterasu": dict(tex="flame", mat="blend", n=7, shape=("box", [0.35, 0.9, 0.35], [0, 0.9, 0], [0, 1, 0]), life=(0.5, 0.9), speed=(0.4, 1.1),
                       drag=1.5, accel=[0, 2.2, 0], size=(0.6, 0.35, [(0, 0.6), (0.25, 1.0), (1, 0.35)]), rot=(-8, 8), spin=(-12, 12),
                       color=colfix([(0, (0.08, 0.0, 0.1, 0.95)), (0.55, (0.03, 0, 0.04, 0.92)), (1, (0.22, 0.0, 0.28, 0))])),

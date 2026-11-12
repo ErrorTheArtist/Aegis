@@ -276,12 +276,24 @@ roots + healing you, Water Dragon + Flying Raijin). Their jutsu are cast in your
 never hit you or your companions, and kills count for you. Then their soul returns to the afterlife and the body crumbles.
 One reanimation at a time.
 
-**The summoning cinematic** (about 7 seconds, the caster's camera; the caster can't move or be hurt during it):
-close-up on the hand seals **Tiger → Serpent → Dog → Dragon** → the palms slam the ground and talismans spread →
-*ゴゴゴ* a wooden **coffin rises out of the earth** with the ground shaking → the camera pushes in → the **lid falls
-forward** with a crash of dust → the reanimated shinobi stands inside, ashen and cracked → **EDO TENSEI**. Everyone
-nearby sees the coffin rise and open; it crumbles to dust a few seconds later. If the caster is already in another
-cinematic (e.g. a jutsu clash) the coffin still rises, without the camera work.
+**The summoning cinematic** (about 10 seconds on the caster's camera; the caster can't move or be hurt during it):
+
+1. **Hand seals** — one camera cut per seal as they snap into place: **Tiger → Serpent → Dog → Dragon**.
+2. **Clap, then both palms hit the ground** — the **summoning formula** (ink script) races out across the ground to
+   the spot in front of the caster. Seen from directly above.
+3. **The coffin heaves out of the earth** in three jerks — the ground cracks, rubble flies, dust pours off it —
+   filmed from ground level looking up. A planked wooden coffin with iron bands and a sealing talisman.
+4. **Stillness** — over the kneeling caster's shoulder, the coffin standing.
+5. **The lid creaks, tips and crashes down**, cut to black…
+6. …**the reanimated shinobi** in the dark of the coffin, head bowed. A twitch; the head lifts, tilted; snaps straight.
+   **EDO TENSEI**. Ash and paper flake off the body for as long as it walks.
+7. Pull back; the caster stands; control returns. The coffin later sinks back into the earth.
+
+It has its own sounds (seal snaps, the clap, a deep gong, the earth rumbling, the lid's creak and crash, an eerie drone).
+Everyone nearby sees and hears it; only the caster's camera is taken over (not at all if they're already in another
+cinematic). The whole shot list is data in `behavior_pack/scripts/edo_shots.js` — camera positions are relative to the
+caster — and `python3 tools/cine_preview.py edo -o storyboard.png` renders the storyboard offline from the real
+models and animations (`--gif` for an animated preview).
 
 ## Tailed Beasts (bosses)
 

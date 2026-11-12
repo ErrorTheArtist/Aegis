@@ -240,6 +240,90 @@
           "load_on_low_memory": true
         }
       ]
+    },
+    "aegis.edo_seal": {
+      "category": "player",
+      "min_distance": 6,
+      "max_distance": 48,
+      "sounds": [
+        {
+          "name": "sounds/aegis/edo_seal",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "aegis.edo_clap": {
+      "category": "player",
+      "min_distance": 6,
+      "max_distance": 48,
+      "sounds": [
+        {
+          "name": "sounds/aegis/edo_clap",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "aegis.edo_gong": {
+      "category": "player",
+      "min_distance": 6,
+      "max_distance": 48,
+      "sounds": [
+        {
+          "name": "sounds/aegis/edo_gong",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "aegis.edo_rumble": {
+      "category": "player",
+      "min_distance": 6,
+      "max_distance": 48,
+      "sounds": [
+        {
+          "name": "sounds/aegis/edo_rumble",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "aegis.edo_creak": {
+      "category": "player",
+      "min_distance": 6,
+      "max_distance": 48,
+      "sounds": [
+        {
+          "name": "sounds/aegis/edo_creak",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "aegis.edo_thud": {
+      "category": "player",
+      "min_distance": 6,
+      "max_distance": 48,
+      "sounds": [
+        {
+          "name": "sounds/aegis/edo_thud",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "aegis.edo_drone": {
+      "category": "player",
+      "min_distance": 6,
+      "max_distance": 48,
+      "sounds": [
+        {
+          "name": "sounds/aegis/edo_drone",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
     }
   }
 }

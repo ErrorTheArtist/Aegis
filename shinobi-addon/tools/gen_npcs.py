@@ -556,7 +556,7 @@ w(BP / "loot_tables" / "entities" / "aegis_akatsuki.json", {"pools": [
     {"rolls": 1, "entries": [{"type": "item", "name": "aegis:ryo", "weight": 1, "functions": cnt(10, 20)}]},
     {"rolls": 1, "entries": [{"type": "item", "name": "minecraft:diamond", "weight": 1, "functions": cnt(2, 5)}]},
     {"rolls": 1, "entries": [{"type": "item", "name": "aegis:reroll_scroll", "weight": 1}, {"type": "item", "name": "aegis:bijuu_scroll", "weight": 1},
-                             {"type": "item", "name": "aegis:samehada", "weight": 1}, {"type": "item", "name": "aegis:shibuki", "weight": 1},
+                             {"type": "item", "name": "aegis:shibuki", "weight": 1},
                              {"type": "empty", "weight": 4}]},
     {"rolls": 1, "entries": [{"type": "item", "name": "aegis:akatsuki_cloak", "weight": 1}, {"type": "item", "name": "aegis:akatsuki_hat", "weight": 1},
                              {"type": "empty", "weight": 2}]}]})

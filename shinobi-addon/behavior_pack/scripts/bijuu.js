@@ -76,6 +76,34 @@ function sealedBeastId(player) {
   }
 }
 
+// ---------------------------------------------------------------------------
+// One Jinchūriki per Tailed Beast (world-wide registry, survives restarts and offline holders)
+// ---------------------------------------------------------------------------
+const holderKey = (id) => `aegis:jin_${id}`;
+export function holderOf(id) {
+  try {
+    return JSON.parse(world.getDynamicProperty(holderKey(id)) ?? "null");
+  } catch {
+    return null;
+  }
+}
+function setHolder(id, player) {
+  world.setDynamicProperty(holderKey(id), player ? JSON.stringify({ id: player.id, name: player.name }) : undefined);
+}
+// May this player become the Jinchūriki of `id`?
+function heldByOther(id, player) {
+  const h = holderOf(id);
+  return h && h.id !== player?.id ? h : null;
+}
+// Beasts that were spawned for a quest (or by other scripted fights) can be defeated but never sealed.
+const unsealable = (e) => {
+  try {
+    return e.getDynamicProperty("aegis:no_seal") === true || e.getTags().some((t) => t.startsWith("aegis_q_"));
+  } catch {
+    return false;
+  }
+};
+
 export function bijuuChakraBonus(player) {
   const b = BEASTS[sealedBeastId(player)];
   return b ? 50 + b.tails * 10 : 0;
@@ -469,7 +497,9 @@ function updateBoss(boss, now) {
 // Summoning
 // ---------------------------------------------------------------------------
 function rollBeastId() {
-  const entries = Object.entries(BEASTS).map(([id, b]) => [id, 10 - b.tails]);
+  // a beast sealed inside a Jinchūriki can't be summoned (unless every beast is taken)
+  let entries = Object.entries(BEASTS).filter(([id]) => !holderOf(id)).map(([id, b]) => [id, 10 - b.tails]);
+  if (!entries.length) entries = Object.entries(BEASTS).map(([id, b]) => [id, 10 - b.tails]);
   const total = entries.reduce((s, [, wt]) => s + wt, 0);
   let r = Math.random() * total;
   for (const [id, wt] of entries) {
@@ -598,6 +628,16 @@ function unequipCloak(player) {
 
 export function sealInto(player, id, sealer) {
   const b = BEASTS[id];
+  const other = heldByOther(id, player);
+  if (other) {
+    const msg = `§c${fullName(b)}§c already has a Jinchūriki: §f${other.name}§c. A Tailed Beast can only be sealed into one person.`;
+    player.sendMessage(msg);
+    if (sealer && sealer.id !== player.id) sealer.sendMessage(msg);
+    return false;
+  }
+  const previous = sealedBeastId(player);
+  if (previous && previous !== id && holderOf(previous)?.id === player.id) setHolder(previous, null);
+  setHolder(id, player);
   endTransformation(player);
   removeCloak(player);
   player.setDynamicProperty(BIJUU_PROP, id);
@@ -612,9 +652,12 @@ export function sealInto(player, id, sealer) {
   );
   if (sealer && sealer.id !== player.id) world.sendMessage(`§6${sealer.name}§e sealed ${fullName(b)}§e into §6${player.name}§e!`);
   else world.sendMessage(`§e${player.name} sealed ${fullName(b)}§e and became its Jinchūriki!`);
+  return true;
 }
 
 function release(player) {
+  const id = sealedBeastId(player);
+  if (id && holderOf(id)?.id === player.id) setHolder(id, null);
   endTransformation(player);
   removeCloak(player);
   player.setDynamicProperty(BIJUU_PROP, undefined);
@@ -845,8 +888,18 @@ export function initBijuu(helpers) {
         killer = undefined;
       }
     }
-    if (killer?.typeId === "minecraft:player") sealInto(killer, id);
-    else world.sendMessage(`§7${fullName(b)}§7 was defeated, but no one sealed it.`);
+    if (unsealable(deadEntity)) {
+      if (killer?.typeId === "minecraft:player") killer.sendMessage(`§7${fullName(b)}§7's chakra scatters — this beast can't be sealed.`);
+      return;
+    }
+    if (killer?.typeId === "minecraft:player") {
+      if (!sealInto(killer, id)) world.sendMessage(`§7${fullName(b)}§7 was defeated, but its chakra returns to ${holderOf(id)?.name ?? "its Jinchūriki"}.`);
+    } else world.sendMessage(`§7${fullName(b)}§7 was defeated, but no one sealed it.`);
+  });
+
+  world.afterEvents.playerSpawn.subscribe(({ player }) => {
+    const mine = sealedBeastId(player);
+    if (mine && !holderOf(mine)) setHolder(mine, player);
   });
 
   world.afterEvents.playerSpawn.subscribe(({ player }) => {
@@ -870,11 +923,18 @@ export function initBijuu(helpers) {
     else if (cmd === "release") {
       release(player);
       player.sendMessage("§7Your Tailed Beast has been released.");
+    } else if (cmd === "holders") {
+      const lines = Object.entries(BEASTS).map(([bid, b]) => `${fullName(b)}§7: ${holderOf(bid)?.name ? `§f${holderOf(bid).name}` : "§8free"}`);
+      player.sendMessage(`§6Jinchūriki\n${lines.join("\n")}`);
+    } else if (cmd === "free" && BEASTS[arg]) {
+      // admin: free a beast whose Jinchūriki left the server for good
+      setHolder(arg, null);
+      player.sendMessage(`§7${fullName(BEASTS[arg])}§7 has no Jinchūriki now.`);
     } else if (cmd === "info") {
       const b = BEASTS[sealedBeastId(player)];
       player.sendMessage(b ? `§7Sealed within you: ${fullName(b)}${isBijuuMastered(player) ? " §6(mastered)" : ""} §7— seal: ${MAX_DEATHS - Number(player.getDynamicProperty(DEATHS_PROP) ?? 0)}/${MAX_DEATHS} lives left` : "§7No Tailed Beast is sealed within you.");
     } else {
-      player.sendMessage(`§7Usage: /scriptevent aegis:bijuu <summon [beast] | seal <beast> | master | release | info>\n§7Beasts: ${Object.keys(BEASTS).join(", ")}`);
+      player.sendMessage(`§7Usage: /scriptevent aegis:bijuu <summon [beast] | seal <beast> | master | release | info | holders | free <beast>>\n§7Beasts: ${Object.keys(BEASTS).join(", ")}`);
     }
   });
 }
@@ -917,6 +977,9 @@ export async function uzumakiSealMenu(player) {
     return player.sendMessage(`§cThe Four Symbols Seal needs §f100 Chakra§c and §f100 Vitality§c stats §7(you: ${chakraStat} / ${vitStat})`);
   }
   if (beingSealed.has(beast.id)) return;
+  if (unsealable(beast)) return player.sendMessage("§cThis beast's chakra is unstable — it can't be sealed.");
+  const taken = holderOf(beastIdOf(beast));
+  if (taken) return player.sendMessage(`§c${fullName(BEASTS[beastIdOf(beast)])}§c already has a Jinchūriki: §f${taken.name}§c.`);
   let hp = 1;
   try {
     const h = beast.getComponent("minecraft:health");
@@ -997,6 +1060,7 @@ function sealRitual(sealer, beast, target) {
       api.particle(dim, "aegis:beast_burst", mid, GOLD);
       api.sound(dim, "mob.enderdragon.growl", mid, 2, 0.6);
       impactFx(dim, beast.location, GOLD, 3);
+      if (heldByOther(id, target)) return fail(`${b.name} already has a Jinchūriki.`);
       beast.remove();
       api.particle(target.dimension, "aegis:beast_burst", api.add(target.location, { x: 0, y: 1, z: 0 }), GOLD);
       sealInto(target, id, sealer);

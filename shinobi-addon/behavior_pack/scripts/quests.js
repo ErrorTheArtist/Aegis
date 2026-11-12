@@ -5,7 +5,7 @@
 import { world, system } from "@minecraft/server";
 import { ActionFormData, ModalFormData, MessageFormData } from "@minecraft/server-ui";
 import { showTitle } from "./hud.js";
-import { NPC_TYPES, setupNpc, defaultsFor, giveItem } from "./npcs.js";
+import { NPC_TYPES, setupNpc, defaultsFor, giveItem, listQuests } from "./npcs.js";
 import { getLevel, gainXp } from "./levels.js";
 import { addRyo, fmtRyo } from "./currency.js";
 
@@ -112,6 +112,7 @@ const getDone = (p) => {
 // ---------------------------------------------------------------------------
 export async function questEditor(player, cfg, save) {
   const q = { ...defaultQuest(), ...(cfg.quest ?? {}) };
+  const others = listQuests().filter((o) => o.id !== q.id);
   const itemOpts = ["None", "The item in my hand right now", ...REWARD_ITEMS.map(itemLabel)];
   const itemIdx = !q.item ? 0 : REWARD_ITEMS.includes(q.item) ? 2 + REWARD_ITEMS.indexOf(q.item) : 1;
   const f = new ModalFormData()
@@ -127,7 +128,8 @@ export async function questEditor(player, cfg, save) {
     .slider("Item amount", 1, 64, 1, Math.max(1, q.itemCount))
     .slider("Minimum level", 1, 200, 1, q.minLevel)
     .toggle("Repeatable", q.repeatable)
-    .slider("Time limit in minutes (0 = no limit)", 0, 30, 1, q.timeLimit);
+    .slider("Time limit in minutes (0 = no limit)", 0, 30, 1, q.timeLimit)
+    .dropdown("Requires finishing this quest first", ["Nothing", ...others.map((o) => o.title)], Math.max(0, others.findIndex((o) => o.id === q.requires) + 1));
   const r = await f.show(player);
   if (r.canceled || !r.formValues) return;
   const v = r.formValues;
@@ -145,6 +147,7 @@ export async function questEditor(player, cfg, save) {
     minLevel: Number(v[9]),
     repeatable: !!v[10],
     timeLimit: Number(v[11]),
+    requires: Number(v[12]) > 0 ? others[Number(v[12]) - 1]?.id ?? "" : "",
     item: "",
   };
   const pick = Number(v[7]);
@@ -159,8 +162,7 @@ export async function questEditor(player, cfg, save) {
       player.sendMessage("§7Your hand was empty — no item reward set.");
     }
   } else if (pick >= 2) out.item = REWARD_ITEMS[pick - 2];
-  // a changed objective counts as a new quest for "already done" checks
-  if (out.target !== q.target || out.count !== q.count || out.title !== q.title) out.id = newId();
+  // the id never changes, so quests that require this one keep working after edits
   cfg.quest = out;
   save(cfg);
   player.sendMessage(`§aQuest saved: §e${out.title}§a — defeat ${out.count} × ${QUEST_TARGETS[out.target].label}. ${rewardText(out)}`);
@@ -198,7 +200,7 @@ export async function questGiver(player, npc, cfg) {
     if (q.ryo) addRyo(player, q.ryo, true);
     if (q.xp) gainXp(player, q.xp);
     if (q.item) giveItem(player, q.item, q.itemCount);
-    if (!q.repeatable) player.setDynamicProperty(DONE_PROP, JSON.stringify([...new Set([...getDone(player), q.id])].slice(-200)));
+    player.setDynamicProperty(DONE_PROP, JSON.stringify([...new Set([...getDone(player), q.id])].slice(-200)));
     showTitle(player, "§aQuest complete!", { subtitle: `§e${cur.title}`, stayDuration: 50 });
     player.sendMessage(`§aQuest complete: §e${cur.title}§a. ${rewardText(q)}`);
     api.sound(player.dimension, "random.levelup", player.location, 1, 1.2);
@@ -213,6 +215,10 @@ export async function questGiver(player, npc, cfg) {
     abandon(player, cur, "§7Previous quest abandoned.");
   }
   if (!q.repeatable && getDone(player).includes(q.id)) return player.sendMessage(`§e${name}§f: You've already helped me. Thank you, shinobi.`);
+  if (q.requires && !getDone(player).includes(q.requires)) {
+    const pre = listQuests().find((o) => o.id === q.requires);
+    return player.sendMessage(`§e${name}§f: You're not ready yet. §7(Finish §e${pre?.title ?? "an earlier quest"}§7 first.)`);
+  }
 
   const f = new ActionFormData().title(`§l${q.title}`)
     .body(`§f${q.text}\n\n§7Objective: §fDefeat ${q.count} × ${QUEST_TARGETS[q.target].label}${q.spawn ? " §7(they'll appear near you)" : " §7(find them in the world)"}` +
@@ -246,7 +252,8 @@ function startQuest(player, cfg, q) {
         const a = (i / q.count) * Math.PI * 2 + Math.random() * 0.4;
         const at = { x: player.location.x + Math.cos(a) * r, y: player.location.y + 0.5, z: player.location.z + Math.sin(a) * r };
         try {
-          t.spawn(dim, at, [tag]);
+          const e = t.spawn(dim, at, [tag]);
+          e?.setDynamicProperty("aegis:no_seal", true); // a quest's Tailed Beast never makes a Jinchūriki
           api.particle(dim, "aegis:smoke_puff", at);
         } catch {
           /* ignore */

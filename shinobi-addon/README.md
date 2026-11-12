@@ -250,6 +250,18 @@ Land the **killing blow** and the beast is sealed inside you (a new one replaces
 - **Hold sneak for 1.5s** while transformed to charge and fire a **Tailed Beast Bomb** (80 chakra, 20s cooldown).
 - Only the beast's own Jinchūriki can wear its cloak.
 
+### One Jinchūriki per Tailed Beast
+
+Each Tailed Beast can be sealed into **only one player at a time**. While someone carries it, defeating another copy of
+that beast doesn't seal it ("its chakra returns to its Jinchūriki"), the Uzumaki seal refuses it, and the Summoning
+Scroll won't summon it. When the Jinchūriki loses the beast (3 deaths, a reroll into another beast, or `release`), it's
+free again. Beasts from quests can never be sealed.
+
+```
+/scriptevent aegis:bijuu holders        (who carries which beast)
+/scriptevent aegis:bijuu free shukaku   (admin: free a beast whose Jinchūriki left the server for good)
+```
+
 ### Uzumaki: Four Symbols Seal & mastering your beast
 
 Only the **Uzumaki** can do this (sneak + use the **Sealing Chains**):
@@ -453,7 +465,9 @@ settings; right after saving, the **Quest Settings** open (later: sneak-tap the 
 | Spawn them when the quest starts | on: they appear around the player (only those count) · off: hunt them anywhere in the world |
 | Rewards | Ryō, XP, and an item — pick one from the list or use **the item in your hand** (any item, any amount) |
 | Minimum level · Repeatable · Time limit | 1–200 · on/off · 0–30 minutes (0 = none) |
+| Requires finishing a quest first | pick another Quest Giver's quest — build **quest chains** (the player is told which quest to finish first) |
 
+Tailed Beasts spawned by a quest can be defeated but **never sealed** (no Jinchūriki from quests).
 Players talk to the Quest Giver to accept, see their progress, claim the reward or abandon. One quest at a time
 (missions from the Mission Desk are separate). `/scriptevent aegis:quest` shows your current quest, `… abandon` drops it.
 

@@ -56,7 +56,7 @@ SWORDS = {
         colors=dict(steel=(70, 95, 140), edge=(150, 180, 220), dark=(40, 50, 70), wrap=(120, 90, 60),
                     accent=(55, 80, 125), accent2=(200, 200, 190), light=(170, 200, 235), red=(150, 40, 40)),
         slash=(0.3, 0.5, 1.0),
-        recipe=(["PDP", "PDP", "PSP"], {"P": "minecraft:prismarine_shard", "D": "minecraft:diamond", "S": "minecraft:stick"}),
+        recipe=None,  # Samehada is earned through the quest chain only
         cubes=None),
     "kubikiribocho": dict(
         name="Kubikiribōchō", damage=12, durability=2000, owner="Zabuza's Executioner's Blade",
@@ -281,11 +281,14 @@ for sid, sd in SWORDS.items():
             "minecraft:use_modifiers": {"use_duration": 0.25, "movement_modifier": 1.0},
             "minecraft:use_animation": "none"}}})
 
-    pattern, key = sd["recipe"]
-    w(BP / "recipes" / f"{sid}.json", {"format_version": "1.21.60", "minecraft:recipe_shaped": {
-        "description": {"identifier": f"aegis:{sid}"}, "tags": ["crafting_table"],
-        "pattern": pattern, "key": {k: {"item": v} for k, v in key.items()},
-        "result": {"item": f"aegis:{sid}", "count": 1}, "unlock": {"context": "AlwaysUnlocked"}}})
+    if sd["recipe"]:
+        pattern, key = sd["recipe"]
+        w(BP / "recipes" / f"{sid}.json", {"format_version": "1.21.60", "minecraft:recipe_shaped": {
+            "description": {"identifier": f"aegis:{sid}"}, "tags": ["crafting_table"],
+            "pattern": pattern, "key": {k: {"item": v} for k, v in key.items()},
+            "result": {"item": f"aegis:{sid}", "count": 1}, "unlock": {"context": "AlwaysUnlocked"}}})
+    else:
+        (BP / "recipes" / f"{sid}.json").unlink(missing_ok=True)
     atlas["texture_data"][f"aegis_{sid}"] = {"textures": f"textures/items/aegis/{sid}"}
 
 w(atlas_path, atlas)

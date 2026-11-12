@@ -167,6 +167,11 @@ function forget(key) {
   world.setDynamicProperty(INDEX_PROP, JSON.stringify([...configs.keys()]));
 }
 
+// Every quest designed on a Quest Giver spawner (for "requires a previous quest").
+export function listQuests() {
+  return [...configs.values()].filter((c) => c.type === "quest_giver" && c.quest?.id).map((c) => ({ id: c.quest.id, title: c.quest.title, key: c.key }));
+}
+
 export function defaultsFor(type) {
   const t = NPC_TYPES[type];
   const hostile = !t.friendly;
@@ -476,7 +481,6 @@ const SHOPS = {
     ["aegis:shibuki", 1, "Shibuki", 40, 25],
     ["aegis:kiba", 1, "Kiba", 44, 30],
     ["aegis:hiramekarei", 1, "Hiramekarei", 44, 30],
-    ["aegis:samehada", 1, "Samehada", 48, 35],
     ["aegis:kubikiribocho", 1, "Kubikiribōchō", 48, 35],
     ["aegis:flak_jacket", 1, "Leaf Flak Jacket", 8, 1],
     ["aegis:shinobi_pants", 1, "Shinobi Pants", 6, 1],

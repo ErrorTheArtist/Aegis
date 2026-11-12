@@ -749,7 +749,7 @@ python3 tools/anim_preview.py gif fireball_jutsu -o fireball.gif
 
 ## Sound effects
 
-Every sound is synthesized (no samples) by the `tools/gen_*_sounds.py` scripts — 62 in all.
+Every sound is synthesized (no samples) by the `tools/gen_*_sounds.py` scripts — 55 in all.
 
 - **Foley, cued from the animations** (`behavior_pack/scripts/sfx.js`): hand seals snap one by one, thrusts and throws
   swish, spins whirl, leaps take off and land with a thud, the chest fills before a breath jutsu, feet pound in the

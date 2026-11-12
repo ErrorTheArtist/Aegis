@@ -64,7 +64,7 @@ export function growWood(dim, center, radius = 3, count = 7, ticks = 100) {
     const h = 1 + Math.floor(Math.random() * 3);
     spots.push([g, "minecraft:mangrove_roots"]);
     for (let y = 1; y <= h; y++) spots.push([{ x: g.x, y: g.y + y, z: g.z }, "minecraft:oak_log"]);
-    api.particle(dim, "aegis:cine_debris", g, WOOD);
+    api.particle(dim, "aegis:wood_burst", g, WOOD);
   }
   const byHeight = new Map();
   for (const s of spots) byHeight.set(s[0].y, [...(byHeight.get(s[0].y) ?? []), s]);
@@ -119,7 +119,7 @@ function castDeepForest(player) {
       const h = 2 + Math.floor(Math.random() * 3);
       spots.push([g, "minecraft:mangrove_roots"]);
       for (let y = 1; y <= h; y++) spots.push([{ x: g.x, y: g.y + y, z: g.z }, "minecraft:oak_log"]);
-      api.particle(dim, "aegis:cine_debris", g, WOOD);
+      api.particle(dim, "aegis:wood_burst", g, WOOD);
     }
     // trees grow upward over a second
     const byHeight = new Map();
@@ -132,7 +132,7 @@ function castDeepForest(player) {
       api.hurt(e, 8, player);
       eff(e, "slowness", 70, 255);
       eff(e, "weakness", 70, 2);
-      api.particle(dim, "aegis:cine_debris", e.location, WOOD);
+      api.particle(dim, "aegis:wood_burst", e.location, WOOD);
       if (e.typeId === "minecraft:player") e.onScreenDisplay?.setActionBar("§2Roots bind you!");
     }
     impactFx(dim, o, [0.4, 0.8, 0.3], 2);
@@ -156,7 +156,7 @@ function castWoodDragon(player) {
         const f = k / 16;
         const wave = Math.sin(f * Math.PI * 3) * 1.6;
         const p = api.add(api.add(start, api.scale(d, f)), api.add(api.scale(side, wave), { x: 0, y: Math.sin(f * Math.PI) * 2.5, z: 0 }));
-        api.particle(dim, "aegis:cine_debris", p, WOOD);
+        api.particle(dim, "aegis:wood_burst", p, WOOD);
         api.particle(dim, "aegis:dust", p);
         if (k % 4 === 0) api.sound(dim, "aegis.wood", p, 1, 0.85);
       }, k);
@@ -246,15 +246,15 @@ function castIceDragon(player) {
     const d = player.getViewDirection();
     api.launchProjectile(player, api.add(player.getHeadLocation(), api.scale(d, 1.8)), d, {
       orbEvent: "aegis:as_water", speed: 0.95, maxAge: 40, damage: 18, radius: 4.5, knock: 2, fire: 0, hitRadius: 2,
-      trail: "minecraft:snowflake_particle", burst: "aegis:slash", color: ICE, sound: "aegis.ice", power: 2,
+      trail: "aegis:ice_trail", burst: "aegis:ice_burst", color: ICE, sound: "aegis.ice", power: 2,
       effects: [["slowness", 100, 3], ["mining_fatigue", 100, 1]],
       onExplode: (pos, dim) => {
         for (let i = 0; i < 24; i++) {
           const a = Math.random() * Math.PI * 2;
           const r = Math.random() * 4;
-          api.particle(dim, "aegis:slash", api.add(pos, { x: Math.cos(a) * r, y: Math.random() * 2.5, z: Math.sin(a) * r }), ICE);
+          api.particle(dim, "aegis:ice_trail", api.add(pos, { x: Math.cos(a) * r, y: Math.random() * 2.5, z: Math.sin(a) * r }), ICE);
         }
-        api.particle(dim, "minecraft:snowflake_particle", pos);
+        api.particle(dim, "aegis:ice_burst", pos);
       },
     });
     api.sound(player.dimension, "aegis.ice", player.location, 1, 0.85);
@@ -280,14 +280,14 @@ function iceMirrors(player) {
   }
   for (let k = 0; k < 60; k += 4) {
     system.runTimeout(() => {
-      for (const m of mirrors) for (let y = 0; y < 3; y += 0.7) api.particle(dim, "aegis:slash", api.add(c, { x: m.x, y, z: m.z }), ICE);
+      for (const m of mirrors) for (let y = 0; y < 3; y += 0.7) api.particle(dim, "aegis:ice_trail", api.add(c, { x: m.x, y, z: m.z }), ICE);
     }, k);
   }
   for (let k = 10; k <= 60; k += 10) {
     system.runTimeout(() => {
       if (!api.isValid(t) || !api.isValid(player)) return;
       const m = mirrors[Math.floor(Math.random() * mirrors.length)];
-      api.particle(dim, "aegis:slash", api.add(t.location, { x: m.x * 0.3, y: 1, z: m.z * 0.3 }), ICE);
+      api.particle(dim, "aegis:ice_trail", api.add(t.location, { x: m.x * 0.3, y: 1, z: m.z * 0.3 }), ICE);
       api.hurt(t, 3, player);
       eff(t, "slowness", 30, 3);
       api.sound(dim, "aegis.ice_shatter", t.location, 0.8, 1 + Math.random() * 0.2);
@@ -304,13 +304,13 @@ function iceDome(player) {
   for (let i = 0; i < 30; i++) {
     const a = Math.random() * Math.PI * 2;
     const b = Math.random() * Math.PI * 0.5;
-    api.particle(dim, "aegis:slash", api.add(player.location, { x: Math.cos(a) * Math.cos(b) * 6, y: Math.sin(b) * 6, z: Math.sin(a) * Math.cos(b) * 6 }), ICE);
+    api.particle(dim, "aegis:ice_trail", api.add(player.location, { x: Math.cos(a) * Math.cos(b) * 6, y: Math.sin(b) * 6, z: Math.sin(a) * Math.cos(b) * 6 }), ICE);
   }
   for (const e of enemiesNear(player, player.location, 6)) {
     api.hurt(e, 5, player);
     eff(e, "slowness", 70, 255);
     eff(e, "weakness", 70, 2);
-    api.particle(dim, "minecraft:snowflake_particle", api.add(e.location, { x: 0, y: 1, z: 0 }));
+    api.particle(dim, "aegis:ice_burst", api.add(e.location, { x: 0, y: 1, z: 0 }));
   }
   return true;
 }
@@ -331,7 +331,7 @@ function castLavaGlobs(player) {
         if (!api.isValid(player)) return;
         api.launchProjectile(player, api.add(player.getHeadLocation(), api.scale(dir, 1.3)), dir, {
           orbEvent: "aegis:as_fireball", speed: 1.05, maxAge: 30, damage: 10, radius: 3, knock: 0.6, fire: 7, hitRadius: 1.6,
-          trail: "minecraft:lava_particle", burst: "aegis:fire_burst", color: LAVA, sound: "aegis.lava", power: 1.2,
+          trail: "minecraft:lava_particle", burst: "aegis:lava_burst", color: LAVA, sound: "aegis.lava", power: 1.2,
           effects: [["weakness", 80, 1]],
           onExplode: (pos, dim) => {
             for (let k = 0; k < 4; k++) api.particle(dim, "minecraft:lava_particle", api.add(pos, { x: Math.random() - 0.5, y: 0.3, z: Math.random() - 0.5 }));

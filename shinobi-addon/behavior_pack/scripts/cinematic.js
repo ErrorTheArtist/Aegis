@@ -6,8 +6,9 @@
 //  - aura: the vortex + streaks that stay under you while transformed.
 // Uses /camera, /camerashake, /fog and /inputpermission through the script API (no cheats needed).
 
-import { world, system, MolangVariableMap } from "@minecraft/server";
+import { world, system } from "@minecraft/server";
 import { showTitle } from "./hud.js";
+import { spawnLayered } from "./particles.js";
 
 const busy = new Set(); // players currently in a cinematic
 
@@ -23,17 +24,7 @@ function cmd(entity, command) {
   }
 }
 
-function fx(dim, id, loc, color) {
-  try {
-    if (color) {
-      const v = new MolangVariableMap();
-      v.setColorRGB("variable.color", { red: color[0], green: color[1], blue: color[2] });
-      dim.spawnParticle(id, loc, v);
-    } else dim.spawnParticle(id, loc);
-  } catch {
-    /* unloaded / unknown particle */
-  }
-}
+const fx = spawnLayered; // with its layers — see particles.js
 
 export function sfx(dim, id, loc, volume = 1, pitch = 1) {
   try {

@@ -21,6 +21,7 @@ import { initKamui, handleKamuiUse } from "./kamui.js";
 import { initVillages, sameVillage, handleGourdUse } from "./villages.js";
 import { animSfx } from "./sfx.js";
 import { initM1 } from "./m1.js";
+import { spawnLayered } from "./particles.js";
 import { initStarter, startStarterQuests, noteCast } from "./starter.js";
 import { initEdoTensei, handleEdoUse } from "./edotensei.js";
 import { beginNatureRoll } from "./natures.js";
@@ -74,17 +75,8 @@ const norm = (v) => {
 };
 const dot = (a, b) => a.x * b.x + a.y * b.y + a.z * b.z;
 
-function particle(dim, id, loc, color) {
-  try {
-    if (color) {
-      const vars = new MolangVariableMap();
-      vars.setColorRGB("variable.color", { red: color[0], green: color[1], blue: color[2] });
-      dim.spawnParticle(id, loc, vars);
-    } else dim.spawnParticle(id, loc);
-  } catch {
-    /* unknown particle or unloaded chunk — ignore */
-  }
-}
+// Every effect comes with its layers (flash, embers, smoke, shockwave …) — see particles.js.
+const particle = spawnLayered;
 
 function sound(dim, id, loc, volume = 1, pitch = 1) {
   try {
@@ -780,7 +772,7 @@ function castEarthWall(player) {
       }, (l.y - base.y) * 2);
     }
     particle(dim, "aegis:dust", { x: base.x + 0.5, y: base.y, z: base.z + 0.5 });
-    particle(dim, "minecraft:huge_explosion_emitter", { x: base.x + 0.5, y: base.y, z: base.z + 0.5 });
+    particle(dim, "aegis:earth_burst", { x: base.x + 0.5, y: base.y, z: base.z + 0.5 });
     impactFx(dim, { x: base.x + 0.5, y: base.y, z: base.z + 0.5 }, [0.6, 0.45, 0.3], 1.5);
     sound(dim, "aegis.earth_break", base, 0.6, 0.85);
     for (const e of dim.getEntities({ location: { x: base.x + 0.5, y: base.y, z: base.z + 0.5 }, maxDistance: 4 })) {

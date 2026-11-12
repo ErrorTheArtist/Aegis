@@ -195,7 +195,7 @@ const MOVES = {
       api.sound(dim, "aegis.earth_break", at, 1, 1.1);
       shake(dim, at, 0.3, 0.4, 16);
       for (const e of foesNear(b, o, at, 4.5)) {
-        for (let y = 0; y < 2.5; y += 0.6) api.particle(dim, "aegis:cine_debris", up(e.location, y), [0.45, 0.32, 0.18]);
+        for (let y = 0; y < 2.5; y += 0.6) api.particle(dim, "aegis:wood_burst", up(e.location, y), [0.45, 0.32, 0.18]);
         api.hurt(e, 11, o);
         eff(e, "slowness", 60, 6);
         if (e.typeId === "minecraft:player") e.onScreenDisplay?.setActionBar("§2Wood Release — the roots bind you!");
@@ -210,7 +210,7 @@ const MOVES = {
       if (!api.isValid(b) || !api.isValid(t)) return;
       api.sound(b.dimension, "aegis.wood", b.location, 1.2, 1.2);
       api.launchProjectile(o, add(up(b.location, 1.5), dirTo(b, t)), dirTo(b, t), { noOrb: true, speed: 1.3, maxAge: 30, damage: 12, radius: 2.4, knock: 1.1, fire: 0,
-        trail: "aegis:cine_debris", burst: "aegis:dust", color: [0.45, 0.32, 0.18], hitRadius: 1.4, sound: "aegis.earth_break" });
+        trail: "aegis:wood_burst", burst: "aegis:dust", color: [0.45, 0.32, 0.18], hitRadius: 1.4, sound: "aegis.earth_break" });
     }, 4);
   },
   // Hashirama's healing: patches up the summoner

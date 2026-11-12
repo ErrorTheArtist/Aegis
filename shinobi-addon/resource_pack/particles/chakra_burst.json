@@ -10,7 +10,7 @@
   },
   "components": {
    "minecraft:emitter_rate_instant": {
-    "num_particles": 28
+    "num_particles": 32
    },
    "minecraft:emitter_lifetime_once": {
     "active_time": 0.05
@@ -56,10 +56,10 @@
    },
    "minecraft:particle_appearance_tinting": {
     "color": [
-     "(1) + ((0.5) - (1)) * math.clamp(((v.particle_age / v.particle_lifetime) - 0) / 0.45, 0, 1) + ((0.1) - (0.5)) * math.clamp(((v.particle_age / v.particle_lifetime) - 0.45) / 0.55, 0, 1)",
-     "(1) + ((0.85) - (1)) * math.clamp(((v.particle_age / v.particle_lifetime) - 0) / 0.45, 0, 1) + ((0.4) - (0.85)) * math.clamp(((v.particle_age / v.particle_lifetime) - 0.45) / 0.55, 0, 1)",
-     "(1) + ((1) - (1)) * math.clamp(((v.particle_age / v.particle_lifetime) - 0) / 0.45, 0, 1) + ((1) - (1)) * math.clamp(((v.particle_age / v.particle_lifetime) - 0.45) / 0.55, 0, 1)",
-     "(1) + ((1) - (1)) * math.clamp(((v.particle_age / v.particle_lifetime) - 0) / 0.45, 0, 1) + ((0) - (1)) * math.clamp(((v.particle_age / v.particle_lifetime) - 0.45) / 0.55, 0, 1)"
+     "(1) + ((0.55) - (1)) * math.clamp(((v.particle_age / v.particle_lifetime) - 0) / 0.4, 0, 1) + ((0.15) - (0.55)) * math.clamp(((v.particle_age / v.particle_lifetime) - 0.4) / 0.6, 0, 1)",
+     "(1) + ((0.88) - (1)) * math.clamp(((v.particle_age / v.particle_lifetime) - 0) / 0.4, 0, 1) + ((0.45) - (0.88)) * math.clamp(((v.particle_age / v.particle_lifetime) - 0.4) / 0.6, 0, 1)",
+     "(1) + ((1) - (1)) * math.clamp(((v.particle_age / v.particle_lifetime) - 0) / 0.4, 0, 1) + ((1) - (1)) * math.clamp(((v.particle_age / v.particle_lifetime) - 0.4) / 0.6, 0, 1)",
+     "(1.0) + ((1.0) - (1.0)) * math.clamp(((v.particle_age / v.particle_lifetime) - 0) / 0.4, 0, 1) + ((0) - (1.0)) * math.clamp(((v.particle_age / v.particle_lifetime) - 0.4) / 0.6, 0, 1)"
     ]
    }
   }

@@ -236,8 +236,7 @@ function castEarthSpikes(player) {
         } catch {
           /* ignore */
         }
-        api.particle(dim, "aegis:dust", g);
-        api.particle(dim, "aegis:cine_debris", g, [0.6, 0.5, 0.4]);
+        api.particle(dim, "aegis:earth_burst", g);
         if (k % 2 === 0) api.sound(dim, "aegis.earth_break", g, 1, 0.6 + Math.random() * 0.3);
         if (!api.isValid(player)) return;
         for (const e of dim.getEntities({ location: api.add(g, { x: 0.5, y: 0, z: 0.5 }), maxDistance: 1.9 })) {
@@ -336,15 +335,15 @@ function castIceNeedles(player) {
   // form
   for (let k = 0; k < 12; k += 2) {
     system.runTimeout(() => {
-      for (const n of needles) api.particle(dim, "aegis:slash", api.add(centre, n), ICE);
-      api.particle(dim, "minecraft:snowflake_particle", api.add(centre, { x: 0, y: 1, z: 0 }));
+      for (const n of needles) api.particle(dim, "aegis:ice_trail", api.add(centre, n), ICE);
+      api.particle(dim, "aegis:ice_burst", api.add(centre, { x: 0, y: 1, z: 0 }));
     }, k);
   }
   // close in
   for (let k = 0; k < 6; k++) {
     system.runTimeout(() => {
       const f = 1 - (k + 1) / 6;
-      for (const n of needles) api.particle(dim, "aegis:slash", api.add(centre, { x: n.x * f, y: n.y, z: n.z * f }), ICE);
+      for (const n of needles) api.particle(dim, "aegis:ice_trail", api.add(centre, { x: n.x * f, y: n.y, z: n.z * f }), ICE);
     }, 12 + k);
   }
   system.runTimeout(() => {

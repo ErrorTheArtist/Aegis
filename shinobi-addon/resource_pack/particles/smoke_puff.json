@@ -10,7 +10,7 @@
   },
   "components": {
    "minecraft:emitter_rate_instant": {
-    "num_particles": 16
+    "num_particles": 18
    },
    "minecraft:emitter_lifetime_once": {
     "active_time": 0.05
@@ -46,8 +46,8 @@
    },
    "minecraft:particle_appearance_billboard": {
     "size": [
-     "(0.85 + v.particle_random_1 * 0.45) * 1 * (0.45) + ((1.0) - (0.45)) * math.clamp(((v.particle_age / v.particle_lifetime) - 0) / 0.15, 0, 1) + ((1.55) - (1.0)) * math.clamp(((v.particle_age / v.particle_lifetime) - 0.15) / 0.85, 0, 1)",
-     "(0.85 + v.particle_random_1 * 0.45) * 1 * (0.45) + ((1.0) - (0.45)) * math.clamp(((v.particle_age / v.particle_lifetime) - 0) / 0.15, 0, 1) + ((1.55) - (1.0)) * math.clamp(((v.particle_age / v.particle_lifetime) - 0.15) / 0.85, 0, 1)"
+     "(0.95 + v.particle_random_1 * 0.5) * 1 * (0.45) + ((1.0) - (0.45)) * math.clamp(((v.particle_age / v.particle_lifetime) - 0) / 0.15, 0, 1) + ((1.6) - (1.0)) * math.clamp(((v.particle_age / v.particle_lifetime) - 0.15) / 0.85, 0, 1)",
+     "(0.95 + v.particle_random_1 * 0.5) * 1 * (0.45) + ((1.0) - (0.45)) * math.clamp(((v.particle_age / v.particle_lifetime) - 0) / 0.15, 0, 1) + ((1.6) - (1.0)) * math.clamp(((v.particle_age / v.particle_lifetime) - 0.15) / 0.85, 0, 1)"
     ],
     "facing_camera_mode": "rotate_xyz",
     "uv": {

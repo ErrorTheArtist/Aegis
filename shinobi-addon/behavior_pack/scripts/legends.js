@@ -416,7 +416,7 @@ function woodLine(boss, t) {
     system.runTimeout(() => {
       if (!api.isValid(boss)) return;
       const at = add(o, { x: d.x * i, y: 0, z: d.z * i });
-      for (let y = 0; y < 3; y += 0.7) api.particle(dim, "aegis:cine_debris", add(at, { x: 0, y, z: 0 }), WOOD);
+      for (let y = 0; y < 3; y += 0.7) api.particle(dim, "aegis:wood_burst", add(at, { x: 0, y, z: 0 }), WOOD);
       api.particle(dim, "aegis:dust", at);
       if (i % 4 === 0) sfx(dim, "aegis.impact", at, 1, 0.6);
       blast(boss, at, 2.2, 13, 0.6, (e) => {

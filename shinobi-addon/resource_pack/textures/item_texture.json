@@ -355,6 +355,9 @@
     },
     "aegis_ryo": {
       "textures": "textures/items/aegis/ryo"
+    },
+    "aegis_kamui": {
+      "textures": "textures/items/aegis/kamui"
     }
   }
 }

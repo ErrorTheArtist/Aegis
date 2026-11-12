@@ -17,6 +17,8 @@ import { makeReleases } from "./releases.js";
 import { initCurrency } from "./currency.js";
 import { initQuests } from "./quests.js";
 import { initClash, registerCast, projectilesMet } from "./clash.js";
+import { initKamui, handleKamuiUse } from "./kamui.js";
+import { breakTobiPhase } from "./akatsuki2.js";
 import { initNatures, natureCostMultiplier, natureDamageMultiplier, onJutsuCast, natureTag } from "./natures.js";
 import { initLevels, handleRecordUse, levelChakraBonus, levelRegenMultiplier, ninjutsuMultiplier, cooldownMultiplier, gainJutsuXp, getLevel, xpInfo } from "./levels.js";
 
@@ -294,6 +296,7 @@ world.afterEvents.itemUse.subscribe(({ source: player, itemStack }) => {
   if (handleBijuuItemUse(player, itemStack)) return;
   if (handleSwordUse(player, itemStack)) return;
   if (handleSummonUse(player, itemStack)) return;
+  if (handleKamuiUse(player, itemStack)) return;
   const jutsu = JUTSU[itemStack.typeId];
   if (!jutsu) return;
 
@@ -1033,6 +1036,7 @@ initNatures(npcApi);
 initCurrency(npcApi);
 initQuests(npcApi);
 initClash(npcApi);
+initKamui(npcApi, breakTobiPhase);
 initNpcs({ ...npcApi, spawnAkatsukiNear: (p, msg) => spawnAkatsukiNear(p, msg) });
 initEnemies(npcApi);
 initCompanions(npcApi);

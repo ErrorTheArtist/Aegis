@@ -5,6 +5,7 @@
 import { world, system } from "@minecraft/server";
 import { showTitle } from "./hud.js";
 import { impactFx, sfx, shake, chargeFx } from "./cinematic.js";
+import { onTobiDefeated, kamuiHolder } from "./kamui.js";
 
 let api;
 const SKIN = { hidan: 23, hidan_jashin: 24, zetsu: 27 };
@@ -21,6 +22,13 @@ function phase(e, on) {
   } catch {
     /* ignore */
   }
+}
+
+// Kamui reaches Kamui: the Kamui holder can pull Tobi out of his phase.
+export function breakTobiPhase(e, by) {
+  if (member(e) !== "tobi" || solid.has(e.id)) return;
+  solidWindow(e, 30);
+  if (by?.typeId === "minecraft:player") by.onScreenDisplay?.setActionBar("§5Your Kamui drags Tobi back into this world — strike!");
 }
 
 function solidWindow(e, ticks) {
@@ -548,6 +556,7 @@ export function initAkatsuki2(helpers) {
   // Tobi: attacks pass straight through him while he's phased
   world.afterEvents.entityHitEntity.subscribe(({ damagingEntity, hitEntity }) => {
     if (hitEntity?.typeId !== "aegis:akatsuki" || member(hitEntity) !== "tobi" || solid.has(hitEntity.id)) return;
+    if (kamuiHolder()?.id === damagingEntity?.id) return; // the Kamui holder breaks his phase instead
     api.particle(hitEntity.dimension, "aegis:cine_swirl", hitEntity.location, PURPLE);
     if (damagingEntity?.typeId === "minecraft:player") damagingEntity.onScreenDisplay?.setActionBar("§7Your attack passes right through him… §8(wait until he turns solid to attack)");
   });
@@ -575,8 +584,20 @@ export function initAkatsuki2(helpers) {
     system.runTimeout(() => api.isValid(entity) && member(entity) === "tobi" && phase(entity, true), 5);
   });
 
-  world.afterEvents.entityDie.subscribe(({ deadEntity }) => {
+  world.afterEvents.entityDie.subscribe(({ deadEntity, damageSource }) => {
     if (deadEntity.typeId !== "aegis:akatsuki") return;
+    if (member(deadEntity) === "tobi") {
+      // whoever defeats Tobi first claims Kamui (companions / clones count for their owner)
+      let killer = damageSource?.damagingEntity;
+      if (killer && killer.typeId !== "minecraft:player") {
+        try {
+          killer = world.getEntity(killer.getDynamicProperty("aegis:owner"));
+        } catch {
+          killer = undefined;
+        }
+      }
+      onTobiDefeated(killer);
+    }
     curse.delete(deadEntity.id);
     solid.delete(deadEntity.id);
     ritual.delete(deadEntity.id);

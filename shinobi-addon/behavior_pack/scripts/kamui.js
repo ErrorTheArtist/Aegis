@@ -1,6 +1,8 @@
 // Kamui — only ONE player in the world can hold it: whoever first defeats Tobi.
-//   right-click: Kamui Warp — twist space around the enemy you look at (or warp yourself to the spot you look at)
-//   sneak + right-click: Kamui Phase — become intangible for 5 seconds
+// Like Tobi, the holder is permanently phased out of this world: nothing can hurt them — except for 1.5 seconds
+// every time they attack (hit something, cast a jutsu, use an item), when they have to turn solid.
+//   right-click: Kamui Warp — twist space around the enemy you look at
+//   sneak + right-click: warp yourself to the spot you look at
 // The Kamui holder's hits also break another Tobi's phase (Kamui can reach Kamui).
 //   /scriptevent aegis:kamui info | free (admin: take Kamui back from its holder's record)
 
@@ -12,10 +14,11 @@ export const KAMUI_ITEM = "aegis:kamui";
 const PROP = "aegis:kamui_holder";
 const PURPLE = [0.6, 0.3, 0.9];
 const WARP = { cost: 45, cd: 300 };
-const PHASE = { cost: 40, cd: 600, ticks: 100 };
+const SELF = { cost: 20, cd: 60 };
+const SOLID_TICKS = 30; // 1.5 s
 let api;
 let breakPhase = () => {};
-const phasing = new Map(); // player id -> end tick
+const solidUntil = new Map(); // holder id -> tick their solid window ends
 
 export function kamuiHolder() {
   try {
@@ -62,7 +65,7 @@ export function onTobiDefeated(killer) {
   api.particle(killer.dimension, "aegis:cine_swirl", killer.location, PURPLE);
   sfx(killer.dimension, "aegis.transform", killer.location, 2, 0.8);
   world.sendMessage(`§5${killer.name}§d defeated Tobi and awakened §5Kamui§d — the only one in the world.`);
-  killer.sendMessage("§7Right-click the §5Kamui§7 eye: §fWarp§7 the enemy you look at (or warp yourself to where you look). §fSneak§7 + right-click: §fPhase§7 — intangible for 5s.");
+  killer.sendMessage("§7Like Tobi, you're now phased out of this world: §fnothing can hurt you§7 — except for §f1.5s§7 every time you attack. Right-click the §5Kamui§7 eye to §fWarp§7 an enemy; §fsneak§7 + right-click to warp yourself.");
 }
 
 function lookTarget(p, range) {
@@ -76,7 +79,11 @@ function lookTarget(p, range) {
 function warp(p) {
   const dim = p.dimension;
   const t = lookTarget(p, 32);
-  if (t) {
+  if (!t) {
+    p.onScreenDisplay.setActionBar("§7Look at an enemy within 32 blocks. §8(sneak + right-click to warp yourself)");
+    return false;
+  }
+  {
     const spot = { ...t.location };
     for (let k = 0; k < 12; k += 2) system.runTimeout(() => api.particle(dim, "aegis:cine_swirl", spot, PURPLE), k);
     sfx(dim, "aegis.charge", spot, 1.5, 1.4);
@@ -105,7 +112,10 @@ function warp(p) {
     }, 12);
     return true;
   }
-  // nothing in sight: warp yourself to the block you're looking at
+}
+
+function warpSelf(p) {
+  const dim = p.dimension;
   let hit;
   try {
     hit = p.getBlockFromViewDirection({ maxDistance: 24 });
@@ -128,17 +138,26 @@ function warp(p) {
   return true;
 }
 
-function phase(p) {
-  phasing.set(p.id, system.currentTick + PHASE.ticks);
+export const isKamuiPhased = (p) => holds(p) && !solidUntil.has(p.id);
+
+// The holder turns solid for 1.5 s whenever they attack.
+function goSolid(p) {
+  const fresh = !solidUntil.has(p.id);
+  solidUntil.set(p.id, system.currentTick + SOLID_TICKS);
   try {
-    p.addEffect("resistance", PHASE.ticks, { amplifier: 4, showParticles: false }); // fully immune while phased
+    if (p.getEffect("resistance")?.amplifier >= 4) p.removeEffect("resistance");
   } catch {
     /* ignore */
   }
-  api.particle(p.dimension, "aegis:cine_swirl", p.location, PURPLE);
-  sfx(p.dimension, "aegis.whoosh", p.location, 1.2, 0.7);
-  p.onScreenDisplay.setActionBar("§5Kamui — you've phased out of this world (5s)");
-  return true;
+  if (fresh) p.onScreenDisplay?.setActionBar("§6You turned solid to attack — §cyou can be hit (1.5s)");
+}
+
+function phaseIn(p) {
+  try {
+    p.addEffect("resistance", 30, { amplifier: 4, showParticles: false }); // full immunity while phased
+  } catch {
+    /* ignore */
+  }
 }
 
 // Returns true if the item was Kamui (handled).
@@ -149,11 +168,11 @@ export function handleKamuiUse(player, itemStack) {
     return true;
   }
   const sneaking = player.isSneaking;
-  const move = sneaking ? PHASE : WARP;
-  const key = sneaking ? "kamui_phase" : "kamui_warp";
+  const move = sneaking ? SELF : WARP;
+  const key = sneaking ? "kamui_self" : "kamui_warp";
   const left = api.cooldownLeft(player, key);
   if (left > 0) {
-    player.onScreenDisplay.setActionBar(`§7Kamui ${sneaking ? "Phase" : "Warp"} ready in §f${(left / 20).toFixed(1)}s`);
+    player.onScreenDisplay.setActionBar(`§7Kamui ${sneaking ? "self-warp" : "Warp"} ready in §f${(left / 20).toFixed(1)}s`);
     return true;
   }
   if (api.getChakra(player) < move.cost) {
@@ -161,7 +180,7 @@ export function handleKamuiUse(player, itemStack) {
     return true;
   }
   api.anim(player, "animation.aegis.eye_activate");
-  if ((sneaking ? phase(player) : warp(player)) === false) return true;
+  if ((sneaking ? warpSelf(player) : warp(player)) === false) return true;
   api.setChakra(player, api.getChakra(player) - move.cost);
   api.startCooldown(player, key, move.cd);
   return true;
@@ -180,19 +199,40 @@ export function initKamui(helpers, onBreakPhase) {
     }
   });
 
-  // phase visuals
+  // permanent phase: refresh full immunity unless the holder is in a solid window
   system.runInterval(() => {
+    const h = kamuiHolder();
+    if (!h) return;
+    const p = world.getEntity(h.id);
+    if (!p || !api.isValid(p)) return;
     const now = system.currentTick;
-    for (const [id, end] of [...phasing]) {
-      const p = world.getEntity(id);
-      if (!p || now >= end) {
-        phasing.delete(id);
-        if (p) api.particle(p.dimension, "aegis:cine_swirl", p.location, PURPLE);
-        continue;
-      }
+    const until = solidUntil.get(p.id);
+    if (until && now >= until) {
+      solidUntil.delete(p.id);
       api.particle(p.dimension, "aegis:cine_swirl", p.location, PURPLE);
+      p.onScreenDisplay?.setActionBar("§5Kamui — phased again");
     }
-  }, 4);
+    if (!solidUntil.has(p.id)) {
+      phaseIn(p);
+      if (now % 40 === 0) api.particle(p.dimension, "aegis:cine_swirl", p.location, PURPLE);
+    } else {
+      api.particle(p.dimension, "aegis:beast_aura", p.location, [1, 0.55, 0.15]);
+    }
+  }, 5);
+
+  // attacking makes the holder solid: melee hits, jutsu / item use (but not the Kamui eye itself)
+  world.afterEvents.entityHitEntity.subscribe(({ damagingEntity }) => {
+    if (holds(damagingEntity)) goSolid(damagingEntity);
+  });
+  world.afterEvents.itemUse.subscribe(({ source, itemStack }) => {
+    if (itemStack?.typeId !== KAMUI_ITEM && holds(source)) goSolid(source);
+  });
+  // hitting the holder while they're phased: it passes through
+  world.afterEvents.entityHitEntity.subscribe(({ damagingEntity, hitEntity }) => {
+    if (!holds(hitEntity) || solidUntil.has(hitEntity.id)) return;
+    api.particle(hitEntity.dimension, "aegis:cine_swirl", hitEntity.location, PURPLE);
+    if (damagingEntity?.typeId === "minecraft:player") damagingEntity.onScreenDisplay?.setActionBar("§7Your attack passes right through them… §8(strike when they attack)");
+  });
 
   // Kamui reaches Kamui: the holder's hits pull another Tobi out of his phase
   world.afterEvents.entityHitEntity.subscribe(({ damagingEntity, hitEntity }) => {

@@ -503,10 +503,11 @@ Shops use **Ryō** — see *Ryō currency* below.
   resurfaces behind you, White Zetsu spore clones, a chakra-draining grab) and **Tobi** (**Kamui**: he's phased out of this
   world and **nothing can hurt him** — except in the ~1.5 s he turns **solid to attack** (his strike, his grab and his
   Great Fireball; you get a *"Tobi is solid — strike NOW!"* cue and he flickers orange). He also warps you away with Kamui.
-  **The first player to defeat Tobi claims Kamui** — only one player in the world can ever hold it (a locked eye item,
-  kept on death): *right-click* = **Kamui Warp** (twist space around the enemy you look at: 14 damage and thrown 10
-  blocks away, 20 to bosses; or warp yourself to the spot you look at), *sneak + right-click* = **Kamui Phase** (fully
-  intangible for 5 s). The Kamui holder's hits also drag any other Tobi out of his phase.
+  **The first player to defeat Tobi claims Kamui** — only one player in the world can ever hold it. Like Tobi, the holder
+  is **permanently phased: nothing can hurt them**, except for **1.5 s every time they attack** (a hit, a jutsu, a clan
+  ability, any item use) when they turn solid. Their locked, keep-on-death Kamui eye: *right-click* = **Kamui Warp**
+  (twist space around the enemy you look at: 14 damage and thrown 10 blocks away, 20 to bosses — stays phased),
+  *sneak + right-click* = warp yourself to the spot you look at. The holder's hits also drag any other Tobi out of his phase.
   `/scriptevent aegis:kamui` shows the holder; `… free` lets the next Tobi-slayer claim it. They **rarely roam the world** (Normal/Hard difficulty — you get a "sighted nearby"
   warning), **hunt Jinchūriki** (every 5 min, 35% chance) and appear for S-rank missions. ~1,500 XP each.
 

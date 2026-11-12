@@ -51,6 +51,17 @@
       },
       "aegis:persistent": {
         "minecraft:persistent": {}
+      },
+      "aegis:equip_kisame": {
+        "minecraft:equipment": {
+          "table": "loot_tables/equipment/aegis_kisame.json",
+          "slot_drop_chance": [
+            {
+              "slot": "slot.weapon.mainhand",
+              "drop_chance": 0.0
+            }
+          ]
+        }
       }
     },
     "components": {
@@ -90,7 +101,7 @@
         "damage": 12
       },
       "minecraft:movement": {
-        "value": 0.33
+        "value": 0.27
       },
       "minecraft:boss": {
         "hud_range": 48,
@@ -126,7 +137,7 @@
       },
       "minecraft:behavior.melee_attack": {
         "priority": 2,
-        "speed_multiplier": 1.25,
+        "speed_multiplier": 1.05,
         "track_target": true
       },
       "minecraft:behavior.hurt_by_target": {
@@ -222,6 +233,13 @@
         "add": {
           "component_groups": [
             "aegis:despawnable"
+          ]
+        }
+      },
+      "aegis:equip_kisame": {
+        "add": {
+          "component_groups": [
+            "aegis:equip_kisame"
           ]
         }
       }

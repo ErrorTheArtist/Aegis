@@ -52,6 +52,25 @@ function groundAt(dim, x, y, z) {
   return undefined;
 }
 
+// Wood Release for anyone (Hashirama's reanimated body uses it): roots and trunks burst out of the ground around a
+// spot and wither away again after `ticks`.
+export function growWood(dim, center, radius = 3, count = 7, ticks = 100) {
+  const spots = [];
+  for (let i = 0; i < count; i++) {
+    const a = Math.random() * Math.PI * 2;
+    const r = 0.8 + Math.random() * radius;
+    const g = groundAt(dim, Math.floor(center.x + Math.cos(a) * r), Math.floor(center.y), Math.floor(center.z + Math.sin(a) * r));
+    if (!g) continue;
+    const h = 1 + Math.floor(Math.random() * 3);
+    spots.push([g, "minecraft:mangrove_roots"]);
+    for (let y = 1; y <= h; y++) spots.push([{ x: g.x, y: g.y + y, z: g.z }, "minecraft:oak_log"]);
+    api.particle(dim, "aegis:cine_debris", g, WOOD);
+  }
+  const byHeight = new Map();
+  for (const s of spots) byHeight.set(s[0].y, [...(byHeight.get(s[0].y) ?? []), s]);
+  [...byHeight.keys()].sort((a, b) => a - b).forEach((y, i) => system.runTimeout(() => tempBlocks(dim, byHeight.get(y), ticks - i * 3), i * 3));
+}
+
 // Temporarily places blocks (only into air) and removes them later.
 function tempBlocks(dim, spots, ticks) {
   const placed = [];

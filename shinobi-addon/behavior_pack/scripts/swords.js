@@ -412,6 +412,65 @@ function heldStack(player) {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Worn swords. Scroll away from a legendary sword and it is slung across your back (it moves to the off-hand slot,
+// where its model is drawn on the body instead of in the hand). Scroll back to its now-empty hotbar slot and it is
+// drawn again. Only one sword is worn at a time, and only if the off hand is free.
+//   /scriptevent aegis:sheath off | on   — keep swords in the hotbar instead
+// ---------------------------------------------------------------------------
+const SHEATH_OFF = "aegis:sheath_off";
+const HOME = "aegis:sheath_slot"; // the hotbar slot a worn sword came from
+const lastHeld = new Map(); // player id -> { slot, typeId } while holding a legendary sword
+
+function sheathTick() {
+  for (const p of world.getAllPlayers()) {
+    try {
+      wear(p);
+    } catch {
+      /* ignore */
+    }
+  }
+}
+
+function wear(p) {
+  const inv = p.getComponent("minecraft:inventory")?.container;
+  const eq = p.getComponent("minecraft:equippable");
+  if (!inv || !eq) return;
+  const sel = p.selectedSlotIndex;
+  const held = inv.getItem(sel);
+  const off = eq.getEquipment("Offhand");
+  const home = p.getDynamicProperty(HOME);
+
+  // draw: back on the slot it came from, with nothing in hand
+  if (off && SWORDS[off.typeId] && home === sel && !held) {
+    inv.setItem(sel, off);
+    if (inv.getItem(sel)?.typeId === off.typeId) {
+      eq.setEquipment("Offhand", undefined);
+      p.setDynamicProperty(HOME, undefined);
+      api.sound(p.dimension, "aegis.draw", p.location, 0.9, 1);
+      lastHeld.set(p.id, { slot: sel, typeId: off.typeId });
+    }
+    return;
+  }
+  if (home !== undefined && !(off && SWORDS[off.typeId])) p.setDynamicProperty(HOME, undefined); // it was moved by hand
+
+  // put away: the sword you were holding a moment ago is still in its slot, you've scrolled off it, the off hand is free
+  const was = lastHeld.get(p.id);
+  if (was && was.slot !== sel && !off && !p.getDynamicProperty(SHEATH_OFF)) {
+    const it = inv.getItem(was.slot);
+    if (it && it.typeId === was.typeId) {
+      eq.setEquipment("Offhand", it);
+      if (eq.getEquipment("Offhand")?.typeId === it.typeId) {
+        inv.setItem(was.slot, undefined);
+        p.setDynamicProperty(HOME, was.slot);
+        api.sound(p.dimension, "aegis.sheathe", p.location, 0.9, 1);
+      }
+    }
+  }
+  if (held && SWORDS[held.typeId]) lastHeld.set(p.id, { slot: sel, typeId: held.typeId });
+  else lastHeld.delete(p.id);
+}
+
 function repairHeld(player, amount) {
   try {
     const inv = player.getComponent("minecraft:inventory").container;
@@ -488,6 +547,16 @@ export function initSwords(helpers) {
     } catch {
       /* ignore */
     }
+  });
+
+  // Putting a sword away / drawing it
+  system.runInterval(sheathTick, 2);
+  world.afterEvents.playerSpawn.subscribe(({ player }) => lastHeld.delete(player.id));
+  system.afterEvents.scriptEventReceive.subscribe(({ id, message, sourceEntity: p }) => {
+    if (id !== "aegis:sheath" || p?.typeId !== "minecraft:player") return;
+    const off = String(message ?? "").trim().toLowerCase() === "off";
+    p.setDynamicProperty(SHEATH_OFF, off ? true : undefined);
+    p.sendMessage(off ? "§7Swords stay in your hotbar when you switch away from them." : "§7Swords go on your back when you switch away from them.");
   });
 
   // Ambient effects while a sword is held.

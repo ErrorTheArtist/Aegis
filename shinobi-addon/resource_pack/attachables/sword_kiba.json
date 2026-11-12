@@ -16,12 +16,15 @@
       },
       "animations": {
         "third": "animation.aegis.sword.hold_third_person",
-        "first": "animation.aegis.sword.hold_first_person"
+        "first": "animation.aegis.sword.hold_first_person",
+        "carry": "animation.aegis.sword.carry",
+        "settle": "animation.aegis.sword.settle",
+        "worn": "controller.animation.aegis.sword_carry"
       },
       "scripts": {
         "animate": [
           {
-            "third": "!c.is_first_person"
+            "worn": "!c.is_first_person && c.item_slot == 'main_hand'"
           },
           {
             "first": "c.is_first_person"
@@ -29,7 +32,7 @@
         ]
       },
       "render_controllers": [
-        "controller.render.item_default"
+        "controller.render.aegis.sword"
       ]
     }
   }

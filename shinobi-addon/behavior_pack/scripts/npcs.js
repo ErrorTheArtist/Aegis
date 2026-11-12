@@ -254,6 +254,7 @@ export function setupNpc(e, cfg, extra = {}) {
     e.setDynamicProperty("aegis:role", cfg.type);
     if (cfg.key) e.setDynamicProperty("aegis:spawner", cfg.key);
     if (member) e.setDynamicProperty("aegis:member", member);
+    if (member === "kisame") e.triggerEvent("aegis:equip_kisame"); // Samehada in hand
     if (t.legend) {
       e.setDynamicProperty("aegis:member", t.legend);
       e.triggerEvent(`aegis:legend_${t.legend}`);

@@ -329,7 +329,34 @@ def s_dome():
     return master((hum * trem + hiss + crk) * e, 0.9)
 
 
-SOUNDS = {"handsign": s_handsign, "swish": s_swish, "spin": s_spin, "leap": s_leap, "land": s_land, "step": s_step, "inhale": s_inhale, "poof": s_poof,
+# ---------------------------------------------------------------- melee and swords
+def s_hit():   # a punch landing: a dull thud with a slap on top
+    return master(mix(0.22, (0, thump(0.16, 190, 70, 30) * 1.6), (0, burst(0.035, 900, 5000, 90) * 0.9), (0.005, burst(0.1, 200, 1200, 35) * 0.7)), 0.85)
+
+
+def s_hit_heavy():   # the finisher: deeper, with a crack and a short tail
+    return master(mix(0.5, (0, thump(0.4, 150, 42, 11) * 2.0), (0, burst(0.05, 1200, 8000, 70) * 1.3), (0, burst(0.2, 150, 1500, 18) * 1.1),
+                      (0.04, filt(noise(0.4), "lowpass", 300) * np.exp(-T(0.4) * 9) * 0.9)), 0.95)
+
+
+def _ring(sec, f0, decay):
+    t = T(sec)
+    return sum(a * np.sin(2 * np.pi * f0 * k * t + ph) for k, a, ph in ((1, 1, 0), (2.76, 0.5, 1), (5.4, 0.3, 2), (8.9, 0.15, 3))) * np.exp(-t * decay)
+
+
+def s_draw():   # steel sliding out of a scabbard, ending in a ring
+    n = noise(0.3)
+    scrape = sweep(n, 2500, 7500, 0.8) * np.linspace(0.3, 1, len(n)) ** 1.5
+    return master(mix(0.75, (0, scrape * 0.8), (0.27, _ring(0.48, 2100, 7) * 0.6), (0.27, burst(0.02, 3000, 9000, 150) * 0.6)), 0.75)
+
+
+def s_sheathe():   # sliding home, then the guard clicks against the scabbard
+    n = noise(0.28)
+    scrape = sweep(n, 6500, 2200, 0.8) * np.linspace(1, 0.4, len(n))
+    return master(mix(0.45, (0, scrape * 0.7), (0.28, thump(0.08, 500, 220, 55) * 1.1), (0.28, burst(0.03, 1500, 6000, 110) * 0.8)), 0.7)
+
+
+SOUNDS = {"hit": s_hit, "hit_heavy": s_hit_heavy, "draw": s_draw, "sheathe": s_sheathe, "handsign": s_handsign, "swish": s_swish, "spin": s_spin, "leap": s_leap, "land": s_land, "step": s_step, "inhale": s_inhale, "poof": s_poof,
           "water": s_water, "water_burst": s_water_burst, "wind": s_wind, "wind_cut": s_wind_cut, "earth": s_earth, "earth_break": s_earth_break,
           "ice": s_ice, "ice_shatter": s_ice_shatter, "wood": s_wood, "lava": s_lava, "fire_roar": s_fire_roar, "thunder": s_thunder, "heal": s_heal,
           "push": s_push, "pull": s_pull, "eye": s_eye, "shadow": s_shadow, "gates": s_gates, "summon": s_summon, "dome": s_dome}

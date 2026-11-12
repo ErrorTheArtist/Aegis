@@ -9,6 +9,7 @@ import { showTitle } from "./hud.js";
 import { impactFx, sfx, shake, inCinematic, setCinematicBusy } from "./cinematic.js";
 import { getLevel } from "./levels.js";
 import { SPOT, T, SHOTS, TEXT } from "./edo_shots.js";
+import { growWood } from "./releases.js";
 
 export const EDO_ITEM = "aegis:edo_tensei_scroll";
 const COST = 100;
@@ -24,13 +25,14 @@ const FIGURES = {
   deidara: { name: "Deidara", skin: 14, color: [1, 0.85, 0.5], moves: ["clay", "clay"] },
   sasori: { name: "Sasori", skin: 26, color: [0.6, 0.3, 0.7], moves: ["senbon", "senbon"] },
   kakuzu: { name: "Kakuzu", skin: 25, color: [0.4, 0.75, 0.4], moves: ["fireball", "wind"] },
-  hashirama: { name: "Hashirama Senju", skin: 30, color: [0.4, 0.8, 0.3], moves: ["wood", "wood", "heal"] },
+  hashirama: { name: "Hashirama Senju", skin: 30, color: [0.4, 0.8, 0.3], moves: ["wood", "woodSpear", "wood", "heal"] },
   tobirama: { name: "Tobirama Senju", skin: 31, color: [0.3, 0.6, 1], moves: ["waterDragon", "flash"] },
 };
 const IDS = Object.keys(FIGURES);
 
 let api;
 const bodies = new Map(); // entity id -> { owner, fig, end, next }
+const marked = new Map(); // owner id -> { id, until }: whoever the summoner is fighting right now
 const pending = new Set(); // bodies still inside their coffin (mid-cinematic)
 
 const add = (a, b) => ({ x: a.x + b.x, y: a.y + b.y, z: a.z + b.z });
@@ -46,11 +48,31 @@ function eff(e, id, ticks, amp = 0) {
   }
 }
 
+// Is this something a reanimated shinobi should hit? Monsters always; anything else only if the summoner is fighting it.
+function foe(e, owner, body) {
+  if (!api.isValid(e) || e.id === body.id || e.id === owner.id || bodies.has(e.id) || !api.canBeHit(e, owner)) return false;
+  if (marked.get(owner.id)?.id === e.id) return true;
+  try {
+    return e.typeId !== "minecraft:player" && !!e.matches?.({ families: ["monster"] });
+  } catch {
+    return false;
+  }
+}
+const foesNear = (body, owner, at, r) => body.dimension.getEntities({ location: at, maxDistance: r }).filter((e) => foe(e, owner, body));
+
+// The summoner's own target first (players and bosses included), otherwise the nearest monster.
 function enemyNear(body, owner) {
+  const m = marked.get(owner.id);
+  if (m) {
+    const e = m.until > system.currentTick ? world.getEntity(m.id) : undefined;
+    if (e && foe(e, owner, body) && e.dimension.id === body.dimension.id) {
+      const d = api.sub(e.location, body.location);
+      if (d.x * d.x + d.y * d.y + d.z * d.z < 28 * 28) return e;
+    } else if (!e) marked.delete(owner.id);
+  }
   let best;
   let bd = 17 * 17;
-  for (const e of body.dimension.getEntities({ location: body.location, maxDistance: 16, families: ["monster"] })) {
-    if (!api.canBeHit(e, owner) || e.id === body.id) continue;
+  for (const e of foesNear(body, owner, body.location, 16)) {
     const d = api.sub(e.location, body.location);
     const dist = d.x * d.x + d.y * d.y + d.z * d.z;
     if (dist < bd) {
@@ -129,8 +151,7 @@ const MOVES = {
   push(b, o, t, c) {
     api.anim(b, "animation.aegis.almighty_push");
     impactFx(b.dimension, b.location, c, 2);
-    for (const e of b.dimension.getEntities({ location: b.location, maxDistance: 7, families: ["monster"] })) {
-      if (!api.canBeHit(e, o) || e.id === b.id) continue;
+    for (const e of foesNear(b, o, b.location, 7)) {
       api.hurt(e, 8, o);
       const d = flat(b, e);
       api.knockback(e, d.x, d.z, 3, 0.7);
@@ -162,21 +183,35 @@ const MOVES = {
       }, k * 2);
     }
   },
-  // Wood Release: roots erupt under every enemy near the target and bind them
+  // Wood Release: trunks and roots burst out of the ground under the target, binding everything caught in them
   wood(b, o, t) {
     api.anim(b, "animation.aegis.earth_slam");
     const dim = b.dimension;
     system.runTimeout(() => {
-      if (!api.isValid(t)) return;
-      for (const e of dim.getEntities({ location: t.location, maxDistance: 5, families: ["monster"] })) {
-        if (!api.canBeHit(e, o) || e.id === b.id) continue;
+      if (!api.isValid(b) || !api.isValid(t)) return;
+      const at = { ...t.location };
+      growWood(dim, at, 3, 8, 90);
+      api.sound(dim, "aegis.wood", at, 1.6, 1);
+      api.sound(dim, "aegis.earth_break", at, 1, 1.1);
+      shake(dim, at, 0.3, 0.4, 16);
+      for (const e of foesNear(b, o, at, 4.5)) {
         for (let y = 0; y < 2.5; y += 0.6) api.particle(dim, "aegis:cine_debris", up(e.location, y), [0.45, 0.32, 0.18]);
-        api.hurt(e, 9, o);
+        api.hurt(e, 11, o);
         eff(e, "slowness", 60, 6);
+        if (e.typeId === "minecraft:player") e.onScreenDisplay?.setActionBar("§2Wood Release — the roots bind you!");
       }
-      api.particle(dim, "aegis:dust", t.location);
-      sfx(dim, "aegis.impact", t.location, 1, 0.6);
-    }, 10);
+      api.particle(dim, "aegis:dust", at);
+    }, 8);
+  },
+  // Wood Release: a lance of living wood
+  woodSpear(b, o, t) {
+    api.anim(b, "animation.aegis.palm_thrust");
+    system.runTimeout(() => {
+      if (!api.isValid(b) || !api.isValid(t)) return;
+      api.sound(b.dimension, "aegis.wood", b.location, 1.2, 1.2);
+      api.launchProjectile(o, add(up(b.location, 1.5), dirTo(b, t)), dirTo(b, t), { noOrb: true, speed: 1.3, maxAge: 30, damage: 12, radius: 2.4, knock: 1.1, fire: 0,
+        trail: "aegis:cine_debris", burst: "aegis:dust", color: [0.45, 0.32, 0.18], hitRadius: 1.4, sound: "aegis.earth_break" });
+    }, 4);
   },
   // Hashirama's healing: patches up the summoner
   heal(b, o, t, c) {
@@ -203,8 +238,7 @@ const MOVES = {
     api.anim(b, "animation.aegis.both_palms");
     const dir = flat(b, t);
     for (let d = 1; d <= 9; d++) api.particle(b.dimension, "aegis:wind_gust", add(up(b.location, 1.2), api.scale(dir, d)));
-    for (const e of b.dimension.getEntities({ location: b.location, maxDistance: 10, families: ["monster"] })) {
-      if (!api.canBeHit(e, o) || e.id === b.id) continue;
+    for (const e of foesNear(b, o, b.location, 10)) {
       const v = flat(b, e);
       if (v.x * dir.x + v.z * dir.z < 0.6) continue;
       api.hurt(e, 9, o);
@@ -450,7 +484,6 @@ function reanimate(player, fig) {
     if (!api.isValid(player)) return b.remove(); // the summoner is gone: so is the soul
     b.nameTag = `§8[Edo Tensei] §f${F.name}`;
     eff(b, "resistance", LIFETIME, 1);
-    eff(b, "speed", LIFETIME, 0);
     sfx(dim, "aegis.edo_gong", spot, 1.3, 1.5);
     for (let k = 0; k < T.release - T.reveal; k += 4) system.runTimeout(() => api.isValid(b) && api.particle(dim, "aegis:edo_ash", b.location), k);
     bodies.set(b.id, { owner: player.id, fig, end: system.currentTick + LIFETIME, next: system.currentTick + (T.release - T.reveal) + 8 });
@@ -526,6 +559,15 @@ export function initEdoTensei(helpers) {
       }
     }
   }, 100);
+
+  // whoever the summoner hits, or is hit by, becomes the reanimated shinobi's target for the next 12 seconds
+  world.afterEvents.entityHurt.subscribe(({ hurtEntity, damageSource }) => {
+    const a = damageSource?.damagingEntity;
+    if (!a || bodies.size === 0 || a.id === hurtEntity.id) return;
+    const owners = new Set([...bodies.values()].map((st) => st.owner));
+    if (owners.has(a.id) && !bodies.has(hurtEntity.id)) marked.set(a.id, { id: hurtEntity.id, until: system.currentTick + 240 });
+    else if (owners.has(hurtEntity.id) && !bodies.has(a.id)) marked.set(hurtEntity.id, { id: a.id, until: system.currentTick + 240 });
+  });
 
   // a destroyed body crumbles instead of dropping anything
   world.afterEvents.entityDie.subscribe(({ deadEntity }) => {

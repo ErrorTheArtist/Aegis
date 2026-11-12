@@ -76,7 +76,7 @@
           "damage": 8
         },
         "minecraft:movement": {
-          "value": 0.36
+          "value": 0.29
         }
       }
     },
@@ -116,7 +116,7 @@
         "damage": 5
       },
       "minecraft:movement": {
-        "value": 0.32
+        "value": 0.26
       },
       "minecraft:pushable": {
         "is_pushable": true,
@@ -134,7 +134,7 @@
       },
       "minecraft:behavior.melee_attack": {
         "priority": 2,
-        "speed_multiplier": 1.2,
+        "speed_multiplier": 1.0,
         "track_target": true
       },
       "minecraft:behavior.hurt_by_target": {

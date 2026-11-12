@@ -1,0 +1,46 @@
+{
+  "format_version": "1.10.0",
+  "animation_controllers": {
+    "controller.animation.aegis.sword_carry": {
+      "initial_state": "hold",
+      "states": {
+        "hold": {
+          "animations": [
+            "third"
+          ],
+          "blend_transition": 0.15,
+          "transitions": [
+            {
+              "settle": "!query.is_moving && !query.is_sneaking"
+            }
+          ]
+        },
+        "settle": {
+          "animations": [
+            "third",
+            "settle"
+          ],
+          "transitions": [
+            {
+              "hold": "query.is_moving || query.is_sneaking"
+            },
+            {
+              "carry": "query.any_animation_finished"
+            }
+          ]
+        },
+        "carry": {
+          "animations": [
+            "carry"
+          ],
+          "blend_transition": 0.3,
+          "transitions": [
+            {
+              "hold": "query.is_moving || query.is_sneaking"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

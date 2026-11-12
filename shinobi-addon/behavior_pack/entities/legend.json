@@ -59,6 +59,15 @@
         "minecraft:health": {
           "value": 850,
           "max": 850
+        },
+        "minecraft:equipment": {
+          "table": "loot_tables/equipment/aegis_sasuke.json",
+          "slot_drop_chance": [
+            {
+              "slot": "slot.weapon.mainhand",
+              "drop_chance": 0.0
+            }
+          ]
         }
       },
       "aegis:legend_tsunade": {
@@ -123,7 +132,7 @@
         "damage": 14
       },
       "minecraft:movement": {
-        "value": 0.36
+        "value": 0.28
       },
       "minecraft:boss": {
         "hud_range": 48,
@@ -160,7 +169,7 @@
       },
       "minecraft:behavior.melee_attack": {
         "priority": 2,
-        "speed_multiplier": 1.3,
+        "speed_multiplier": 1.05,
         "track_target": true
       },
       "minecraft:behavior.hurt_by_target": {

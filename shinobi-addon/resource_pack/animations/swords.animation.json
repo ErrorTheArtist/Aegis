@@ -34,6 +34,26 @@
           ]
         }
       }
+    },
+    "animation.aegis.sword.carry": {
+      "loop": true,
+      "bones": {
+        "sword": {
+          "position": [
+            0.71,
+            8.73,
+            2.46
+          ],
+          "rotation": [
+            -14.0,
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    "animation.aegis.sword.settle": {
+      "animation_length": 1.2
     }
   }
 }

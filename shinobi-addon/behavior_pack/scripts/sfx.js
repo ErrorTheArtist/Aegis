@@ -39,6 +39,14 @@ const CUES = {
   sword_thrust: [[3, "aegis.swish", 0.9, 1.3]],
   sword_spin: [[1, "aegis.spin", 1, 1], [6, "aegis.spin", 0.8, 1.15]],
   sword_raise: [[13, "aegis.swish", 0.9, 0.9]],
+  // M1 combos (the hit sound itself is played by m1.js)
+  m1_jab: [[0, "aegis.swish", 0.6, 1.4]],
+  m1_cross: [[0, "aegis.swish", 0.6, 1.25]],
+  m1_kick: [[0, "aegis.swish", 0.8, 1]],
+  m1_finisher: [[1, "aegis.leap", 0.7, 1.2], [8, "aegis.land", 0.6, 1.2]],
+  m1_slash1: [[0, "aegis.swish", 0.8, 1.3]],
+  m1_slash2: [[0, "aegis.swish", 0.8, 1.15]],
+  m1_slash3: [[0, "aegis.swish", 0.9, 0.9], [3, "aegis.land", 0.6, 1.2]],
   // Jutsu Clash
   clash_charge_chidori: [[8, "aegis.swish", 0.8, 0.8]],
   clash_charge_orb: seals([3], 0.6),

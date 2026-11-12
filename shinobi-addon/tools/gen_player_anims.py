@@ -797,6 +797,65 @@ A["animation.aegis.clash_rise"] = anim(1.2, [
 ], loop="hold")
 
 
+# ===========================================================================
+# M1 combos (behavior_pack/scripts/m1.js): the hit has already landed when these start, so each one snaps to its
+# strike within two frames, holds it for a beat, then recovers — short enough to chain.
+# Fists: jab → cross → roundhouse kick → rising uppercut.   Blades: slash → backhand → leaping chop.
+# ===========================================================================
+_GUARD = {"ra": [-56, -30, 0], "la": [-62, 34, 0], "w": HIPS(8, drop=1.2), "rl": [-10, 0, 6], "ll": [10, 0, -6]}
+A["animation.aegis.m1_jab"] = anim(0.42, [
+    (0.05, "snap", {"ra": ([-92, -10, 0], [0, 0, -3]), "la": [-56, 38, 0], "w": HIPS(10, -22, drop=1.2), "rl": [-22, 0, 6], "ll": [18, 0, -6],
+                    "rt": R(f=1.2), "h": [-4, 12, 0]}),
+    (0.13, "back", {"w": HIPS(8, -18, drop=1.1), "rt": R(f=0.9)}),
+    (0.28, "io", {**_GUARD, "rt": R(), "h": Z}),
+    (0.42, "io", REST),
+])
+A["animation.aegis.m1_cross"] = anim(0.45, [
+    (0.05, "snap", {"la": ([-94, 10, 0], [0, 0, -3.5]), "ra": [-50, -40, 0], "w": HIPS(14, 26, drop=1.6), "rl": [20, 0, 6], "ll": [-26, 0, -6],
+                    "rt": R(f=1.6), "h": [-6, -14, 0]}),
+    (0.13, "back", {"w": HIPS(12, 22, drop=1.4), "rt": R(f=1.3)}),
+    (0.3, "io", {**_GUARD, "rt": R(), "h": Z}),
+    (0.45, "io", REST),
+])
+A["animation.aegis.m1_kick"] = anim(0.5, [
+    (0.06, "snap", {"rl": [-84, 0, 26], "ll": [8, 0, -4], "w": HIPS(-14, -34), "ra": [34, 0, 32], "la": [-46, 30, -10], "h": [4, 18, 0],
+                    "rt": ([0, -30, 0], [0, 0.6, -1])}),                                                             # roundhouse
+    (0.16, "back", {"rl": [-78, 0, 22], "w": HIPS(-11, -30)}),
+    (0.32, "io", {**_GUARD, "rt": R(), "h": Z}),
+    (0.5, "io", REST),
+])
+A["animation.aegis.m1_finisher"] = anim(0.62, [
+    (0.04, "in", {"w": HIPS(22, 18, drop=3), "ra": [20, 10, 20], "la": [-50, 30, 0], "rl": [-24, 0, 8], "ll": [20, 0, -8], "h": [8, 0, 0]}),   # dips
+    (0.12, "snap", {"ra": [-158, -18, 0], "la": [34, 0, -34], "w": HIPS(-16, -24), "rl": [-36, 0, 8], "ll": [22, 0, -8], "h": [-24, 0, 0],
+                    "rt": R(y=4.5, f=1.5)}),                                                                           # rising uppercut, off the ground
+    (0.22, "back", {"rt": R(y=5, f=1.5)}),
+    (0.38, "in", {"rt": R(f=1), "w": HIPS(14, drop=2.4), "ra": [-70, -20, 0], "rl": [-20, 0, 8], "ll": [16, 0, -8], "h": Z}),
+    (0.46, "elastic", {"w": HIPS(10, drop=1.8)}),
+    (0.62, "io", REST),
+])
+A["animation.aegis.m1_slash1"] = anim(0.42, [
+    (0.0, "lin", {"ra": [-124, 60, 30], "w": HIPS(2, 30, drop=1.2)}),
+    (0.06, "snap", {"ra": [-72, -80, -12], "la": [24, 0, -34], "w": HIPS(12, -40, drop=2.2), "rl": [-26, 0, 6], "ll": [20, 0, -6], "h": [0, 18, 0],
+                    "rt": R(f=1.4)}),
+    (0.15, "back", {"w": HIPS(10, -36, drop=2)}),
+    (0.42, "io", REST),
+])
+A["animation.aegis.m1_slash2"] = anim(0.42, [
+    (0.0, "lin", {"ra": [-80, -90, -10], "w": HIPS(8, -30, drop=1.6)}),
+    (0.06, "snap", {"ra": [-96, 72, 30], "la": [-30, 30, -10], "w": HIPS(10, 40, drop=2), "rl": [20, 0, 6], "ll": [-24, 0, -6], "h": [0, -18, 0],
+                    "rt": R(f=1.4)}),                                                                                # backhand
+    (0.15, "back", {"w": HIPS(8, 36, drop=1.8)}),
+    (0.42, "io", REST),
+])
+A["animation.aegis.m1_slash3"] = anim(0.6, [
+    (0.0, "lin", {"ra": [-192, 6, 0], "la": [-170, -14, 0], "w": HIPS(-16), "rt": R(y=4), "rl": [-26, 0, 8], "ll": [18, 0, -8]}),
+    (0.08, "snap", {"ra": [-34, 0, 0], "la": [-40, 26, 0], "w": HIPS(32, drop=3.4), "h": [-22, 0, 0], "rl": [-44, 0, 6], "ll": [30, 0, -6],
+                    "rt": R(f=1.8)}),                                                                                # the leaping chop
+    (0.16, "elastic", {"w": HIPS(27, drop=2.9)}),
+    (0.4, "io", {"w": HIPS(24, drop=2.6)}),
+    (0.6, "io", REST),
+])
+
 
 def mirrored(a):
     """The same motion for the other hand: left and right limbs swapped, turns and sideways moves reversed."""

@@ -232,14 +232,72 @@ def held_cube(cu):
             "uv": {f: dict(face) for f in ("north", "south", "east", "west", "up", "down")}}
 
 
-# Third person: the trident's grip position, without its roll, tip tilted ~25° up.
-# First person: the vanilla trident pose.
+# ---------------------------------------------------------------------------
+# How a sword is worn
+# ---------------------------------------------------------------------------
+# In the main hand: the trident's grip position, without its roll, tip tilted ~25° up (first person: the vanilla
+# trident pose). Standing still for a moment, the blade is swung up to rest against the shoulder ("carry") until its
+# owner moves again — players and sword-carrying NPCs alike.
+# In the off hand it isn't held at all: it is slung across the back (or the back of the waist), drawn as a second
+# copy of the model that follows the body bone. swords.js moves a sword there when you put it away.
+import sys  # noqa: E402
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import anim_preview as _AP  # noqa: E402  (the same bone maths the game uses)
+
+HOLD_ROT, HOLD_POS = 65.0, [0.71, 2.98, -9.6]
+_PIVOT_TO_GRIP = 24 - GRIP_Y
+
+
+def hold_pose(rot_x, roll=0.0):
+    """Bone pose that keeps the grip in the hand with the blade at rot_x (90 = level, 0 = straight up, <0 = leaning back)."""
+    c0, s0 = math.cos(math.radians(HOLD_ROT)), math.sin(math.radians(HOLD_ROT))
+    grip = [HOLD_POS[0], 24 - _PIVOT_TO_GRIP * c0 + HOLD_POS[1], _PIVOT_TO_GRIP * s0 + HOLD_POS[2]]   # where the hand is
+    c, s_ = math.cos(math.radians(rot_x)), math.sin(math.radians(rot_x))
+    return {"position": [round(grip[0], 2), round(grip[1] - 24 + _PIVOT_TO_GRIP * c, 2), round(grip[2] - _PIVOT_TO_GRIP * s_, 2)],
+            "rotation": [rot_x, 0.0, roll]}
+
+
 w(RP / "animations" / "swords.animation.json", {"format_version": "1.10.0", "animations": {
-    "animation.aegis.sword.hold_third_person": {"loop": True, "bones": {"sword": {
-        "position": [0.71, 2.98, -9.6], "rotation": [65.0, 0.0, 0.0]}}},
+    "animation.aegis.sword.hold_third_person": {"loop": True, "bones": {"sword": {"position": HOLD_POS, "rotation": [HOLD_ROT, 0.0, 0.0]}}},
     "animation.aegis.sword.hold_first_person": {"loop": True, "bones": {"sword": {
         "position": [-7.0, -3.0, -2.0], "rotation": [152.0, -9.0, 25.0]}}},
+    "animation.aegis.sword.carry": {"loop": True, "bones": {"sword": hold_pose(-14.0)}},        # resting on the shoulder
+    "animation.aegis.sword.settle": {"animation_length": 1.2},                                   # how long you stand still first
 }})
+w(RP / "animation_controllers" / "swords.animation_controllers.json", {"format_version": "1.10.0", "animation_controllers": {
+    "controller.animation.aegis.sword_carry": {"initial_state": "hold", "states": {
+        "hold": {"animations": ["third"], "blend_transition": 0.15,
+                 "transitions": [{"settle": "!query.is_moving && !query.is_sneaking"}]},
+        "settle": {"animations": ["third", "settle"],
+                   "transitions": [{"hold": "query.is_moving || query.is_sneaking"}, {"carry": "query.any_animation_finished"}]},
+        "carry": {"animations": ["carry"], "blend_transition": 0.3,
+                  "transitions": [{"hold": "query.is_moving || query.is_sneaking"}]}}}}})
+w(RP / "render_controllers" / "swords.render_controllers.json", {"format_version": "1.8.0", "render_controllers": {
+    "controller.render.aegis.sword": {
+        "geometry": "Geometry.default",
+        "materials": [{"*": "variable.is_enchanted ? Material.enchanted : Material.default"}],
+        "textures": ["Texture.default", "Texture.enchanted"],
+        "part_visibility": [{"*": True}, {"sword": "c.item_slot == 'main_hand'"},
+                            {"back": "c.item_slot == 'off_hand' && !c.is_first_person"}]}}})
+
+# Where each sword sits when it's put away: (grip position on the body, blade angle from straight up)
+MOUNT_BACK = ([-5.0, 27.0, 3.6], 148)      # hilt over the right shoulder, blade down across the back
+MOUNT_WAIST = ([-7.0, 13.2, 3.6], 96)      # level across the back of the waist, hilt to the right (Sasuke's Kusanagi)
+MOUNTS = {"kusanagi": MOUNT_WAIST, "chakra_blades": MOUNT_WAIST, "nuibari": MOUNT_WAIST}
+
+
+def back_bone(cubes, sid):
+    grip, angle = MOUNTS.get(sid, MOUNT_BACK)
+    # flat against the back (the thin side turned toward it), then swung to the angle — whichever way puts the tip
+    # toward the wearer's left
+    theta = next(t for t in (angle, -angle) if _AP.apply(_AP.rot_matrix(0, 90, t), (0, 1, 0))[0] > 0)
+    moved = []
+    for cu in cubes:
+        c = dict(cu)
+        c["origin"] = [round(cu["origin"][0] + grip[0], 3), round(cu["origin"][1] - GRIP_Y + grip[1], 3), round(cu["origin"][2] + grip[2], 3)]
+        moved.append(c)
+    return {"name": "back", "parent": "body", "pivot": grip, "rotation": [0, 90, theta], "cubes": moved}
+
 
 atlas_path = RP / "textures" / "item_texture.json"
 atlas = json.loads(atlas_path.read_text())
@@ -255,15 +313,19 @@ for sid, sd in SWORDS.items():
         "description": {"identifier": f"geometry.aegis.sword_{sid}", "texture_width": 64, "texture_height": 64,
                         "visible_bounds_width": 5, "visible_bounds_height": 5, "visible_bounds_offset": [0, 1.5, 0]},
         "bones": [{"name": "sword", "pivot": [0, 24, 0], "binding": "q.item_slot_to_bone_name(c.item_slot)",
-                   "cubes": [held_cube(cu) for cu in cubes]}]}]})
+                   "cubes": [held_cube(cu) for cu in cubes]},
+                  {"name": "body", "pivot": [0, 24, 0]},
+                  back_bone([held_cube(cu) for cu in cubes], sid)]}]})
     w(RP / "attachables" / f"sword_{sid}.json", {"format_version": "1.10.0", "minecraft:attachable": {"description": {
         "identifier": f"aegis:{sid}",
         "materials": {"default": "entity_alphatest", "enchanted": "entity_alphatest_glint"},
         "textures": {"default": f"textures/models/swords/{sid}", "enchanted": "textures/misc/enchanted_item_glint"},
         "geometry": {"default": f"geometry.aegis.sword_{sid}"},
-        "animations": {"third": "animation.aegis.sword.hold_third_person", "first": "animation.aegis.sword.hold_first_person"},
-        "scripts": {"animate": [{"third": "!c.is_first_person"}, {"first": "c.is_first_person"}]},
-        "render_controllers": ["controller.render.item_default"]}}})
+        "animations": {"third": "animation.aegis.sword.hold_third_person", "first": "animation.aegis.sword.hold_first_person",
+                       "carry": "animation.aegis.sword.carry", "settle": "animation.aegis.sword.settle",
+                       "worn": "controller.animation.aegis.sword_carry"},
+        "scripts": {"animate": [{"worn": "!c.is_first_person && c.item_slot == 'main_hand'"}, {"first": "c.is_first_person"}]},
+        "render_controllers": ["controller.render.aegis.sword"]}}})
 
     w(BP / "items" / f"{sid}.json", {"format_version": "1.21.60", "minecraft:item": {
         "description": {"identifier": f"aegis:{sid}", "menu_category": {"category": "equipment", "group": "minecraft:itemGroup.name.sword"}},
@@ -272,6 +334,7 @@ for sid, sd in SWORDS.items():
             "minecraft:display_name": {"value": f"§b{sd['name']}§r\n§7{sd['owner']}"},
             "minecraft:max_stack_size": 1,
             "minecraft:hand_equipped": True,
+            "minecraft:allow_off_hand": {"value": True},
             "minecraft:damage": sd["damage"],
             "minecraft:durability": {"max_durability": sd["durability"]},
             "minecraft:enchantable": {"slot": "sword", "value": 15},

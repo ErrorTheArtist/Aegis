@@ -257,6 +257,27 @@ export function spawnAkatsukiNear(player, message) {
 }
 
 export function initEnemies(helpers) {
+  // Enemy jutsu used to fling players across the map the instant they landed. Against players (and their companions)
+  // the push is now less than half as strong, and nobody can be thrown again within 1.5 s of the last throw.
+  const lastThrown = new Map();
+  const softer = {
+    ...helpers,
+    knockback(e, x, z, horizontal, vertical) {
+      let victim = false;
+      try {
+        victim = e?.typeId === "minecraft:player" || !!e?.matches?.({ families: ["ninja_companion"] });
+      } catch {
+        victim = false;
+      }
+      if (!victim) return helpers.knockback(e, x, z, horizontal, vertical); // the enemy's own dashes and leaps
+      const now = system.currentTick;
+      if ((lastThrown.get(e.id) ?? -100) > now - 30) return;
+      lastThrown.set(e.id, now);
+      if (lastThrown.size > 200) for (const [id, t] of lastThrown) if (t < now - 200) lastThrown.delete(id);
+      helpers.knockback(e, x, z, horizontal * 0.45, (vertical ?? 0) * 0.6);
+    },
+  };
+  helpers = softer;
   api = helpers;
   initLegends(helpers);
 

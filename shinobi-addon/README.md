@@ -276,6 +276,10 @@ roots + healing you, Water Dragon + Flying Raijin). Their jutsu are cast in your
 never hit you or your companions, and kills count for you. Then their soul returns to the afterlife and the body crumbles.
 One reanimation at a time.
 
+A reanimated shinobi attacks **whoever you are fighting** — players and bosses included — for 12 seconds after you hit
+them or they hit you; otherwise the nearest monster. Hashirama grows real (temporary) trunks and roots under his
+target and throws lances of wood. They walk at a normal pace.
+
 **The summoning cinematic** (about 10 seconds on the caster's camera; the caster can't move or be hurt during it):
 
 1. **Hand seals** — one camera cut per seal as they snap into place: **Tiger → Serpent → Dog → Dragon**.
@@ -483,6 +487,16 @@ All swords repair with diamonds and take sword enchantments. Models and icons ar
 (held placement copies the vanilla trident's bound-bone setup);
 abilities live in `behavior_pack/scripts/swords.js`.
 
+### Wearing a sword
+
+- **On your back:** scroll away from a legendary sword and it is slung across your back (Kusanagi, Nuibari and the
+  Chakra Blades sit across the back of the waist). Scroll back to its now-empty hotbar slot to draw it. It works by
+  moving the sword to your off-hand slot, so the off hand must be free, and one sword is worn at a time.
+  `/scriptevent aegis:sheath off` keeps swords in the hotbar instead.
+- **On your shoulder:** stand still with a sword in hand for a moment and the blade is swung up to rest against your
+  shoulder until you move or sneak.
+- **Kisame** now carries **Samehada** and **Sasuke** his **Kusanagi** (they never drop from them).
+
 ## HUD
 
 The vanilla hearts are replaced by a custom HUD in the **top-left corner**, in a slanted-bar style:
@@ -605,6 +619,9 @@ Shops use **Ryō** — see *Ryō currency* below.
   `/scriptevent aegis:kamui` shows the holder; `… free` lets the next Tobi-slayer claim it. They **rarely roam the world** (Normal/Hard difficulty — you get a "sighted nearby"
   warning), **hunt Jinchūriki** (every 5 min, 35% chance) and appear for S-rank missions. ~1,500 XP each.
 
+Enemy ninja, the Akatsuki, the legends and companions walk at about a player's pace. Their jutsu push players less
+than half as far as before, and nobody can be thrown again within 1.5 s of the last throw.
+
 ### Legendary bosses (NPC Spawner only)
 
 These **never spawn on their own** — place an **NPC Spawner**, choose *Legend: …* as the NPC type, and they
@@ -692,6 +709,18 @@ Catalysts: Fireball = blaze powder · Rasengan = ender pearl · Substitution = o
 Shadow Clone = armor stand · Body Flicker = sugar · Wind Style: Great Breakthrough = feather · Chidori = lightning rod.
 
 All items are also in the creative inventory.
+
+## M1 combos (basic attacks)
+
+Land hits within 1.4 s of each other and they chain; every hit has its own animation and sound, and pulls you a step
+toward the target so the next one connects.
+
+| Weapon | Combo | Bonus |
+|---|---|---|
+| **Fists** (or anything that isn't a blade) | jab → cross → roundhouse kick → **rising uppercut** | +2, +2, +3, **+5** damage (×(1 + Taijutsu/100)); the uppercut launches and staggers the target |
+| **Blades** (legendary swords, vanilla swords, kunai, axes) | slash → backhand → **leaping chop** | +2 on the chop, which also launches and staggers |
+
+`/scriptevent aegis:m1 off` turns your own combo animations off (the bonus stays).
 
 ## Jutsu Clash
 

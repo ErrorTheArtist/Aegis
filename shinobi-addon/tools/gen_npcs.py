@@ -349,19 +349,19 @@ client_humanoid("npc", ("#4a6a3a", "#2a3a6a"))
 TIER = {
     "rogue": {"minecraft:health": {"value": 40, "max": 40}, "minecraft:attack": {"damage": 5}},
     "sound": {"minecraft:health": {"value": 50, "max": 50}, "minecraft:attack": {"damage": 6}},
-    "anbu": {"minecraft:health": {"value": 80, "max": 80}, "minecraft:attack": {"damage": 8}, "minecraft:movement": {"value": 0.36}},
+    "anbu": {"minecraft:health": {"value": 80, "max": 80}, "minecraft:attack": {"damage": 8}, "minecraft:movement": {"value": 0.29}},
 }
 entity("hostile_ninja", {**BASE_MOVE,
     "minecraft:type_family": {"family": ["ninja", "monster", "mob"]},
     "minecraft:health": {"value": 40, "max": 40},
     "minecraft:attack": {"damage": 5},
-    "minecraft:movement": {"value": 0.32},
+    "minecraft:movement": {"value": 0.26},
     "minecraft:pushable": {"is_pushable": True, "is_pushable_by_piston": True},
     "minecraft:nameable": {},
     "minecraft:loot": {"table": "loot_tables/entities/aegis_ninja.json"},
     "minecraft:experience_reward": {"on_death": "q.last_hit_by_player ? 12 : 0"},
     "minecraft:follow_range": {"value": 32},
-    "minecraft:behavior.melee_attack": {"priority": 2, "speed_multiplier": 1.2, "track_target": True},
+    "minecraft:behavior.melee_attack": {"priority": 2, "speed_multiplier": 1.0, "track_target": True},
     "minecraft:behavior.hurt_by_target": {"priority": 1},
     "minecraft:behavior.nearest_attackable_target": {"priority": 3, "must_see": True, "reselect_targets": True, "within_radius": 24,
         "entity_types": [{"filters": {"any_of": [{"test": "is_family", "subject": "other", "value": "player"},
@@ -375,12 +375,19 @@ entity("hostile_ninja", {**BASE_MOVE,
             "minecraft:entity_spawned": {"add": {"component_groups": ["aegis:despawnable"]}}})
 client_humanoid("hostile_ninja", ("#5a5a5f", "#8a2020"))
 
+def equip(name, item):
+    """Component group that puts a weapon in the NPC's hand (drawn through the item's attachable); it never drops."""
+    w(BP / "loot_tables" / "equipment" / f"aegis_{name}.json", {"pools": [{"rolls": 1, "entries": [{"type": "item", "name": item, "weight": 1}]}]})
+    return {"minecraft:equipment": {"table": f"loot_tables/equipment/aegis_{name}.json",
+                                    "slot_drop_chance": [{"slot": "slot.weapon.mainhand", "drop_chance": 0.0}]}}
+
+
 # Akatsuki bosses
 entity("akatsuki", {**BASE_MOVE,
     "minecraft:type_family": {"family": ["akatsuki", "ninja", "monster", "mob"]},
     "minecraft:health": {"value": 500, "max": 500},
     "minecraft:attack": {"damage": 12},
-    "minecraft:movement": {"value": 0.33},
+    "minecraft:movement": {"value": 0.27},
     "minecraft:boss": {"hud_range": 48, "should_darken_sky": False},
     "minecraft:knockback_resistance": {"value": 0.7},
     "minecraft:pushable": {"is_pushable": False, "is_pushable_by_piston": False},
@@ -390,16 +397,17 @@ entity("akatsuki", {**BASE_MOVE,
     "minecraft:loot": {"table": "loot_tables/entities/aegis_akatsuki.json"},
     "minecraft:experience_reward": {"on_death": "q.last_hit_by_player ? 300 : 0"},
     "minecraft:follow_range": {"value": 48},
-    "minecraft:behavior.melee_attack": {"priority": 2, "speed_multiplier": 1.25, "track_target": True},
+    "minecraft:behavior.melee_attack": {"priority": 2, "speed_multiplier": 1.05, "track_target": True},
     "minecraft:behavior.hurt_by_target": {"priority": 1},
     "minecraft:behavior.nearest_attackable_target": {"priority": 3, "must_see": False, "reselect_targets": True, "within_radius": 40,
         "entity_types": [{"filters": {"any_of": [{"test": "is_family", "subject": "other", "value": "player"},
                                                   {"test": "is_family", "subject": "other", "value": "ninja_companion"}]}, "max_dist": 40}]},
     "minecraft:behavior.random_stroll": {"priority": 7, "speed_multiplier": 0.7},
     "minecraft:behavior.look_at_player": {"priority": 8, "look_distance": 16}},
-    groups={"aegis:persistent": {"minecraft:persistent": {}}},
+    groups={"aegis:persistent": {"minecraft:persistent": {}}, "aegis:equip_kisame": equip("kisame", "aegis:samehada")},
     events={"minecraft:entity_spawned": {"add": {"component_groups": ["aegis:despawnable"]}},
-            "aegis:persist": {"remove": {"component_groups": ["aegis:despawnable"]}, "add": {"component_groups": ["aegis:persistent"]}}})
+            "aegis:persist": {"remove": {"component_groups": ["aegis:despawnable"]}, "add": {"component_groups": ["aegis:persistent"]}},
+            "aegis:equip_kisame": {"add": {"component_groups": ["aegis:equip_kisame"]}}})
 client_humanoid("akatsuki", ("#141418", "#c81419"))
 
 # Legendary bosses — only ever created by an NPC Spawner (no spawn rules).
@@ -408,7 +416,7 @@ entity("legend", {**BASE_MOVE,
     "minecraft:type_family": {"family": ["legend", "ninja", "monster", "mob"]},
     "minecraft:health": {"value": 800, "max": 800},
     "minecraft:attack": {"damage": 14},
-    "minecraft:movement": {"value": 0.36},
+    "minecraft:movement": {"value": 0.28},
     "minecraft:boss": {"hud_range": 48, "should_darken_sky": False},
     "minecraft:knockback_resistance": {"value": 0.8},
     "minecraft:pushable": {"is_pushable": False, "is_pushable_by_piston": False},
@@ -419,21 +427,22 @@ entity("legend", {**BASE_MOVE,
     "minecraft:loot": {"table": "loot_tables/entities/aegis_legend.json"},
     "minecraft:experience_reward": {"on_death": "q.last_hit_by_player ? 500 : 0"},
     "minecraft:follow_range": {"value": 48},
-    "minecraft:behavior.melee_attack": {"priority": 2, "speed_multiplier": 1.3, "track_target": True},
+    "minecraft:behavior.melee_attack": {"priority": 2, "speed_multiplier": 1.05, "track_target": True},
     "minecraft:behavior.hurt_by_target": {"priority": 1},
     "minecraft:behavior.nearest_attackable_target": {"priority": 3, "must_see": False, "reselect_targets": True, "within_radius": 32,
         "entity_types": [{"filters": {"any_of": [{"test": "is_family", "subject": "other", "value": "player"},
                                                   {"test": "is_family", "subject": "other", "value": "ninja_companion"}]}, "max_dist": 32}]},
     "minecraft:behavior.random_stroll": {"priority": 7, "speed_multiplier": 0.7},
     "minecraft:behavior.look_at_player": {"priority": 8, "look_distance": 16}},
-    groups={f"aegis:legend_{k}": {"minecraft:health": {"value": hp, "max": hp}} for k, hp in LEGEND_HP.items()},
+    groups={f"aegis:legend_{k}": {"minecraft:health": {"value": hp, "max": hp}, **(equip("sasuke", "aegis:kusanagi") if k == "sasuke" else {})}
+            for k, hp in LEGEND_HP.items()},
     events={f"aegis:legend_{k}": {"add": {"component_groups": [f"aegis:legend_{k}"]}} for k in LEGEND_HP})
 client_humanoid("legend", ("#f0782a", "#1e1e28"))
 
 # Recruitable genin companion
 COMPANION_TAMED = {
     "minecraft:is_tamed": {},
-    "minecraft:behavior.follow_owner": {"priority": 4, "speed_multiplier": 1.1, "start_distance": 8, "stop_distance": 3},
+    "minecraft:behavior.follow_owner": {"priority": 4, "speed_multiplier": 1.0, "start_distance": 8, "stop_distance": 3},
     "minecraft:behavior.owner_hurt_by_target": {"priority": 1},
     "minecraft:behavior.owner_hurt_target": {"priority": 2},
 }
@@ -441,13 +450,13 @@ entity("genin", {**BASE_MOVE, **TALK,
     "minecraft:type_family": {"family": ["ninja_companion", "npc", "mob"]},
     "minecraft:health": {"value": 30, "max": 30},
     "minecraft:attack": {"damage": 5},
-    "minecraft:movement": {"value": 0.3},
+    "minecraft:movement": {"value": 0.26},
     "minecraft:pushable": {"is_pushable": True, "is_pushable_by_piston": True},
     "minecraft:nameable": {"always_show": True},
     "minecraft:persistent": {},
     "minecraft:damage_sensor": {"triggers": [{"cause": "fall", "deals_damage": "no"}]},
     "minecraft:tameable": {"probability": 0.0, "tame_items": "minecraft:barrier", "tame_event": {"event": "aegis:tamed", "target": "self"}},
-    "minecraft:behavior.melee_attack": {"priority": 3, "speed_multiplier": 1.2, "track_target": True},
+    "minecraft:behavior.melee_attack": {"priority": 3, "speed_multiplier": 1.0, "track_target": True},
     "minecraft:behavior.nearest_attackable_target": {"priority": 5, "must_see": True, "within_radius": 16,
         "entity_types": [{"filters": {"test": "is_family", "subject": "other", "value": "monster"}, "max_dist": 16}]},
     "minecraft:behavior.look_at_player": {"priority": 8, "look_distance": 8}},

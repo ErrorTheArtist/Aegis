@@ -15,6 +15,8 @@ import { showTitle } from "./hud.js";
 import { ActionFormData, ModalFormData, MessageFormData } from "@minecraft/server-ui";
 import { applyNameTag, refreshClanEffects } from "./clans.js";
 import { getRyo, fmtRyo, walletMenu } from "./currency.js";
+import { getVillage, villageLabel } from "./villages.js";
+import { starterLine } from "./starter.js";
 
 export const MAX_LEVEL = 200;
 const POINTS_PER_LEVEL = 3;
@@ -175,6 +177,8 @@ export async function openStats(player) {
         level >= MAX_LEVEL ? "§6MAX LEVEL" : `§7XP ${bar(xp, need)} §f${xp}/${need}`,
         `§7Unspent points: §e${points}`,
         `§7Ryō: §6${fmtRyo(getRyo(player))}`,
+        `§7Village: ${villageLabel(getVillage(player))}`,
+        starterLine(player),
         "",
         ...ids.map((id) => `${STATS[id].color}${STATS[id].name}§r §f${getStat(player, id)}§7/${STAT_CAP} §8— ${STATS[id].desc}`),
       ].join("\n")

@@ -13,6 +13,39 @@ Uses the real Naruto names (Rasengan, Shadow Clone Jutsu, etc.) — personal use
    (the resource pack is applied automatically).
 4. Requires Minecraft Bedrock **1.21.60+**. No experimental toggles needed.
 
+## Joining: choose your village
+
+The first time a player joins they choose one of the villages, are **teleported there** (it becomes their spawn point)
+and receive a **starter kit** (Kusanagi, 8 kunai, 3 Soldier Pills, 2 ramen). Then they roll their clan, their chakra
+nature, and start the starter quests. Players from before this update are asked once on their next join.
+
+| Village | Coordinates |
+|---|---|
+| Hidden Leaf — Konohagakure | 500 74 -1412 |
+| Hidden Sand — Sunagakure | -959 88 -175 |
+| Hidden Rain — Amegakure | -192 70 -1197 |
+| Hidden Stone — Iwagakure | -216 95 -1533 |
+| Hidden Cloud — Kumogakure | 1980 78 -2380 |
+| Hidden Mist — Kirigakure | 2135 77 -641 |
+
+`/scriptevent aegis:village` (show) · `… home` (go back) · `… choose` (pick again). Coordinates live in
+`behavior_pack/scripts/villages.js`.
+
+### Starter quests
+
+An automatic chain — progress on the action bar, rewards paid instantly, shown in the Shinobi Record:
+
+| # | Quest | Goal | Reward |
+|---|---|---|---|
+| 1 | First Blood | defeat 5 hostile mobs | 1,000 Ryō, 300 XP |
+| 2 | Chakra Control | cast 3 jutsu / clan abilities | Body Flicker scroll, 500 XP |
+| 3 | Rogue Hunter | defeat 3 enemy ninja | 2,500 Ryō, 3 Soldier Pills, 800 XP |
+| 4 | Growing Stronger | reach level 10 | 3,000 Ryō, Shadow Clone scroll |
+| 5 | The Chūnin Exam | pass the Chūnin exam | 5,000 Ryō, Leaf Flak Jacket |
+| 6 | Akatsuki Sighting | defeat any Akatsuki member | 10,000 Ryō, 5,000 XP, Rasengan scroll |
+
+`/scriptevent aegis:starter` shows your current quest.
+
 ## Chakra
 
 - You have **100 chakra** (more depending on your clan, Tailed Beast and stats), shown on the chakra bar in the top-left.
@@ -200,6 +233,15 @@ Clan odds, stats and abilities are all in `behavior_pack/scripts/clans.js`.
 Thousand Needles of Death is now a **Yuki-only Ice Release** (see Clans). Clan discounts on the new scrolls: **Uchiha** — Great Fire Annihilation, Kirin, Chidori Sharp Spear · **Sarutobi** — Great
 Fire Annihilation · **Senju** — Earth Spikes · **Hyuga** — Vacuum Bullets. All of them are sold by the Jutsu Sensei
 (unlocked from level 10 to 70) and are craftable.
+
+### Forbidden: Reanimation Jutsu (Edo Tensei)
+
+Sold by the Jutsu Sensei (Lv 60, 9,000 Ryō; using it needs Lv 40, 100 chakra, 5 min cooldown). Choose a fallen shinobi —
+**Hiruzen Sarutobi, Minato Namikaze, Itachi Uchiha, Nagato, Deidara, Sasori or Kakuzu** — a coffin rises from the earth
+and they fight beside you for **60 seconds** with their own jutsu (Fire Dragon, Flying Raijin + Rasengan, Amaterasu,
+Shinra Tensei + Banshō Ten'in, clay bombs, poison senbon, fire & wind masks). Their jutsu are cast in your name — they
+never hit you or your companions, and kills count for you. Then their soul returns to the afterlife and the body crumbles.
+One reanimation at a time.
 
 ## Tailed Beasts (bosses)
 

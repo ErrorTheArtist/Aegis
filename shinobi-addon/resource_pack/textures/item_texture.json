@@ -358,6 +358,9 @@
     },
     "aegis_kamui": {
       "textures": "textures/items/aegis/kamui"
+    },
+    "aegis_edo_tensei_scroll": {
+      "textures": "textures/items/aegis/edo_tensei_scroll"
     }
   }
 }

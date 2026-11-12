@@ -6,6 +6,7 @@ import { world, system } from "@minecraft/server";
 import { ActionFormData } from "@minecraft/server-ui";
 import { showTitle } from "./hud.js";
 import { spendRyo, fmtRyo } from "./currency.js";
+import { getVillage } from "./villages.js";
 
 export const NATURES = {
   fire: { name: "Fire Release", color: "§c", rgb: [1, 0.45, 0.1] },
@@ -83,6 +84,10 @@ export function natureTag(player, itemId) {
   return n && hasNature(player, n) ? ` ${NATURES[n].color}(affinity)` : "";
 }
 
+export function beginNatureRoll(player) {
+  if (!getNatures(player).length) rollNature(player);
+}
+
 function rollNature(player) {
   const n = IDS[Math.floor(Math.random() * IDS.length)];
   setNatures(player, [n]);
@@ -124,7 +129,7 @@ export function initNatures(helpers) {
 
   // Roll on first join (after the clan reveal), and for older players who don't have one yet.
   world.afterEvents.playerSpawn.subscribe(({ player }) => {
-    if (getNatures(player).length) return;
+    if (getNatures(player).length || !getVillage(player)) return; // new players: after choosing a village
     system.runTimeout(() => api.isValid(player) && !getNatures(player).length && rollNature(player), 240);
   });
 

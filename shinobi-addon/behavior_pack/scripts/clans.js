@@ -13,6 +13,8 @@ import { showTitle } from "./hud.js";
 import { uzumakiSealMenu } from "./bijuu.js";
 import { getKage, KAGE_VILLAGES, isSannin } from "./armor.js";
 import { registerCast } from "./clash.js";
+import { getVillage } from "./villages.js";
+import { noteCast } from "./starter.js";
 import { transformCinematic, impactFx, sfx, chargeFx } from "./cinematic.js";
 import { statEffectLevels, getLevel, getRank, RANKS } from "./levels.js";
 
@@ -780,6 +782,10 @@ export function registerClanAbilities(map) {
   Object.assign(ABILITIES, map);
 }
 
+export function beginClanRoll(player) {
+  if (!getClanId(player)) rollClan(player);
+}
+
 export function handleClanItemUse(player, itemStack) {
   if (itemStack.typeId === REROLL_ITEM) {
     useRerollScroll(player);
@@ -807,6 +813,7 @@ export function handleClanItemUse(player, itemStack) {
   }
   if (move.cast(player) === false) return true;
   if (move.cost) registerCast(player, `${itemStack.typeId}#${move.name}`, move.cost);
+  noteCast(player);
   if (move.cost) api.setChakra(player, api.getChakra(player) - move.cost);
   api.gainJutsuXp(player, move.cost);
   api.startCooldown(player, key, Math.round(move.cd * (1 - 0.1 * mastery(player))));
@@ -823,7 +830,8 @@ export function initClans(helpers) {
   // First join → roll. Every spawn → name tag + make sure they still have their item.
   world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
     if (!getClanId(player)) {
-      if (initialSpawn) system.runTimeout(() => api.isValid(player) && rollClan(player), 60);
+      // new players roll after choosing their village (villages.js calls beginClanRoll)
+      if (initialSpawn && getVillage(player)) system.runTimeout(() => api.isValid(player) && rollClan(player), 60);
       return;
     }
     applyNameTag(player);

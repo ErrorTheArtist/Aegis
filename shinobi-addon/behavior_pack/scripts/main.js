@@ -2,7 +2,7 @@
 // Chakra system, jutsu scrolls and ninja tools, driven by @minecraft/server.
 
 import { world, system, ItemStack, MolangVariableMap } from "@minecraft/server";
-import { initClans, applyNameTag, registerClanAbilities, getClanId, CLANS, clanMaxChakra, clanRegenMultiplier, handleClanItemUse, clanJutsuCostMultiplier } from "./clans.js";
+import { initClans, applyNameTag, registerClanAbilities, beginClanRoll, getClanId, CLANS, clanMaxChakra, clanRegenMultiplier, handleClanItemUse, clanJutsuCostMultiplier } from "./clans.js";
 import { initBijuu, bijuuChakraBonus, bijuuRegenMultiplier, handleBijuuItemUse, isTransformed, isBijuuMastered } from "./bijuu.js";
 import { initSwords, handleSwordUse } from "./swords.js";
 import { initHud } from "./hud.js";
@@ -18,6 +18,10 @@ import { initCurrency } from "./currency.js";
 import { initQuests } from "./quests.js";
 import { initClash, registerCast, projectilesMet } from "./clash.js";
 import { initKamui, handleKamuiUse } from "./kamui.js";
+import { initVillages } from "./villages.js";
+import { initStarter, startStarterQuests, noteCast } from "./starter.js";
+import { initEdoTensei, handleEdoUse } from "./edotensei.js";
+import { beginNatureRoll } from "./natures.js";
 import { breakTobiPhase } from "./akatsuki2.js";
 import { initNatures, natureCostMultiplier, natureDamageMultiplier, onJutsuCast, natureTag } from "./natures.js";
 import { initLevels, handleRecordUse, levelChakraBonus, levelRegenMultiplier, ninjutsuMultiplier, cooldownMultiplier, gainJutsuXp, getLevel, xpInfo } from "./levels.js";
@@ -297,6 +301,7 @@ world.afterEvents.itemUse.subscribe(({ source: player, itemStack }) => {
   if (handleSwordUse(player, itemStack)) return;
   if (handleSummonUse(player, itemStack)) return;
   if (handleKamuiUse(player, itemStack)) return;
+  if (handleEdoUse(player, itemStack)) return;
   const jutsu = JUTSU[itemStack.typeId];
   if (!jutsu) return;
 
@@ -329,6 +334,7 @@ world.afterEvents.itemUse.subscribe(({ source: player, itemStack }) => {
   gainJutsuXp(player, cost);
   startCooldown(player, itemStack.typeId, jutsu.cooldown);
   registerCast(player, itemStack.typeId, cost);
+  noteCast(player);
   player.onScreenDisplay.setActionBar(`§6${jutsu.name}!${natureTag(player, itemStack.typeId)}`);
 });
 
@@ -1037,6 +1043,14 @@ initCurrency(npcApi);
 initQuests(npcApi);
 initClash(npcApi);
 initKamui(npcApi, breakTobiPhase);
+initStarter(npcApi);
+initEdoTensei(npcApi);
+// new shinobi: choose a village → teleport + starter kit → clan roll → chakra nature → starter quests
+initVillages(npcApi, (player) => {
+  system.runTimeout(() => isValid(player) && beginClanRoll(player), 30);
+  system.runTimeout(() => isValid(player) && beginNatureRoll(player), 260);
+  system.runTimeout(() => isValid(player) && startStarterQuests(player), 400);
+});
 initNpcs({ ...npcApi, spawnAkatsukiNear: (p, msg) => spawnAkatsukiNear(p, msg) });
 initEnemies(npcApi);
 initCompanions(npcApi);

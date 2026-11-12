@@ -476,6 +476,7 @@ const SHOPS = {
     ["aegis:summon_snake_scroll", 1, "Summoning: Snake", 20, 20],
     ["aegis:blank_scroll", 4, "Blank Scroll ×4", 2, 1],
     ["__sage", 0, "Sage Training (learn Sage Mode)", 48, 60],
+    ["aegis:edo_tensei_scroll", 1, "§8Forbidden: Reanimation Jutsu", 90, 60],
     ["__exchange", 0, "Exchange emeralds for Ryō", 0, 1],
     ["__nature", 0, "Chakra Nature Training (learn another release)", 0, 1],
   ],

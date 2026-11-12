@@ -100,8 +100,16 @@ async function geninMenu(player, e) {
   }
 }
 
+const reanimated = (e) => {
+  try {
+    return !!e.getDynamicProperty("aegis:reanimated");
+  } catch {
+    return false;
+  }
+};
+
 function companionKill(companion, dead) {
-  if (companion.typeId !== "aegis:genin" || !ownerOf(companion)) return;
+  if (companion.typeId !== "aegis:genin" || !ownerOf(companion) || reanimated(companion)) return;
   let lvl = companion.getDynamicProperty("aegis:clevel") ?? 1;
   if (lvl >= MAX_COMPANION_LEVEL) return;
   let xp = (companion.getDynamicProperty("aegis:cxp") ?? 0) + 25;
@@ -245,7 +253,7 @@ export function initCompanions(helpers) {
   api = helpers;
 
   world.afterEvents.playerInteractWithEntity.subscribe(({ player, target }) => {
-    if (target.typeId !== "aegis:genin") return;
+    if (target.typeId !== "aegis:genin" || reanimated(target)) return; // Edo Tensei bodies aren't hireable companions
     system.run(() => geninMenu(player, target).catch(() => {}));
   });
 

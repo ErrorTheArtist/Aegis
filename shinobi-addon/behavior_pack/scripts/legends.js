@@ -191,6 +191,7 @@ const AI = {
     }
     if (r < 0.4) {
       sfx(boss.dimension, "aegis.chidori", boss.location, 1.4, 1);
+      for (let i = 0; i < 12; i++) system.runTimeout(() => api.isValid(boss) && api.particle(boss.dimension, "aegis:chidori", api.chidoriHand(boss)), i);
       dashStrike(boss, t, [0.6, 0.85, 1], p2 ? 22 : 16, 12, "animation.aegis.chidori_charge", 3.6);
       return 70;
     }

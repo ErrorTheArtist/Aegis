@@ -177,7 +177,14 @@ export function projectilesMet(a, b) {
 // ---------------------------------------------------------------------------
 // The cinematic
 // ---------------------------------------------------------------------------
-function handOf(e, dir, perp) {
+function handOf(e, dir, perp, style) {
+  if (style?.anim === "animation.aegis.chidori_charge" && api.chidoriHand) {
+    try {
+      return api.chidoriHand(e);
+    } catch {
+      /* fall through */
+    }
+  }
   if (isPlayer(e)) {
     try {
       return api.handPos(e);
@@ -305,7 +312,7 @@ function startClash(A, castA, B, castB) {
     for (let t = 0; t < 60; t += 3) {
       run(() => {
         const c = e.location;
-        const h = handOf(e, toward(), { x: -toward().z, y: 0, z: toward().x });
+        const h = handOf(e, toward(), { x: -toward().z, y: 0, z: toward().x }, s);
         for (let n = 0; n < 2; n++) {
           const a = Math.random() * Math.PI * 2;
           const r = 1.8 + Math.random() * 2;

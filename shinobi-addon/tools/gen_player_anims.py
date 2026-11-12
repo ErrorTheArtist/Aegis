@@ -232,11 +232,15 @@ A["animation.aegis.rasengan_hold"] = anim(0.9, [
     (0.9, "io", {"la": [-70, 38, -6]}),
 ], loop=False)
 
+# Chidori: Sasuke's stance — crouched low, the lightning hand held down at his side, the other hand gripping the wrist.
+# (Pose solved with the preview rig so the left hand really reaches the right wrist; the script spawns the lightning at
+#  CHIDORI_HAND in main.js, which matches where this hand ends up.)
+CHIDORI_POSE = {"w": HIPS(24, 6, drop=3), "b": [0, 12, 0], "ra": [-30, 10, 0], "la": [-25, 70, 40],
+                "rl": [30, 0, 14], "ll": [-40, 0, -12], "h": [-22, -10, 0]}
 A["animation.aegis.chidori_charge"] = anim(0.8, [
-    (0.12, "out", {"w": HIPS(26, 6, drop=3), "rl": [30, 0, 14], "ll": [-40, 0, -12], "ra": [40, 8, 34], "la": [-30, 54, 0],
-                   "h": [-22, -10, 0], "b": [0, 12, 0]}),
-    *[(round(t, 3), "lin", {"ra": v}) for t, v in shake(0.18, 0.78, 3, 0.04, [42, 8, 34])],
-    (0.8, "lin", {"ra": [42, 8, 34]}),
+    (0.12, "out", CHIDORI_POSE),
+    *[(round(t, 3), "lin", {"ra": v}) for t, v in shake(0.18, 0.78, 3, 0.04, [-30, 10, 0])],
+    (0.8, "lin", {"ra": [-30, 10, 0]}),
 ])
 
 A["animation.aegis.palm_thrust"] = anim(0.55, [
@@ -493,9 +497,8 @@ A["animation.aegis.kirin_call"] = anim(1.6, [
 ])
 
 A["animation.aegis.chidori_spear"] = anim(0.95, [
-    (0.15, "out", {"ra": [28, 12, 36], "la": [-36, 50, 0], "w": HIPS(18, 8, drop=2.6), "rl": [26, 0, 14], "ll": [-32, 0, -12], "h": [-10, -12, 0],
-                   "b": [0, 14, 0]}),
-    *[(round(t, 3), "lin", {"ra": v}) for t, v in shake(0.2, 0.46, 2.5, 0.04, [30, 12, 38])],
+    (0.15, "out", CHIDORI_POSE),
+    *[(round(t, 3), "lin", {"ra": v}) for t, v in shake(0.2, 0.46, 2.5, 0.04, [-30, 10, 0])],
     (0.52, "snap", {"ra": ([-94, -8, 0], [0, 0, -3]), "la": [22, 0, -30], "w": HIPS(18, -20, drop=2.4), "rl": [-48, 0, 8], "ll": [38, 0, -8],
                     "h": [-14, 20, 0], "b": [0, -6, 0], "rt": (Z, [0, 0, -3])}),
     (0.6, "back", {"w": HIPS(16, -20, drop=2.2)}),

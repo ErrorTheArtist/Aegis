@@ -162,6 +162,16 @@ function handPos(player) {
   return add(player.getHeadLocation(), add(add(scale(d, 0.7), scale(right, 0.35)), { x: 0, y: -0.45, z: 0 }));
 }
 
+// Where the lightning hand is in the Chidori stance (animation.aegis.chidori_charge, solved with tools/anim_preview.py):
+// held low at the right side, a little forward.
+const CHIDORI_HAND = { forward: 0.17, right: 0.5, up: 0.6 };
+function chidoriHand(entity) {
+  const d = entity.getViewDirection();
+  const h = norm({ x: d.x, y: 0, z: d.z });
+  const right = { x: -h.z, y: 0, z: h.x };
+  return add(entity.location, add(add(scale(h, CHIDORI_HAND.forward), scale(right, CHIDORI_HAND.right)), { x: 0, y: CHIDORI_HAND.up, z: 0 }));
+}
+
 function spawnFx(dim, typeId, event, loc) {
   try {
     const e = dim.spawnEntity(typeId, loc);
@@ -659,8 +669,10 @@ function castChidori(player) {
   for (let i = 0; i < CHARGE + 14; i++) {
     system.runTimeout(() => {
       if (!isValid(player)) return;
-      const hand = sub(handPos(player), { x: 0, y: 0.25, z: 0 });
+      // lightning in the hand while charging, then on the fist as you lunge
+      const hand = i < CHARGE ? chidoriHand(player) : sub(handPos(player), { x: 0, y: 0.1, z: 0 });
       particle(dim, "aegis:chidori", hand);
+      if (i % 2 === 0) particle(dim, "aegis:chidori", hand);
       if (i % 4 === 0) particle(dim, "minecraft:electric_spark_particle", hand);
     }, i);
   }
@@ -1009,7 +1021,7 @@ initHud({ getChakra, getMaxChakra, getLevel, xpInfo });
 
 const npcApi = {
   add, sub, scale, norm, dot, particle, sound, knockback, hurt, isValid, canBeHit,
-  getChakra, setChakra, cooldownLeft, startCooldown, anim, handPos, launchProjectile, gainJutsuXp, spawnFx, removeFx,
+  getChakra, setChakra, cooldownLeft, startCooldown, anim, handPos, chidoriHand, launchProjectile, gainJutsuXp, spawnFx, removeFx,
 };
 Object.assign(JUTSU, makeJutsu2(npcApi));
 {

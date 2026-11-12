@@ -272,7 +272,7 @@ function castChidoriSpear(player) {
   chargeFx(player, BOLT, CHARGE);
   sfx(dim, "aegis.chidori", player.location, 1.3, 1.2);
   for (let i = 0; i < CHARGE; i++) {
-    system.runTimeout(() => api.isValid(player) && api.particle(dim, "aegis:chidori", api.sub(api.handPos(player), { x: 0, y: 0.25, z: 0 })), i);
+    system.runTimeout(() => api.isValid(player) && api.particle(dim, "aegis:chidori", api.chidoriHand(player)), i);
   }
   system.runTimeout(() => {
     if (!api.isValid(player)) return;

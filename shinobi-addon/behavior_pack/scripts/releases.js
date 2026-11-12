@@ -90,7 +90,7 @@ function castDeepForest(player) {
     if (!api.isValid(player)) return;
     const o = player.location;
     shake(dim, o, 0.45, 1.2, 24);
-    api.sound(dim, "dig.wood", o, 1.5, 0.5);
+    api.sound(dim, "aegis.wood", o, 1.5, 0.85);
     const spots = [];
     for (let i = 0; i < 16; i++) {
       const a = Math.random() * Math.PI * 2;
@@ -139,7 +139,7 @@ function castWoodDragon(player) {
         const p = api.add(api.add(start, api.scale(d, f)), api.add(api.scale(side, wave), { x: 0, y: Math.sin(f * Math.PI) * 2.5, z: 0 }));
         api.particle(dim, "aegis:cine_debris", p, WOOD);
         api.particle(dim, "aegis:dust", p);
-        if (k % 4 === 0) api.sound(dim, "dig.wood", p, 1, 0.6);
+        if (k % 4 === 0) api.sound(dim, "aegis.wood", p, 1, 0.85);
       }, k);
     }
     system.runTimeout(() => {
@@ -227,7 +227,7 @@ function castIceDragon(player) {
     const d = player.getViewDirection();
     api.launchProjectile(player, api.add(player.getHeadLocation(), api.scale(d, 1.8)), d, {
       orbEvent: "aegis:as_water", speed: 0.95, maxAge: 40, damage: 18, radius: 4.5, knock: 2, fire: 0, hitRadius: 2,
-      trail: "minecraft:snowflake_particle", burst: "aegis:slash", color: ICE, sound: "random.glass", power: 2,
+      trail: "minecraft:snowflake_particle", burst: "aegis:slash", color: ICE, sound: "aegis.ice", power: 2,
       effects: [["slowness", 100, 3], ["mining_fatigue", 100, 1]],
       onExplode: (pos, dim) => {
         for (let i = 0; i < 24; i++) {
@@ -238,7 +238,7 @@ function castIceDragon(player) {
         api.particle(dim, "minecraft:snowflake_particle", pos);
       },
     });
-    api.sound(player.dimension, "random.glass", player.location, 1, 0.6);
+    api.sound(player.dimension, "aegis.ice", player.location, 1, 0.85);
   }, 14);
 }
 
@@ -253,7 +253,7 @@ function iceMirrors(player) {
   const c = { ...t.location };
   api.anim(player, "animation.aegis.ice_seal");
   castFx(player, ICE, "aegis.seal");
-  api.sound(dim, "random.glass", c, 1, 1.4);
+  api.sound(dim, "aegis.ice", c, 1, 1.25);
   const mirrors = [];
   for (let i = 0; i < 6; i++) {
     const a = (i / 6) * Math.PI * 2;
@@ -271,7 +271,7 @@ function iceMirrors(player) {
       api.particle(dim, "aegis:slash", api.add(t.location, { x: m.x * 0.3, y: 1, z: m.z * 0.3 }), ICE);
       api.hurt(t, 3, player);
       eff(t, "slowness", 30, 3);
-      api.sound(dim, "random.glass", t.location, 0.6, 1.6 + Math.random() * 0.3);
+      api.sound(dim, "aegis.ice_shatter", t.location, 0.8, 1 + Math.random() * 0.2);
     }, k);
   }
   return true;
@@ -280,7 +280,7 @@ function iceMirrors(player) {
 function iceDome(player) {
   const dim = player.dimension;
   api.anim(player, "animation.aegis.both_palms");
-  api.sound(dim, "random.glass", player.location, 1.2, 0.5);
+  api.sound(dim, "aegis.ice", player.location, 1.2, 0.85);
   impactFx(dim, player.location, ICE, 1.8);
   for (let i = 0; i < 30; i++) {
     const a = Math.random() * Math.PI * 2;
@@ -312,7 +312,7 @@ function castLavaGlobs(player) {
         if (!api.isValid(player)) return;
         api.launchProjectile(player, api.add(player.getHeadLocation(), api.scale(dir, 1.3)), dir, {
           orbEvent: "aegis:as_fireball", speed: 1.05, maxAge: 30, damage: 10, radius: 3, knock: 0.6, fire: 7, hitRadius: 1.6,
-          trail: "minecraft:lava_particle", burst: "aegis:fire_burst", color: LAVA, sound: "bucket.empty_lava", power: 1.2,
+          trail: "minecraft:lava_particle", burst: "aegis:fire_burst", color: LAVA, sound: "aegis.lava", power: 1.2,
           effects: [["weakness", 80, 1]],
           onExplode: (pos, dim) => {
             for (let k = 0; k < 4; k++) api.particle(dim, "minecraft:lava_particle", api.add(pos, { x: Math.random() - 0.5, y: 0.3, z: Math.random() - 0.5 }));
@@ -320,7 +320,7 @@ function castLavaGlobs(player) {
         });
       }, i * 4);
     }
-    api.sound(player.dimension, "bucket.empty_lava", player.location, 1, 0.7);
+    api.sound(player.dimension, "aegis.lava", player.location, 1, 0.85);
   }, 12);
 }
 
@@ -346,7 +346,7 @@ function meltingApparition(player) {
   chargeFx(player, LAVA, 8, "aegis.fire");
   system.runTimeout(() => {
     if (!api.isValid(player)) return;
-    api.sound(dim, "bucket.empty_lava", player.location, 1.5, 0.6);
+    api.sound(dim, "aegis.lava", player.location, 1.5, 0.85);
     for (let s = 1; s <= 8; s++) {
       system.runTimeout(() => {
         for (let k = -2; k <= 2; k++) {
@@ -405,9 +405,9 @@ function waterGun(player) {
   const d = player.getViewDirection();
   api.launchProjectile(player, api.add(player.getHeadLocation(), api.scale(d, 1.2)), d, {
     noOrb: true, speed: 2.2, maxAge: 18, damage: 8, radius: 1.3, knock: 0.9, fire: 0, hitRadius: 1.1,
-    trail: "aegis:water_splash", burst: "aegis:water_splash", color: WATER, sound: "random.splash", power: 0.5,
+    trail: "aegis:water_splash", burst: "aegis:water_splash", color: WATER, sound: "aegis.water_burst", power: 0.5,
   });
-  api.sound(player.dimension, "random.splash", player.location, 0.8, 1.6);
+  api.sound(player.dimension, "aegis.water_burst", player.location, 0.8, 1.25);
   return true;
 }
 
@@ -416,7 +416,7 @@ function hydrification(player) {
   eff(player, "speed", 120, 1, false);
   api.anim(player, "animation.aegis.substitution");
   api.particle(player.dimension, "aegis:water_splash", api.add(player.location, { x: 0, y: 1, z: 0 }));
-  api.sound(player.dimension, "bucket.fill_water", player.location, 1.2, 0.8);
+  api.sound(player.dimension, "aegis.water", player.location, 1.2, 0.85);
   player.onScreenDisplay.setActionBar("§9Hydrification — attacks pass straight through you!");
   return true;
 }

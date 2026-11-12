@@ -182,6 +182,7 @@ export function handleSummonUse(player, itemStack) {
   system.runTimeout(() => {
     try {
       const e = player.dimension.spawnEntity(s.entity, at);
+      api.sound(player.dimension, "aegis.summon", at, 1.8, 1);
       tame(e, player);
       e.nameTag = `${player.name}'s ${s.name}`;
       api.particle(player.dimension, "aegis:smoke_puff", at);

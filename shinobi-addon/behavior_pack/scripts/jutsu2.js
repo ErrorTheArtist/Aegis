@@ -63,7 +63,7 @@ function castGreatFire(player) {
     const origin = { ...player.location };
     const hits = new Map(); // entity id -> times burned
     sfx(dim, "aegis.fire", player.location, 2, 0.7);
-    api.sound(dim, "mob.ghast.fireball", player.location, 1.5, 0.5);
+    api.sound(dim, "aegis.fire_roar", player.location, 1.5, 0.85);
     shake(dim, player.location, 0.35, 1.2, 20);
     for (let k = 0; k < 14; k++) {
       system.runTimeout(() => {
@@ -116,7 +116,7 @@ function castKirin(player) {
   const DELAY = 30;
   api.anim(player, "animation.aegis.kirin_call");
   chargeFx(player, BOLT, DELAY, "aegis.charge");
-  api.sound(dim, "ambient.weather.thunder", spot, 2, 0.6);
+  api.sound(dim, "aegis.thunder", spot, 1.2, 0.6);
   for (let t = 0; t < DELAY; t += 4) {
     system.runTimeout(() => {
       api.particle(dim, "aegis:cine_ring", spot, BOLT);
@@ -133,6 +133,7 @@ function castKirin(player) {
     }
     sfx(dim, "aegis.lightning", spot, 3, 0.7);
     sfx(dim, "aegis.boom", spot, 2.5, 0.8);
+    sfx(dim, "aegis.thunder", spot, 3.5, 1);
     impactFx(dim, spot, BOLT, 4);
     shake(dim, spot, 1.2, 1.2, 40);
     if (!api.isValid(player)) return;
@@ -160,7 +161,7 @@ function castWaterPrison(player) {
   const dur = isBig(t) ? 40 : 100;
   api.anim(player, "animation.aegis.water_seals");
   castFx(player, WATER, "aegis.seal");
-  api.sound(dim, "bucket.fill_water", at, 1.5, 0.6);
+  api.sound(dim, "aegis.water", at, 1.5, 0.85);
   if (t.typeId === "minecraft:player") t.onScreenDisplay?.setActionBar("§9You're caught in a Water Prison!");
   for (let k = 0; k <= dur; k += 2) {
     system.runTimeout(() => {
@@ -202,7 +203,7 @@ function castVacuum(player) {
         noOrb: true, speed: 1.9, maxAge: 22, damage: 6, radius: 1.8, knock: 1.4, fire: 0, hitRadius: 1.2,
         trail: "aegis:wind_gust", burst: "aegis:wind_gust", color: [0.75, 1, 0.85], sound: "mob.breeze.wind_burst", power: 0.6,
       });
-      api.sound(player.dimension, "mob.breeze.shoot", player.location, 0.8, 1.3 + i * 0.05);
+      api.sound(player.dimension, "aegis.wind_cut", player.location, 0.8, 1.3 + i * 0.05);
     }, 8 + i * 3);
   }
 }
@@ -219,7 +220,7 @@ function castEarthSpikes(player) {
   api.anim(player, "animation.aegis.earth_slam");
   chargeFx(player, [0.65, 0.5, 0.3], 7);
   system.runTimeout(() => {
-    api.sound(dim, "dig.stone", origin, 1.2, 0.5);
+    api.sound(dim, "aegis.earth", origin, 1.2, 0.85);
     shake(dim, origin, 0.3, 0.8, 16);
     for (let k = 1; k <= 14; k++) {
       system.runTimeout(() => {
@@ -237,7 +238,7 @@ function castEarthSpikes(player) {
         }
         api.particle(dim, "aegis:dust", g);
         api.particle(dim, "aegis:cine_debris", g, [0.6, 0.5, 0.4]);
-        if (k % 2 === 0) api.sound(dim, "break.pointed_dripstone", g, 1, 0.6 + Math.random() * 0.3);
+        if (k % 2 === 0) api.sound(dim, "aegis.earth_break", g, 1, 0.6 + Math.random() * 0.3);
         if (!api.isValid(player)) return;
         for (const e of dim.getEntities({ location: api.add(g, { x: 0.5, y: 0, z: 0.5 }), maxDistance: 1.9 })) {
           if (!api.canBeHit(e, player) || hit.has(e.id)) continue;
@@ -325,7 +326,7 @@ function castIceNeedles(player) {
   const centre = t ? { ...t.location } : api.add(player.location, api.scale(flat(player.getViewDirection()), 7));
   api.anim(player, "animation.aegis.ice_seal");
   castFx(player, ICE, "aegis.seal");
-  api.sound(dim, "random.glass", centre, 0.6, 1.6);
+  api.sound(dim, "aegis.ice", centre, 1, 1.1);
   const N = 18;
   const needles = [];
   for (let i = 0; i < N; i++) {
@@ -347,7 +348,7 @@ function castIceNeedles(player) {
     }, 12 + k);
   }
   system.runTimeout(() => {
-    api.sound(dim, "random.glass", centre, 1.2, 0.8);
+    api.sound(dim, "aegis.ice_shatter", centre, 1.2, 0.8);
     impactFx(dim, centre, ICE, 1.5);
     if (!api.isValid(player)) return;
     for (const e of dim.getEntities({ location: centre, maxDistance: 3.2 })) {
@@ -371,6 +372,7 @@ function castEightGates(player) {
   const dim = player.dimension;
   api.anim(player, "animation.aegis.gates_release");
   chargeFx(player, GATE, 14, "aegis.aura");
+  sfx(dim, "aegis.gates", player.location, 2.2, 1);
   system.runTimeout(() => {
     if (!api.isValid(player)) return;
     impactFx(dim, player.location, GATE, 2.5);

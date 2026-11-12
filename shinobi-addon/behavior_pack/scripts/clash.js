@@ -471,6 +471,7 @@ function startClash(A, castA, B, castB) {
     for (const p of players) cmd(p, "camera @s fade time 0.03 0.06 0.2 color 255 255 255");
     sfx(dim, "aegis.clash_struggle", clashPt, 3, 1);
     sfx(dim, "aegis.impact", clashPt, 2.5, 1.2);
+    sfx(dim, "aegis.dome", clashPt, 3, 1);
     shake(dim, mid, 0.9, 0.5, 32);
     api.particle(dim, "aegis:beast_burst", clashPt, mixed);
     api.particle(dim, "aegis:cine_ring", up(mid, 0.1), S.A.color);

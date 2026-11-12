@@ -439,7 +439,6 @@ function toggleDojutsu(player, kind, label) {
   refreshEffects(player, true);
   api.anim(player, "animation.aegis.eye_activate");
   chargeFx(player, kind === "byakugan" ? [0.85, 0.82, 1] : kind === "eternal" ? [0.6, 0.1, 0.55] : [0.85, 0.05, 0.08], 6);
-  api.sound(player.dimension, "mob.endermen.stare", player.location, 0.4, 1.8);
   player.onScreenDisplay.setActionBar(`§c${label}!`);
   return true;
 }
@@ -474,7 +473,7 @@ const ABILITIES = {
           const a = (i / 24) * Math.PI * 2;
           api.particle(p.dimension, "aegis:wind_gust", api.add(p.location, { x: Math.cos(a) * 2, y: 1, z: Math.sin(a) * 2 }));
         }
-        api.sound(p.dimension, "mob.breeze.wind_burst", p.location, 1, 0.8);
+        api.sound(p.dimension, "aegis.wind", p.location, 1, 0.85);
         for (const e of nearbyTargets(p, 5)) {
           const away = api.norm({ x: e.location.x - p.location.x, y: 0, z: e.location.z - p.location.z });
           api.knockback(e, away.x, away.z, 2.5, 0.5);
@@ -501,7 +500,7 @@ const ABILITIES = {
             api.particle(p.dimension, "aegis:wind_gust", api.add(p.location, { x: Math.cos(a) * r, y: 0.5, z: Math.sin(a) * r }));
           }
         }
-        api.sound(p.dimension, "random.explode", p.location, 1, 0.5);
+        api.sound(p.dimension, "aegis.push", p.location, 1, 0.85);
         for (const e of nearbyTargets(p, 10)) {
           const away = api.norm({ x: e.location.x - p.location.x, y: 0, z: e.location.z - p.location.z });
           api.knockback(e, away.x, away.z, 4.5, 0.8);
@@ -519,7 +518,7 @@ const ABILITIES = {
         line(p, p.getHeadLocation(), t.location, "minecraft:portal_reverse_particle");
         const to = api.norm({ x: p.location.x - t.location.x, y: 0, z: p.location.z - t.location.z });
         api.knockback(t, to.x, to.z, 3, 0.4);
-        api.sound(p.dimension, "mob.endermen.portal", t.location, 1, 0.6);
+        api.sound(p.dimension, "aegis.pull", t.location, 1, 0.85);
         return true;
       },
     },
@@ -537,7 +536,7 @@ const ABILITIES = {
           api.particle(pl.dimension, "aegis:chakra_aura", pl.location);
           api.particle(pl.dimension, "minecraft:villager_happy", api.add(pl.location, { x: 0, y: 1, z: 0 }));
         }
-        api.sound(p.dimension, "random.levelup", p.location, 0.6, 1.4);
+        api.sound(p.dimension, "aegis.heal", p.location, 1, 1.25);
         return true;
       },
     },
@@ -597,6 +596,7 @@ const ABILITIES = {
         if (!t) return noTarget(p);
         api.anim(p, "animation.aegis.shadow_seal");
         chargeFx(p, [0.1, 0.1, 0.12], 9);
+        api.sound(p.dimension, "aegis.shadow", p.location, 1.3, 1);
         for (let i = 0; i < 5; i++) {
           system.runTimeout(() => {
             if (api.isValid(t) && api.isValid(p)) line(p, api.add(p.location, { x: 0, y: 0.05, z: 0 }), api.add(t.location, { x: 0, y: 0.05, z: 0 }), "aegis:shadow");
@@ -606,7 +606,7 @@ const ABILITIES = {
         eff(t, "weakness", 120, 4);
         eff(t, "mining_fatigue", 120, 4);
         eff(p, "slowness", 120, 1); // you're tied together
-        api.sound(p.dimension, "mob.endermen.stare", t.location, 0.5, 0.5);
+        api.sound(p.dimension, "aegis.shadow", t.location, 1, 0.85);
         p.onScreenDisplay.setActionBar("§8Shadow Possession — success!");
         return true;
       },
@@ -740,7 +740,7 @@ function woodWall(p) {
     }
   }
   if (!placed.length) return false;
-  api.sound(dim, "dig.wood", p.location, 1, 0.6);
+  api.sound(dim, "aegis.wood", p.location, 1, 0.85);
   system.runTimeout(() => {
     for (const loc of placed) {
       try {

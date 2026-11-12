@@ -19,6 +19,7 @@ import { initQuests } from "./quests.js";
 import { initClash, registerCast, projectilesMet } from "./clash.js";
 import { initKamui, handleKamuiUse } from "./kamui.js";
 import { initVillages, sameVillage, handleGourdUse } from "./villages.js";
+import { animSfx } from "./sfx.js";
 import { initStarter, startStarterQuests, noteCast } from "./starter.js";
 import { initEdoTensei, handleEdoUse } from "./edotensei.js";
 import { beginNatureRoll } from "./natures.js";
@@ -161,6 +162,7 @@ function anim(entity, name, controller = "aegis_jutsu", stopExpression) {
   } catch {
     /* ignore */
   }
+  if (controller === "aegis_jutsu") animSfx(entity, name); // seal snaps, swishes, leaps and landings
 }
 
 // World position of the player's right hand (roughly).
@@ -514,7 +516,7 @@ function castSubstitution(player) {
   substitutionArmed.set(player.id, system.currentTick + 160);
   anim(player, "animation.aegis.substitution");
   particle(player.dimension, "aegis:chakra_aura", player.location);
-  sound(player.dimension, "random.pop", player.location, 1, 0.6);
+  sound(player.dimension, "aegis.poof", player.location, 1, 0.85);
   player.sendMessage("§7[Substitution] Ready — the next hit you take will be avoided (8s).");
 }
 
@@ -603,7 +605,7 @@ function castClones(player) {
       /* ignore */
     }
   }
-  sound(dim, "random.pop", player.location, 1, 0.5);
+  sound(dim, "aegis.poof", player.location, 1, 0.85);
   return true;
 }
 
@@ -642,7 +644,7 @@ function castFlashStep(player) {
     /* ignore */
   }
   particle(player.dimension, "aegis:smoke_puff", player.location);
-  sound(player.dimension, "mob.enderdragon.flap", player.location, 0.8, 1.6);
+  sound(player.dimension, "aegis.swish", player.location, 0.8, 1.25);
   sfx(player.dimension, "aegis.whoosh", player.location, 1.2, 1.3);
 }
 
@@ -655,8 +657,8 @@ function castGalePalm(player) {
   for (let d = 1; d <= 8; d++) {
     particle(dim, "aegis:wind_gust", add(head, scale(dir, d)));
   }
-  sound(dim, "mob.breeze.wind_burst", head, 1, 1);
-  sound(dim, "mob.enderdragon.flap", head, 1, 0.6);
+  sound(dim, "aegis.wind", head, 1, 1);
+  sound(dim, "aegis.wind_cut", head, 1, 0.85);
   sfx(dim, "aegis.whoosh", head, 1.5, 0.8);
   castFx(player, [0.6, 1, 0.75]);
   shake(dim, head, 0.2, 0.4, 12);
@@ -734,7 +736,7 @@ function castPhoenix(player) {
 function castWaterDragon(player) {
   anim(player, "animation.aegis.water_seals");
   chargeFx(player, [0.3, 0.6, 1], 14);
-  sound(player.dimension, "bucket.fill_water", player.location, 1, 0.8);
+  sound(player.dimension, "aegis.water", player.location, 1, 0.85);
   for (let t = 0; t < 12; t += 3) system.runTimeout(() => isValid(player) && particle(player.dimension, "aegis:water_splash", add(player.location, { x: 0, y: 0.2, z: 0 })), t);
   system.runTimeout(() => {
     if (!isValid(player)) return;
@@ -742,9 +744,9 @@ function castWaterDragon(player) {
     const d = player.getViewDirection();
     launchProjectile(player, add(player.getHeadLocation(), scale(d, 1.8)), d, {
       orbEvent: "aegis:as_water", speed: 1.0, maxAge: 40, damage: 14, radius: 4.2, knock: 2.6, fire: 0,
-      trail: "aegis:water_splash", burst: "aegis:water_splash", hitRadius: 2, sound: "random.splash", effects: [["slowness", 60, 2]], color: [0.3, 0.6, 1],
+      trail: "aegis:water_splash", burst: "aegis:water_splash", hitRadius: 2, sound: "aegis.water_burst", effects: [["slowness", 60, 2]], color: [0.3, 0.6, 1],
     });
-    sound(player.dimension, "random.splash", player.location, 1, 0.6);
+    sound(player.dimension, "aegis.water_burst", player.location, 1, 0.85);
   }, 14);
 }
 
@@ -760,7 +762,7 @@ function castEarthWall(player) {
   if (!spots.some((l) => dim.getBlock(l)?.isAir)) return false;
   anim(player, "animation.aegis.earth_slam");
   chargeFx(player, [0.65, 0.5, 0.3], 7);
-  sound(dim, "dig.stone", player.location, 1, 0.5);
+  sound(dim, "aegis.earth", player.location, 1, 0.85);
   const placed = [];
   system.runTimeout(() => {
     for (const l of spots) {
@@ -779,7 +781,7 @@ function castEarthWall(player) {
     particle(dim, "aegis:dust", { x: base.x + 0.5, y: base.y, z: base.z + 0.5 });
     particle(dim, "minecraft:huge_explosion_emitter", { x: base.x + 0.5, y: base.y, z: base.z + 0.5 });
     impactFx(dim, { x: base.x + 0.5, y: base.y, z: base.z + 0.5 }, [0.6, 0.45, 0.3], 1.5);
-    sound(dim, "random.explode", base, 0.6, 0.5);
+    sound(dim, "aegis.earth_break", base, 0.6, 0.85);
     for (const e of dim.getEntities({ location: { x: base.x + 0.5, y: base.y, z: base.z + 0.5 }, maxDistance: 4 })) {
       if (!canBeHit(e, player)) continue;
       hurt(e, 6, player);
@@ -872,10 +874,10 @@ function castRasenshuriken(player) {
             for (const e of pdim.getEntities({ location: pos, maxDistance: 5.5 })) if (canBeHit(e, caster)) hurt(e, 4, caster, "magic");
           }, k * 5);
         }
-        sound(pdim, "mob.breeze.wind_burst", pos, 2, 0.6);
+        sound(pdim, "aegis.wind", pos, 2, 0.85);
       },
     });
-    sound(dim, "mob.breeze.shoot", player.location, 1, 0.8);
+    sound(dim, "aegis.wind_cut", player.location, 1, 0.85);
   }, CHARGE);
 }
 
@@ -891,7 +893,7 @@ function castMysticalPalm(player) {
   }
   anim(player, "animation.aegis.heal_palms");
   chargeFx(player, [0.3, 1, 0.4], 9);
-  sound(player.dimension, "beacon.ambient", player.location, 1, 1.6);
+  sound(player.dimension, "aegis.heal", player.location, 1, 1.25);
   sfx(player.dimension, "aegis.seal", player.location, 1, 1.3);
   castFx(player, [0.3, 1, 0.4]);
   for (let t = 0; t <= 20; t += 4) {

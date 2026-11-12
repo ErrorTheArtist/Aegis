@@ -60,6 +60,13 @@ export const QUEST_TARGETS = {
   itachi: { label: "Akatsuki: Itachi", match: (e) => e.typeId === "aegis:akatsuki" && member(e) === "itachi", spawn: spawnNinja("akatsuki", { member: "itachi" }) },
   kisame: { label: "Akatsuki: Kisame", match: (e) => e.typeId === "aegis:akatsuki" && member(e) === "kisame", spawn: spawnNinja("akatsuki", { member: "kisame" }) },
   deidara: { label: "Akatsuki: Deidara", match: (e) => e.typeId === "aegis:akatsuki" && member(e) === "deidara", spawn: spawnNinja("akatsuki", { member: "deidara" }) },
+  pain: { label: "Akatsuki: Pain", match: (e) => e.typeId === "aegis:akatsuki" && member(e) === "pain", spawn: spawnNinja("akatsuki", { member: "pain" }) },
+  konan: { label: "Akatsuki: Konan", match: (e) => e.typeId === "aegis:akatsuki" && member(e) === "konan", spawn: spawnNinja("akatsuki", { member: "konan" }) },
+  hidan: { label: "Akatsuki: Hidan", match: (e) => e.typeId === "aegis:akatsuki" && member(e) === "hidan", spawn: spawnNinja("akatsuki", { member: "hidan" }) },
+  kakuzu: { label: "Akatsuki: Kakuzu", match: (e) => e.typeId === "aegis:akatsuki" && member(e) === "kakuzu", spawn: spawnNinja("akatsuki", { member: "kakuzu" }) },
+  sasori: { label: "Akatsuki: Sasori", match: (e) => e.typeId === "aegis:akatsuki" && member(e) === "sasori", spawn: spawnNinja("akatsuki", { member: "sasori" }) },
+  zetsu: { label: "Akatsuki: Zetsu", match: (e) => e.typeId === "aegis:akatsuki" && member(e) === "zetsu", spawn: spawnNinja("akatsuki", { member: "zetsu" }) },
+  tobi: { label: "Akatsuki: Tobi", match: (e) => e.typeId === "aegis:akatsuki" && member(e) === "tobi", spawn: spawnNinja("akatsuki", { member: "tobi" }) },
   bijuu: { label: "Any Tailed Beast", match: (e) => BEASTS.some((b) => e.typeId === `aegis:${b}`),
     spawn: (dim, at, tags) => spawnPlain(`aegis:${BEASTS[Math.floor(Math.random() * BEASTS.length)]}`)(dim, at, tags) },
   ...Object.fromEntries(BEASTS.map((b) => [b, { label: `Tailed Beast: ${cap(b)}`, match: (e) => e.typeId === `aegis:${b}`, spawn: spawnPlain(`aegis:${b}`) }])),
@@ -70,7 +77,7 @@ export const QUEST_TARGETS = {
   }])),
 };
 const TARGET_IDS = Object.keys(QUEST_TARGETS);
-const BIG = (id) => id === "bijuu" || BEASTS.includes(id) || id.startsWith("legend_") || ["akatsuki", "itachi", "kisame", "deidara"].includes(id);
+const BIG = (id) => id === "bijuu" || BEASTS.includes(id) || id.startsWith("legend_") || ["akatsuki", "itachi", "kisame", "deidara", "pain", "konan", "hidan", "kakuzu", "sasori", "zetsu", "tobi"].includes(id);
 
 // Reward items offered in the quest editor ("Item in my hand" covers everything else).
 const REWARD_ITEMS = [

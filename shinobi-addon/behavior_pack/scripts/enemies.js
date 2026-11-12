@@ -6,6 +6,7 @@ import { showTitle } from "./hud.js";
 import { NPC_TYPES, AKATSUKI, setupNpc } from "./npcs.js";
 import { initLegends, legendTick, updateLegend } from "./legends.js";
 import { registerCast, inClash } from "./clash.js";
+import { MORE_MEMBER_AI, initAkatsuki2 } from "./akatsuki2.js";
 
 const DIMENSIONS = ["overworld", "nether", "the_end"];
 let api;
@@ -298,7 +299,7 @@ export function initEnemies(helpers) {
     if (hurtEntity.typeId !== "aegis:hostile_ninja" && hurtEntity.typeId !== "aegis:akatsuki") return;
     const role = hurtEntity.getDynamicProperty("aegis:role");
     const member = hurtEntity.getDynamicProperty("aegis:member");
-    const chance = member === "itachi" ? 0.3 : role === "anbu" ? 0.25 : role === "rogue" ? 0.15 : 0;
+    const chance = member === "itachi" ? 0.3 : member === "konan" ? 0.25 : role === "anbu" ? 0.25 : role === "rogue" ? 0.15 : 0;
     const st = state.get(hurtEntity.id) ?? {};
     const attacker = damageSource?.damagingEntity;
     if (!attacker || Math.random() > chance || system.currentTick < (st.subNext ?? 0)) return;
@@ -333,5 +334,7 @@ export function initEnemies(helpers) {
     }
   }, 6000);
 
+  Object.assign(MEMBER_AI, MORE_MEMBER_AI);
+  initAkatsuki2(helpers);
   for (const k of Object.keys(AKATSUKI)) if (!MEMBER_AI[k]) throw new Error(`missing AI for ${k}`);
 }

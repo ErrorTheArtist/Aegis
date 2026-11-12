@@ -27,7 +27,15 @@
         "s17": "textures/entity/aegis/npc/sasuke",
         "s18": "textures/entity/aegis/npc/tsunade",
         "s19": "textures/entity/aegis/npc/sarutobi",
-        "s20": "textures/entity/aegis/npc/minato"
+        "s20": "textures/entity/aegis/npc/minato",
+        "s21": "textures/entity/aegis/npc/pain",
+        "s22": "textures/entity/aegis/npc/konan",
+        "s23": "textures/entity/aegis/npc/hidan",
+        "s24": "textures/entity/aegis/npc/hidan_jashin",
+        "s25": "textures/entity/aegis/npc/kakuzu",
+        "s26": "textures/entity/aegis/npc/sasori",
+        "s27": "textures/entity/aegis/npc/zetsu",
+        "s28": "textures/entity/aegis/npc/tobi"
       },
       "geometry": {
         "default": "geometry.humanoid.custom"
@@ -40,15 +48,15 @@
         "bob": "animation.humanoid.bob"
       },
       "scripts": {
+        "pre_animation": [
+          "variable.tcos0 = (math.cos(query.modified_distance_moved * 38.17) * query.modified_move_speed) * 57.3;"
+        ],
         "animate": [
           "humanoid_base_pose",
           "look_at_target",
           "move",
           "attack.rotations",
           "bob"
-        ],
-        "pre_animation": [
-          "variable.tcos0 = (math.cos(query.modified_distance_moved * 38.17) * query.modified_move_speed) * 57.3;"
         ]
       },
       "render_controllers": [

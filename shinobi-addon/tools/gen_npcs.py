@@ -219,6 +219,15 @@ SKINS = [
                       belt=(200, 30, 30), skin=(210, 170, 135))),
     ("minato", dict(hair=(250, 215, 70), top=(40, 50, 90), pants=(40, 50, 90), vest=(80, 110, 60), band=((40, 60, 140), STEEL),
                     haori=((245, 245, 245), (210, 40, 30)), eyes=(60, 120, 230), hair_side=5, bangs=3)),
+    # the rest of the Akatsuki (hand-made skins in tools/skins/)
+    ("pain", dict(hair=(30, 30, 30), cloak=True, top=(20, 20, 25), pants=(30, 30, 50))),
+    ("konan", dict(hair=(30, 30, 30), cloak=True, top=(20, 20, 25), pants=(30, 30, 50))),
+    ("hidan", dict(hair=(30, 30, 30), cloak=True, top=(20, 20, 25), pants=(30, 30, 50))),
+    ("hidan_jashin", dict(hair=(30, 30, 30), cloak=True, top=(20, 20, 25), pants=(30, 30, 50))),
+    ("kakuzu", dict(hair=(30, 30, 30), cloak=True, top=(20, 20, 25), pants=(30, 30, 50))),
+    ("sasori", dict(hair=(30, 30, 30), cloak=True, top=(20, 20, 25), pants=(30, 30, 50))),
+    ("zetsu", dict(hair=(30, 30, 30), cloak=True, top=(20, 20, 25), pants=(30, 30, 50))),
+    ("tobi", dict(hair=(30, 30, 30), cloak=True, top=(20, 20, 25), pants=(30, 30, 50))),
 ]
 (RP / "textures" / "entity" / "aegis" / "npc").mkdir(parents=True, exist_ok=True)
 for name, o in SKINS:

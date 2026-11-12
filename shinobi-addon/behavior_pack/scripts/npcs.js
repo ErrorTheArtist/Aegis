@@ -22,7 +22,8 @@ const SPAWNER = "aegis:npc_spawner";
 const INDEX_PROP = "aegis:spawners";
 const SKIN_NAMES = ["Sensei", "Elder", "Weaponsmith", "Ramen chef", "Hokage", "Proctor", "Genin (orange)", "Genin (blue)",
   "Genin (pink)", "Rogue ninja", "Sound ninja", "Anbu", "Itachi", "Kisame", "Deidara", "Leaf chūnin",
-  "Naruto", "Sasuke", "Tsunade", "Hiruzen Sarutobi", "Minato"];
+  "Naruto", "Sasuke", "Tsunade", "Hiruzen Sarutobi", "Minato",
+  "Pain", "Konan", "Hidan", "Hidan (Jashin form)", "Kakuzu", "Sasori", "Zetsu", "Tobi"];
 
 export const NPC_TYPES = {
   sensei: { label: "Jutsu Sensei (jutsu shop)", entity: "aegis:npc", skin: 0, name: "§bJutsu Sensei", friendly: true,
@@ -59,6 +60,13 @@ export const AKATSUKI = {
   itachi: { name: "§cItachi Uchiha", skin: 12 },
   kisame: { name: "§9Kisame Hoshigaki", skin: 13 },
   deidara: { name: "§eDeidara", skin: 14 },
+  pain: { name: "§5Pain", skin: 21 },
+  konan: { name: "§9Konan", skin: 22 },
+  hidan: { name: "§fHidan", skin: 23 },
+  kakuzu: { name: "§2Kakuzu", skin: 25 },
+  sasori: { name: "§cSasori", skin: 26 },
+  zetsu: { name: "§aZetsu", skin: 27 },
+  tobi: { name: "§6Tobi", skin: 28 },
 };
 const MEMBER_IDS = ["random", ...Object.keys(AKATSUKI)];
 
@@ -237,7 +245,7 @@ function resolveSkin(cfg) {
 
 export function setupNpc(e, cfg, extra = {}) {
   const t = NPC_TYPES[cfg.type];
-  const member = cfg.type === "akatsuki" ? (cfg.member === "random" ? Object.keys(AKATSUKI)[Math.floor(Math.random() * 3)] : cfg.member) : undefined;
+  const member = cfg.type === "akatsuki" ? (cfg.member === "random" ? Object.keys(AKATSUKI)[Math.floor(Math.random() * Object.keys(AKATSUKI).length)] : cfg.member) : undefined;
   cfg.memberResolved = member;
   try {
     if (cfg.key) e.addTag(tagOf(cfg.key));
@@ -382,7 +390,7 @@ async function configure(player, cfg) {
     .textField("Name (empty = default; § colour codes work)", "default", cfg.name)
     .dropdown("Outfit", ["Default for this NPC", ...SKIN_NAMES], cfg.skin + 1)
     .dropdown("Clan (Clan Elder only)", clanIds.map((c) => (c === "random" ? "Random" : CLANS[c].name)), Math.max(0, clanIds.indexOf(cfg.clan)))
-    .dropdown("Akatsuki member (Akatsuki only)", ["Random", "Itachi", "Kisame", "Deidara"], Math.max(0, MEMBER_IDS.indexOf(cfg.member)))
+    .dropdown("Akatsuki member (Akatsuki only)", ["Random", ...Object.values(AKATSUKI).map((m) => m.name.replace(/§./g, ""))], Math.max(0, MEMBER_IDS.indexOf(cfg.member)))
     .slider("How many to keep spawned", 1, 6, 1, cfg.count)
     .toggle("Respawn when killed / removed", cfg.respawn)
     .slider("Respawn delay (seconds)", 5, 600, 5, Math.max(5, cfg.delay))

@@ -276,6 +276,13 @@ roots + healing you, Water Dragon + Flying Raijin). Their jutsu are cast in your
 never hit you or your companions, and kills count for you. Then their soul returns to the afterlife and the body crumbles.
 One reanimation at a time.
 
+**The summoning cinematic** (about 7 seconds, the caster's camera; the caster can't move or be hurt during it):
+close-up on the hand seals **Tiger → Serpent → Dog → Dragon** → the palms slam the ground and talismans spread →
+*ゴゴゴ* a wooden **coffin rises out of the earth** with the ground shaking → the camera pushes in → the **lid falls
+forward** with a crash of dust → the reanimated shinobi stands inside, ashen and cracked → **EDO TENSEI**. Everyone
+nearby sees the coffin rise and open; it crumbles to dust a few seconds later. If the caster is already in another
+cinematic (e.g. a jutsu clash) the coffin still rises, without the camera work.
+
 ## Tailed Beasts (bosses)
 
 Nine boss mobs with a boss bar, their own models and animations, a chakra aura, and a full move set:

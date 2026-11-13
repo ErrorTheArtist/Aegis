@@ -28,6 +28,40 @@
             ]
           }
         },
+        "jaw": {
+          "rotation": {
+            "0.0": [
+              0,
+              0,
+              0
+            ],
+            "0.2": [
+              34,
+              0,
+              0
+            ],
+            "0.5": [
+              30,
+              0,
+              0
+            ],
+            "0.8": [
+              34,
+              0,
+              0
+            ],
+            "1.2": [
+              32,
+              0,
+              0
+            ],
+            "1.6": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
         "body": {
           "rotation": {
             "0.0": [
@@ -64,38 +98,115 @@
             0
           ]
         },
+        "body": {
+          "position": [
+            0,
+            "math.sin(q.life_time * 90) * 0.5",
+            0
+          ]
+        },
+        "jaw": {
+          "rotation": [
+            "4 + math.sin(q.life_time * 90) * 3 + math.sin(v.attack_time * 180) * 28",
+            0,
+            0
+          ]
+        },
         "leg0": {
           "rotation": [
-            "1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            "1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg0_l": {
+          "rotation": [
+            "math.max(0, -1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)) * 0.7",
             0,
             0
           ]
         },
         "leg1": {
           "rotation": [
-            "-1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            "-1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg1_l": {
+          "rotation": [
+            "math.max(0, 1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)) * 0.7",
             0,
             0
           ]
         },
         "leg2": {
           "rotation": [
-            "-1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            "-1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg2_l": {
+          "rotation": [
+            "math.max(0, 1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)) * 0.7",
             0,
             0
           ]
         },
         "leg3": {
           "rotation": [
-            "1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            "1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)",
             0,
             0
           ]
         },
-        "tail0": {
+        "leg3_l": {
           "rotation": [
-            "math.sin(q.life_time * 70 + 0) * 7",
-            "math.cos(q.life_time * 55 + 0) * 9",
+            "math.max(0, -1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)) * 0.7",
+            0,
+            0
+          ]
+        },
+        "tail0_0": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 0 - 0) * 3.0",
+            "math.cos(q.life_time * 62 + 0 - 0) * 3.6",
+            0
+          ]
+        },
+        "tail0_1": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 0 - 38) * 4.6",
+            "math.cos(q.life_time * 62 + 0 - 33) * 5.5",
+            0
+          ]
+        },
+        "tail0_2": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 0 - 76) * 6.2",
+            "math.cos(q.life_time * 62 + 0 - 66) * 7.4",
+            0
+          ]
+        },
+        "tail0_3": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 0 - 114) * 7.8",
+            "math.cos(q.life_time * 62 + 0 - 99) * 9.4",
+            0
+          ]
+        },
+        "tail0_4": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 0 - 152) * 9.4",
+            "math.cos(q.life_time * 62 + 0 - 132) * 11.3",
+            0
+          ]
+        },
+        "tail0_5": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 0 - 190) * 11.0",
+            "math.cos(q.life_time * 62 + 0 - 165) * 13.2",
             0
           ]
         }
@@ -111,45 +222,185 @@
             0
           ]
         },
+        "body": {
+          "position": [
+            0,
+            "math.sin(q.life_time * 90) * 0.5",
+            0
+          ]
+        },
+        "jaw": {
+          "rotation": [
+            "4 + math.sin(q.life_time * 90) * 3 + math.sin(v.attack_time * 180) * 28",
+            0,
+            0
+          ]
+        },
         "leg0": {
           "rotation": [
-            "1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            "1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg0_l": {
+          "rotation": [
+            "math.max(0, -1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)) * 0.7",
             0,
             0
           ]
         },
         "leg1": {
           "rotation": [
-            "-1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            "-1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg1_l": {
+          "rotation": [
+            "math.max(0, 1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)) * 0.7",
             0,
             0
           ]
         },
         "leg2": {
           "rotation": [
-            "-1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            "-1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg2_l": {
+          "rotation": [
+            "math.max(0, 1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)) * 0.7",
             0,
             0
           ]
         },
         "leg3": {
           "rotation": [
-            "1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            "1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)",
             0,
             0
           ]
         },
-        "tail0": {
+        "leg3_l": {
           "rotation": [
-            "math.sin(q.life_time * 70 + 0) * 7",
-            "math.cos(q.life_time * 55 + 0) * 9",
+            "math.max(0, -1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)) * 0.7",
+            0,
             0
           ]
         },
-        "tail1": {
+        "tail0_0": {
           "rotation": [
-            "math.sin(q.life_time * 70 + 40) * 7",
-            "math.cos(q.life_time * 55 + 55) * 9",
+            "math.sin(q.life_time * 80 + 0 - 0) * 3.0",
+            "math.cos(q.life_time * 62 + 0 - 0) * 3.6",
+            0
+          ]
+        },
+        "tail0_1": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 0 - 38) * 4.6",
+            "math.cos(q.life_time * 62 + 0 - 33) * 5.5",
+            0
+          ]
+        },
+        "tail0_2": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 0 - 76) * 6.2",
+            "math.cos(q.life_time * 62 + 0 - 66) * 7.4",
+            0
+          ]
+        },
+        "tail0_3": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 0 - 114) * 7.8",
+            "math.cos(q.life_time * 62 + 0 - 99) * 9.4",
+            0
+          ]
+        },
+        "tail0_4": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 0 - 152) * 9.4",
+            "math.cos(q.life_time * 62 + 0 - 132) * 11.3",
+            0
+          ]
+        },
+        "tail0_5": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 0 - 190) * 11.0",
+            "math.cos(q.life_time * 62 + 0 - 165) * 13.2",
+            0
+          ]
+        },
+        "tail0_6": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 0 - 228) * 12.6",
+            "math.cos(q.life_time * 62 + 0 - 198) * 15.1",
+            0
+          ]
+        },
+        "tail0_7": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 0 - 266) * 14.2",
+            "math.cos(q.life_time * 62 + 0 - 231) * 17.0",
+            0
+          ]
+        },
+        "tail1_0": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 47 - 0) * 3.0",
+            "math.cos(q.life_time * 62 + 61 - 0) * 3.6",
+            0
+          ]
+        },
+        "tail1_1": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 47 - 38) * 4.6",
+            "math.cos(q.life_time * 62 + 61 - 33) * 5.5",
+            0
+          ]
+        },
+        "tail1_2": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 47 - 76) * 6.2",
+            "math.cos(q.life_time * 62 + 61 - 66) * 7.4",
+            0
+          ]
+        },
+        "tail1_3": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 47 - 114) * 7.8",
+            "math.cos(q.life_time * 62 + 61 - 99) * 9.4",
+            0
+          ]
+        },
+        "tail1_4": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 47 - 152) * 9.4",
+            "math.cos(q.life_time * 62 + 61 - 132) * 11.3",
+            0
+          ]
+        },
+        "tail1_5": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 47 - 190) * 11.0",
+            "math.cos(q.life_time * 62 + 61 - 165) * 13.2",
+            0
+          ]
+        },
+        "tail1_6": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 47 - 228) * 12.6",
+            "math.cos(q.life_time * 62 + 61 - 198) * 15.1",
+            0
+          ]
+        },
+        "tail1_7": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 47 - 266) * 14.2",
+            "math.cos(q.life_time * 62 + 61 - 231) * 17.0",
             0
           ]
         }
@@ -165,52 +416,178 @@
             0
           ]
         },
+        "body": {
+          "position": [
+            0,
+            "math.sin(q.life_time * 90) * 0.5",
+            0
+          ]
+        },
+        "jaw": {
+          "rotation": [
+            "4 + math.sin(q.life_time * 90) * 3 + math.sin(v.attack_time * 180) * 28",
+            0,
+            0
+          ]
+        },
         "leg0": {
           "rotation": [
-            "1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            "1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg0_l": {
+          "rotation": [
+            "math.max(0, -1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)) * 0.7",
             0,
             0
           ]
         },
         "leg1": {
           "rotation": [
-            "-1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            "-1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg1_l": {
+          "rotation": [
+            "math.max(0, 1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)) * 0.7",
             0,
             0
           ]
         },
         "leg2": {
           "rotation": [
-            "-1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            "-1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg2_l": {
+          "rotation": [
+            "math.max(0, 1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)) * 0.7",
             0,
             0
           ]
         },
         "leg3": {
           "rotation": [
-            "1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            "1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)",
             0,
             0
           ]
         },
-        "tail0": {
+        "leg3_l": {
           "rotation": [
-            "math.sin(q.life_time * 70 + 0) * 7",
-            "math.cos(q.life_time * 55 + 0) * 9",
+            "math.max(0, -1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)) * 0.7",
+            0,
             0
           ]
         },
-        "tail1": {
+        "tail0_0": {
           "rotation": [
-            "math.sin(q.life_time * 70 + 40) * 7",
-            "math.cos(q.life_time * 55 + 55) * 9",
+            "math.sin(q.life_time * 80 + 0 - 0) * 3.0",
+            "math.cos(q.life_time * 62 + 0 - 0) * 3.6",
             0
           ]
         },
-        "tail2": {
+        "tail0_1": {
           "rotation": [
-            "math.sin(q.life_time * 70 + 80) * 7",
-            "math.cos(q.life_time * 55 + 110) * 9",
+            "math.sin(q.life_time * 80 + 0 - 38) * 4.6",
+            "math.cos(q.life_time * 62 + 0 - 33) * 5.5",
+            0
+          ]
+        },
+        "tail0_2": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 0 - 76) * 6.2",
+            "math.cos(q.life_time * 62 + 0 - 66) * 7.4",
+            0
+          ]
+        },
+        "tail0_3": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 0 - 114) * 7.8",
+            "math.cos(q.life_time * 62 + 0 - 99) * 9.4",
+            0
+          ]
+        },
+        "tail0_4": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 0 - 152) * 9.4",
+            "math.cos(q.life_time * 62 + 0 - 132) * 11.3",
+            0
+          ]
+        },
+        "tail1_0": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 47 - 0) * 3.0",
+            "math.cos(q.life_time * 62 + 61 - 0) * 3.6",
+            0
+          ]
+        },
+        "tail1_1": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 47 - 38) * 4.6",
+            "math.cos(q.life_time * 62 + 61 - 33) * 5.5",
+            0
+          ]
+        },
+        "tail1_2": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 47 - 76) * 6.2",
+            "math.cos(q.life_time * 62 + 61 - 66) * 7.4",
+            0
+          ]
+        },
+        "tail1_3": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 47 - 114) * 7.8",
+            "math.cos(q.life_time * 62 + 61 - 99) * 9.4",
+            0
+          ]
+        },
+        "tail1_4": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 47 - 152) * 9.4",
+            "math.cos(q.life_time * 62 + 61 - 132) * 11.3",
+            0
+          ]
+        },
+        "tail2_0": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 94 - 0) * 3.0",
+            "math.cos(q.life_time * 62 + 122 - 0) * 3.6",
+            0
+          ]
+        },
+        "tail2_1": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 94 - 38) * 4.6",
+            "math.cos(q.life_time * 62 + 122 - 33) * 5.5",
+            0
+          ]
+        },
+        "tail2_2": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 94 - 76) * 6.2",
+            "math.cos(q.life_time * 62 + 122 - 66) * 7.4",
+            0
+          ]
+        },
+        "tail2_3": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 94 - 114) * 7.8",
+            "math.cos(q.life_time * 62 + 122 - 99) * 9.4",
+            0
+          ]
+        },
+        "tail2_4": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 94 - 152) * 9.4",
+            "math.cos(q.life_time * 62 + 122 - 132) * 11.3",
             0
           ]
         }
@@ -226,59 +603,269 @@
             0
           ]
         },
+        "body": {
+          "position": [
+            0,
+            "math.sin(q.life_time * 90) * 0.5",
+            0
+          ]
+        },
+        "jaw": {
+          "rotation": [
+            "4 + math.sin(q.life_time * 90) * 3 + math.sin(v.attack_time * 180) * 28",
+            0,
+            0
+          ]
+        },
         "leg0": {
           "rotation": [
-            "1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            "1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg0_l": {
+          "rotation": [
+            "math.max(0, -1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)) * 0.7",
             0,
             0
           ]
         },
         "leg1": {
           "rotation": [
-            "-1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            "-1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg1_l": {
+          "rotation": [
+            "math.max(0, 1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)) * 0.7",
             0,
             0
           ]
         },
         "leg2": {
           "rotation": [
-            "-1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            "-1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg2_l": {
+          "rotation": [
+            "math.max(0, 1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)) * 0.7",
             0,
             0
           ]
         },
         "leg3": {
           "rotation": [
-            "1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            "1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)",
             0,
             0
           ]
         },
-        "tail0": {
+        "leg3_l": {
           "rotation": [
-            "math.sin(q.life_time * 70 + 0) * 7",
-            "math.cos(q.life_time * 55 + 0) * 9",
+            "math.max(0, -1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)) * 0.7",
+            0,
             0
           ]
         },
-        "tail1": {
+        "tail0_0": {
           "rotation": [
-            "math.sin(q.life_time * 70 + 40) * 7",
-            "math.cos(q.life_time * 55 + 55) * 9",
+            "math.sin(q.life_time * 80 + 0 - 0) * 3.0",
+            "math.cos(q.life_time * 62 + 0 - 0) * 3.6",
             0
           ]
         },
-        "tail2": {
+        "tail0_1": {
           "rotation": [
-            "math.sin(q.life_time * 70 + 80) * 7",
-            "math.cos(q.life_time * 55 + 110) * 9",
+            "math.sin(q.life_time * 80 + 0 - 38) * 4.6",
+            "math.cos(q.life_time * 62 + 0 - 33) * 5.5",
             0
           ]
         },
-        "tail3": {
+        "tail0_2": {
           "rotation": [
-            "math.sin(q.life_time * 70 + 120) * 7",
-            "math.cos(q.life_time * 55 + 165) * 9",
+            "math.sin(q.life_time * 80 + 0 - 76) * 6.2",
+            "math.cos(q.life_time * 62 + 0 - 66) * 7.4",
+            0
+          ]
+        },
+        "tail0_3": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 0 - 114) * 7.8",
+            "math.cos(q.life_time * 62 + 0 - 99) * 9.4",
+            0
+          ]
+        },
+        "tail0_4": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 0 - 152) * 9.4",
+            "math.cos(q.life_time * 62 + 0 - 132) * 11.3",
+            0
+          ]
+        },
+        "tail0_5": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 0 - 190) * 11.0",
+            "math.cos(q.life_time * 62 + 0 - 165) * 13.2",
+            0
+          ]
+        },
+        "tail0_6": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 0 - 228) * 12.6",
+            "math.cos(q.life_time * 62 + 0 - 198) * 15.1",
+            0
+          ]
+        },
+        "tail1_0": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 47 - 0) * 3.0",
+            "math.cos(q.life_time * 62 + 61 - 0) * 3.6",
+            0
+          ]
+        },
+        "tail1_1": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 47 - 38) * 4.6",
+            "math.cos(q.life_time * 62 + 61 - 33) * 5.5",
+            0
+          ]
+        },
+        "tail1_2": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 47 - 76) * 6.2",
+            "math.cos(q.life_time * 62 + 61 - 66) * 7.4",
+            0
+          ]
+        },
+        "tail1_3": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 47 - 114) * 7.8",
+            "math.cos(q.life_time * 62 + 61 - 99) * 9.4",
+            0
+          ]
+        },
+        "tail1_4": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 47 - 152) * 9.4",
+            "math.cos(q.life_time * 62 + 61 - 132) * 11.3",
+            0
+          ]
+        },
+        "tail1_5": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 47 - 190) * 11.0",
+            "math.cos(q.life_time * 62 + 61 - 165) * 13.2",
+            0
+          ]
+        },
+        "tail1_6": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 47 - 228) * 12.6",
+            "math.cos(q.life_time * 62 + 61 - 198) * 15.1",
+            0
+          ]
+        },
+        "tail2_0": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 94 - 0) * 3.0",
+            "math.cos(q.life_time * 62 + 122 - 0) * 3.6",
+            0
+          ]
+        },
+        "tail2_1": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 94 - 38) * 4.6",
+            "math.cos(q.life_time * 62 + 122 - 33) * 5.5",
+            0
+          ]
+        },
+        "tail2_2": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 94 - 76) * 6.2",
+            "math.cos(q.life_time * 62 + 122 - 66) * 7.4",
+            0
+          ]
+        },
+        "tail2_3": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 94 - 114) * 7.8",
+            "math.cos(q.life_time * 62 + 122 - 99) * 9.4",
+            0
+          ]
+        },
+        "tail2_4": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 94 - 152) * 9.4",
+            "math.cos(q.life_time * 62 + 122 - 132) * 11.3",
+            0
+          ]
+        },
+        "tail2_5": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 94 - 190) * 11.0",
+            "math.cos(q.life_time * 62 + 122 - 165) * 13.2",
+            0
+          ]
+        },
+        "tail2_6": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 94 - 228) * 12.6",
+            "math.cos(q.life_time * 62 + 122 - 198) * 15.1",
+            0
+          ]
+        },
+        "tail3_0": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 141 - 0) * 3.0",
+            "math.cos(q.life_time * 62 + 183 - 0) * 3.6",
+            0
+          ]
+        },
+        "tail3_1": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 141 - 38) * 4.6",
+            "math.cos(q.life_time * 62 + 183 - 33) * 5.5",
+            0
+          ]
+        },
+        "tail3_2": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 141 - 76) * 6.2",
+            "math.cos(q.life_time * 62 + 183 - 66) * 7.4",
+            0
+          ]
+        },
+        "tail3_3": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 141 - 114) * 7.8",
+            "math.cos(q.life_time * 62 + 183 - 99) * 9.4",
+            0
+          ]
+        },
+        "tail3_4": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 141 - 152) * 9.4",
+            "math.cos(q.life_time * 62 + 183 - 132) * 11.3",
+            0
+          ]
+        },
+        "tail3_5": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 141 - 190) * 11.0",
+            "math.cos(q.life_time * 62 + 183 - 165) * 13.2",
+            0
+          ]
+        },
+        "tail3_6": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 141 - 228) * 12.6",
+            "math.cos(q.life_time * 62 + 183 - 198) * 15.1",
             0
           ]
         }
@@ -294,66 +881,353 @@
             0
           ]
         },
+        "body": {
+          "position": [
+            0,
+            "math.sin(q.life_time * 90) * 0.5",
+            0
+          ]
+        },
+        "jaw": {
+          "rotation": [
+            "4 + math.sin(q.life_time * 90) * 3 + math.sin(v.attack_time * 180) * 28",
+            0,
+            0
+          ]
+        },
         "leg0": {
           "rotation": [
-            "1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            "1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg0_l": {
+          "rotation": [
+            "math.max(0, -1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)) * 0.7",
             0,
             0
           ]
         },
         "leg1": {
           "rotation": [
-            "-1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            "-1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg1_l": {
+          "rotation": [
+            "math.max(0, 1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)) * 0.7",
             0,
             0
           ]
         },
         "leg2": {
           "rotation": [
-            "-1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            "-1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg2_l": {
+          "rotation": [
+            "math.max(0, 1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)) * 0.7",
             0,
             0
           ]
         },
         "leg3": {
           "rotation": [
-            "1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            "1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)",
             0,
             0
           ]
         },
-        "tail0": {
+        "leg3_l": {
           "rotation": [
-            "math.sin(q.life_time * 70 + 0) * 7",
-            "math.cos(q.life_time * 55 + 0) * 9",
+            "math.max(0, -1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)) * 0.7",
+            0,
             0
           ]
         },
-        "tail1": {
+        "tail0_0": {
           "rotation": [
-            "math.sin(q.life_time * 70 + 40) * 7",
-            "math.cos(q.life_time * 55 + 55) * 9",
+            "math.sin(q.life_time * 80 + 0 - 0) * 3.0",
+            "math.cos(q.life_time * 62 + 0 - 0) * 3.6",
             0
           ]
         },
-        "tail2": {
+        "tail0_1": {
           "rotation": [
-            "math.sin(q.life_time * 70 + 80) * 7",
-            "math.cos(q.life_time * 55 + 110) * 9",
+            "math.sin(q.life_time * 80 + 0 - 38) * 4.6",
+            "math.cos(q.life_time * 62 + 0 - 33) * 5.5",
             0
           ]
         },
-        "tail3": {
+        "tail0_2": {
           "rotation": [
-            "math.sin(q.life_time * 70 + 120) * 7",
-            "math.cos(q.life_time * 55 + 165) * 9",
+            "math.sin(q.life_time * 80 + 0 - 76) * 6.2",
+            "math.cos(q.life_time * 62 + 0 - 66) * 7.4",
             0
           ]
         },
-        "tail4": {
+        "tail0_3": {
           "rotation": [
-            "math.sin(q.life_time * 70 + 160) * 7",
-            "math.cos(q.life_time * 55 + 220) * 9",
+            "math.sin(q.life_time * 80 + 0 - 114) * 7.8",
+            "math.cos(q.life_time * 62 + 0 - 99) * 9.4",
+            0
+          ]
+        },
+        "tail0_4": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 0 - 152) * 9.4",
+            "math.cos(q.life_time * 62 + 0 - 132) * 11.3",
+            0
+          ]
+        },
+        "tail0_5": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 0 - 190) * 11.0",
+            "math.cos(q.life_time * 62 + 0 - 165) * 13.2",
+            0
+          ]
+        },
+        "tail0_6": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 0 - 228) * 12.6",
+            "math.cos(q.life_time * 62 + 0 - 198) * 15.1",
+            0
+          ]
+        },
+        "tail0_7": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 0 - 266) * 14.2",
+            "math.cos(q.life_time * 62 + 0 - 231) * 17.0",
+            0
+          ]
+        },
+        "tail1_0": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 47 - 0) * 3.0",
+            "math.cos(q.life_time * 62 + 61 - 0) * 3.6",
+            0
+          ]
+        },
+        "tail1_1": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 47 - 38) * 4.6",
+            "math.cos(q.life_time * 62 + 61 - 33) * 5.5",
+            0
+          ]
+        },
+        "tail1_2": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 47 - 76) * 6.2",
+            "math.cos(q.life_time * 62 + 61 - 66) * 7.4",
+            0
+          ]
+        },
+        "tail1_3": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 47 - 114) * 7.8",
+            "math.cos(q.life_time * 62 + 61 - 99) * 9.4",
+            0
+          ]
+        },
+        "tail1_4": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 47 - 152) * 9.4",
+            "math.cos(q.life_time * 62 + 61 - 132) * 11.3",
+            0
+          ]
+        },
+        "tail1_5": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 47 - 190) * 11.0",
+            "math.cos(q.life_time * 62 + 61 - 165) * 13.2",
+            0
+          ]
+        },
+        "tail1_6": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 47 - 228) * 12.6",
+            "math.cos(q.life_time * 62 + 61 - 198) * 15.1",
+            0
+          ]
+        },
+        "tail1_7": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 47 - 266) * 14.2",
+            "math.cos(q.life_time * 62 + 61 - 231) * 17.0",
+            0
+          ]
+        },
+        "tail2_0": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 94 - 0) * 3.0",
+            "math.cos(q.life_time * 62 + 122 - 0) * 3.6",
+            0
+          ]
+        },
+        "tail2_1": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 94 - 38) * 4.6",
+            "math.cos(q.life_time * 62 + 122 - 33) * 5.5",
+            0
+          ]
+        },
+        "tail2_2": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 94 - 76) * 6.2",
+            "math.cos(q.life_time * 62 + 122 - 66) * 7.4",
+            0
+          ]
+        },
+        "tail2_3": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 94 - 114) * 7.8",
+            "math.cos(q.life_time * 62 + 122 - 99) * 9.4",
+            0
+          ]
+        },
+        "tail2_4": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 94 - 152) * 9.4",
+            "math.cos(q.life_time * 62 + 122 - 132) * 11.3",
+            0
+          ]
+        },
+        "tail2_5": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 94 - 190) * 11.0",
+            "math.cos(q.life_time * 62 + 122 - 165) * 13.2",
+            0
+          ]
+        },
+        "tail2_6": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 94 - 228) * 12.6",
+            "math.cos(q.life_time * 62 + 122 - 198) * 15.1",
+            0
+          ]
+        },
+        "tail2_7": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 94 - 266) * 14.2",
+            "math.cos(q.life_time * 62 + 122 - 231) * 17.0",
+            0
+          ]
+        },
+        "tail3_0": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 141 - 0) * 3.0",
+            "math.cos(q.life_time * 62 + 183 - 0) * 3.6",
+            0
+          ]
+        },
+        "tail3_1": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 141 - 38) * 4.6",
+            "math.cos(q.life_time * 62 + 183 - 33) * 5.5",
+            0
+          ]
+        },
+        "tail3_2": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 141 - 76) * 6.2",
+            "math.cos(q.life_time * 62 + 183 - 66) * 7.4",
+            0
+          ]
+        },
+        "tail3_3": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 141 - 114) * 7.8",
+            "math.cos(q.life_time * 62 + 183 - 99) * 9.4",
+            0
+          ]
+        },
+        "tail3_4": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 141 - 152) * 9.4",
+            "math.cos(q.life_time * 62 + 183 - 132) * 11.3",
+            0
+          ]
+        },
+        "tail3_5": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 141 - 190) * 11.0",
+            "math.cos(q.life_time * 62 + 183 - 165) * 13.2",
+            0
+          ]
+        },
+        "tail3_6": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 141 - 228) * 12.6",
+            "math.cos(q.life_time * 62 + 183 - 198) * 15.1",
+            0
+          ]
+        },
+        "tail3_7": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 141 - 266) * 14.2",
+            "math.cos(q.life_time * 62 + 183 - 231) * 17.0",
+            0
+          ]
+        },
+        "tail4_0": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 188 - 0) * 3.0",
+            "math.cos(q.life_time * 62 + 244 - 0) * 3.6",
+            0
+          ]
+        },
+        "tail4_1": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 188 - 38) * 4.6",
+            "math.cos(q.life_time * 62 + 244 - 33) * 5.5",
+            0
+          ]
+        },
+        "tail4_2": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 188 - 76) * 6.2",
+            "math.cos(q.life_time * 62 + 244 - 66) * 7.4",
+            0
+          ]
+        },
+        "tail4_3": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 188 - 114) * 7.8",
+            "math.cos(q.life_time * 62 + 244 - 99) * 9.4",
+            0
+          ]
+        },
+        "tail4_4": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 188 - 152) * 9.4",
+            "math.cos(q.life_time * 62 + 244 - 132) * 11.3",
+            0
+          ]
+        },
+        "tail4_5": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 188 - 190) * 11.0",
+            "math.cos(q.life_time * 62 + 244 - 165) * 13.2",
+            0
+          ]
+        },
+        "tail4_6": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 188 - 228) * 12.6",
+            "math.cos(q.life_time * 62 + 244 - 198) * 15.1",
+            0
+          ]
+        },
+        "tail4_7": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 188 - 266) * 14.2",
+            "math.cos(q.life_time * 62 + 244 - 231) * 17.0",
             0
           ]
         }
@@ -369,45 +1243,248 @@
             0
           ]
         },
-        "tail0": {
-          "rotation": [
-            "math.sin(q.life_time * 70 + 0) * 7",
-            "math.cos(q.life_time * 55 + 0) * 9",
+        "body": {
+          "position": [
+            0,
+            "math.sin(q.life_time * 90) * 0.5",
             0
           ]
         },
-        "tail1": {
+        "leg0": {
           "rotation": [
-            "math.sin(q.life_time * 70 + 40) * 7",
-            "math.cos(q.life_time * 55 + 55) * 9",
+            "1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
             0
           ]
         },
-        "tail2": {
+        "leg0_l": {
           "rotation": [
-            "math.sin(q.life_time * 70 + 80) * 7",
-            "math.cos(q.life_time * 55 + 110) * 9",
+            "math.max(0, -1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)) * 0.7",
+            0,
             0
           ]
         },
-        "tail3": {
+        "leg1": {
           "rotation": [
-            "math.sin(q.life_time * 70 + 120) * 7",
-            "math.cos(q.life_time * 55 + 165) * 9",
+            "-1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
             0
           ]
         },
-        "tail4": {
+        "leg1_l": {
           "rotation": [
-            "math.sin(q.life_time * 70 + 160) * 7",
-            "math.cos(q.life_time * 55 + 220) * 9",
+            "math.max(0, 1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)) * 0.7",
+            0,
             0
           ]
         },
-        "tail5": {
+        "tail0_0": {
           "rotation": [
-            "math.sin(q.life_time * 70 + 200) * 7",
-            "math.cos(q.life_time * 55 + 275) * 9",
+            "math.sin(q.life_time * 80 + 0 - 0) * 3.0",
+            "math.cos(q.life_time * 62 + 0 - 0) * 3.6",
+            0
+          ]
+        },
+        "tail0_1": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 0 - 38) * 4.6",
+            "math.cos(q.life_time * 62 + 0 - 33) * 5.5",
+            0
+          ]
+        },
+        "tail0_2": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 0 - 76) * 6.2",
+            "math.cos(q.life_time * 62 + 0 - 66) * 7.4",
+            0
+          ]
+        },
+        "tail0_3": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 0 - 114) * 7.8",
+            "math.cos(q.life_time * 62 + 0 - 99) * 9.4",
+            0
+          ]
+        },
+        "tail0_4": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 0 - 152) * 9.4",
+            "math.cos(q.life_time * 62 + 0 - 132) * 11.3",
+            0
+          ]
+        },
+        "tail1_0": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 47 - 0) * 3.0",
+            "math.cos(q.life_time * 62 + 61 - 0) * 3.6",
+            0
+          ]
+        },
+        "tail1_1": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 47 - 38) * 4.6",
+            "math.cos(q.life_time * 62 + 61 - 33) * 5.5",
+            0
+          ]
+        },
+        "tail1_2": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 47 - 76) * 6.2",
+            "math.cos(q.life_time * 62 + 61 - 66) * 7.4",
+            0
+          ]
+        },
+        "tail1_3": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 47 - 114) * 7.8",
+            "math.cos(q.life_time * 62 + 61 - 99) * 9.4",
+            0
+          ]
+        },
+        "tail1_4": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 47 - 152) * 9.4",
+            "math.cos(q.life_time * 62 + 61 - 132) * 11.3",
+            0
+          ]
+        },
+        "tail2_0": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 94 - 0) * 3.0",
+            "math.cos(q.life_time * 62 + 122 - 0) * 3.6",
+            0
+          ]
+        },
+        "tail2_1": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 94 - 38) * 4.6",
+            "math.cos(q.life_time * 62 + 122 - 33) * 5.5",
+            0
+          ]
+        },
+        "tail2_2": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 94 - 76) * 6.2",
+            "math.cos(q.life_time * 62 + 122 - 66) * 7.4",
+            0
+          ]
+        },
+        "tail2_3": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 94 - 114) * 7.8",
+            "math.cos(q.life_time * 62 + 122 - 99) * 9.4",
+            0
+          ]
+        },
+        "tail2_4": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 94 - 152) * 9.4",
+            "math.cos(q.life_time * 62 + 122 - 132) * 11.3",
+            0
+          ]
+        },
+        "tail3_0": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 141 - 0) * 3.0",
+            "math.cos(q.life_time * 62 + 183 - 0) * 3.6",
+            0
+          ]
+        },
+        "tail3_1": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 141 - 38) * 4.6",
+            "math.cos(q.life_time * 62 + 183 - 33) * 5.5",
+            0
+          ]
+        },
+        "tail3_2": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 141 - 76) * 6.2",
+            "math.cos(q.life_time * 62 + 183 - 66) * 7.4",
+            0
+          ]
+        },
+        "tail3_3": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 141 - 114) * 7.8",
+            "math.cos(q.life_time * 62 + 183 - 99) * 9.4",
+            0
+          ]
+        },
+        "tail3_4": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 141 - 152) * 9.4",
+            "math.cos(q.life_time * 62 + 183 - 132) * 11.3",
+            0
+          ]
+        },
+        "tail4_0": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 188 - 0) * 3.0",
+            "math.cos(q.life_time * 62 + 244 - 0) * 3.6",
+            0
+          ]
+        },
+        "tail4_1": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 188 - 38) * 4.6",
+            "math.cos(q.life_time * 62 + 244 - 33) * 5.5",
+            0
+          ]
+        },
+        "tail4_2": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 188 - 76) * 6.2",
+            "math.cos(q.life_time * 62 + 244 - 66) * 7.4",
+            0
+          ]
+        },
+        "tail4_3": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 188 - 114) * 7.8",
+            "math.cos(q.life_time * 62 + 244 - 99) * 9.4",
+            0
+          ]
+        },
+        "tail4_4": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 188 - 152) * 9.4",
+            "math.cos(q.life_time * 62 + 244 - 132) * 11.3",
+            0
+          ]
+        },
+        "tail5_0": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 235 - 0) * 3.0",
+            "math.cos(q.life_time * 62 + 305 - 0) * 3.6",
+            0
+          ]
+        },
+        "tail5_1": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 235 - 38) * 4.6",
+            "math.cos(q.life_time * 62 + 305 - 33) * 5.5",
+            0
+          ]
+        },
+        "tail5_2": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 235 - 76) * 6.2",
+            "math.cos(q.life_time * 62 + 305 - 66) * 7.4",
+            0
+          ]
+        },
+        "tail5_3": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 235 - 114) * 7.8",
+            "math.cos(q.life_time * 62 + 305 - 99) * 9.4",
+            0
+          ]
+        },
+        "tail5_4": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 235 - 152) * 9.4",
+            "math.cos(q.life_time * 62 + 305 - 132) * 11.3",
             0
           ]
         }
@@ -423,52 +1500,101 @@
             0
           ]
         },
+        "body": {
+          "position": [
+            0,
+            "math.sin(q.life_time * 90) * 0.5",
+            0
+          ]
+        },
         "leg0": {
           "rotation": [
-            "1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
             0,
+            "1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2) * 0.6",
             0
           ]
         },
         "leg1": {
           "rotation": [
-            "-1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
             0,
+            "-1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2) * 0.6",
             0
           ]
         },
         "leg2": {
           "rotation": [
-            "-1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
             0,
+            "-1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2) * 0.6",
             0
           ]
         },
         "leg3": {
           "rotation": [
-            "1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
             0,
+            "1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2) * 0.6",
             0
           ]
         },
         "leg4": {
           "rotation": [
-            "1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
             0,
+            "1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2) * 0.6",
             0
           ]
         },
         "leg5": {
           "rotation": [
-            "-1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
             0,
+            "-1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2) * 0.6",
             0
           ]
         },
-        "tail0": {
+        "tail0_0": {
           "rotation": [
-            "math.sin(q.life_time * 70 + 0) * 7",
-            "math.cos(q.life_time * 55 + 0) * 9",
+            "math.sin(q.life_time * 80 + 0 - 0) * 3.0",
+            "math.cos(q.life_time * 62 + 0 - 0) * 3.6",
+            0
+          ]
+        },
+        "tail0_1": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 0 - 38) * 4.6",
+            "math.cos(q.life_time * 62 + 0 - 33) * 5.5",
+            0
+          ]
+        },
+        "tail0_2": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 0 - 76) * 6.2",
+            "math.cos(q.life_time * 62 + 0 - 66) * 7.4",
+            0
+          ]
+        },
+        "tail0_3": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 0 - 114) * 7.8",
+            "math.cos(q.life_time * 62 + 0 - 99) * 9.4",
+            0
+          ]
+        },
+        "tail0_4": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 0 - 152) * 9.4",
+            "math.cos(q.life_time * 62 + 0 - 132) * 11.3",
+            0
+          ]
+        },
+        "tail0_5": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 0 - 190) * 11.0",
+            "math.cos(q.life_time * 62 + 0 - 165) * 13.2",
+            0
+          ]
+        },
+        "tail0_6": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 0 - 228) * 12.6",
+            "math.cos(q.life_time * 62 + 0 - 198) * 15.1",
             0
           ]
         },
@@ -476,42 +1602,42 @@
           "rotation": [
             0,
             0,
-            "-1 * math.sin(q.life_time * 1600 + 0) * 22"
+            "-1 * math.sin(q.life_time * 1600 + 0) * 24"
           ]
         },
         "wing1": {
           "rotation": [
             0,
             0,
-            "1 * math.sin(q.life_time * 1600 + 30) * 22"
+            "1 * math.sin(q.life_time * 1600 + 30) * 24"
           ]
         },
         "wing2": {
           "rotation": [
             0,
             0,
-            "-1 * math.sin(q.life_time * 1600 + 60) * 22"
+            "-1 * math.sin(q.life_time * 1600 + 60) * 24"
           ]
         },
         "wing3": {
           "rotation": [
             0,
             0,
-            "1 * math.sin(q.life_time * 1600 + 90) * 22"
+            "1 * math.sin(q.life_time * 1600 + 90) * 24"
           ]
         },
         "wing4": {
           "rotation": [
             0,
             0,
-            "-1 * math.sin(q.life_time * 1600 + 120) * 22"
+            "-1 * math.sin(q.life_time * 1600 + 120) * 24"
           ]
         },
         "wing5": {
           "rotation": [
             0,
             0,
-            "1 * math.sin(q.life_time * 1600 + 150) * 22"
+            "1 * math.sin(q.life_time * 1600 + 150) * 24"
           ]
         }
       }
@@ -526,87 +1652,493 @@
             0
           ]
         },
+        "body": {
+          "position": [
+            0,
+            "math.sin(q.life_time * 90) * 0.5",
+            0
+          ]
+        },
+        "jaw": {
+          "rotation": [
+            "4 + math.sin(q.life_time * 90) * 3 + math.sin(v.attack_time * 180) * 28",
+            0,
+            0
+          ]
+        },
         "leg0": {
           "rotation": [
-            "1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            "1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg0_l": {
+          "rotation": [
+            "math.max(0, -1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)) * 0.7",
             0,
             0
           ]
         },
         "leg1": {
           "rotation": [
-            "-1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            "-1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)",
             0,
             0
           ]
         },
-        "leg2": {
+        "leg1_l": {
           "rotation": [
-            "-1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            "math.max(0, 1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)) * 0.7",
             0,
             0
           ]
         },
-        "leg3": {
+        "tail0_0": {
           "rotation": [
-            "1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
-            0,
+            "math.sin(q.life_time * 80 + 0 - 0) * 3.0",
+            "math.cos(q.life_time * 62 + 0 - 0) * 3.6",
             0
           ]
         },
-        "tail0": {
+        "tail0_1": {
           "rotation": [
-            "math.sin(q.life_time * 70 + 0) * 7",
-            "math.cos(q.life_time * 55 + 0) * 9",
+            "math.sin(q.life_time * 80 + 0 - 38) * 4.6",
+            "math.cos(q.life_time * 62 + 0 - 33) * 5.5",
             0
           ]
         },
-        "tail1": {
+        "tail0_2": {
           "rotation": [
-            "math.sin(q.life_time * 70 + 40) * 7",
-            "math.cos(q.life_time * 55 + 55) * 9",
+            "math.sin(q.life_time * 80 + 0 - 76) * 6.2",
+            "math.cos(q.life_time * 62 + 0 - 66) * 7.4",
             0
           ]
         },
-        "tail2": {
+        "tail0_3": {
           "rotation": [
-            "math.sin(q.life_time * 70 + 80) * 7",
-            "math.cos(q.life_time * 55 + 110) * 9",
+            "math.sin(q.life_time * 80 + 0 - 114) * 7.8",
+            "math.cos(q.life_time * 62 + 0 - 99) * 9.4",
             0
           ]
         },
-        "tail3": {
+        "tail0_4": {
           "rotation": [
-            "math.sin(q.life_time * 70 + 120) * 7",
-            "math.cos(q.life_time * 55 + 165) * 9",
+            "math.sin(q.life_time * 80 + 0 - 152) * 9.4",
+            "math.cos(q.life_time * 62 + 0 - 132) * 11.3",
             0
           ]
         },
-        "tail4": {
+        "tail0_5": {
           "rotation": [
-            "math.sin(q.life_time * 70 + 160) * 7",
-            "math.cos(q.life_time * 55 + 220) * 9",
+            "math.sin(q.life_time * 80 + 0 - 190) * 11.0",
+            "math.cos(q.life_time * 62 + 0 - 165) * 13.2",
             0
           ]
         },
-        "tail5": {
+        "tail0_6": {
           "rotation": [
-            "math.sin(q.life_time * 70 + 200) * 7",
-            "math.cos(q.life_time * 55 + 275) * 9",
+            "math.sin(q.life_time * 80 + 0 - 228) * 12.6",
+            "math.cos(q.life_time * 62 + 0 - 198) * 15.1",
             0
           ]
         },
-        "tail6": {
+        "tail0_7": {
           "rotation": [
-            "math.sin(q.life_time * 70 + 240) * 7",
-            "math.cos(q.life_time * 55 + 330) * 9",
+            "math.sin(q.life_time * 80 + 0 - 266) * 14.2",
+            "math.cos(q.life_time * 62 + 0 - 231) * 17.0",
             0
           ]
         },
-        "tail7": {
+        "tail1_0": {
           "rotation": [
-            "math.sin(q.life_time * 70 + 280) * 7",
-            "math.cos(q.life_time * 55 + 385) * 9",
+            "math.sin(q.life_time * 80 + 47 - 0) * 3.0",
+            "math.cos(q.life_time * 62 + 61 - 0) * 3.6",
+            0
+          ]
+        },
+        "tail1_1": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 47 - 38) * 4.6",
+            "math.cos(q.life_time * 62 + 61 - 33) * 5.5",
+            0
+          ]
+        },
+        "tail1_2": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 47 - 76) * 6.2",
+            "math.cos(q.life_time * 62 + 61 - 66) * 7.4",
+            0
+          ]
+        },
+        "tail1_3": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 47 - 114) * 7.8",
+            "math.cos(q.life_time * 62 + 61 - 99) * 9.4",
+            0
+          ]
+        },
+        "tail1_4": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 47 - 152) * 9.4",
+            "math.cos(q.life_time * 62 + 61 - 132) * 11.3",
+            0
+          ]
+        },
+        "tail1_5": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 47 - 190) * 11.0",
+            "math.cos(q.life_time * 62 + 61 - 165) * 13.2",
+            0
+          ]
+        },
+        "tail1_6": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 47 - 228) * 12.6",
+            "math.cos(q.life_time * 62 + 61 - 198) * 15.1",
+            0
+          ]
+        },
+        "tail1_7": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 47 - 266) * 14.2",
+            "math.cos(q.life_time * 62 + 61 - 231) * 17.0",
+            0
+          ]
+        },
+        "tail2_0": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 94 - 0) * 3.0",
+            "math.cos(q.life_time * 62 + 122 - 0) * 3.6",
+            0
+          ]
+        },
+        "tail2_1": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 94 - 38) * 4.6",
+            "math.cos(q.life_time * 62 + 122 - 33) * 5.5",
+            0
+          ]
+        },
+        "tail2_2": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 94 - 76) * 6.2",
+            "math.cos(q.life_time * 62 + 122 - 66) * 7.4",
+            0
+          ]
+        },
+        "tail2_3": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 94 - 114) * 7.8",
+            "math.cos(q.life_time * 62 + 122 - 99) * 9.4",
+            0
+          ]
+        },
+        "tail2_4": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 94 - 152) * 9.4",
+            "math.cos(q.life_time * 62 + 122 - 132) * 11.3",
+            0
+          ]
+        },
+        "tail2_5": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 94 - 190) * 11.0",
+            "math.cos(q.life_time * 62 + 122 - 165) * 13.2",
+            0
+          ]
+        },
+        "tail2_6": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 94 - 228) * 12.6",
+            "math.cos(q.life_time * 62 + 122 - 198) * 15.1",
+            0
+          ]
+        },
+        "tail2_7": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 94 - 266) * 14.2",
+            "math.cos(q.life_time * 62 + 122 - 231) * 17.0",
+            0
+          ]
+        },
+        "tail3_0": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 141 - 0) * 3.0",
+            "math.cos(q.life_time * 62 + 183 - 0) * 3.6",
+            0
+          ]
+        },
+        "tail3_1": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 141 - 38) * 4.6",
+            "math.cos(q.life_time * 62 + 183 - 33) * 5.5",
+            0
+          ]
+        },
+        "tail3_2": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 141 - 76) * 6.2",
+            "math.cos(q.life_time * 62 + 183 - 66) * 7.4",
+            0
+          ]
+        },
+        "tail3_3": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 141 - 114) * 7.8",
+            "math.cos(q.life_time * 62 + 183 - 99) * 9.4",
+            0
+          ]
+        },
+        "tail3_4": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 141 - 152) * 9.4",
+            "math.cos(q.life_time * 62 + 183 - 132) * 11.3",
+            0
+          ]
+        },
+        "tail3_5": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 141 - 190) * 11.0",
+            "math.cos(q.life_time * 62 + 183 - 165) * 13.2",
+            0
+          ]
+        },
+        "tail3_6": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 141 - 228) * 12.6",
+            "math.cos(q.life_time * 62 + 183 - 198) * 15.1",
+            0
+          ]
+        },
+        "tail3_7": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 141 - 266) * 14.2",
+            "math.cos(q.life_time * 62 + 183 - 231) * 17.0",
+            0
+          ]
+        },
+        "tail4_0": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 188 - 0) * 3.0",
+            "math.cos(q.life_time * 62 + 244 - 0) * 3.6",
+            0
+          ]
+        },
+        "tail4_1": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 188 - 38) * 4.6",
+            "math.cos(q.life_time * 62 + 244 - 33) * 5.5",
+            0
+          ]
+        },
+        "tail4_2": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 188 - 76) * 6.2",
+            "math.cos(q.life_time * 62 + 244 - 66) * 7.4",
+            0
+          ]
+        },
+        "tail4_3": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 188 - 114) * 7.8",
+            "math.cos(q.life_time * 62 + 244 - 99) * 9.4",
+            0
+          ]
+        },
+        "tail4_4": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 188 - 152) * 9.4",
+            "math.cos(q.life_time * 62 + 244 - 132) * 11.3",
+            0
+          ]
+        },
+        "tail4_5": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 188 - 190) * 11.0",
+            "math.cos(q.life_time * 62 + 244 - 165) * 13.2",
+            0
+          ]
+        },
+        "tail4_6": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 188 - 228) * 12.6",
+            "math.cos(q.life_time * 62 + 244 - 198) * 15.1",
+            0
+          ]
+        },
+        "tail4_7": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 188 - 266) * 14.2",
+            "math.cos(q.life_time * 62 + 244 - 231) * 17.0",
+            0
+          ]
+        },
+        "tail5_0": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 235 - 0) * 3.0",
+            "math.cos(q.life_time * 62 + 305 - 0) * 3.6",
+            0
+          ]
+        },
+        "tail5_1": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 235 - 38) * 4.6",
+            "math.cos(q.life_time * 62 + 305 - 33) * 5.5",
+            0
+          ]
+        },
+        "tail5_2": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 235 - 76) * 6.2",
+            "math.cos(q.life_time * 62 + 305 - 66) * 7.4",
+            0
+          ]
+        },
+        "tail5_3": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 235 - 114) * 7.8",
+            "math.cos(q.life_time * 62 + 305 - 99) * 9.4",
+            0
+          ]
+        },
+        "tail5_4": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 235 - 152) * 9.4",
+            "math.cos(q.life_time * 62 + 305 - 132) * 11.3",
+            0
+          ]
+        },
+        "tail5_5": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 235 - 190) * 11.0",
+            "math.cos(q.life_time * 62 + 305 - 165) * 13.2",
+            0
+          ]
+        },
+        "tail5_6": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 235 - 228) * 12.6",
+            "math.cos(q.life_time * 62 + 305 - 198) * 15.1",
+            0
+          ]
+        },
+        "tail5_7": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 235 - 266) * 14.2",
+            "math.cos(q.life_time * 62 + 305 - 231) * 17.0",
+            0
+          ]
+        },
+        "tail6_0": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 282 - 0) * 3.0",
+            "math.cos(q.life_time * 62 + 366 - 0) * 3.6",
+            0
+          ]
+        },
+        "tail6_1": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 282 - 38) * 4.6",
+            "math.cos(q.life_time * 62 + 366 - 33) * 5.5",
+            0
+          ]
+        },
+        "tail6_2": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 282 - 76) * 6.2",
+            "math.cos(q.life_time * 62 + 366 - 66) * 7.4",
+            0
+          ]
+        },
+        "tail6_3": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 282 - 114) * 7.8",
+            "math.cos(q.life_time * 62 + 366 - 99) * 9.4",
+            0
+          ]
+        },
+        "tail6_4": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 282 - 152) * 9.4",
+            "math.cos(q.life_time * 62 + 366 - 132) * 11.3",
+            0
+          ]
+        },
+        "tail6_5": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 282 - 190) * 11.0",
+            "math.cos(q.life_time * 62 + 366 - 165) * 13.2",
+            0
+          ]
+        },
+        "tail6_6": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 282 - 228) * 12.6",
+            "math.cos(q.life_time * 62 + 366 - 198) * 15.1",
+            0
+          ]
+        },
+        "tail6_7": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 282 - 266) * 14.2",
+            "math.cos(q.life_time * 62 + 366 - 231) * 17.0",
+            0
+          ]
+        },
+        "tail7_0": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 329 - 0) * 3.0",
+            "math.cos(q.life_time * 62 + 427 - 0) * 3.6",
+            0
+          ]
+        },
+        "tail7_1": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 329 - 38) * 4.6",
+            "math.cos(q.life_time * 62 + 427 - 33) * 5.5",
+            0
+          ]
+        },
+        "tail7_2": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 329 - 76) * 6.2",
+            "math.cos(q.life_time * 62 + 427 - 66) * 7.4",
+            0
+          ]
+        },
+        "tail7_3": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 329 - 114) * 7.8",
+            "math.cos(q.life_time * 62 + 427 - 99) * 9.4",
+            0
+          ]
+        },
+        "tail7_4": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 329 - 152) * 9.4",
+            "math.cos(q.life_time * 62 + 427 - 132) * 11.3",
+            0
+          ]
+        },
+        "tail7_5": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 329 - 190) * 11.0",
+            "math.cos(q.life_time * 62 + 427 - 165) * 13.2",
+            0
+          ]
+        },
+        "tail7_6": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 329 - 228) * 12.6",
+            "math.cos(q.life_time * 62 + 427 - 198) * 15.1",
+            0
+          ]
+        },
+        "tail7_7": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 329 - 266) * 14.2",
+            "math.cos(q.life_time * 62 + 427 - 231) * 17.0",
             0
           ]
         }
@@ -622,94 +2154,591 @@
             0
           ]
         },
+        "body": {
+          "position": [
+            0,
+            "math.sin(q.life_time * 90) * 0.5",
+            0
+          ]
+        },
+        "jaw": {
+          "rotation": [
+            "4 + math.sin(q.life_time * 90) * 3 + math.sin(v.attack_time * 180) * 28",
+            0,
+            0
+          ]
+        },
+        "ear0": {
+          "rotation": [
+            0,
+            0,
+            "math.sin(q.life_time * 37) > 0.96 ? 14 : 0"
+          ]
+        },
+        "ear1": {
+          "rotation": [
+            0,
+            0,
+            "math.sin(q.life_time * 41 + 60) > 0.96 ? -14 : 0"
+          ]
+        },
         "leg0": {
           "rotation": [
-            "1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            "1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg0_l": {
+          "rotation": [
+            "math.max(0, -1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)) * 0.7",
             0,
             0
           ]
         },
         "leg1": {
           "rotation": [
-            "-1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            "-1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg1_l": {
+          "rotation": [
+            "math.max(0, 1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)) * 0.7",
             0,
             0
           ]
         },
         "leg2": {
           "rotation": [
-            "-1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            "-1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg2_l": {
+          "rotation": [
+            "math.max(0, 1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)) * 0.7",
             0,
             0
           ]
         },
         "leg3": {
           "rotation": [
-            "1 * math.cos(q.modified_distance_moved * 22) * 28 * math.min(1.0, q.modified_move_speed * 2)",
+            "1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)",
             0,
             0
           ]
         },
-        "tail0": {
+        "leg3_l": {
           "rotation": [
-            "math.sin(q.life_time * 70 + 0) * 7",
-            "math.cos(q.life_time * 55 + 0) * 9",
+            "math.max(0, -1 * math.cos(q.modified_distance_moved * 22) * 26 * math.min(1.0, q.modified_move_speed * 2)) * 0.7",
+            0,
             0
           ]
         },
-        "tail1": {
+        "tail0_0": {
           "rotation": [
-            "math.sin(q.life_time * 70 + 40) * 7",
-            "math.cos(q.life_time * 55 + 55) * 9",
+            "math.sin(q.life_time * 80 + 0 - 0) * 3.0",
+            "math.cos(q.life_time * 62 + 0 - 0) * 3.6",
             0
           ]
         },
-        "tail2": {
+        "tail0_1": {
           "rotation": [
-            "math.sin(q.life_time * 70 + 80) * 7",
-            "math.cos(q.life_time * 55 + 110) * 9",
+            "math.sin(q.life_time * 80 + 0 - 38) * 4.6",
+            "math.cos(q.life_time * 62 + 0 - 33) * 5.5",
             0
           ]
         },
-        "tail3": {
+        "tail0_2": {
           "rotation": [
-            "math.sin(q.life_time * 70 + 120) * 7",
-            "math.cos(q.life_time * 55 + 165) * 9",
+            "math.sin(q.life_time * 80 + 0 - 76) * 6.2",
+            "math.cos(q.life_time * 62 + 0 - 66) * 7.4",
             0
           ]
         },
-        "tail4": {
+        "tail0_3": {
           "rotation": [
-            "math.sin(q.life_time * 70 + 160) * 7",
-            "math.cos(q.life_time * 55 + 220) * 9",
+            "math.sin(q.life_time * 80 + 0 - 114) * 7.8",
+            "math.cos(q.life_time * 62 + 0 - 99) * 9.4",
             0
           ]
         },
-        "tail5": {
+        "tail0_4": {
           "rotation": [
-            "math.sin(q.life_time * 70 + 200) * 7",
-            "math.cos(q.life_time * 55 + 275) * 9",
+            "math.sin(q.life_time * 80 + 0 - 152) * 9.4",
+            "math.cos(q.life_time * 62 + 0 - 132) * 11.3",
             0
           ]
         },
-        "tail6": {
+        "tail0_5": {
           "rotation": [
-            "math.sin(q.life_time * 70 + 240) * 7",
-            "math.cos(q.life_time * 55 + 330) * 9",
+            "math.sin(q.life_time * 80 + 0 - 190) * 11.0",
+            "math.cos(q.life_time * 62 + 0 - 165) * 13.2",
             0
           ]
         },
-        "tail7": {
+        "tail0_6": {
           "rotation": [
-            "math.sin(q.life_time * 70 + 280) * 7",
-            "math.cos(q.life_time * 55 + 385) * 9",
+            "math.sin(q.life_time * 80 + 0 - 228) * 12.6",
+            "math.cos(q.life_time * 62 + 0 - 198) * 15.1",
             0
           ]
         },
-        "tail8": {
+        "tail0_7": {
           "rotation": [
-            "math.sin(q.life_time * 70 + 320) * 7",
-            "math.cos(q.life_time * 55 + 440) * 9",
+            "math.sin(q.life_time * 80 + 0 - 266) * 14.2",
+            "math.cos(q.life_time * 62 + 0 - 231) * 17.0",
+            0
+          ]
+        },
+        "tail1_0": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 47 - 0) * 3.0",
+            "math.cos(q.life_time * 62 + 61 - 0) * 3.6",
+            0
+          ]
+        },
+        "tail1_1": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 47 - 38) * 4.6",
+            "math.cos(q.life_time * 62 + 61 - 33) * 5.5",
+            0
+          ]
+        },
+        "tail1_2": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 47 - 76) * 6.2",
+            "math.cos(q.life_time * 62 + 61 - 66) * 7.4",
+            0
+          ]
+        },
+        "tail1_3": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 47 - 114) * 7.8",
+            "math.cos(q.life_time * 62 + 61 - 99) * 9.4",
+            0
+          ]
+        },
+        "tail1_4": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 47 - 152) * 9.4",
+            "math.cos(q.life_time * 62 + 61 - 132) * 11.3",
+            0
+          ]
+        },
+        "tail1_5": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 47 - 190) * 11.0",
+            "math.cos(q.life_time * 62 + 61 - 165) * 13.2",
+            0
+          ]
+        },
+        "tail1_6": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 47 - 228) * 12.6",
+            "math.cos(q.life_time * 62 + 61 - 198) * 15.1",
+            0
+          ]
+        },
+        "tail1_7": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 47 - 266) * 14.2",
+            "math.cos(q.life_time * 62 + 61 - 231) * 17.0",
+            0
+          ]
+        },
+        "tail2_0": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 94 - 0) * 3.0",
+            "math.cos(q.life_time * 62 + 122 - 0) * 3.6",
+            0
+          ]
+        },
+        "tail2_1": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 94 - 38) * 4.6",
+            "math.cos(q.life_time * 62 + 122 - 33) * 5.5",
+            0
+          ]
+        },
+        "tail2_2": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 94 - 76) * 6.2",
+            "math.cos(q.life_time * 62 + 122 - 66) * 7.4",
+            0
+          ]
+        },
+        "tail2_3": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 94 - 114) * 7.8",
+            "math.cos(q.life_time * 62 + 122 - 99) * 9.4",
+            0
+          ]
+        },
+        "tail2_4": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 94 - 152) * 9.4",
+            "math.cos(q.life_time * 62 + 122 - 132) * 11.3",
+            0
+          ]
+        },
+        "tail2_5": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 94 - 190) * 11.0",
+            "math.cos(q.life_time * 62 + 122 - 165) * 13.2",
+            0
+          ]
+        },
+        "tail2_6": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 94 - 228) * 12.6",
+            "math.cos(q.life_time * 62 + 122 - 198) * 15.1",
+            0
+          ]
+        },
+        "tail2_7": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 94 - 266) * 14.2",
+            "math.cos(q.life_time * 62 + 122 - 231) * 17.0",
+            0
+          ]
+        },
+        "tail3_0": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 141 - 0) * 3.0",
+            "math.cos(q.life_time * 62 + 183 - 0) * 3.6",
+            0
+          ]
+        },
+        "tail3_1": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 141 - 38) * 4.6",
+            "math.cos(q.life_time * 62 + 183 - 33) * 5.5",
+            0
+          ]
+        },
+        "tail3_2": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 141 - 76) * 6.2",
+            "math.cos(q.life_time * 62 + 183 - 66) * 7.4",
+            0
+          ]
+        },
+        "tail3_3": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 141 - 114) * 7.8",
+            "math.cos(q.life_time * 62 + 183 - 99) * 9.4",
+            0
+          ]
+        },
+        "tail3_4": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 141 - 152) * 9.4",
+            "math.cos(q.life_time * 62 + 183 - 132) * 11.3",
+            0
+          ]
+        },
+        "tail3_5": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 141 - 190) * 11.0",
+            "math.cos(q.life_time * 62 + 183 - 165) * 13.2",
+            0
+          ]
+        },
+        "tail3_6": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 141 - 228) * 12.6",
+            "math.cos(q.life_time * 62 + 183 - 198) * 15.1",
+            0
+          ]
+        },
+        "tail3_7": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 141 - 266) * 14.2",
+            "math.cos(q.life_time * 62 + 183 - 231) * 17.0",
+            0
+          ]
+        },
+        "tail4_0": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 188 - 0) * 3.0",
+            "math.cos(q.life_time * 62 + 244 - 0) * 3.6",
+            0
+          ]
+        },
+        "tail4_1": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 188 - 38) * 4.6",
+            "math.cos(q.life_time * 62 + 244 - 33) * 5.5",
+            0
+          ]
+        },
+        "tail4_2": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 188 - 76) * 6.2",
+            "math.cos(q.life_time * 62 + 244 - 66) * 7.4",
+            0
+          ]
+        },
+        "tail4_3": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 188 - 114) * 7.8",
+            "math.cos(q.life_time * 62 + 244 - 99) * 9.4",
+            0
+          ]
+        },
+        "tail4_4": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 188 - 152) * 9.4",
+            "math.cos(q.life_time * 62 + 244 - 132) * 11.3",
+            0
+          ]
+        },
+        "tail4_5": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 188 - 190) * 11.0",
+            "math.cos(q.life_time * 62 + 244 - 165) * 13.2",
+            0
+          ]
+        },
+        "tail4_6": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 188 - 228) * 12.6",
+            "math.cos(q.life_time * 62 + 244 - 198) * 15.1",
+            0
+          ]
+        },
+        "tail4_7": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 188 - 266) * 14.2",
+            "math.cos(q.life_time * 62 + 244 - 231) * 17.0",
+            0
+          ]
+        },
+        "tail5_0": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 235 - 0) * 3.0",
+            "math.cos(q.life_time * 62 + 305 - 0) * 3.6",
+            0
+          ]
+        },
+        "tail5_1": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 235 - 38) * 4.6",
+            "math.cos(q.life_time * 62 + 305 - 33) * 5.5",
+            0
+          ]
+        },
+        "tail5_2": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 235 - 76) * 6.2",
+            "math.cos(q.life_time * 62 + 305 - 66) * 7.4",
+            0
+          ]
+        },
+        "tail5_3": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 235 - 114) * 7.8",
+            "math.cos(q.life_time * 62 + 305 - 99) * 9.4",
+            0
+          ]
+        },
+        "tail5_4": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 235 - 152) * 9.4",
+            "math.cos(q.life_time * 62 + 305 - 132) * 11.3",
+            0
+          ]
+        },
+        "tail5_5": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 235 - 190) * 11.0",
+            "math.cos(q.life_time * 62 + 305 - 165) * 13.2",
+            0
+          ]
+        },
+        "tail5_6": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 235 - 228) * 12.6",
+            "math.cos(q.life_time * 62 + 305 - 198) * 15.1",
+            0
+          ]
+        },
+        "tail5_7": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 235 - 266) * 14.2",
+            "math.cos(q.life_time * 62 + 305 - 231) * 17.0",
+            0
+          ]
+        },
+        "tail6_0": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 282 - 0) * 3.0",
+            "math.cos(q.life_time * 62 + 366 - 0) * 3.6",
+            0
+          ]
+        },
+        "tail6_1": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 282 - 38) * 4.6",
+            "math.cos(q.life_time * 62 + 366 - 33) * 5.5",
+            0
+          ]
+        },
+        "tail6_2": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 282 - 76) * 6.2",
+            "math.cos(q.life_time * 62 + 366 - 66) * 7.4",
+            0
+          ]
+        },
+        "tail6_3": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 282 - 114) * 7.8",
+            "math.cos(q.life_time * 62 + 366 - 99) * 9.4",
+            0
+          ]
+        },
+        "tail6_4": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 282 - 152) * 9.4",
+            "math.cos(q.life_time * 62 + 366 - 132) * 11.3",
+            0
+          ]
+        },
+        "tail6_5": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 282 - 190) * 11.0",
+            "math.cos(q.life_time * 62 + 366 - 165) * 13.2",
+            0
+          ]
+        },
+        "tail6_6": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 282 - 228) * 12.6",
+            "math.cos(q.life_time * 62 + 366 - 198) * 15.1",
+            0
+          ]
+        },
+        "tail6_7": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 282 - 266) * 14.2",
+            "math.cos(q.life_time * 62 + 366 - 231) * 17.0",
+            0
+          ]
+        },
+        "tail7_0": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 329 - 0) * 3.0",
+            "math.cos(q.life_time * 62 + 427 - 0) * 3.6",
+            0
+          ]
+        },
+        "tail7_1": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 329 - 38) * 4.6",
+            "math.cos(q.life_time * 62 + 427 - 33) * 5.5",
+            0
+          ]
+        },
+        "tail7_2": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 329 - 76) * 6.2",
+            "math.cos(q.life_time * 62 + 427 - 66) * 7.4",
+            0
+          ]
+        },
+        "tail7_3": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 329 - 114) * 7.8",
+            "math.cos(q.life_time * 62 + 427 - 99) * 9.4",
+            0
+          ]
+        },
+        "tail7_4": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 329 - 152) * 9.4",
+            "math.cos(q.life_time * 62 + 427 - 132) * 11.3",
+            0
+          ]
+        },
+        "tail7_5": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 329 - 190) * 11.0",
+            "math.cos(q.life_time * 62 + 427 - 165) * 13.2",
+            0
+          ]
+        },
+        "tail7_6": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 329 - 228) * 12.6",
+            "math.cos(q.life_time * 62 + 427 - 198) * 15.1",
+            0
+          ]
+        },
+        "tail7_7": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 329 - 266) * 14.2",
+            "math.cos(q.life_time * 62 + 427 - 231) * 17.0",
+            0
+          ]
+        },
+        "tail8_0": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 376 - 0) * 3.0",
+            "math.cos(q.life_time * 62 + 488 - 0) * 3.6",
+            0
+          ]
+        },
+        "tail8_1": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 376 - 38) * 4.6",
+            "math.cos(q.life_time * 62 + 488 - 33) * 5.5",
+            0
+          ]
+        },
+        "tail8_2": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 376 - 76) * 6.2",
+            "math.cos(q.life_time * 62 + 488 - 66) * 7.4",
+            0
+          ]
+        },
+        "tail8_3": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 376 - 114) * 7.8",
+            "math.cos(q.life_time * 62 + 488 - 99) * 9.4",
+            0
+          ]
+        },
+        "tail8_4": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 376 - 152) * 9.4",
+            "math.cos(q.life_time * 62 + 488 - 132) * 11.3",
+            0
+          ]
+        },
+        "tail8_5": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 376 - 190) * 11.0",
+            "math.cos(q.life_time * 62 + 488 - 165) * 13.2",
+            0
+          ]
+        },
+        "tail8_6": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 376 - 228) * 12.6",
+            "math.cos(q.life_time * 62 + 488 - 198) * 15.1",
+            0
+          ]
+        },
+        "tail8_7": {
+          "rotation": [
+            "math.sin(q.life_time * 80 + 376 - 266) * 14.2",
+            "math.cos(q.life_time * 62 + 488 - 231) * 17.0",
             0
           ]
         }

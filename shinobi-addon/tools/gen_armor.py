@@ -83,19 +83,7 @@ ARMOR = {
                         c([-0.5, 14, 2.5], [1, 12, 1], "dark", 0, [0, 0, 35], [0, 20, 3]), c([-0.6, 23, 2.4], [1.2, 3.5, 1.2], "red", 0, [0, 0, 35], [0, 20, 3])],
                "rightArm": [RARM(0.55, "metal", 12, 5), RARM(0.4, "base", 17, 7)], "leftArm": [LARM(0.55, "metal", 12, 5), LARM(0.4, "base", 17, 7)]},
         recipe=(["I I", "IBI", "III"], {"I": "minecraft:iron_ingot", "B": "minecraft:black_wool"})),
-    # ---- Akatsuki ----
-    "akatsuki_cloak": dict(name="Akatsuki Cloak", slot="chest", prot=6, dur=420, colors=dict(base=(22, 22, 28), red=(200, 25, 30), white=(235, 235, 235), dark=(120, 20, 25)),
-        bones={"body": [BODY(0.8, "base"), c([-4.6, 21.5, -2.9], [9.2, 5, 5.8], "base", 0.3), c([-4.3, 21.6, -3.05], [8.6, 0.5, 0.2], "dark")]
-                       + cloud(-3.2, 16.5, -2.95) + cloud(0.6, 13.5, -2.95) + cloud(-2, 18, 2.95, False) + cloud(1, 14, 2.95, False),
-               "rightArm": [RARM(0.7, "base")] + [c([-8.95, 16, -1.5], [0.2, 2, 3], "red")],
-               "leftArm": [LARM(0.7, "base")] + [c([8.75, 18, -1.5], [0.2, 2, 3], "red")],
-               "rightLeg": [RLEG(0.9, "base", 3.5, 8.5)] + cloud(-3.6, 6, -2.95), "leftLeg": [LLEG(0.9, "base", 3.5, 8.5)]},
-        recipe=(["B B", "BRB", "BBB"], {"B": "minecraft:black_wool", "R": "minecraft:red_dye"})),
-    "akatsuki_hat": dict(name="Akatsuki Straw Hat", slot="head", prot=1, dur=200, colors=dict(base=(205, 175, 105), dark=(160, 130, 70), white=(240, 240, 240), gold=(230, 190, 60)),
-        bones={"head": hat_layers(31.5, None, [18, 15, 12, 8, 4], "base", "dark")
-               + [c([x, 25, z], [0.5, 6.5, 0.5], "white") for x, z in ((-8.7, -1), (-8.7, 1.5), (8.2, -1), (8.2, 1.5), (-1, -8.7), (1.5, -8.7))]
-               + [c([-0.8, 29.6, -9.2], [1.6, 1.6, 1.6], "gold")]},
-        recipe=(["WWW", "WSW"], {"W": "minecraft:wheat", "S": "minecraft:string"})),
+    # ---- Akatsuki (built below by akatsuki_set()) ----
     # ---- Samurai (Land of Iron) ----
     "samurai_helmet": dict(name="Samurai Kabuto", slot="head", prot=3, dur=420, colors=dict(base=(150, 30, 30), dark=(80, 15, 15), gold=(235, 190, 60), black=(25, 20, 20)),
         bones={"head": [c([-4.6, 28, -4.6], [9.2, 4.5, 9.2], "base", 0.3), c([-5.6, 24.5, -2], [11.2, 4, 7.6], "dark", 0.1),
@@ -118,6 +106,83 @@ ARMOR = {
         recipe=(["R R", "I I"], {"I": "minecraft:iron_ingot", "R": "minecraft:red_wool"})),
     # Kage sets (Hokage, Kazekage, Mizukage, Raikage, Tsuchikage) are added below by kage_set().
 }
+
+def red_cloud(x, y, z, front=True, scale=1.0, axis="z"):
+    """The Akatsuki cloud: a red, lobed cloud with a white outline, lying flat on a surface of the cloak.
+    axis "z" = on the front/back of the body, "x" = on the outside of a sleeve."""
+    k = scale
+    lobes = [(0, 0, 4.2, 1.5), (0.5, 1.2, 1.7, 1.0), (2.0, 1.2, 1.6, 1.4), (3.2, 0.9, 1.0, 0.9), (-0.5, 0.2, 0.8, 0.9), (1.0, -0.5, 2.4, 0.7)]
+    out = []
+    for (lx, ly, lw, lh) in lobes:
+        for sw, grow, lift in (("white", 0.3, 0.0), ("red", 0.0, 0.12)):
+            if axis == "z":
+                zz = z - lift - 0.1 if front else z + lift
+                out.append(c([x + (lx - grow) * k, y + (ly - grow) * k, zz], [(lw + 2 * grow) * k, (lh + 2 * grow) * k, 0.1], sw))
+            else:
+                xx = x - lift - 0.1 if front else x + lift
+                out.append(c([xx, y + (ly - grow) * k, z + (lx - grow) * k], [0.1, (lh + 2 * grow) * k, (lw + 2 * grow) * k], sw))
+    return out
+
+
+def akatsuki_set():
+    """Akatsuki cloak and straw hat (v2 models).
+    Cloak: a long black coat to the shins, a tall standing collar that hides the mouth (red lining showing inside),
+    wide sleeves that swallow the hands, a red-lined hem, a seam down the front, and red clouds on the chest, back,
+    sleeves and skirt.  Hat: a round conical kasa in woven rings, a curtain of white paper strips hanging from the
+    brim (open at the front), and a small bell on a red cord."""
+    body = [BODY(0.85, "base"),
+            c([-4.95, 10.4, -2.95], [9.9, 2.2, 5.9], "base"),                                  # the coat flares at the waist
+            c([-0.2, 11, -3.02], [0.4, 10.6, 0.15], "dark"),                                   # front seam
+            # standing collar: back, sides, and two front flaps with a gap for the mouth
+            c([-5.2, 22.2, 1.9], [10.4, 7.6, 1.3], "base"), c([-4.6, 22.6, 1.75], [9.2, 7.0, 0.2], "red"),
+            c([-5.2, 22.2, -3.0], [1.3, 6.8, 5.0], "base"), c([-3.95, 22.6, -2.6], [0.2, 6.2, 4.4], "red"),
+            c([3.9, 22.2, -3.0], [1.3, 6.8, 5.0], "base"), c([3.75, 22.6, -2.6], [0.2, 6.2, 4.4], "red"),
+            c([-5.2, 22.2, -4.2], [4.2, 5.6, 1.3], "base"), c([1.0, 22.2, -4.2], [4.2, 5.6, 1.3], "base"),
+            c([-1.0, 22.2, -4.0], [2.0, 2.6, 0.9], "base"),
+            c([-5.2, 21.6, -4.25], [10.4, 0.8, 7.5], "dark")]                                  # collar band
+    body += red_cloud(-3.9, 17.6, -2.95, True, 0.8) + red_cloud(0.2, 13.4, -2.95, True, 0.8)
+    body += red_cloud(-2.6, 15.6, 2.95, False, 1.15)
+    sleeve = lambda sx: [c([-8.75 if sx < 0 else 3.75, 10.2, -2.75], [5, 12.6, 5.5], "base", 0.1),              # long, wide sleeve
+                         c([-9.05 if sx < 0 else 3.45, 9.6, -3.05], [5.6, 2.4, 6.1], "base"),                  # flared cuff
+                         c([-8.6 if sx < 0 else 3.9, 9.5, -2.6], [4.7, 0.25, 5.2], "red")]                     # lining inside the cuff
+    rarm = sleeve(-1) + red_cloud(-8.9, 15.5, -1.7, True, 0.7, axis="x")
+    larm = sleeve(1) + red_cloud(8.9, 13.5, -1.7, False, 0.7, axis="x")
+    skirt = lambda sx: [(RLEG if sx < 0 else LLEG)(0.95, "base", 3, 9),
+                        c([-4.95 if sx < 0 else 0.0, 2.2, -3.1], [4.95, 2.4, 6.2], "base"),                     # hem flares out
+                        c([-4.8 if sx < 0 else 0.15, 2.05, -2.95], [4.5, 0.25, 5.9], "red")]                   # red lining at the hem
+    rleg = skirt(-1) + red_cloud(-4.4, 5.6, -3.05, True, 0.75)
+    lleg = skirt(1) + red_cloud(0.9, 7.6, 3.05, False, 0.75)
+
+    hat = []
+    y = 30.8
+    for i, wd in enumerate([20.5, 19, 17, 14.8, 12.4, 9.8, 7.2, 4.6, 2.2]):                   # woven rings: each a square plus one turned 45°
+        sw = "dark" if i in (0, 3, 6) else "base"
+        for turn in (0, 22.5, 45, 67.5):                                                       # four turned squares make it round
+            k = 0.94 if turn else 0.92
+            hat.append(c([-wd * k / 2, y + i * 0.85, -wd * k / 2], [wd * k, 0.9, wd * k], sw, 0, [0, turn, 0] if turn else None, [0, y + i * 0.85, 0]))
+    hat.append(c([-0.6, y + 7.6, -0.6], [1.2, 1.3, 1.2], "dark"))                              # the knot at the tip
+    hat.append(c([-4.2, 28.3, -4.2], [8.4, 2.6, 8.4], "dark", 0.25))                           # inner band on the head
+    n = 22
+    for k in range(n):                                                                         # paper strips all round, open at the front
+        ang = k / n * 360
+        if ang < 38 or ang > 322:
+            continue
+        rad = math.radians(ang)
+        x, z = math.sin(rad) * 9.7, -math.cos(rad) * 9.7
+        ln = 7.2 + (k % 3) * 0.7
+        hat.append(c([x - 0.55, y - ln + 0.2, z - 0.12], [1.1, ln, 0.24], "white", 0, [0, -ang, 0], [x, y, z]))
+    hat += [c([-9.2, y - 2.2, -6.2], [0.2, 2.4, 0.2], "red"), c([-9.7, y - 3.6, -6.7], [1.3, 1.4, 1.3], "gold"), c([-9.35, y - 3.9, -6.35], [0.6, 0.4, 0.6], "black")]
+    return {
+        "akatsuki_cloak": dict(name="Akatsuki Cloak", slot="chest", prot=6, dur=420,
+                               colors=dict(base=(20, 20, 26), red=(196, 22, 28), white=(238, 238, 238), dark=(44, 44, 54)),
+                               bones={"body": body, "rightArm": rarm, "leftArm": larm, "rightLeg": rleg, "leftLeg": lleg},
+                               recipe=(["B B", "BRB", "BBB"], {"B": "minecraft:black_wool", "R": "minecraft:red_dye"})),
+        "akatsuki_hat": dict(name="Akatsuki Straw Hat", slot="head", prot=1, dur=200,
+                             colors=dict(base=(212, 184, 116), dark=(160, 130, 72), white=(244, 244, 240), gold=(232, 192, 62), red=(196, 22, 28), black=(30, 26, 22)),
+                             bones={"head": hat},
+                             recipe=(["WWW", "WSW"], {"W": "minecraft:wheat", "S": "minecraft:string"})),
+    }
+
 
 def kage_set(vid, title, trim, trim2, under, under_dark):
     """Hat + robe + pants + sandals for one Kage. White robes with the village colour, like the anime."""
@@ -165,6 +230,7 @@ KAGE = {
 }
 for _vid, _k in KAGE.items():
     ARMOR.update(kage_set(_vid, *_k))
+ARMOR.update(akatsuki_set())
 
 
 # ---- The Legendary Sannin (given by the server owner with /scriptevent aegis:sannin <name>) ----

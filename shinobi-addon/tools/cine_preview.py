@@ -78,6 +78,8 @@ def bone_xforms(model, anim, t):
 def cube_faces(c):
     """Yields (face, corner(u01, v01) -> model point, (tex u, tex v, tex w, tex h))."""
     (ox, oy, oz), (w, h, d) = c["origin"], c["size"]
+    inf = c.get("inflate", 0)
+    ox, oy, oz, w, h, d = ox - inf, oy - inf, oz - inf, w + 2 * inf, h + 2 * inf, d + 2 * inf
     uv = c["uv"]
     geo = {
         "north": lambda a, b: (ox + a * w, oy + h - b * h, oz),
@@ -87,6 +89,14 @@ def cube_faces(c):
         "up": lambda a, b: (ox + a * w, oy + h, oz + d - b * d),
         "down": lambda a, b: (ox + a * w, oy, oz + d - b * d),
     }
+    if c.get("rotation"):   # a cube turned about its own pivot
+        M, piv = AP.rot_matrix(*c["rotation"]), c.get("pivot", [ox + w / 2, oy + h / 2, oz + d / 2])
+        for k, fn in list(geo.items()):
+            def turned(a, b, fn=fn):
+                q = fn(a, b)
+                r = AP.apply(M, (q[0] - piv[0], q[1] - piv[1], q[2] - piv[2]))
+                return (r[0] + piv[0], r[1] + piv[1], r[2] + piv[2])
+            geo[k] = turned
     if isinstance(uv, dict):
         for face, spec in uv.items():
             (u, v), (uw, vh) = spec["uv"], spec.get("uv_size", [1, 1])

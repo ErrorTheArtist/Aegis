@@ -988,6 +988,13 @@ python3 tools/gen_particles.py --preview fire_burst ice_burst heal -o sheet.png
 
 The timers start when the server starts. Intervals are the two constants at the top of `behavior_pack/scripts/lagclear.js`.
 
+## Fixes (v1.41.1)
+
+- The legendary swords are visible again, in the hand and on the back. Since v1.35 their renderer decided which copy
+  to show (in the hand or put away on the back) with values Minecraft only allows in an attachable's scripts, so it
+  errored and hid both. The swords use the standard item renderer again, and the switch is done by the attachable's
+  own scripts, the way the vanilla shield does it.
+
 ## Fixes (v1.40)
 
 - Jutsu hits no longer count as M1 punches. Before, a Rasengan or any other scripted hit that landed also played a

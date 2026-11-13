@@ -53,7 +53,32 @@
       }
     },
     "animation.aegis.sword.settle": {
-      "animation_length": 1.2
+      "animation_length": 1.2,
+      "bones": {
+        "sword": {
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      }
+    },
+    "animation.aegis.sword.hide_back": {
+      "loop": true,
+      "bones": {
+        "back": {
+          "scale": 0
+        }
+      }
+    },
+    "animation.aegis.sword.hide_hand": {
+      "loop": true,
+      "bones": {
+        "sword": {
+          "scale": 0
+        }
+      }
     }
   }
 }

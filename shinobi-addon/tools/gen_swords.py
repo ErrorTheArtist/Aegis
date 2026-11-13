@@ -262,7 +262,10 @@ w(RP / "animations" / "swords.animation.json", {"format_version": "1.10.0", "ani
     "animation.aegis.sword.hold_first_person": {"loop": True, "bones": {"sword": {
         "position": [-7.0, -3.0, -2.0], "rotation": [152.0, -9.0, 25.0]}}},
     "animation.aegis.sword.carry": {"loop": True, "bones": {"sword": hold_pose(-14.0)}},        # resting on the shoulder
-    "animation.aegis.sword.settle": {"animation_length": 1.2},                                   # how long you stand still first
+    "animation.aegis.sword.settle": {"animation_length": 1.2, "bones": {"sword": {"rotation": [0, 0, 0]}}},  # stand still this long first
+    # which copy shows: the one in the hand (main hand) or the one on the back (put away in the off hand)
+    "animation.aegis.sword.hide_back": {"loop": True, "bones": {"back": {"scale": 0}}},
+    "animation.aegis.sword.hide_hand": {"loop": True, "bones": {"sword": {"scale": 0}}},
 }})
 w(RP / "animation_controllers" / "swords.animation_controllers.json", {"format_version": "1.10.0", "animation_controllers": {
     "controller.animation.aegis.sword_carry": {"initial_state": "hold", "states": {
@@ -272,13 +275,7 @@ w(RP / "animation_controllers" / "swords.animation_controllers.json", {"format_v
                    "transitions": [{"hold": "query.is_moving || query.is_sneaking"}, {"carry": "query.any_animation_finished"}]},
         "carry": {"animations": ["carry"], "blend_transition": 0.3,
                   "transitions": [{"hold": "query.is_moving || query.is_sneaking"}]}}}}})
-w(RP / "render_controllers" / "swords.render_controllers.json", {"format_version": "1.8.0", "render_controllers": {
-    "controller.render.aegis.sword": {
-        "geometry": "Geometry.default",
-        "materials": [{"*": "variable.is_enchanted ? Material.enchanted : Material.default"}],
-        "textures": ["Texture.default", "Texture.enchanted"],
-        "part_visibility": [{"*": True}, {"sword": "c.item_slot == 'main_hand'"},
-                            {"back": "c.item_slot == 'off_hand' && !c.is_first_person"}]}}})
+(RP / "render_controllers" / "swords.render_controllers.json").unlink(missing_ok=True)   # replaced (see the attachable)
 
 # Where each sword sits when it's put away: (grip position on the body, blade angle from straight up)
 MOUNT_BACK = ([-5.0, 27.0, 3.6], 148)      # hilt over the right shoulder, blade down across the back
@@ -323,9 +320,14 @@ for sid, sd in SWORDS.items():
         "geometry": {"default": f"geometry.aegis.sword_{sid}"},
         "animations": {"third": "animation.aegis.sword.hold_third_person", "first": "animation.aegis.sword.hold_first_person",
                        "carry": "animation.aegis.sword.carry", "settle": "animation.aegis.sword.settle",
-                       "worn": "controller.animation.aegis.sword_carry"},
-        "scripts": {"animate": [{"worn": "!c.is_first_person && c.item_slot == 'main_hand'"}, {"first": "c.is_first_person"}]},
-        "render_controllers": ["controller.render.aegis.sword"]}}})
+                       "worn": "controller.animation.aegis.sword_carry",
+                       "hide_back": "animation.aegis.sword.hide_back", "hide_hand": "animation.aegis.sword.hide_hand"},
+        # c.item_slot / c.is_first_person are read here (like the vanilla shield does), never in a render controller
+        "scripts": {"animate": [{"worn": "!c.is_first_person && c.item_slot == 'main_hand'"},
+                                {"first": "c.is_first_person && c.item_slot == 'main_hand'"},
+                                {"hide_back": "c.item_slot == 'main_hand' || c.is_first_person"},
+                                {"hide_hand": "c.item_slot != 'main_hand'"}]},
+        "render_controllers": ["controller.render.item_default"]}}})
 
     w(BP / "items" / f"{sid}.json", {"format_version": "1.21.60", "minecraft:item": {
         "description": {"identifier": f"aegis:{sid}", "menu_category": {"category": "equipment", "group": "minecraft:itemGroup.name.sword"}},

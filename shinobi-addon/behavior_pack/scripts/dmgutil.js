@@ -1,4 +1,4 @@
-// Bonus damage and heal-back helpers shared by the M1 combos and the Nindō system.
+// Bonus damage, heal-back and drain helpers (the M1 combos, Tailed Beast Mode, the jutsu).
 //
 // Scripted hits (every jutsu, taijutsu and sword art goes through main.js hurt()) are marked with markScripted() so
 // listeners that only care about real melee swings — the M1 combo, Chakra Scalpel, Lightning Armour — can tell a jutsu

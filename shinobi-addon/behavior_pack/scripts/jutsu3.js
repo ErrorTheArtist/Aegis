@@ -5,9 +5,9 @@
 //   Lightning: Lightning Hound · Lightning Release Armour
 //   Earth:     Earth Dragon Bullet · Headhunter Jutsu · Swamp of the Underworld
 //   Ninjutsu:  Big Ball Rasengan · Explosive Tag Barrage
-//   Taijutsu:  Leaf Hurricane · Dynamic Entry · Front Lotus   (count as melee for nindō bonuses; not ninjutsu)
+//   Taijutsu:  Leaf Hurricane · Dynamic Entry · Front Lotus   (melee: they scale with the Taijutsu stat)
 //   Medical:   Chakra Scalpel          Genjutsu: Demonic Illusion — Hell Viewing
-// main.js merges these into its JUTSU table (cost, cooldown, chakra, nindō and affinity all work like every scroll).
+// main.js merges these into its JUTSU table (cost, cooldown, chakra and affinity all work like every scroll).
 
 import { world, system, BlockPermutation } from "@minecraft/server";
 import { impactFx, sfx, shake, chargeFx } from "./cinematic.js";
@@ -756,7 +756,7 @@ function stickTag(player, pos, stuckTo, fuse) {
 }
 
 // ===========================================================================
-// TAIJUTSU (counts as melee: nindō fist bonuses apply, ninjutsu cost penalties don't)
+// TAIJUTSU (melee techniques: they scale with the Taijutsu stat instead of Ninjutsu)
 // ===========================================================================
 // Leaf Hurricane: a leaping spin kick that hits everything around you.
 function castLeafHurricane(player) {

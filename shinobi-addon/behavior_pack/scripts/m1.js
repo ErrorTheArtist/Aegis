@@ -8,7 +8,6 @@
 
 import { world, system } from "@minecraft/server";
 import { getStat } from "./levels.js";
-import { nindoDamage, NINDOS, getNindoId } from "./nindos.js";
 import { boostHit, isEcho, healBack, scriptedHit } from "./dmgutil.js";
 import { bijuuMeleeBonus } from "./bijuu.js";
 
@@ -52,14 +51,13 @@ function onHit(player, target, damage) {
   api.sound(dim, move.finisher ? "aegis.hit_heavy" : blade ? "aegis.slash" : "aegis.hit", at, move.finisher ? 1.3 : 0.9, 0.95 + (c.step % 3) * 0.08);
   if (!blade) api.particle(dim, "aegis:slash", at, [1, 0.95, 0.8]);
 
-  // bonus damage: fists scale with Taijutsu; then the nindō (Heavy Handed, Top Physique, Clever …) scales the hit.
+  // bonus damage: fists scale with Taijutsu.
   // A bigger hit is applied as (this hit + bonus) so it lands inside the hurt cooldown; a weaker one is healed back.
   const bonus = Math.round(move.bonus * (blade ? 1 : 1 + getStat(player, "taijutsu") / 100));
   // …and in Tailed Beast Mode every hit carries the beast's chakra
-  const total = nindoDamage(player, target, damage, blade ? "blade" : "fist") + bonus + bijuuMeleeBonus(player, target);
+  const total = damage + bonus + bijuuMeleeBonus(player, target);
   if (total > damage) boostHit(target, damage, total, player);
   else healBack(target, damage - total);
-  const knock = NINDOS[getNindoId(player)]?.knock;
 
   const d = api.norm({ x: target.location.x - player.location.x, y: 0, z: target.location.z - player.location.z });
   const gap = Math.hypot(target.location.x - player.location.x, target.location.z - player.location.z);
@@ -80,7 +78,6 @@ function onHit(player, target, damage) {
   } else if (gap > 1.6) {
     api.knockback(player, d.x, d.z, 0.35, 0); // step in so the next hit connects
   }
-  if (knock && !move.finisher) api.knockback(target, d.x, d.z, knock, 0.2);
 }
 
 export function initM1(helpers) {

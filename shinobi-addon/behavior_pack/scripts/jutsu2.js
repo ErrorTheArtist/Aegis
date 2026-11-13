@@ -4,7 +4,6 @@
 
 import { world, system } from "@minecraft/server";
 import { impactFx, sfx, shake, chargeFx, castFx, aura } from "./cinematic.js";
-import { nindoGatesMultiplier } from "./nindos.js";
 
 let api;
 const gates = new Map(); // playerId -> tick the Eight Gates end
@@ -378,7 +377,7 @@ function castEightGates(player) {
     impactFx(dim, player.location, GATE, 2.5);
     sfx(dim, "aegis.transform", player.location, 1.8, 1.2);
     api.particle(dim, "aegis:cine_pillar", player.location, GATE);
-    const open = Math.round(400 * nindoGatesMultiplier(player)); // Awakening of Youth keeps them open longer
+    const open = 400;
     eff(player, "strength", open, 2, false);
     eff(player, "speed", open, 2, false);
     eff(player, "jump_boost", open, 1, false);

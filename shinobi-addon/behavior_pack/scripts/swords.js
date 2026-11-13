@@ -3,7 +3,6 @@
 
 import { world, system } from "@minecraft/server";
 import { sameVillage } from "./villages.js";
-import { nindoCostMultiplier } from "./nindos.js";
 import { impactFx, sfx } from "./cinematic.js";
 
 let api;
@@ -536,7 +535,7 @@ export function handleSwordUse(player, itemStack) {
     player.onScreenDisplay.setActionBar(`§7${s.special} ready in §f${(left / 20).toFixed(1)}s`);
     return true;
   }
-  const cost = Math.round((s.cost ?? 0) * nindoCostMultiplier(player, "sword", key));
+  const cost = s.cost ?? 0;
   if (api.getChakra(player) < cost) {
     player.onScreenDisplay.setActionBar(`§cNot enough chakra! §7(${Math.floor(api.getChakra(player))}/${cost})`);
     return true;

@@ -17,7 +17,6 @@ import { applyNameTag, refreshClanEffects } from "./clans.js";
 import { getRyo, fmtRyo, walletMenu } from "./currency.js";
 import { getVillage, villageLabel, villageMenu } from "./villages.js";
 import { starterLine } from "./starter.js";
-import { getNindoId, nindoLabel, nindoMenu, nindoXpMultiplier, nindoShareXp } from "./nindos.js";
 
 export const MAX_LEVEL = 200;
 const POINTS_PER_LEVEL = 3;
@@ -108,10 +107,6 @@ export function statEffectLevels(player) {
 // ---------------------------------------------------------------------------
 export function gainXp(player, amount, quiet = false, shared = false) {
   if (!player || player.typeId !== "minecraft:player" || amount <= 0) return;
-  if (!shared) {
-    amount *= nindoXpMultiplier(player); // Prodigy, Clever, Never Give Up …
-    nindoShareXp(player, amount, (ally, amt) => gainXp(ally, amt, true, true)); // Passing the Will
-  }
   let level = getLevel(player);
   if (level >= MAX_LEVEL) return;
   let xp = num(player, P.xp, 0) + Math.round(amount);
@@ -177,7 +172,6 @@ export async function openStats(player) {
         `§7Unspent points: §e${points}`,
         `§7Ryō: §6${fmtRyo(getRyo(player))}`,
         `§7Village: ${villageLabel(getVillage(player))}`,
-        `§7Nindō: ${nindoLabel(getNindoId(player))}`,
         starterLine(player),
         "",
         ...ids.map((id) => `${STATS[id].color}${STATS[id].name}§r §f${getStat(player, id)}§7/${STAT_CAP} §8— ${STATS[id].desc}`),
@@ -187,14 +181,12 @@ export async function openStats(player) {
   form.button("§cReset stats");
   form.button("§6Ryō Wallet\n§r§7pay players · exchange emeralds");
   form.button("§aVillage\n§r§7chat · leaderboard · return home");
-  form.button("§eNindō\n§r§7your ninja way");
 
   const res = await form.show(player);
   if (res.canceled || res.selection === undefined) return;
   if (res.selection === ids.length) return confirmReset(player);
   if (res.selection === ids.length + 1) return walletMenu(player);
   if (res.selection === ids.length + 2) return villageMenu(player);
-  if (res.selection === ids.length + 3) return nindoMenu(player);
   const id = ids[res.selection];
   const room = Math.min(getPoints(player), STAT_CAP - getStat(player, id));
   if (room <= 0) {

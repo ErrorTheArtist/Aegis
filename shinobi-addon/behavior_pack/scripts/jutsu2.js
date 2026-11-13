@@ -278,8 +278,8 @@ function castChidoriSpear(player) {
     if (!api.isValid(player)) return;
     const d = player.getViewDirection();
     const start = api.sub(api.handPos(player), { x: 0, y: 0.2, z: 0 });
-    let len = 16;
-    for (let s = 1; s <= 16; s += 0.5) {
+    let len = 22;
+    for (let s = 1; s <= 22; s += 0.5) {
       try {
         const b = dim.getBlock(api.add(start, api.scale(d, s)));
         if (b && !b.isAir && !b.isLiquid) {
@@ -302,8 +302,9 @@ function castChidoriSpear(player) {
           for (const e of dim.getEntities({ location: p, maxDistance: 1.3 })) {
             if (!api.canBeHit(e, player) || hit.has(e.id)) continue;
             hit.add(e.id);
-            api.hurt(e, 12, player, "lightning");
-            eff(e, "slowness", 50, 4);
+            api.hurt(e, 22, player, "lightning");
+            eff(e, "slowness", 60, 5);
+            eff(e, "weakness", 60, 1);
             api.particle(dim, "aegis:lightning_burst", api.add(e.location, { x: 0, y: 1, z: 0 }));
           }
         }
@@ -437,7 +438,7 @@ export function makeJutsu2(helpers) {
     "aegis:water_prison_scroll": { name: "Water Style: Water Prison", cost: 35, cooldown: 240, cast: castWaterPrison },
     "aegis:vacuum_scroll": { name: "Wind Style: Vacuum Bullets", cost: 30, cooldown: 60, cast: castVacuum },
     "aegis:earth_spikes_scroll": { name: "Earth Style: Earth Spikes", cost: 35, cooldown: 100, cast: castEarthSpikes },
-    "aegis:chidori_spear_scroll": { name: "Lightning Style: Chidori Sharp Spear", cost: 40, cooldown: 100, cast: castChidoriSpear },
+    "aegis:chidori_spear_scroll": { name: "Lightning Style: Chidori Sharp Spear", cost: 40, cooldown: 80, cast: castChidoriSpear },
     "aegis:ice_needles_scroll": { name: "Ice Release: Thousand Needles of Death", cost: 45, cooldown: 160, clan: "yuki", cast: castIceNeedles },
     "aegis:eight_gates_scroll": { name: "Eight Inner Gates Release", cost: 50, cooldown: 1200, kind: "taijutsu", cast: castEightGates },
   };

@@ -662,7 +662,7 @@ function tickSwamps() {
 // Big Ball Rasengan: a Rasengan several times the size — slower to form, and it craters the ground.
 function castBigRasengan(player) {
   const dim = player.dimension;
-  const CHARGE = 22;
+  const CHARGE = 18;
   api.anim(player, "animation.aegis.rasengan_form");
   chargeFx(player, COL.chakra, CHARGE, "aegis.charge");
   sfx(dim, "aegis.rasengan", player.location, 1.6, 0.7);
@@ -696,11 +696,12 @@ function castBigRasengan(player) {
         api.sound(dim, "random.explode", c, 1.4, 1);
         shake(dim, c, 0.9, 0.9, 28);
         const look = flat(player.getViewDirection());
-        for (const e of foes(player, c, 3.6)) {
+        for (const e of foes(player, c, 4.5)) {
           const main = e.id === target.id;
-          api.hurt(e, main ? 24 : 12, player);
+          api.hurt(e, main ? 34 : 18, player);
           const a = main ? look : api.norm({ x: e.location.x - c.x, y: 0, z: e.location.z - c.z });
-          api.knockback(e, a.x, a.z, main ? 3.4 : 2, 0.7);
+          api.knockback(e, a.x, a.z, main ? 3.6 : 2.2, main ? 0.75 : 0.85);
+          eff(e, "slowness", 30, main ? 4 : 2, true);
         }
         api.removeFx(orb);
       },
@@ -1003,7 +1004,7 @@ export function makeJutsu3(helpers) {
     "aegis:earth_dragon_scroll": { name: "Earth Style: Earth Dragon Bullet", cost: 35, cooldown: 120, cast: castEarthDragon },
     "aegis:headhunter_scroll": { name: "Earth Style: Headhunter Jutsu", cost: 30, cooldown: 160, cast: castHeadhunter },
     "aegis:swamp_scroll": { name: "Earth Style: Swamp of the Underworld", cost: 45, cooldown: 320, cast: castSwamp },
-    "aegis:big_rasengan_scroll": { name: "Big Ball Rasengan", cost: 50, cooldown: 200, cast: castBigRasengan },
+    "aegis:big_rasengan_scroll": { name: "Big Ball Rasengan", cost: 50, cooldown: 160, cast: castBigRasengan },
     "aegis:explosive_tags_scroll": { name: "Explosive Tag Barrage", cost: 15, cooldown: 100, cast: castExplosiveTags },
     "aegis:leaf_hurricane_scroll": { name: "Taijutsu: Leaf Hurricane", cost: 15, cooldown: 40, kind: "taijutsu", cast: castLeafHurricane },
     "aegis:dynamic_entry_scroll": { name: "Taijutsu: Dynamic Entry", cost: 15, cooldown: 80, kind: "taijutsu", cast: castDynamicEntry },

@@ -51,17 +51,17 @@ const HUD_INTERVAL = 5; // ticks
 // cost = chakra, cooldown = ticks
 const JUTSU = {
   "aegis:fireball_scroll": { name: "Fire Style: Fireball Jutsu", cost: 25, cooldown: 40, cast: castFireball },
-  "aegis:sphere_scroll": { name: "Rasengan", cost: 30, cooldown: 60, cast: castSphere },
+  "aegis:sphere_scroll": { name: "Rasengan", cost: 30, cooldown: 50, cast: castSphere },
   "aegis:substitution_scroll": { name: "Substitution Jutsu", cost: 20, cooldown: 100, cast: castSubstitution },
   "aegis:clone_scroll": { name: "Shadow Clone Jutsu", cost: 40, cooldown: 200, cast: castClones },
   "aegis:flash_scroll": { name: "Body Flicker", cost: 10, cooldown: 15, cast: castFlashStep },
   "aegis:wind_scroll": { name: "Wind Style: Great Breakthrough", cost: 15, cooldown: 30, cast: castGalePalm },
-  "aegis:chidori_scroll": { name: "Chidori", cost: 35, cooldown: 80, cast: castChidori },
+  "aegis:chidori_scroll": { name: "Chidori", cost: 35, cooldown: 60, cast: castChidori },
   "aegis:phoenix_scroll": { name: "Fire Style: Phoenix Sage Fire", cost: 30, cooldown: 60, cast: castPhoenix },
   "aegis:water_dragon_scroll": { name: "Water Style: Water Dragon Bullet", cost: 35, cooldown: 80, cast: castWaterDragon },
   "aegis:earth_wall_scroll": { name: "Earth Style: Earth Wall", cost: 25, cooldown: 200, cast: castEarthWall },
-  "aegis:chidori_current_scroll": { name: "Lightning Style: Chidori Current", cost: 30, cooldown: 120, cast: castChidoriCurrent },
-  "aegis:rasenshuriken_scroll": { name: "Wind Style: Rasenshuriken", cost: 60, cooldown: 240, cast: castRasenshuriken },
+  "aegis:chidori_current_scroll": { name: "Lightning Style: Chidori Current", cost: 30, cooldown: 100, cast: castChidoriCurrent },
+  "aegis:rasenshuriken_scroll": { name: "Wind Style: Rasenshuriken", cost: 60, cooldown: 200, cast: castRasenshuriken },
   "aegis:mystical_palm_scroll": { name: "Mystical Palm Technique", cost: 25, cooldown: 100, cast: castMysticalPalm },
 };
 
@@ -532,7 +532,7 @@ function explodeProjectile(pr) {
 // --- Rasengan: form the spinning orb in your palm, then drive it into the first thing you reach. ---
 function castSphere(player) {
   const dim = player.dimension;
-  const CHARGE = 14;
+  const CHARGE = 10;
   anim(player, "animation.aegis.rasengan_form");
   chargeFx(player, [0.4, 0.75, 1], CHARGE);
   const orb = spawnFx(dim, "aegis:jutsu_orb", "aegis:as_rasengan", handPos(player));
@@ -551,17 +551,29 @@ function castSphere(player) {
     anim(player, "animation.aegis.ram_strike");
     sound(dim, "mob.breeze.wind_burst", player.location, 0.6, 1.4);
     lungeStrike(player, {
-      power: 2.6, range: 2.6, ticks: 14,
+      power: 3.0, range: 3.2, ticks: 14,
       onHit: (target) => {
         const center = add(target.location, { x: 0, y: 1, z: 0 });
         particle(dim, "aegis:chakra_burst", center);
         particle(dim, "minecraft:huge_explosion_emitter", center);
-        impactFx(dim, target.location, [0.4, 0.75, 1], 2);
-        sound(dim, "random.explode", center, 0.7, 1.6);
-        hurt(target, 14, player);
+        particle(dim, "aegis:cine_ring", target.location, [0.4, 0.75, 1]);
+        impactFx(dim, target.location, [0.4, 0.75, 1], 2.4);
+        sound(dim, "random.explode", center, 0.8, 1.5);
+        hurt(target, 22, player);
         const d = player.getViewDirection();
         const h = norm({ x: d.x, y: 0, z: d.z });
-        knockback(target, h.x, h.z, 3.2, 0.7);
+        knockback(target, h.x, h.z, 3.4, 0.75);
+        try {
+          target.addEffect("slowness", 20, { amplifier: 3 }); // dazed by the grinding spiral
+        } catch {
+          /* ignore */
+        }
+        for (const e of dim.getEntities({ location: target.location, maxDistance: 3 })) {   // the burst catches whoever stands close
+          if (e.id === target.id || !canBeHit(e, player)) continue;
+          hurt(e, 8, player);
+          const a = norm({ x: e.location.x - target.location.x, y: 0, z: e.location.z - target.location.z });
+          knockback(e, a.x, a.z, 1.8, 0.45);
+        }
         removeFx(orb);
       },
     });
@@ -736,7 +748,7 @@ function castGalePalm(player) {
 // --- Chidori: lightning gathers in your hand, then you lunge; the first thing you hit takes it all. ---
 function castChidori(player) {
   const dim = player.dimension;
-  const CHARGE = 14;
+  const CHARGE = 12;
   anim(player, "animation.aegis.chidori_charge");
   chargeFx(player, [0.6, 0.85, 1], CHARGE);
   sound(dim, "ambient.weather.thunder", player.location, 0.5, 1.8);
@@ -755,11 +767,30 @@ function castChidori(player) {
     if (!isValid(player)) return;
     anim(player, "animation.aegis.ram_strike");
     lungeStrike(player, {
-      power: 3.6, range: 2.6, ticks: 14,
+      power: 3.8, range: 3.0, ticks: 14,
       onHit: (target) => {
-        hurt(target, 13, player);
+        hurt(target, 24, player);
         const kb = norm({ x: target.location.x - player.location.x, y: 0, z: target.location.z - player.location.z });
         knockback(target, kb.x, kb.z, 1.5, 0.4);
+        try {
+          target.addEffect("slowness", 30, { amplifier: 5 });   // paralysed by the current
+          target.addEffect("weakness", 60, { amplifier: 1 });
+        } catch {
+          /* ignore */
+        }
+        // the thousand birds don't stop at one: the current arcs to the two closest enemies around
+        const from = add(target.location, { x: 0, y: 1, z: 0 });
+        const others = dim.getEntities({ location: target.location, maxDistance: 4 }).filter((e) => e.id !== target.id && canBeHit(e, player)).slice(0, 2);
+        for (const e of others) {
+          const to = add(e.location, { x: 0, y: 1, z: 0 });
+          for (let s = 1; s <= 4; s++) particle(dim, "aegis:chidori", add(from, scale(sub(to, from), s / 4)));
+          hurt(e, 8, player, "lightning");
+          try {
+            e.addEffect("slowness", 20, { amplifier: 3 });
+          } catch {
+            /* ignore */
+          }
+        }
         particle(dim, "aegis:lightning_burst", add(target.location, { x: 0, y: 1, z: 0 }));
         sound(dim, "ambient.weather.lightning.impact", target.location, 0.8, 1.4);
         sfx(dim, "aegis.lightning", target.location, 1.5, 1);
@@ -870,11 +901,11 @@ function castChidoriCurrent(player) {
   system.runTimeout(() => {
     if (!isValid(player)) return;
     sound(dim, "ambient.weather.thunder", player.location, 0.6, 1.8);
-    for (let k = 1; k <= 5; k++) {
+    for (let k = 1; k <= 7; k++) {
       system.runTimeout(() => {
         if (!isValid(player)) return;
-        for (let i = 0; i < 14; i++) {
-          const a = (i / 14) * Math.PI * 2;
+        for (let i = 0; i < 16; i++) {
+          const a = (i / 16) * Math.PI * 2;
           particle(dim, "aegis:chidori", add(player.location, { x: Math.cos(a) * k, y: 0.6 + Math.random(), z: Math.sin(a) * k }));
         }
       }, k);
@@ -882,17 +913,27 @@ function castChidoriCurrent(player) {
     particle(dim, "aegis:lightning_burst", add(player.location, { x: 0, y: 1, z: 0 }));
     sfx(dim, "aegis.lightning", player.location, 1.6, 0.9);
     impactFx(dim, player.location, [0.6, 0.85, 1], 2);
-    for (const e of dim.getEntities({ location: player.location, maxDistance: 5.5 })) {
-      if (!canBeHit(e, player)) continue;
-      hurt(e, 8, player, "lightning");
-      try {
-        e.addEffect("slowness", 50, { amplifier: 4 });
-        e.addEffect("weakness", 80, { amplifier: 1 });
-      } catch {
-        /* ignore */
+    const zap = (dmg, slowTicks) => {
+      for (const e of dim.getEntities({ location: player.location, maxDistance: 7 })) {
+        if (!canBeHit(e, player)) continue;
+        hurt(e, dmg, player, "lightning");
+        try {
+          e.addEffect("slowness", slowTicks, { amplifier: 6 });
+          e.addEffect("weakness", 80, { amplifier: 1 });
+        } catch {
+          /* ignore */
+        }
+        particle(dim, "aegis:chidori", add(e.location, { x: 0, y: 1, z: 0 }));
       }
-      particle(dim, "aegis:chidori", add(e.location, { x: 0, y: 1, z: 0 }));
-    }
+    };
+    zap(14, 60);
+    // the current keeps flowing: a second pulse half a second later
+    system.runTimeout(() => {
+      if (!isValid(player)) return;
+      particle(dim, "aegis:lightning_burst", add(player.location, { x: 0, y: 1, z: 0 }));
+      sfx(dim, "aegis.lightning", player.location, 1.2, 1.2);
+      zap(6, 40);
+    }, 11);
   }, 6);
 }
 
@@ -917,12 +958,21 @@ function castRasenshuriken(player) {
     if (!isValid(player)) return;
     removeFx(model);
     const d = player.getViewDirection();
-    launchProjectile(player, add(above(), scale(d, 1)), d, {
-      orbEntity: "aegis:rasenshuriken", orbOffset: 0.4, speed: 1.15, maxAge: 40, damage: 22, radius: 6, knock: 1.6, fire: 0,
-      trail: "aegis:wind_gust", burst: "aegis:chakra_burst", hitRadius: 2.2, sound: "random.explode",
+    // it's thrown from above your head, so fly it to what the crosshair is on (an enemy, else straight ahead)
+    const from = add(above(), scale(d, 1));
+    let aim = add(player.getHeadLocation(), scale(d, 32));
+    try {
+      const hit = player.getEntitiesFromViewDirection({ maxDistance: 40 }).map((h) => h.entity).find((e) => canBeHit(e, player));
+      if (hit) aim = add(hit.location, { x: 0, y: 1, z: 0 });
+    } catch {
+      /* straight ahead */
+    }
+    launchProjectile(player, from, sub(aim, from), {
+      orbEntity: "aegis:rasenshuriken", orbOffset: 0.4, speed: 1.4, maxAge: 36, damage: 34, radius: 6.5, knock: 1.8, fire: 0,
+      trail: "aegis:wind_gust", burst: "aegis:chakra_burst", hitRadius: 2.6, sound: "random.explode",
       onExplode: (pos, pdim, caster) => {
-        // the sphere of micro wind blades lingers and keeps cutting
-        for (let k = 0; k < 5; k++) {
+        // the sphere of micro wind blades lingers and keeps cutting (every half second, so each cut lands)
+        for (let k = 1; k <= 6; k++) {
           system.runTimeout(() => {
             for (let i = 0; i < 18; i++) {
               const a = Math.random() * Math.PI * 2;
@@ -931,8 +981,16 @@ function castRasenshuriken(player) {
             }
             particle(pdim, "aegis:wind_gust", pos);
             if (!isValid(caster)) return;
-            for (const e of pdim.getEntities({ location: pos, maxDistance: 5.5 })) if (canBeHit(e, caster)) hurt(e, 4, caster, "magic");
-          }, k * 5);
+            for (const e of pdim.getEntities({ location: pos, maxDistance: 6.5 })) {
+              if (!canBeHit(e, caster)) continue;
+              hurt(e, 6, caster, "magic");
+              try {
+                e.addEffect("slowness", 30, { amplifier: 2 });
+              } catch {
+                /* ignore */
+              }
+            }
+          }, k * 10);
         }
         sound(pdim, "aegis.wind", pos, 2, 0.85);
       },

@@ -242,22 +242,22 @@ Clan odds, stats and abilities are all in `behavior_pack/scripts/clans.js`.
 | Scroll | Chakra | Cooldown | Effect |
 |---|---|---|---|
 | Fire Style: Fireball Jutsu | 25 | 2s | Fireball flies forward and bursts: 9 fire damage in an area, sets mobs alight. No block damage. |
-| Rasengan | 30 | 3s | Close-range (5 blocks) strike: 14 damage and a huge knockback. No cost if nothing is in reach. |
+| Rasengan | 30 | 2.5s | Form it in your palm and lunge: the first thing you reach takes **22** damage, is dazed and blasted away; anyone close by takes 8. |
 | Substitution Jutsu | 20 | 5s | For 8s, the next hit you take is undone and you reappear behind the attacker. |
 | Shadow Clone Jutsu | 40 | 10s | Summons 2 clones (max 4) that fight hostile mobs for 30s. Hit your own clone to dispel it. |
 | Body Flicker | 10 | 0.75s | Burst of speed where you're looking, with a moment of slow-falling. |
 | Wind Style: Great Breakthrough | 15 | 1.5s | Cone of wind that blasts everything in front of you away. |
-| Chidori | 35 | 4s | Charge up lightning, then lunge forward: the first thing you hit takes 13 damage. |
+| Chidori | 35 | 3s | Charge up lightning, then lunge: the first thing you hit takes **24** damage and is paralysed for 1.5s, and the current arcs to the two closest enemies around it (8 each). |
 | Fire Style: Phoenix Sage Fire | 30 | 3s | Breathe a fan of 5 fireballs (5 fire damage each). |
 | Water Style: Water Dragon Bullet | 35 | 4s | Heavy water orb: 14 damage in a 4-block splash, big knockback, slows. |
 | Earth Style: Earth Wall | 25 | 10s | Slam the ground: a 7×4 mud-brick wall erupts in front of you for 15s, launching enemies. |
-| Lightning Style: Chidori Current | 30 | 6s | Lightning bursts from your whole body: 8 damage and a stun to everything within 5 blocks. |
-| Wind Style: Rasenshuriken | 60 | 12s | Form the spinning shuriken overhead and hurl it: 22 damage, then a storm of wind blades keeps cutting (5 × 4). |
+| Lightning Style: Chidori Current | 30 | 5s | Lightning bursts from your whole body: **14** damage and a 3s paralysis to everything within **7** blocks, then a second pulse (6) half a second later. |
+| Wind Style: Rasenshuriken | 60 | 10s | Form the spinning shuriken overhead and hurl it at what you aim at: **34** damage in 6.5 blocks, then a storm of wind blades keeps cutting and slowing (6 × 6). |
 | Mystical Palm Technique | 25 | 5s | Heal the player/companion you're looking at (or yourself): +12 HP over 1s and Regeneration II. |
 | Wind Style: Vacuum Bullets | 30 | 3s | Five compressed air bullets in quick succession: 6 damage + strong knockback each. |
 | Earth Style: Earth Spikes | 35 | 5s | A 14-block line of stone spikes rips out of the ground: 10 damage, launches and slows (spikes crumble after 4s). |
 | Water Style: Water Prison | 35 | 12s | Trap the target you look at (12 blocks) in a sphere of water for 5s (2s on bosses): can't move, 3 drowning damage per second. |
-| Lightning Style: Chidori Sharp Spear | 40 | 5s | The Chidori stretches into a 16-block lightning blade that pierces everything in line: 12 damage + stun. |
+| Lightning Style: Chidori Sharp Spear | 40 | 4s | The Chidori stretches into a **22-block** lightning blade that pierces everything in line: **22** damage and a 3s paralysis. |
 | Fire Style: Great Fire Annihilation | 55 | 10s | A huge wall of fire that widens as it rolls forward: up to 3 × 6 fire damage and sets everything alight. |
 | Eight Inner Gates Release | 50 | 60s | 20s of Strength III, Speed III, Haste, Jump Boost and Resistance; every punch blasts enemies away. Afterwards: exhaustion and −2 hearts. |
 | Lightning Style: Kirin | 80 | 20s | Aim at a spot up to 48 blocks away: storm clouds gather, then a dragon of lightning crashes down — 28 damage in 5 blocks. |
@@ -286,7 +286,7 @@ if you aren't looking at one.
 | Earth Style: Earth Dragon Bullet | 35 | 6s | Lv 30 · 2,200 | A dragon of rock rises from the ground in front of you and spits 3 mud bullets at your target: 9 damage in 2.6 blocks + slowness each. |
 | Earth Style: Headhunter Jutsu | 30 | 8s | Lv 20 · 1,600 | Sink into the earth and drag the enemy you look at (16 blocks) into the ground: 10 damage, rooted for 3s — then pop up behind them with an uppercut (+6). |
 | Earth Style: Swamp of the Underworld | 45 | 16s | Lv 50 · 3,200 | The ground where you look turns to sucking mud (4-block radius) for 8s: enemies are slowed, weakened, dragged to the centre and take 1.5 damage a second. Every block is put back afterwards — even after a crash or restart. |
-| Big Ball Rasengan | 50 | 10s | Lv 50 · 3,400 | A Rasengan more than twice the size. Dash into the first enemy you reach: 24 damage and a huge knockback, 12 to everyone within 3.5 blocks. |
+| Big Ball Rasengan | 50 | 8s | Lv 50 · 3,400 | A Rasengan more than twice the size. Dash into the first enemy you reach: **34** damage and a huge knockback, **18** to everyone within 4.5 blocks, everyone slowed. |
 | Explosive Tag Barrage | 15 | 5s | Lv 10 · 800 | Throw 3 tags at your target: they stick to whatever they hit, fizz, and go off one after another (6 damage in 3 blocks each). |
 | Taijutsu: Leaf Hurricane | 15 | 2s | Lv 5 · 600 | A leaping spin kick: 8 damage and knockback to everyone within 3 blocks. |
 | Taijutsu: Dynamic Entry | 15 | 4s | Lv 15 · 1,000 | A flying kick straight at the enemy you look at (up to 16 blocks): 12 damage and a big knockback. |

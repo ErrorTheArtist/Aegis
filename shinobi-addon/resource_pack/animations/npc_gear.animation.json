@@ -1,0 +1,52 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.aegis.npc_gear.flutter": {
+      "loop": true,
+      "bones": {
+        "g_ties": {
+          "rotation": [
+            "math.sin(q.life_time * 300) * 7 + q.modified_move_speed * 30",
+            0,
+            "math.sin(q.life_time * 220) * 6"
+          ]
+        },
+        "g_scarf_t0": {
+          "rotation": [
+            "math.sin(q.life_time * 260) * 8 + q.modified_move_speed * 48",
+            0,
+            "math.sin(q.life_time * 180) * 6"
+          ]
+        },
+        "g_scarf_t0b": {
+          "rotation": [
+            "math.sin(q.life_time * 260 - 70) * 12 + q.modified_move_speed * 20",
+            0,
+            0
+          ]
+        },
+        "g_scarf_t1": {
+          "rotation": [
+            "math.sin(q.life_time * 240 + 40) * 8 + q.modified_move_speed * 42",
+            0,
+            "math.sin(q.life_time * 200 + 60) * 6"
+          ]
+        },
+        "g_scarf_t1b": {
+          "rotation": [
+            "math.sin(q.life_time * 240 - 30) * 12 + q.modified_move_speed * 18",
+            0,
+            0
+          ]
+        },
+        "g_tail": {
+          "rotation": [
+            "math.sin(q.life_time * 200) * 4 - q.modified_move_speed * 12",
+            0,
+            "math.sin(q.life_time * 150) * 4"
+          ]
+        }
+      }
+    }
+  }
+}

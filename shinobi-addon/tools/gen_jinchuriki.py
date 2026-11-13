@@ -818,7 +818,7 @@ def main():
                     "minecraft:max_stack_size": 1, "minecraft:glint": True,
                     "minecraft:wearable": {"slot": "slot.armor.chest", "protection": 10 if gold else 8},
                     "minecraft:enchantable": {"slot": "armor_torso", "value": 15}}}})
-            (icon(GOLD["col"], beast["core"]) if gold else icon(beast["col"])).save(RP / "textures" / "items" / "aegis" / f"cloak_{bid}{sfx}.png")
+            # the item icons (both forms) are drawn by tools/gen_icons.py
             atlas["texture_data"][f"aegis_cloak_{bid}{sfx}"] = {"textures": f"textures/items/aegis/cloak_{bid}{sfx}"}
     w(atlas_p, atlas)
     w(RP / "animations" / "jinchuriki.animation.json", {"format_version": "1.8.0", "animations": anims})

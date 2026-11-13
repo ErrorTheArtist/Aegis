@@ -277,11 +277,15 @@ for name, o in SKINS:
     (Image.open(custom).convert("RGBA") if custom.exists() else humanoid(o)).save(RP / "textures" / "entity" / "aegis" / "npc" / f"{name}.png")
 
 skin_tex = {f"s{i}": f"textures/entity/aegis/npc/{n}" for i, (n, _) in enumerate(SKINS)}
+# 3D gear worn over some skins (tools/gen_npc_gear.py): the Rogue Ninja and the Leaf Shinobi
+GEAR = {n: i for i, (n, _) in enumerate(SKINS) if n in ("rogue", "chunin")}
 w(RP / "render_controllers" / "npc.render_controllers.json", {"format_version": "1.8.0", "render_controllers": {
     "controller.render.aegis.npc": {
         "arrays": {"textures": {"Array.skins": [f"Texture.s{i}" for i in range(len(SKINS))]}},
         "geometry": "Geometry.default", "materials": [{"*": "Material.default"}],
-        "textures": ["Array.skins[q.property('aegis:skin')]"]}}})
+        "textures": ["Array.skins[q.property('aegis:skin')]"]},
+    **{f"controller.render.aegis.npc_gear_{n}": {
+        "geometry": f"Geometry.gear_{n}", "materials": [{"*": "Material.default"}], "textures": [f"Texture.gear_{n}"]} for n in GEAR}}})
 
 HUMANOID_ANIMS = {"humanoid_base_pose": "animation.humanoid.base_pose", "look_at_target": "animation.humanoid.look_at_target.default",
                   "move": "animation.humanoid.move", "attack.rotations": "animation.humanoid.attack.rotations", "bob": "animation.humanoid.bob"}
@@ -291,10 +295,14 @@ SKIN_PROP = {"aegis:skin": {"type": "int", "range": [0, len(SKINS) - 1], "defaul
 
 def client_humanoid(ident, egg):
     w(RP / "entity" / f"{ident}.entity.json", {"format_version": "1.10.0", "minecraft:client_entity": {"description": {
-        "identifier": f"aegis:{ident}", "materials": {"default": "entity_alphatest"}, "textures": skin_tex,
-        "geometry": {"default": "geometry.humanoid.custom"}, "animations": HUMANOID_ANIMS,
+        "identifier": f"aegis:{ident}", "materials": {"default": "entity_alphatest"},
+        "textures": {**skin_tex, **{f"gear_{n}": f"textures/entity/aegis/npc/gear_{n}" for n in GEAR}},
+        "geometry": {"default": "geometry.humanoid.custom", **{f"gear_{n}": f"geometry.aegis.gear_{n}" for n in GEAR}},
+        "animations": {**HUMANOID_ANIMS, "gear": "animation.aegis.npc_gear.flutter"},
         # the vanilla walk cycle reads variable.tcos0 — mobs have to compute it themselves, or the legs never move
-        "scripts": {"pre_animation": WALK_PRE, "animate": list(HUMANOID_ANIMS)}, "render_controllers": ["controller.render.aegis.npc"],
+        "scripts": {"pre_animation": WALK_PRE, "animate": list(HUMANOID_ANIMS) + ["gear"]},
+        "render_controllers": ["controller.render.aegis.npc",
+                               *({f"controller.render.aegis.npc_gear_{n}": f"q.property('aegis:skin') == {i}"} for n, i in GEAR.items())],
         "enable_attachables": True, "spawn_egg": {"base_color": egg[0], "overlay_color": egg[1]}}}})
 
 

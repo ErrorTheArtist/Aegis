@@ -49,6 +49,28 @@
       "textures": [
         "Array.skins[q.property('aegis:skin')]"
       ]
+    },
+    "controller.render.aegis.npc_gear_rogue": {
+      "geometry": "Geometry.gear_rogue",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_rogue"
+      ]
+    },
+    "controller.render.aegis.npc_gear_chunin": {
+      "geometry": "Geometry.gear_chunin",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_chunin"
+      ]
     }
   }
 }

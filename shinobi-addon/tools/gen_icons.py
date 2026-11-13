@@ -626,6 +626,24 @@ def aura(color):
     return img
 
 
+def aura_mastered(color):
+    """The mastered cloak: golden flames around a core of the beast's own chakra, with the black seal swirl."""
+    img = new()
+    gold = (255, 196, 52)
+    hi, lo = (255, 236, 150), (196, 116, 12)
+    for cx, cy, sz in ((36, 78, 34), (92, 78, 34), (64, 66, 52)):
+        shape(img, lambda d, cx=cx, cy=cy, sz=sz: d.polygon(flame_poly(cx, cy, sz), fill=255), hi, lo)
+    lay = new()
+    shape(lay, lambda d: d.polygon(flame_poly(64, 80, 30), fill=255), tuple(min(255, v + 70) for v in color), tuple(color))
+    glow(img, lay, gold, 6, 1.5)
+    d = ImageDraw.Draw(img)
+    pts = [(64 + math.cos(a / 10) * a * 0.55, 88 + math.sin(a / 10) * a * 0.55) for a in range(4, 42)]
+    d.line(pts, fill=(30, 18, 8, 255), width=4)
+    d.polygon([(42, 58), (60, 64), (44, 68)], fill=(30, 18, 8, 255))
+    d.polygon([(86, 58), (68, 64), (84, 68)], fill=(30, 18, 8, 255))
+    return img
+
+
 def make_scroll(name, rod, emblem, paper=None):
     img = scroll(rod) if paper is None else scroll(rod, paper)
     if emblem:
@@ -683,4 +701,5 @@ if __name__ == "__main__":
     for beast, col in (("shukaku", (210, 170, 100)), ("matatabi", (60, 120, 240)), ("isobu", (110, 170, 150)), ("son_goku", (200, 60, 40)),
                        ("kokuo", (235, 235, 230)), ("saiken", (150, 220, 120)), ("chomei", (110, 200, 90)), ("gyuki", (160, 90, 170)), ("kurama", (245, 120, 20))):
         finish(aura(col), f"cloak_{beast}")
+        finish(aura_mastered(col), f"cloak_{beast}_m")     # Tailed Beast Chakra Mode: golden, the beast's colour inside
     print("Icons drawn.")

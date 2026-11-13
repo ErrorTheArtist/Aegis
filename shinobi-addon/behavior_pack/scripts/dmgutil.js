@@ -1,5 +1,9 @@
 // Bonus damage and heal-back helpers shared by the M1 combos and the Nindō system.
 //
+// Scripted hits (every jutsu, taijutsu and sword art goes through main.js hurt()) are marked with markScripted() so
+// listeners that only care about real melee swings — the M1 combo, Chakra Scalpel, Lightning Armour — can tell a jutsu
+// hit from a punch with scriptedHit(). Otherwise a Rasengan landing would also count as a jab.
+//
 // Bedrock only applies the part of a hit that exceeds the last one while an entity's hurt cooldown is running, so a
 // bonus on top of a hit that just landed is applied as one bigger hit (base + bonus). That re-applied hit raises its
 // own (deferred) hurt event: boostHit() remembers it so every handler can recognise that echo (same target, a few
@@ -8,6 +12,20 @@
 import { system } from "@minecraft/server";
 
 const echoes = new Map(); // entity id -> { tick, bonus, total } of the last boosted hit
+const scripted = new Map(); // entity id -> { tick, by, cause, kind } of the last scripted hit
+
+export function markScripted(target, attacker, cause, kind) {
+  if (target?.id) scripted.set(target.id, { tick: system.currentTick, by: attacker?.id, cause, kind });
+}
+
+// The scripted hit behind this hurt event (same target, attacker and cause, a tick or two ago), or undefined if it was
+// a real swing. Its `kind` says what it was ("fist" for taijutsu, "tech" for ninjutsu …).
+export function scriptedHit(entity, damageSource) {
+  const s = scripted.get(entity?.id);
+  if (!s || system.currentTick - s.tick > 2) return undefined;
+  if (s.cause !== damageSource?.cause || s.by !== damageSource?.damagingEntity?.id) return undefined;
+  return s;
+}
 
 export function boostHit(target, base, total, attacker, cause = "entityAttack") {
   if (!(total > base + 0.01)) return false;
@@ -55,4 +73,5 @@ export function drain(entity, amount) {
 system.runInterval(() => {
   const now = system.currentTick;
   for (const [id, e] of echoes) if (now - e.tick > 20) echoes.delete(id);
+  for (const [id, e] of scripted) if (now - e.tick > 20) scripted.delete(id);
 }, 200);

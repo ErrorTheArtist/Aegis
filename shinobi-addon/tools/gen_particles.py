@@ -712,6 +712,24 @@ L["heal_lines"] = dict(tex="beam", mat="add", n=4, shape=("disc", 0.6, [0, 0.1, 
                        size=(0.45, 0.25, [(0, 0.4), (0.3, 1), (1, 0.6)]), aspect=(0.08, 1.2), color=GREEN)
 L["slash_sparks"] = embers(TINT(), n=3, speed=(2.5, 6), life=(0.2, 0.45), grav=-8, size=0.05, radius=0.1, collide=False)
 
+# ---- jutsu wave 3 (jutsu3.js) ----
+P["ash_cloud"] = dict(tex="smoke", mat="blend", n=3, shape=("sphere", 0.8, [0, 0, 0], "outwards"), life=(1.4, 2.2), speed=(0.2, 0.7), drag=1.4,
+                      accel=[0, 0.25, 0], size=(1.5, 0.8, [(0, 0.5), (0.25, 1), (1, 1.4)]), spin=(-25, 25),
+                      color=colfix([(0, (0.2, 0.18, 0.18, 0)), (0.2, (0.24, 0.22, 0.21, 0.85)), (0.8, (0.3, 0.28, 0.27, 0.7)), (1, (0.35, 0.33, 0.32, 0))]),
+                      layers=["ash_cloud_embers"])
+L["ash_cloud_embers"] = dict(tex="ember", mat="add", n=4, shape=("sphere", 1.0, [0, 0, 0], "outwards"), life=(0.6, 1.4), speed=(0.1, 0.5), drag=0.8,
+                             accel=[0, 0.6, 0], size=(0.06, 0.05, [(0, 0), (0.2, 1), (1, 0)]), alpha_flicker=True,
+                             color=colfix([(0, (1, 0.8, 0.3, 1)), (0.5, (1, 0.45, 0.1, 1)), (1, (0.6, 0.15, 0.05, 0))]))
+P["mist_cloud"] = dict(tex="smoke", mat="blend", n=3, shape=("box", [3.5, 0.8, 3.5], [0, 0.9, 0], "outwards"), life=(1.8, 2.8), speed=(0.05, 0.3), drag=1,
+                       size=(2.4, 1.2, [(0, 0.6), (0.3, 1), (1, 1.3)]), spin=(-10, 10),
+                       color=colfix([(0, (0.86, 0.9, 0.94, 0)), (0.25, (0.88, 0.91, 0.95, 0.6)), (0.8, (0.9, 0.92, 0.95, 0.5)), (1, (0.92, 0.94, 0.96, 0))]))
+P["swamp_mud"] = dict(tex="scorch", mat="blend", n=1, shape=("point", [0, 0.05, 0]), life=(1.2, 1.2), speed=(0, 0), flat=True, rot=(0, 360),
+                      size=(2.2, 0.6, [(0, 0.95), (0.5, 1.02), (1, 1)]),
+                      color=colfix([(0, (0.2, 0.15, 0.09, 0)), (0.15, (0.22, 0.16, 0.1, 0.8)), (0.85, (0.22, 0.16, 0.1, 0.8)), (1, (0.22, 0.16, 0.1, 0))]))
+P["swamp_bubble"] = dict(tex="droplet", mat="blend", n=3, shape=("disc", 1.2, [0, 0.05, 0], [0, 1, 0]), life=(0.5, 0.9), speed=(0.3, 0.8), drag=1,
+                         size=(0.12, 0.1, [(0, 0.4), (0.7, 1.1), (1, 1.4)]),
+                         color=colfix([(0, (0.45, 0.36, 0.22, 0.9)), (0.8, (0.5, 0.42, 0.28, 0.8)), (1, (0.55, 0.45, 0.3, 0))]))
+
 # ---- dedicated effects for the releases that used to borrow generic ones ----
 P["ice_burst"] = chips("shard", colfix([(0, (0.95, 0.99, 1, 1)), (1, (0.7, 0.9, 1, 1))]), n=16, speed=(4, 10), size=0.2, grav=-13, radius=0.3)
 P["ice_burst"]["layers"] = ["ice_burst_flash", "ice_burst_mist", "ice_burst_sparkle", "ice_burst_shock"]

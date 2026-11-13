@@ -1,0 +1,28 @@
+{
+  "format_version": "1.16.100",
+  "minecraft:fog_settings": {
+    "description": {
+      "identifier": "aegis:fog_mist"
+    },
+    "distance": {
+      "air": {
+        "fog_start": 0.0,
+        "fog_end": 6.0,
+        "fog_color": "#D8E0E6",
+        "render_distance_type": "fixed"
+      },
+      "weather": {
+        "fog_start": 0.0,
+        "fog_end": 6.0,
+        "fog_color": "#D8E0E6",
+        "render_distance_type": "fixed"
+      },
+      "water": {
+        "fog_start": 0.0,
+        "fog_end": 4.0,
+        "fog_color": "#B8CCDA",
+        "render_distance_type": "fixed"
+      }
+    }
+  }
+}

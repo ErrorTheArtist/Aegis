@@ -856,6 +856,45 @@ A["animation.aegis.m1_slash3"] = anim(0.6, [
     (0.6, "io", REST),
 ])
 
+# ===========================================================================
+# Taijutsu scrolls (jutsu3.js) — timed against the hits there: Leaf Hurricane hits at 0.4s, Dynamic Entry flies
+# 0.1–0.6s, Front Lotus kicks at 0.15s, leaps at 0.2s, wraps at 0.6s and slams at 1.05s.
+# ===========================================================================
+A["animation.aegis.leaf_hurricane"] = anim(0.9, [
+    (0.08, "in", {"w": HIPS(18, -30, drop=3.4), "ra": [-40, 0, 30], "la": [-40, 0, -30], "rl": [-26, 0, 10], "ll": [20, 0, -10]}),       # coil
+    (0.2, "out", {"rt": ([0, 0, 0], [0, 6, 0]), "w": HIPS(-6, 0), "rl": [-14, 0, 82], "ll": [24, 0, -6], "ra": [-20, 0, 70], "la": [-20, 0, -90]}),  # up, leg out
+    (0.55, "lin", {"rt": ([0, -360, 0], [0, 7, 0])}),                                                                                     # the whirl
+    (0.55, "cut", {"rt": (Z, [0, 7, 0])}),
+    (0.66, "in", {"rt": R(), "w": HIPS(26, drop=4), "rl": [-40, 0, 14], "ll": [30, 0, -14], "ra": [-30, 0, 40], "la": [-10, 0, -50]}),  # land low
+    (0.74, "elastic", {"w": HIPS(22, drop=3.6)}),
+    (0.9, "io", REST),
+], plant=False)
+
+A["animation.aegis.dynamic_entry"] = anim(0.9, [
+    (0.06, "in", {"w": HIPS(26, drop=3.5), "ra": [40, 0, 20], "la": [40, 0, -20], "rl": [-30, 0, 8], "ll": [24, 0, -8]}),
+    (0.16, "snap", {"rt": ([-8, 0, 0], [0, 5, -2]), "w": HIPS(-30), "rl": [-98, 0, 4], "ll": [50, 0, -4], "ra": [40, 0, 40], "la": [40, 0, -40],
+                    "h": [20, 0, 0]}),                                                                                                    # the flying kick
+    (0.5, "lin", {"rt": ([-10, 0, 0], [0, 4, -3])}),
+    (0.62, "in", {"rt": R(), "w": HIPS(20, drop=3), "rl": [-40, 0, 10], "ll": [30, 0, -10], "ra": [-20, 0, 30], "la": [-60, 30, 0], "h": [0, 0, 0]}),
+    (0.7, "back", {"w": HIPS(16, drop=2.6)}),                                                                                             # the thumbs-up landing
+    (0.78, "io", {"la": [-150, 40, 20], "w": HIPS(10, drop=1.5)}),
+    (0.9, "io", REST),
+], plant=False)
+
+A["animation.aegis.front_lotus"] = anim(1.4, [
+    (0.08, "in", {"w": HIPS(28, drop=4), "rl": [-30, 0, 10], "ll": [26, 0, -10], "ra": [30, 0, 20], "la": [30, 0, -20]}),
+    (0.15, "snap", {"w": HIPS(-26), "rl": [-176, 0, 6], "ll": [10, 0, -6], "ra": [20, 0, 50], "la": [20, 0, -50], "h": [-20, 0, 0]}),       # the kick that launches them
+    (0.22, "out", {"rt": ([0, 0, 0], [0, 10, 0]), "rl": [-30, 0, 8], "ll": [20, 0, -8], "w": HIPS(10)}),                                   # leaps after them
+    (0.6, "io", {"rt": ([0, 0, 0], [0, 16, 0]), "ra": [-150, -40, 0], "la": [-150, 40, 0], "w": HIPS(20)}),                                # wraps them up
+    *[(round(0.6 + 0.4 * i / 8, 3), "lin", {"rt": ((lambda r, y: ([r[0][0], -720 * i / 8, 0], [r[1][0], r[1][1] + y, r[1][2]]))(
+        _tumble(min(180, 180 * i / 5)), 16 - 8 * i / 8)), "rl": [0, 0, 6], "ll": [0, 0, -6], "w": HIPS(0)}) for i in range(1, 9)],   # spinning, head first
+    (1.0, "cut", {"rt": ([0, 0, 0], [0, 0, 0])}),
+    (1.05, "snap", {"rt": R(), "w": HIPS(40, drop=5), "rl": [-58, 0, 12], "ll": [34, 0, -12], "ra": [-30, 0, 20], "la": [-30, 0, -20],
+                    "h": [-20, 0, 0]}),                                                                                                   # SLAM
+    (1.15, "elastic", {"w": HIPS(36, drop=4.6)}),
+    (1.4, "io", REST),
+], plant=False)
+
 
 def mirrored(a):
     """The same motion for the other hand: left and right limbs swapped, turns and sideways moves reversed."""

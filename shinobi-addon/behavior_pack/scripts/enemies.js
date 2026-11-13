@@ -260,6 +260,7 @@ export function initEnemies(helpers) {
   // Enemy jutsu used to fling players across the map the instant they landed. Against players (and their companions)
   // the push is now less than half as strong, and nobody can be thrown again within 1.5 s of the last throw.
   const lastThrown = new Map();
+  const push = helpers.knockback; // the real one (helpers is replaced by the softer version below)
   const softer = {
     ...helpers,
     knockback(e, x, z, horizontal, vertical) {
@@ -269,12 +270,12 @@ export function initEnemies(helpers) {
       } catch {
         victim = false;
       }
-      if (!victim) return helpers.knockback(e, x, z, horizontal, vertical); // the enemy's own dashes and leaps
+      if (!victim) return push(e, x, z, horizontal, vertical); // the enemy's own dashes and leaps
       const now = system.currentTick;
       if ((lastThrown.get(e.id) ?? -100) > now - 30) return;
       lastThrown.set(e.id, now);
       if (lastThrown.size > 200) for (const [id, t] of lastThrown) if (t < now - 200) lastThrown.delete(id);
-      helpers.knockback(e, x, z, horizontal * 0.45, (vertical ?? 0) * 0.6);
+      push(e, x, z, horizontal * 0.45, (vertical ?? 0) * 0.6);
     },
   };
   helpers = softer;

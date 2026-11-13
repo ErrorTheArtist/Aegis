@@ -47,6 +47,10 @@ const CUES = {
   m1_slash1: [[0, "aegis.swish", 0.8, 1.3]],
   m1_slash2: [[0, "aegis.swish", 0.8, 1.15]],
   m1_slash3: [[0, "aegis.swish", 0.9, 0.9], [3, "aegis.land", 0.6, 1.2]],
+  // Taijutsu scrolls
+  leaf_hurricane: [[2, "aegis.leap", 0.7, 1.2], [4, "aegis.spin", 1, 1.15], [8, "aegis.swish", 1, 0.85], [13, "aegis.land", 0.7, 1.1]],
+  dynamic_entry: [[2, "aegis.leap", 0.9, 1], [4, "aegis.swish", 1, 0.8], [12, "aegis.land", 0.9, 1]],
+  front_lotus: [[3, "aegis.swish", 1, 1.1], [4, "aegis.leap", 0.9, 0.9], [12, "aegis.spin", 1, 0.9], [16, "aegis.spin", 1, 1.05], [21, "aegis.land", 1.2, 0.8]],
   // Jutsu Clash
   clash_charge_chidori: [[8, "aegis.swish", 0.8, 0.8]],
   clash_charge_orb: seals([3], 0.6),

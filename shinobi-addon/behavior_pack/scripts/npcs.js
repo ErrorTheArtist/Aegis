@@ -451,37 +451,78 @@ function cfgForEntity(e) {
 // ---------------------------------------------------------------------------
 // Shops
 // ---------------------------------------------------------------------------
-const SHOPS = {
-  sensei: [
+// The Jutsu Sensei teaches by school: pick a category, then a scroll. [item, amount, label, price (×100 Ryō), level]
+const SENSEI = [
+  ["§cFire Release", [
     ["aegis:fireball_scroll", 1, "Fire Style: Fireball Jutsu", 8, 1],
-    ["aegis:flash_scroll", 1, "Body Flicker", 6, 1],
+    ["aegis:phoenix_scroll", 1, "Phoenix Sage Fire", 12, 10],
+    ["aegis:dragon_flame_scroll", 1, "Dragon Flame Bullet", 28, 35],
+    ["aegis:ash_burning_scroll", 1, "Ash Pile Burning", 30, 45],
+    ["aegis:great_fire_scroll", 1, "Great Fire Annihilation", 32, 45],
+  ]],
+  ["§9Water Release", [
+    ["aegis:water_dragon_scroll", 1, "Water Dragon Bullet", 16, 15],
+    ["aegis:water_prison_scroll", 1, "Water Prison", 18, 20],
+    ["aegis:hiding_mist_scroll", 1, "Hiding in Mist", 18, 25],
+    ["aegis:water_shark_scroll", 1, "Water Shark Bomb", 22, 30],
+    ["aegis:water_shockwave_scroll", 1, "Exploding Water Shockwave", 44, 70],
+  ]],
+  ["§aWind Release", [
     ["aegis:wind_scroll", 1, "Wind Style: Great Breakthrough", 10, 5],
+    ["aegis:vacuum_scroll", 1, "Vacuum Bullets", 14, 10],
+    ["aegis:sickle_weasel_scroll", 1, "Sickle Weasel", 16, 20],
+    ["aegis:rasenshuriken_scroll", 1, "Rasenshuriken", 40, 50],
+    ["aegis:pressure_damage_scroll", 1, "Pressure Damage", 38, 60],
+  ]],
+  ["§eLightning Release", [
+    ["aegis:chidori_scroll", 1, "Chidori", 24, 25],
+    ["aegis:chidori_current_scroll", 1, "Chidori Current", 20, 25],
+    ["aegis:chidori_spear_scroll", 1, "Chidori Sharp Spear", 24, 35],
+    ["aegis:lightning_hound_scroll", 1, "Lightning Hound", 26, 40],
+    ["aegis:lightning_armor_scroll", 1, "Lightning Release Armour", 40, 60],
+    ["aegis:kirin_scroll", 1, "Kirin", 48, 70],
+  ]],
+  ["§6Earth Release", [
+    ["aegis:earth_wall_scroll", 1, "Earth Wall", 14, 12],
+    ["aegis:earth_spikes_scroll", 1, "Earth Spikes", 16, 15],
+    ["aegis:headhunter_scroll", 1, "Headhunter Jutsu", 16, 20],
+    ["aegis:earth_dragon_scroll", 1, "Earth Dragon Bullet", 22, 30],
+    ["aegis:swamp_scroll", 1, "Swamp of the Underworld", 32, 50],
+  ]],
+  ["§bNinjutsu", [
+    ["aegis:flash_scroll", 1, "Body Flicker", 6, 1],
     ["aegis:substitution_scroll", 1, "Substitution Jutsu", 10, 5],
+    ["aegis:explosive_tags_scroll", 1, "Explosive Tag Barrage", 8, 10],
     ["aegis:clone_scroll", 1, "Shadow Clone Jutsu", 16, 15],
     ["aegis:sphere_scroll", 1, "Rasengan", 24, 25],
-    ["aegis:chidori_scroll", 1, "Chidori", 24, 25],
-    ["aegis:phoenix_scroll", 1, "Phoenix Sage Fire", 12, 10],
-    ["aegis:earth_wall_scroll", 1, "Earth Wall", 14, 12],
-    ["aegis:water_dragon_scroll", 1, "Water Dragon Bullet", 16, 15],
-    ["aegis:mystical_palm_scroll", 1, "Mystical Palm (healing)", 18, 20],
-    ["aegis:chidori_current_scroll", 1, "Chidori Current", 20, 25],
-    ["aegis:rasenshuriken_scroll", 1, "Rasenshuriken", 40, 50],
-    ["aegis:vacuum_scroll", 1, "Vacuum Bullets", 14, 10],
-    ["aegis:earth_spikes_scroll", 1, "Earth Spikes", 16, 15],
-    ["aegis:water_prison_scroll", 1, "Water Prison", 18, 20],
-    ["aegis:chidori_spear_scroll", 1, "Chidori Sharp Spear", 24, 35],
-    ["aegis:great_fire_scroll", 1, "Great Fire Annihilation", 32, 45],
+    ["aegis:big_rasengan_scroll", 1, "Big Ball Rasengan", 34, 50],
+  ]],
+  ["§2Taijutsu", [
+    ["aegis:leaf_hurricane_scroll", 1, "Leaf Hurricane", 6, 5],
+    ["aegis:dynamic_entry_scroll", 1, "Dynamic Entry", 10, 15],
+    ["aegis:front_lotus_scroll", 1, "Front Lotus", 24, 35],
     ["aegis:eight_gates_scroll", 1, "Eight Inner Gates Release", 36, 55],
-    ["aegis:kirin_scroll", 1, "Kirin", 48, 70],
+  ]],
+  ["§dGenjutsu & Medical", [
+    ["aegis:mystical_palm_scroll", 1, "Mystical Palm (healing)", 18, 20],
+    ["aegis:hell_viewing_scroll", 1, "Genjutsu: Hell Viewing", 18, 25],
+    ["aegis:chakra_scalpel_scroll", 1, "Chakra Scalpel", 20, 30],
+  ]],
+  ["§5Summoning & Forbidden", [
     ["aegis:summon_toad_scroll", 1, "Summoning: Toad", 20, 20],
     ["aegis:summon_slug_scroll", 1, "Summoning: Slug", 20, 20],
     ["aegis:summon_snake_scroll", 1, "Summoning: Snake", 20, 20],
-    ["aegis:blank_scroll", 4, "Blank Scroll ×4", 2, 1],
     ["__sage", 0, "Sage Training (learn Sage Mode)", 48, 60],
     ["aegis:edo_tensei_scroll", 1, "§8Forbidden: Reanimation Jutsu", 90, 60],
-    ["__exchange", 0, "Exchange emeralds for Ryō", 0, 1],
+  ]],
+  ["§fServices", [
+    ["aegis:blank_scroll", 4, "Blank Scroll ×4", 2, 1],
     ["__nature", 0, "Chakra Nature Training (learn another release)", 0, 1],
-  ],
+    ["__exchange", 0, "Exchange emeralds for Ryō", 0, 1],
+  ]],
+];
+
+const SHOPS = {
   weaponsmith: [
     ["aegis:kunai", 8, "Kunai ×8", 3, 1],
     ["aegis:shuriken", 16, "Shuriken ×16", 3, 1],
@@ -512,17 +553,19 @@ const SHOPS = {
   ],
 };
 
-async function shop(player, npc, cfg, list, title) {
+async function shop(player, npc, cfg, list, title, back) {
   const ems = getRyo(player);
   const lvl = getLevel(player);
   const f = new ActionFormData().title(title).body(`§7${cfg?.greeting || NPC_TYPES[cfg?.type ?? npc.getDynamicProperty("aegis:role")]?.greeting || ""}\n\n§6Your Ryō: §f${fmtRyo(ems)}`);
+  if (back) f.button("§l« Back");
   for (const [id, , label, base, req] of list) {
     const p = priceOf(base, cfg);
     f.button(id === "__exchange" ? `§e${label}\n§r§7${EMERALD_RATE} Ryō per emerald` : base === 0 ? `§5${label}\n§r§7price depends on how many you know` : `${lvl < req ? "§8" : ems >= p ? "§2" : "§c"}${label}\n§r§7${fmtRyo(p)}${lvl < req ? ` · Lv ${req}` : ""}`);
   }
   const r = await f.show(player);
   if (r.canceled || r.selection === undefined) return;
-  const [id, amount, label, base, req] = list[r.selection];
+  if (back && r.selection === 0) return back();
+  const [id, amount, label, base, req] = list[r.selection - (back ? 1 : 0)];
   const price = priceOf(base, cfg);
   if (lvl < req) player.sendMessage(`§cYou need to be level ${req} for that.`);
   else if (id === "__exchange") {
@@ -552,7 +595,23 @@ async function shop(player, npc, cfg, list, title) {
     api.sound(player.dimension, "random.orb", player.location, 1, 1.2);
     player.sendMessage(`§aBought ${label}.`);
   }
-  return shop(player, npc, cfg, list, title);
+  return shop(player, npc, cfg, list, title, back);
+}
+
+// The Jutsu Sensei's front page: one button per school.
+async function senseiMenu(player, npc, cfg) {
+  const lvl = getLevel(player);
+  const f = new ActionFormData()
+    .title("§lJutsu Sensei")
+    .body(`§7${cfg?.greeting || NPC_TYPES.sensei.greeting}\n\n§6Your Ryō: §f${fmtRyo(getRyo(player))}`);
+  for (const [label, list] of SENSEI) {
+    const open = list.filter((e) => lvl >= e[4]).length;
+    f.button(`${label}\n§r§7${open < list.length ? `${open}/${list.length} unlocked at your level` : `${list.length} on offer`}`);
+  }
+  const r = await f.show(player);
+  if (r.canceled || r.selection === undefined) return;
+  const [label, list] = SENSEI[r.selection];
+  return shop(player, npc, cfg, list, `§lJutsu Sensei §r§8· ${label}`, () => senseiMenu(player, npc, cfg));
 }
 
 // ---------------------------------------------------------------------------
@@ -805,7 +864,7 @@ async function talk(player, npc) {
   if (player.isSneaking && isCreative(player) && cfg) return spawnerMenu(player, cfg);
   switch (role) {
     case "sensei":
-      return shop(player, npc, cfg, SHOPS.sensei, "§lJutsu Sensei");
+      return senseiMenu(player, npc, cfg);
     case "weaponsmith":
       return shop(player, npc, cfg, SHOPS.weaponsmith, "§lWeaponsmith");
     case "ramen":

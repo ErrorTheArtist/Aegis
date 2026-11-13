@@ -109,6 +109,9 @@ export const LAYERS = {
     "aegis:wind_gust_lines",
     "aegis:wind_gust_leaves"
   ],
+  "aegis:ash_cloud": [
+    "aegis:ash_cloud_embers"
+  ],
   "aegis:ice_burst": [
     "aegis:ice_burst_flash",
     "aegis:ice_burst_mist",

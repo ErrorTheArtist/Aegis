@@ -440,6 +440,6 @@ export function makeJutsu2(helpers) {
     "aegis:earth_spikes_scroll": { name: "Earth Style: Earth Spikes", cost: 35, cooldown: 100, cast: castEarthSpikes },
     "aegis:chidori_spear_scroll": { name: "Lightning Style: Chidori Sharp Spear", cost: 40, cooldown: 100, cast: castChidoriSpear },
     "aegis:ice_needles_scroll": { name: "Ice Release: Thousand Needles of Death", cost: 45, cooldown: 160, clan: "yuki", cast: castIceNeedles },
-    "aegis:eight_gates_scroll": { name: "Eight Inner Gates Release", cost: 50, cooldown: 1200, cast: castEightGates },
+    "aegis:eight_gates_scroll": { name: "Eight Inner Gates Release", cost: 50, cooldown: 1200, kind: "taijutsu", cast: castEightGates },
   };
 }

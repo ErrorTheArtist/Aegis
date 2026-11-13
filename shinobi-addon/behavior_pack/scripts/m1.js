@@ -9,7 +9,7 @@
 import { world, system } from "@minecraft/server";
 import { getStat } from "./levels.js";
 import { nindoDamage, NINDOS, getNindoId } from "./nindos.js";
-import { boostHit, isEcho, healBack } from "./dmgutil.js";
+import { boostHit, isEcho, healBack, scriptedHit } from "./dmgutil.js";
 
 const WINDOW = 28; // ticks between hits to keep the combo going
 const FISTS = [
@@ -84,7 +84,7 @@ function onHit(player, target, damage) {
 export function initM1(helpers) {
   api = helpers;
   world.afterEvents.entityHurt.subscribe(({ hurtEntity, damage, damageSource }) => {
-    if (damageSource?.cause !== "entityAttack" || isEcho(hurtEntity, damage)) return;
+    if (damageSource?.cause !== "entityAttack" || isEcho(hurtEntity, damage) || scriptedHit(hurtEntity, damageSource)) return;
     const p = damageSource.damagingEntity;
     if (p?.typeId !== "minecraft:player" || !api.isValid(hurtEntity) || !api.canBeHit(hurtEntity, p)) return;
     try {

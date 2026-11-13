@@ -33,6 +33,19 @@ export const JUTSU_NATURE = {
   "aegis:earth_spikes_scroll": "earth",
   "aegis:water_dragon_scroll": "water",
   "aegis:water_prison_scroll": "water",
+  // wave 3 (not clan-bound)
+  "aegis:dragon_flame_scroll": "fire",
+  "aegis:ash_burning_scroll": "fire",
+  "aegis:water_shark_scroll": "water",
+  "aegis:hiding_mist_scroll": "water",
+  "aegis:water_shockwave_scroll": "water",
+  "aegis:sickle_weasel_scroll": "wind",
+  "aegis:pressure_damage_scroll": "wind",
+  "aegis:lightning_hound_scroll": "lightning",
+  "aegis:lightning_armor_scroll": "lightning",
+  "aegis:earth_dragon_scroll": "earth",
+  "aegis:headhunter_scroll": "earth",
+  "aegis:swamp_scroll": "earth",
 };
 
 // Level + price (in units of 100 Ryō) for your 2nd, 3rd, 4th and 5th release.

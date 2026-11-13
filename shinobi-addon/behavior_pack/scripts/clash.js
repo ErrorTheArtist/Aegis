@@ -54,7 +54,7 @@ export function styleOf(kind = "") {
   if (/wood|senju/.test(k)) return "wood";
   if (/lava|boil|terumi/.test(k)) return "lava";
   if (/bijuu|cloak|beast/.test(k)) return "beast";
-  if (/fire|phoenix|flame|sarutobi|deidara|tobi/.test(k) || n === "fire") return "fire";
+  if (/fire|phoenix|flame|explosive|sarutobi|deidara|tobi/.test(k) || n === "fire") return "fire";
   if (/hidan/.test(k)) return "blaze";
   if (/kakuzu/.test(k)) return "earth";
   if (/zetsu/.test(k)) return "wood";

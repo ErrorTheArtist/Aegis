@@ -356,7 +356,18 @@ def s_sheathe():   # sliding home, then the guard clicks against the scabbard
     return master(mix(0.45, (0, scrape * 0.7), (0.28, thump(0.08, 500, 220, 55) * 1.1), (0.28, burst(0.03, 1500, 6000, 110) * 0.8)), 0.7)
 
 
-SOUNDS = {"hit": s_hit, "hit_heavy": s_hit_heavy, "draw": s_draw, "sheathe": s_sheathe, "handsign": s_handsign, "swish": s_swish, "spin": s_spin, "leap": s_leap, "land": s_land, "step": s_step, "inhale": s_inhale, "poof": s_poof,
+def s_hound():   # Lightning Hound: an electric howl over crackle
+    sec = 1.3
+    t = T(sec)
+    f = 320 + 420 * np.sin(np.pi * np.clip(t / 0.9, 0, 1)) ** 1.3
+    howl = (np.sin(2 * np.pi * np.cumsum(f) / SR) + 0.35 * np.sin(2 * np.pi * np.cumsum(f * 2.01) / SR)) * (0.75 + 0.25 * np.sin(2 * np.pi * 7 * t))
+    howl *= np.minimum(1, t / 0.08) * np.minimum(1, (sec - t) / 0.35)
+    crk = clicks(sec, 260, 2500, 9000, 6) * 0.7
+    buzz = filt(2 * ((np.cumsum(np.full(len(t), 110.0)) / SR) % 1) - 1, "bandpass", [200, 2400]) * 0.25 * np.minimum(1, (sec - t) / 0.3)
+    return master(howl * 0.8 + crk + buzz, 0.85)
+
+
+SOUNDS = {"hound": s_hound, "hit": s_hit, "hit_heavy": s_hit_heavy, "draw": s_draw, "sheathe": s_sheathe, "handsign": s_handsign, "swish": s_swish, "spin": s_spin, "leap": s_leap, "land": s_land, "step": s_step, "inhale": s_inhale, "poof": s_poof,
           "water": s_water, "water_burst": s_water_burst, "wind": s_wind, "wind_cut": s_wind_cut, "earth": s_earth, "earth_break": s_earth_break,
           "ice": s_ice, "ice_shatter": s_ice_shatter, "wood": s_wood, "lava": s_lava, "fire_roar": s_fire_roar, "thunder": s_thunder, "heal": s_heal,
           "push": s_push, "pull": s_pull, "eye": s_eye, "shadow": s_shadow, "gates": s_gates, "summon": s_summon, "dome": s_dome}

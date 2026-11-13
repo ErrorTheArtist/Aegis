@@ -364,6 +364,63 @@
     },
     "aegis_sand_gourd": {
       "textures": "textures/items/aegis/sand_gourd"
+    },
+    "aegis_dragon_flame_scroll": {
+      "textures": "textures/items/aegis/dragon_flame_scroll"
+    },
+    "aegis_ash_burning_scroll": {
+      "textures": "textures/items/aegis/ash_burning_scroll"
+    },
+    "aegis_water_shark_scroll": {
+      "textures": "textures/items/aegis/water_shark_scroll"
+    },
+    "aegis_hiding_mist_scroll": {
+      "textures": "textures/items/aegis/hiding_mist_scroll"
+    },
+    "aegis_water_shockwave_scroll": {
+      "textures": "textures/items/aegis/water_shockwave_scroll"
+    },
+    "aegis_sickle_weasel_scroll": {
+      "textures": "textures/items/aegis/sickle_weasel_scroll"
+    },
+    "aegis_pressure_damage_scroll": {
+      "textures": "textures/items/aegis/pressure_damage_scroll"
+    },
+    "aegis_lightning_hound_scroll": {
+      "textures": "textures/items/aegis/lightning_hound_scroll"
+    },
+    "aegis_lightning_armor_scroll": {
+      "textures": "textures/items/aegis/lightning_armor_scroll"
+    },
+    "aegis_earth_dragon_scroll": {
+      "textures": "textures/items/aegis/earth_dragon_scroll"
+    },
+    "aegis_headhunter_scroll": {
+      "textures": "textures/items/aegis/headhunter_scroll"
+    },
+    "aegis_swamp_scroll": {
+      "textures": "textures/items/aegis/swamp_scroll"
+    },
+    "aegis_big_rasengan_scroll": {
+      "textures": "textures/items/aegis/big_rasengan_scroll"
+    },
+    "aegis_leaf_hurricane_scroll": {
+      "textures": "textures/items/aegis/leaf_hurricane_scroll"
+    },
+    "aegis_dynamic_entry_scroll": {
+      "textures": "textures/items/aegis/dynamic_entry_scroll"
+    },
+    "aegis_front_lotus_scroll": {
+      "textures": "textures/items/aegis/front_lotus_scroll"
+    },
+    "aegis_chakra_scalpel_scroll": {
+      "textures": "textures/items/aegis/chakra_scalpel_scroll"
+    },
+    "aegis_hell_viewing_scroll": {
+      "textures": "textures/items/aegis/hell_viewing_scroll"
+    },
+    "aegis_explosive_tags_scroll": {
+      "textures": "textures/items/aegis/explosive_tags_scroll"
     }
   }
 }

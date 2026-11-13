@@ -1,0 +1,65 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.aegis.lightning_hound.run": {
+      "loop": true,
+      "bones": {
+        "body": {
+          "position": [
+            0,
+            "math.abs(math.sin(q.life_time * 1300)) * 1.2",
+            0
+          ],
+          "rotation": [
+            "math.sin(q.life_time * 1300) * 5",
+            0,
+            0
+          ],
+          "scale": "1.0 + math.sin(q.life_time * 3100) * 0.05"
+        },
+        "head": {
+          "rotation": [
+            "-8 - math.sin(q.life_time * 1300) * 6",
+            0,
+            0
+          ]
+        },
+        "leg0": {
+          "rotation": [
+            "math.sin(q.life_time * 1300) * 55",
+            0,
+            0
+          ]
+        },
+        "leg1": {
+          "rotation": [
+            "math.sin(q.life_time * 1300) * 55",
+            0,
+            0
+          ]
+        },
+        "leg2": {
+          "rotation": [
+            "-math.sin(q.life_time * 1300) * 55",
+            0,
+            0
+          ]
+        },
+        "leg3": {
+          "rotation": [
+            "-math.sin(q.life_time * 1300) * 55",
+            0,
+            0
+          ]
+        },
+        "tail": {
+          "rotation": [
+            "math.sin(q.life_time * 1300) * 12",
+            "math.sin(q.life_time * 700) * 18",
+            0
+          ]
+        }
+      }
+    }
+  }
+}

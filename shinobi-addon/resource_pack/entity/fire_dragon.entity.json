@@ -1,0 +1,28 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "aegis:fire_dragon",
+      "materials": {
+        "default": "entity_alphablend"
+      },
+      "textures": {
+        "default": "textures/entity/aegis/fire_dragon"
+      },
+      "geometry": {
+        "default": "geometry.aegis.fire_dragon"
+      },
+      "animations": {
+        "play": "animation.aegis.fire_dragon.fly"
+      },
+      "scripts": {
+        "animate": [
+          "play"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.aegis.fx_glow"
+      ]
+    }
+  }
+}

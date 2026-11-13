@@ -84,6 +84,7 @@ const REWARD_ITEMS = [
   "aegis:chakra_pill", "aegis:ramen", "aegis:blank_scroll", "aegis:reroll_scroll", "aegis:bijuu_scroll",
   "aegis:fireball_scroll", "aegis:sphere_scroll", "aegis:chidori_scroll", "aegis:clone_scroll", "aegis:rasenshuriken_scroll",
   "aegis:kirin_scroll", "aegis:great_fire_scroll", "aegis:eight_gates_scroll", "aegis:summon_toad_scroll",
+  "aegis:big_rasengan_scroll", "aegis:dragon_flame_scroll", "aegis:water_shark_scroll", "aegis:lightning_hound_scroll", "aegis:front_lotus_scroll",
   "aegis:kunai", "aegis:shuriken", "aegis:kusanagi", "aegis:samehada", "aegis:kubikiribocho", "aegis:hiramekarei",
   "aegis:anbu_mask", "aegis:anbu_armor", "aegis:akatsuki_cloak",
   "minecraft:diamond", "minecraft:golden_apple", "minecraft:enchanted_golden_apple", "minecraft:netherite_ingot", "minecraft:totem_of_undying",

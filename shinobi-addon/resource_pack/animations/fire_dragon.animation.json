@@ -1,0 +1,59 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.aegis.fire_dragon.fly": {
+      "loop": true,
+      "bones": {
+        "head": {
+          "rotation": [
+            "math.sin(q.life_time * 300) * 5",
+            "math.sin(q.life_time * 400) * 6",
+            0
+          ]
+        },
+        "jaw": {
+          "rotation": [
+            "18 + math.sin(q.life_time * 520) * 12",
+            0,
+            0
+          ]
+        },
+        "seg0": {
+          "rotation": [
+            "math.sin(q.life_time * 300 - 0) * 7",
+            "math.sin(q.life_time * 400 - 0) * 16",
+            0
+          ]
+        },
+        "seg1": {
+          "rotation": [
+            "math.sin(q.life_time * 300 - 55) * 7",
+            "math.sin(q.life_time * 400 - 60) * 16",
+            0
+          ]
+        },
+        "seg2": {
+          "rotation": [
+            "math.sin(q.life_time * 300 - 110) * 7",
+            "math.sin(q.life_time * 400 - 120) * 16",
+            0
+          ]
+        },
+        "seg3": {
+          "rotation": [
+            "math.sin(q.life_time * 300 - 165) * 7",
+            "math.sin(q.life_time * 400 - 180) * 16",
+            0
+          ]
+        },
+        "seg4": {
+          "rotation": [
+            "math.sin(q.life_time * 300 - 220) * 7",
+            "math.sin(q.life_time * 400 - 240) * 16",
+            0
+          ]
+        }
+      }
+    }
+  }
+}

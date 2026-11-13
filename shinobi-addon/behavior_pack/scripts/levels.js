@@ -29,7 +29,7 @@ const P = { level: "aegis:level", xp: "aegis:xp", points: "aegis:points", given:
 export const STATS = {
   vitality: { name: "Vitality", color: "§c", desc: "+2 hearts every 10 points (up to +20 hearts)" },
   chakra: { name: "Chakra", color: "§b", desc: "+2 max chakra and +0.5% chakra regen per point" },
-  taijutsu: { name: "Taijutsu", color: "§6", desc: "Strength (+3 melee damage) every 25 points" },
+  taijutsu: { name: "Taijutsu", color: "§6", desc: "Strength (+3 melee damage) every 25 points, and +1% damage for punch combos and taijutsu scrolls per point" },
   ninjutsu: { name: "Ninjutsu", color: "§d", desc: "+1% damage for jutsu, clan abilities and sword specials per point" },
   agility: { name: "Agility", color: "§a", desc: "Speed every 25 points, and -0.25% jutsu cooldowns per point" },
   endurance: { name: "Endurance", color: "§7", desc: "Shrug off 0.3% of all damage taken per point (up to 30%)" },
@@ -91,6 +91,7 @@ function spentPoints(player) {
 export const levelChakraBonus = (player) => getStat(player, "chakra") * 2;
 export const levelRegenMultiplier = (player) => 1 + getStat(player, "chakra") * 0.005;
 export const ninjutsuMultiplier = (player) => 1 + getStat(player, "ninjutsu") * 0.01;
+export const taijutsuMultiplier = (player) => 1 + getStat(player, "taijutsu") * 0.01;
 export const cooldownMultiplier = (player) => 1 - getStat(player, "agility") * 0.0025;
 
 // Extra "levels" of potion-style effects, merged with clan passives in clans.js.

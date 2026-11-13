@@ -708,6 +708,18 @@
           "load_on_low_memory": true
         }
       ]
+    },
+    "aegis.hound": {
+      "category": "player",
+      "min_distance": 4,
+      "max_distance": 40,
+      "sounds": [
+        {
+          "name": "sounds/aegis/hound",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
     }
   }
 }

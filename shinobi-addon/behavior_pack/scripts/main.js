@@ -13,6 +13,7 @@ import { initSage, sageMultiplier } from "./sage.js";
 import { initArmor, armorChakraBonus, armorRegenMultiplier, armorDamageMultiplier } from "./armor.js";
 import { impactFx, castFx, sfx, shake, chargeFx } from "./cinematic.js";
 import { makeJutsu2 } from "./jutsu2.js";
+import { makeJutsu3 } from "./jutsu3.js";
 import { makeReleases } from "./releases.js";
 import { initCurrency } from "./currency.js";
 import { initQuests } from "./quests.js";
@@ -23,13 +24,14 @@ import { animSfx } from "./sfx.js";
 import { initM1 } from "./m1.js";
 import { spawnLayered } from "./particles.js";
 import { initLagClear } from "./lagclear.js";
+import { markScripted } from "./dmgutil.js";
 import { initNindos, beginNindoRoll, nindoDamage, nindoCostMultiplier, nindoCooldownMultiplier, nindoChakraBonus, nindoRegenMultiplier, nindoFocusMultiplier, nindoOnCast, nindoHealMultiplier } from "./nindos.js";
 import { initStarter, startStarterQuests, noteCast } from "./starter.js";
 import { initEdoTensei, handleEdoUse } from "./edotensei.js";
 import { beginNatureRoll } from "./natures.js";
 import { breakTobiPhase } from "./akatsuki2.js";
 import { initNatures, natureCostMultiplier, natureDamageMultiplier, onJutsuCast, natureTag } from "./natures.js";
-import { initLevels, handleRecordUse, levelChakraBonus, levelRegenMultiplier, ninjutsuMultiplier, cooldownMultiplier, gainJutsuXp, getLevel, xpInfo } from "./levels.js";
+import { initLevels, handleRecordUse, levelChakraBonus, levelRegenMultiplier, ninjutsuMultiplier, taijutsuMultiplier, cooldownMultiplier, gainJutsuXp, getLevel, xpInfo } from "./levels.js";
 
 // ---------------------------------------------------------------------------
 // Config
@@ -105,13 +107,14 @@ function knockback(entity, dirX, dirZ, horizontal, vertical) {
   }
 }
 
-function hurt(target, amount, attacker, cause = "entityAttack") {
+function hurt(target, amount, attacker, cause = "entityAttack", kind = "tech") {
   if (sameVillage(target, attacker)) return; // no friendly fire between village-mates
-  // Ninjutsu stat boosts every scripted technique a player lands.
+  // Ninjutsu stat boosts every scripted technique a player lands (taijutsu scrolls use the Taijutsu stat instead).
   if (attacker?.typeId === "minecraft:player") {
-    amount *= ninjutsuMultiplier(attacker) * sageMultiplier(attacker) * armorDamageMultiplier(attacker) * natureDamageMultiplier(attacker);
-    amount = nindoDamage(attacker, target, amount, "tech");
+    amount *= (kind === "fist" ? taijutsuMultiplier(attacker) : ninjutsuMultiplier(attacker)) * sageMultiplier(attacker) * armorDamageMultiplier(attacker) * natureDamageMultiplier(attacker);
+    amount = nindoDamage(attacker, target, amount, kind);
   }
+  markScripted(target, attacker, cause, kind); // so the M1 combo doesn't mistake this for a punch
   try {
     target.applyDamage(amount, { cause, damagingEntity: attacker });
   } catch {
@@ -131,10 +134,16 @@ function isValid(e) {
   }
 }
 
+// Effect models (orbs, dragons, the shark, coffins …) are never targets — a projectile would "hit" its own model.
+const FX_MODELS = new Set([
+  "aegis:jutsu_orb", "aegis:susanoo", "aegis:clash_orb", "aegis:edo_coffin", "aegis:edo_seal", "aegis:rasenshuriken",
+  "aegis:fire_dragon", "aegis:water_shark", "aegis:lightning_hound", "aegis:earth_dragon",
+]);
+
 function canBeHit(e, caster) {
   if (!isValid(e) || e.id === caster.id) return false;
   if (e.typeId === "minecraft:item" || e.typeId === "minecraft:xp_orb") return false;
-  if (e.typeId === "aegis:jutsu_orb" || e.typeId === "aegis:susanoo") return false;
+  if (FX_MODELS.has(e.typeId)) return false;
   // never hit friendly village NPCs with a player's techniques, nor your own clones / companions / summons
   if (e.typeId === "aegis:npc" && caster.typeId === "minecraft:player") return false;
   // no friendly fire between village-mates
@@ -222,6 +231,23 @@ function updateFollowers() {
       /* ignore */
     }
   }
+}
+
+// The air block on top of the ground near `pos` (searching 2 up and 3 down), or undefined.
+function surfaceY(dim, pos) {
+  const x = Math.floor(pos.x);
+  const z = Math.floor(pos.z);
+  const y0 = Math.floor(pos.y);
+  for (let y = y0 + 2; y >= y0 - 3; y--) {
+    try {
+      const b = dim.getBlock({ x, y, z });
+      const below = dim.getBlock({ x, y: y - 1, z });
+      if (b && (b.isAir || b.isLiquid) && below && !below.isAir && !below.isLiquid) return y;
+    } catch {
+      return undefined;
+    }
+  }
+  return undefined;
 }
 
 // Dash forward; the first thing within `range` during the next `ticks` gets onHit().
@@ -321,7 +347,7 @@ world.afterEvents.itemUse.subscribe(({ source: player, itemStack }) => {
     player.onScreenDisplay.setActionBar(`§7${jutsu.name} ready in §f${(left / 20).toFixed(1)}s`);
     return;
   }
-  const cost = Math.round(jutsu.cost * clanJutsuCostMultiplier(player, itemStack.typeId) * natureCostMultiplier(player, itemStack.typeId) * nindoCostMultiplier(player, "jutsu", itemStack.typeId));
+  const cost = Math.round(jutsu.cost * clanJutsuCostMultiplier(player, itemStack.typeId) * natureCostMultiplier(player, itemStack.typeId) * nindoCostMultiplier(player, jutsu.kind ?? "jutsu", itemStack.typeId));
   const chakra = getChakra(player);
   if (chakra < cost) {
     player.onScreenDisplay.setActionBar(`§cNot enough chakra! §7(${Math.floor(chakra)}/${cost})`);
@@ -394,10 +420,22 @@ function updateProjectiles() {
     const o = pr.o;
     let hit = false;
     let fizzled = false;
+    // Homing: steer a little toward the target every tick.
+    if (o.home && isValid(o.home) && o.home.dimension.id === pr.dim.id) {
+      const want = norm(sub(add(o.home.location, { x: 0, y: o.homeY ?? 1, z: 0 }), pr.pos));
+      const k = o.turn ?? 0.15;
+      pr.dir = norm(add(scale(pr.dir, 1 - k), scale(want, k)));
+      if (o.hug) pr.dir = norm({ x: pr.dir.x, y: 0, z: pr.dir.z });
+    }
     // Move in small sub-steps so it doesn't skip through walls.
     const steps = Math.max(1, Math.ceil(o.speed / 0.45));
     for (let step = 0; step < steps && !hit; step++) {
       pr.pos = add(pr.pos, scale(pr.dir, o.speed / steps));
+      if (o.hug) {
+        // runs along the ground, climbing and dropping with it
+        const g = surfaceY(pr.dim, pr.pos);
+        if (g !== undefined) pr.pos = { x: pr.pos.x, y: g + (o.hugHeight ?? 0.5), z: pr.pos.z };
+      }
       try {
         const block = pr.dim.getBlock(pr.pos);
         if (!block || (!block.isAir && !block.isLiquid)) hit = true;
@@ -412,7 +450,11 @@ function updateProjectiles() {
       }
       if (!hit && isValid(pr.caster)) {
         const near = pr.dim.getEntities({ location: pr.pos, maxDistance: o.hitRadius });
-        if (near.some((e) => canBeHit(e, pr.caster) && !(o.ignoreFamily && e.matches?.({ families: [o.ignoreFamily] })))) hit = true;
+        const victim = near.find((e) => canBeHit(e, pr.caster) && !(o.ignoreFamily && e.matches?.({ families: [o.ignoreFamily] })));
+        if (victim) {
+          hit = true;
+          pr.hitEntity = victim;
+        }
       }
     }
     if (fizzled) {
@@ -420,10 +462,23 @@ function updateProjectiles() {
       projectiles.splice(i, 1);
       continue;
     }
-    particle(pr.dim, o.trail, pr.pos, o.color);
+    if (o.trail) particle(pr.dim, o.trail, pr.pos, o.color);
+    if (o.tick) {
+      try {
+        o.tick(pr);
+      } catch {
+        /* ignore */
+      }
+    }
     if (isValid(pr.orb)) {
       try {
-        pr.orb.teleport(sub(pr.pos, { x: 0, y: o.orbOffset ?? 0.25, z: 0 }));
+        const at = sub(pr.pos, { x: 0, y: o.orbOffset ?? 0.25, z: 0 });
+        if (o.faceDir) {
+          // models face their direction of travel
+          const yaw = (Math.atan2(-pr.dir.x, pr.dir.z) * 180) / Math.PI;
+          const pitch = (-Math.asin(Math.max(-1, Math.min(1, pr.dir.y))) * 180) / Math.PI;
+          pr.orb.teleport(at, { rotation: { x: pitch, y: yaw } });
+        } else pr.orb.teleport(at);
       } catch {
         /* ignore */
       }
@@ -439,6 +494,15 @@ function updateProjectiles() {
 
 function explodeProjectile(pr) {
   const o = pr.o;
+  if (o.custom) {
+    // the jutsu handles its own impact (bites, chain lightning, sticking tags …)
+    try {
+      o.onHit?.(pr);
+    } catch {
+      /* ignore */
+    }
+    return;
+  }
   sound(pr.dim, o.sound, pr.pos, 1, o.radius > 4 ? 0.6 : 1.2);
   particle(pr.dim, o.burst, pr.pos, o.color);
   if (!o.noOrb) particle(pr.dim, "minecraft:huge_explosion_emitter", pr.pos);
@@ -1040,8 +1104,10 @@ initHud({ getChakra, getMaxChakra, getLevel, xpInfo });
 const npcApi = {
   add, sub, scale, norm, dot, particle, sound, knockback, hurt, isValid, canBeHit,
   getChakra, setChakra, cooldownLeft, startCooldown, anim, handPos, chidoriHand, launchProjectile, gainJutsuXp, spawnFx, removeFx,
+  lungeStrike, follow, surfaceY,
 };
 Object.assign(JUTSU, makeJutsu2(npcApi));
+Object.assign(JUTSU, makeJutsu3(npcApi));
 {
   const rel = makeReleases(npcApi);
   Object.assign(JUTSU, rel.jutsu);

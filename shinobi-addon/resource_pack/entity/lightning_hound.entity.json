@@ -1,0 +1,28 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "aegis:lightning_hound",
+      "materials": {
+        "default": "entity_alphablend"
+      },
+      "textures": {
+        "default": "textures/entity/aegis/lightning_hound"
+      },
+      "geometry": {
+        "default": "geometry.aegis.lightning_hound"
+      },
+      "animations": {
+        "play": "animation.aegis.lightning_hound.run"
+      },
+      "scripts": {
+        "animate": [
+          "play"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.aegis.fx_glow"
+      ]
+    }
+  }
+}

@@ -30,6 +30,14 @@
         "minecraft:variant": {
           "value": 3
         }
+      },
+      "aegis:big_rasengan": {
+        "minecraft:variant": {
+          "value": 0
+        },
+        "minecraft:scale": {
+          "value": 2.4
+        }
       }
     },
     "components": {
@@ -108,6 +116,13 @@
         "add": {
           "component_groups": [
             "aegis:water"
+          ]
+        }
+      },
+      "aegis:as_big_rasengan": {
+        "add": {
+          "component_groups": [
+            "aegis:big_rasengan"
           ]
         }
       }

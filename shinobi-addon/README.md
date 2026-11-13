@@ -104,7 +104,7 @@ from a book + Blank Scroll), or `/scriptevent aegis:stats`:
 |---|---|
 | Vitality | +2 hearts every 10 points (up to +20 hearts) |
 | Chakra | +2 max chakra and +0.5% chakra regen per point (+200 chakra, +50% regen at 100) |
-| Taijutsu | Strength I/II/III/IV at 25/50/75/100 (stacks with clan Strength) |
+| Taijutsu | Strength I/II/III/IV at 25/50/75/100 (stacks with clan Strength), and +1% damage for punch combos and taijutsu scrolls per point |
 | Ninjutsu | +1% damage for jutsu, clan abilities and sword specials per point (+100% at 100) |
 | Agility | Speed I–IV at 25/50/75/100 and −0.25% jutsu cooldowns per point (−25% at 100) |
 | Endurance | Shrug off 0.3% of all damage taken per point (30% at 100) |
@@ -173,13 +173,14 @@ drawbacks. Odds by rarity: Common 48% · Uncommon 32% · Rare 13% · Epic 4% · 
 | **Inner Sage** | Rare (2.6%) | Sage Mode without Sage Training<br>Natural energy gathers twice as fast and Sage Mode lasts 50% longer<br>Focusing chakra (sneaking still) works 50% better | Chakra regenerates 20% slower while you move |
 | **Passing the Will** | Rare (2.6%) | Your companions and summons deal 30% more damage<br>Allies within 16 blocks also get 20% of the XP you earn<br>When you fall, allies within 20 blocks gain Strength I and Regeneration I for 30s | You deal 10% less damage yourself |
 | **Genius** | Epic (2.0%) | Jutsu and clan abilities cost 20% less chakra<br>Techniques deal 15% more damage | Fists and blades deal 20% less damage<br>You take 10% more damage |
-| **Top Physique** | Epic (2.0%) | Fists and blades hit 40% harder<br>Speed I, Jump Boost I and +2 hearts at all times | Jutsu and clan abilities cost 50% more chakra<br>Techniques deal 25% less damage |
+| **Top Physique** | Epic (2.0%) | Fists and blades hit 40% harder (taijutsu scrolls too)<br>Taijutsu scrolls cost 25% less chakra<br>Speed I, Jump Boost I and +2 hearts at all times | Jutsu and clan abilities cost 50% more chakra<br>Techniques deal 25% less damage |
 | **Prodigy** | Legendary (1.5%) | +30% XP<br>All jutsu, clan abilities and sword specials recharge 15% faster and cost 10% less chakra | A frail body: chakra regenerates 20% slower |
 | **Phoenix of Rebirth** | Legendary (1.5%) | Once every 10 minutes, a hit that leaves you under 25% health makes you rise in flames: back to 70% health, Regeneration II, and a blast that burns enemies within 5 blocks<br>Fire Resistance at all times | While your rebirth recharges you deal 15% less damage |
 
 "Allies" are village-mates (or, if you have no village, other village-less players) and your own companions and
 summons. "Techniques" are jutsu, clan abilities, sword specials — anything scripted; melee bonuses apply to the M1
-combo hits.
+combo hits and to **taijutsu scrolls** (Leaf Hurricane, Dynamic Entry, Front Lotus, Eight Gates), which are not ninjutsu:
+"jutsu cost" penalties and discounts don't touch them.
 
 ```
 /scriptevent aegis:nindo              (show yours)
@@ -198,11 +199,11 @@ basic jutsu — affinity just makes them better.
 
 | Release | Jutsu |
 |---|---|
-| Fire | Fireball, Phoenix Sage Fire, Great Fire Annihilation |
-| Wind | Great Breakthrough, Vacuum Bullets, Rasenshuriken |
-| Lightning | Chidori, Chidori Current, Chidori Sharp Spear, Kirin |
-| Earth | Earth Wall, Earth Spikes |
-| Water | Water Dragon Bullet, Water Prison |
+| Fire | Fireball, Phoenix Sage Fire, Great Fire Annihilation, Dragon Flame Bullet, Ash Pile Burning |
+| Wind | Great Breakthrough, Vacuum Bullets, Rasenshuriken, Sickle Weasel, Pressure Damage |
+| Lightning | Chidori, Chidori Current, Chidori Sharp Spear, Kirin, Lightning Hound, Lightning Release Armour |
+| Earth | Earth Wall, Earth Spikes, Earth Dragon Bullet, Headhunter Jutsu, Swamp of the Underworld |
+| Water | Water Dragon Bullet, Water Prison, Water Shark Bomb, Hiding in Mist, Exploding Water Shockwave |
 
 Learn more releases at the **Jutsu Sensei** (*Chakra Nature Training*): 2nd release Lv 25 / 2,400 Ryō, 3rd Lv 50 / 4,000,
 4th Lv 90 / 5,600, 5th Lv 140 / 6,400. `/scriptevent aegis:nature info|reroll|add <nature>|set <nature>` for testing.
@@ -312,6 +313,38 @@ Clan odds, stats and abilities are all in `behavior_pack/scripts/clans.js`.
 Thousand Needles of Death is now a **Yuki-only Ice Release** (see Clans). Clan discounts on the new scrolls: **Uchiha** — Great Fire Annihilation, Kirin, Chidori Sharp Spear · **Sarutobi** — Great
 Fire Annihilation · **Senju** — Earth Spikes · **Hyuga** — Vacuum Bullets. All of them are sold by the Jutsu Sensei
 (unlocked from level 10 to 70) and are craftable.
+
+### More jutsu — anyone can learn these (v1.40)
+
+19 more scrolls that belong to no clan. Buy them from the Jutsu Sensei (level and price below) or craft them.
+Elemental ones get your **chakra-nature affinity** (−25% chakra, +25% damage). Jutsu that need a target cost nothing
+if you aren't looking at one.
+
+| Scroll | Chakra | Cooldown | Sensei | Effect |
+|---|---|---|---|---|
+| Fire Style: Dragon Flame Bullet | 45 | 8s | Lv 35 · 2,800 | A dragon of fire pours from your mouth and hunts the target you look at, scorching everything it passes (3 + burning), then bursts: 16 fire damage in 4 blocks. |
+| Fire Style: Ash Pile Burning | 40 | 10s | Lv 45 · 3,000 | Breathe a 10-block cone of hot ash: enemies inside are blinded and slowed. Two seconds later you click your teeth and the cloud ignites — 14 fire damage and burning. |
+| Water Style: Water Shark Bomb | 35 | 5s | Lv 30 · 2,200 | A shark of water swims after your target and bites: 16 damage, 7 to anyone within 3 blocks, knockback and slowness. |
+| Water Style: Hiding in Mist | 30 | 20s | Lv 25 · 1,800 | A thick mist (9 blocks) for 10s: you're invisible and faster inside it; enemies inside are blinded and enemy players see only fog. |
+| Water Style: Exploding Water Shockwave | 60 | 25s | Lv 70 · 4,400 | A flood erupts from your mouth and rolls out as a wall of water up to 11 blocks: 12 damage, a huge push and Slowness III. You get Water Breathing. (No real water is placed.) |
+| Wind Style: Sickle Weasel | 30 | 4.5s | Lv 20 · 1,600 | A crescent of wind blades sweeps 14 blocks forward: 10 damage and a knock-up to everything in front of you. |
+| Wind Style: Pressure Damage | 55 | 13s | Lv 60 · 3,800 | A slow, huge ball of compressed wind that bursts across 7 blocks: 24 damage and a big push. |
+| Lightning Style: Lightning Hound | 40 | 7s | Lv 40 · 2,600 | A hound of lightning leaps from your hand, runs your target down along the ground and bites: 14 damage and a 1.5s paralysis, then the current jumps to 2 more enemies (6 each). |
+| Lightning Style: Lightning Release Armour | 50 | 35s | Lv 60 · 4,000 | 15s of Speed II, Strength I, Resistance I and Haste II. Anyone who hits you in melee gets shocked (5 + slowness); your own melee hits crackle for +4. |
+| Earth Style: Earth Dragon Bullet | 35 | 6s | Lv 30 · 2,200 | A dragon of rock rises from the ground in front of you and spits 3 mud bullets at your target: 9 damage in 2.6 blocks + slowness each. |
+| Earth Style: Headhunter Jutsu | 30 | 8s | Lv 20 · 1,600 | Sink into the earth and drag the enemy you look at (16 blocks) into the ground: 10 damage, rooted for 3s — then pop up behind them with an uppercut (+6). |
+| Earth Style: Swamp of the Underworld | 45 | 16s | Lv 50 · 3,200 | The ground where you look turns to sucking mud (4-block radius) for 8s: enemies are slowed, weakened, dragged to the centre and take 1.5 damage a second. Every block is put back afterwards — even after a crash or restart. |
+| Big Ball Rasengan | 50 | 10s | Lv 50 · 3,400 | A Rasengan more than twice the size. Dash into the first enemy you reach: 24 damage and a huge knockback, 12 to everyone within 3.5 blocks. |
+| Explosive Tag Barrage | 15 | 5s | Lv 10 · 800 | Throw 3 tags at your target: they stick to whatever they hit, fizz, and go off one after another (6 damage in 3 blocks each). |
+| Taijutsu: Leaf Hurricane | 15 | 2s | Lv 5 · 600 | A leaping spin kick: 8 damage and knockback to everyone within 3 blocks. |
+| Taijutsu: Dynamic Entry | 15 | 4s | Lv 15 · 1,000 | A flying kick straight at the enemy you look at (up to 16 blocks): 12 damage and a big knockback. |
+| Taijutsu: Front Lotus | 30 | 12s | Lv 35 · 2,400 | Kick the enemy (within 4 blocks) high into the air, follow them up, wrap them and drive them head-first into the ground: 4 + 20 damage. Costs you 1.5 hearts. Bosses can't be lifted but still take the slam. |
+| Medical: Chakra Scalpel | 25 | 10s | Lv 30 · 2,000 | Chakra blades on your hands for 10s: every punch also cuts muscle — +5 damage, Slowness III and Weakness II for 5s. |
+| Genjutsu: Hell Viewing | 25 | 10s | Lv 25 · 1,800 | Trap the enemy you look at (18 blocks) in their worst fear for 6s (3s on bosses): nausea, blindness, weakness and slowness; players also see darkness. |
+
+**Taijutsu scrolls** are melee techniques: they scale with the **Taijutsu** stat (+1% per point) instead of Ninjutsu,
+nindō fist bonuses apply (Top Physique, Heavy Handed, Awakening of Youth…), and ninjutsu cost penalties don't.
+Top Physique makes them 25% cheaper. The Eight Inner Gates count as taijutsu too.
 
 ### Forbidden: Reanimation Jutsu (Edo Tensei)
 
@@ -651,7 +684,7 @@ Players talk to the Quest Giver to accept, see their progress, claim the reward 
 
 | NPC | What they do |
 |---|---|
-| **Jutsu Sensei** | Sells jutsu scrolls (Fireball → Rasengan/Chidori), Summoning scrolls and **Sage Training** (Lv 60); level requirements apply |
+| **Jutsu Sensei** | Teaches by school — pick **Fire, Water, Wind, Lightning, Earth, Ninjutsu, Taijutsu, Genjutsu & Medical** or **Summoning & Forbidden**, then a scroll (each page shows how many you've unlocked at your level and has a « Back button). **Services**: blank scrolls, Chakra Nature Training, emerald exchange. **Sage Training** (Lv 60) is under Summoning & Forbidden |
 | **Weaponsmith** | Kunai, shuriken, headbands, all 8 legendary swords (Lv 15–35), repairs the item in your hand |
 | **Ramen Shop** | Ichiraku Ramen (heal + 60 chakra + regen), Miso Ramen (+30 chakra + speed), Soldier Pills |
 | **Hokage (Mission Desk)** | D/C/B/A/S missions (kill mobs, ninja, a Tailed Beast, an Akatsuki member) for XP, Ryō and items |
@@ -771,6 +804,12 @@ Chidori Current = copper ingot · Mystical Palm = glistering melon · Rasenshuri
 Vacuum Bullets = wind charge · Earth Spikes = pointed dripstone · Water Prison = water bucket ·
 Chidori Sharp Spear = trident · Great Fire Annihilation = blaze powder + diamond · Eight Gates = golden apple + diamond ·
 Kirin = lightning rod + diamond.
+v1.40 scrolls: Dragon Flame = blaze rod · Ash Pile Burning = gunpowder + charcoal · Water Shark = prismarine shard ·
+Hiding in Mist = glass bottle · Water Shockwave = nautilus shell + diamond · Sickle Weasel = feather ·
+Pressure Damage = breeze rod + diamond · Lightning Hound = bone + copper ingot · Lightning Armour = copper block + diamond ·
+Earth Dragon = clay ball · Headhunter = iron shovel · Swamp = mud + slime ball · Big Ball Rasengan = ender pearl + diamond ·
+Leaf Hurricane = oak leaves · Dynamic Entry = leather boots · Front Lotus = string + pink tulip · Chakra Scalpel = shears ·
+Hell Viewing = fermented spider eye · Explosive Tags = TNT.
 All are also sold by the Jutsu Sensei.
 
 Catalysts: Fireball = blaze powder · Rasengan = ender pearl · Substitution = oak log ·
@@ -910,6 +949,14 @@ python3 tools/gen_particles.py --preview fire_burst ice_burst heal -o sheet.png
 ```
 
 The timers start when the server starts. Intervals are the two constants at the top of `behavior_pack/scripts/lagclear.js`.
+
+## Fixes (v1.40)
+
+- Jutsu hits no longer count as M1 punches. Before, a Rasengan or any other scripted hit that landed also played a
+  punch animation (cutting the jutsu's own animation short) and stacked the punch combo's bonus damage on top.
+- Enemy knockback works again: since v1.35 the softened enemy knockback called itself, so enemy jutsu never pushed
+  players at all and enemies' own dashes and leaps failed with a script error.
+- Projectiles can never "hit" an effect model (orbs, the new dragons, shark and hound, coffins, Susanoo).
 
 ## Stability notes (v1.30)
 

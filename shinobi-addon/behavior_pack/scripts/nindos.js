@@ -177,10 +177,11 @@ export const NINDOS = {
   },
   top_physique: {
     name: "Top Physique", rarity: "epic", line: "I can't use ninjutsu — so I became the best without it.",
-    pros: ["Fists and blades hit 40% harder", "Speed I, Jump Boost I and +2 hearts at all times"],
+    pros: ["Fists and blades hit 40% harder (taijutsu scrolls too)", "Taijutsu scrolls cost 25% less chakra",
+      "Speed I, Jump Boost I and +2 hearts at all times"],
     cons: ["Jutsu and clan abilities cost 50% more chakra", "Techniques deal 25% less damage"],
     melee: { fist: 1.4, blade: 1.4 }, effects: [["speed", 0], ["jump_boost", 0], ["health_boost", 0]],
-    cost: { jutsu: 1.5, clan: 1.5 }, tech: 0.75,
+    cost: { jutsu: 1.5, clan: 1.5, taijutsu: 0.75 }, tech: 0.75,
   },
   // ---------------------------------------------------------------- legendary
   prodigy: {

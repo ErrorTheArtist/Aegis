@@ -1,0 +1,34 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.aegis.water_shark.swim": {
+      "loop": true,
+      "bones": {
+        "body": {
+          "rotation": [
+            0,
+            "math.sin(q.life_time * 500) * 6",
+            "math.sin(q.life_time * 250) * 4"
+          ]
+        },
+        "tail": {
+          "rotation": [
+            0,
+            "math.sin(q.life_time * 500 - 50) * 24",
+            0
+          ]
+        },
+        "jaw": {
+          "rotation": [
+            "12 + math.sin(q.life_time * 360) * 12",
+            0,
+            0
+          ]
+        },
+        "wake": {
+          "scale": "1.0 + math.sin(q.life_time * 900) * 0.04"
+        }
+      }
+    }
+  }
+}

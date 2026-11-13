@@ -2,7 +2,7 @@
 // Chakra system, jutsu scrolls and ninja tools, driven by @minecraft/server.
 
 import { world, system, ItemStack, MolangVariableMap } from "@minecraft/server";
-import { initClans, applyNameTag, registerClanAbilities, beginClanRoll, getClanId, CLANS, clanMaxChakra, clanRegenMultiplier, handleClanItemUse, clanJutsuCostMultiplier } from "./clans.js";
+import { initClans, applyNameTag, registerClanAbilities, beginClanRoll, getClanId, CLANS, clanMaxChakra, clanRegenMultiplier, handleClanItemUse, clanJutsuCostMultiplier, refreshClanEffects } from "./clans.js";
 import { initBijuu, bijuuChakraBonus, bijuuRegenMultiplier, handleBijuuItemUse, isTransformed, isBijuuMastered } from "./bijuu.js";
 import { initSwords, handleSwordUse } from "./swords.js";
 import { initHud } from "./hud.js";
@@ -23,6 +23,7 @@ import { animSfx } from "./sfx.js";
 import { initM1 } from "./m1.js";
 import { spawnLayered } from "./particles.js";
 import { initLagClear } from "./lagclear.js";
+import { initNindos, beginNindoRoll, nindoDamage, nindoCostMultiplier, nindoCooldownMultiplier, nindoChakraBonus, nindoRegenMultiplier, nindoFocusMultiplier, nindoOnCast, nindoHealMultiplier } from "./nindos.js";
 import { initStarter, startStarterQuests, noteCast } from "./starter.js";
 import { initEdoTensei, handleEdoUse } from "./edotensei.js";
 import { beginNatureRoll } from "./natures.js";
@@ -38,7 +39,7 @@ const WELCOME_PROP = "aegis:welcomed";
 const OWNER_PROP = "aegis:owner";
 
 const BASE_MAX_CHAKRA = 100;
-const getMaxChakra = (player) => clanMaxChakra(player, BASE_MAX_CHAKRA) + bijuuChakraBonus(player) + levelChakraBonus(player) + armorChakraBonus(player);
+const getMaxChakra = (player) => clanMaxChakra(player, BASE_MAX_CHAKRA) + bijuuChakraBonus(player) + levelChakraBonus(player) + armorChakraBonus(player) + nindoChakraBonus(player);
 const REGEN_PER_SECOND = 4; // base regen
 const HEADBAND_REGEN_BONUS = 1.5; // multiplier while wearing the headband
 const FOCUS_REGEN_BONUS = 3; // multiplier while sneaking and standing still
@@ -107,7 +108,10 @@ function knockback(entity, dirX, dirZ, horizontal, vertical) {
 function hurt(target, amount, attacker, cause = "entityAttack") {
   if (sameVillage(target, attacker)) return; // no friendly fire between village-mates
   // Ninjutsu stat boosts every scripted technique a player lands.
-  if (attacker?.typeId === "minecraft:player") amount *= ninjutsuMultiplier(attacker) * sageMultiplier(attacker) * armorDamageMultiplier(attacker) * natureDamageMultiplier(attacker);
+  if (attacker?.typeId === "minecraft:player") {
+    amount *= ninjutsuMultiplier(attacker) * sageMultiplier(attacker) * armorDamageMultiplier(attacker) * natureDamageMultiplier(attacker);
+    amount = nindoDamage(attacker, target, amount, "tech");
+  }
   try {
     target.applyDamage(amount, { cause, damagingEntity: attacker });
   } catch {
@@ -285,7 +289,7 @@ function cooldownLeft(player, itemId) {
 }
 
 function startCooldown(player, itemId, ticks) {
-  const mult = player?.typeId === "minecraft:player" ? cooldownMultiplier(player) : 1;
+  const mult = player?.typeId === "minecraft:player" ? cooldownMultiplier(player) * nindoCooldownMultiplier(player, itemId) : 1;
   cooldowns.set(`${player.id}|${itemId}`, system.currentTick + Math.round(ticks * mult));
 }
 
@@ -317,7 +321,7 @@ world.afterEvents.itemUse.subscribe(({ source: player, itemStack }) => {
     player.onScreenDisplay.setActionBar(`§7${jutsu.name} ready in §f${(left / 20).toFixed(1)}s`);
     return;
   }
-  const cost = Math.round(jutsu.cost * clanJutsuCostMultiplier(player, itemStack.typeId) * natureCostMultiplier(player, itemStack.typeId));
+  const cost = Math.round(jutsu.cost * clanJutsuCostMultiplier(player, itemStack.typeId) * natureCostMultiplier(player, itemStack.typeId) * nindoCostMultiplier(player, "jutsu", itemStack.typeId));
   const chakra = getChakra(player);
   if (chakra < cost) {
     player.onScreenDisplay.setActionBar(`§cNot enough chakra! §7(${Math.floor(chakra)}/${cost})`);
@@ -327,6 +331,7 @@ world.afterEvents.itemUse.subscribe(({ source: player, itemStack }) => {
 
   // cast() returns false if the jutsu fizzled (e.g. no target) — no cost then.
   onJutsuCast(player, itemStack.typeId); // affinity damage boost starts before the jutsu lands
+  nindoOnCast(player, itemStack.typeId); // and the nindō's element boost (Will of Fire / Water)
   const ok = jutsu.cast(player);
   if (ok === false) return;
 
@@ -896,7 +901,7 @@ function castMysticalPalm(player) {
       particle(target.dimension, "aegis:heal", target.location);
       try {
         const h = target.getComponent("minecraft:health");
-        h.setCurrentValue(Math.min(h.effectiveMax, h.currentValue + 2));
+        h.setCurrentValue(Math.min(h.effectiveMax, h.currentValue + 2 * nindoHealMultiplier(player)));
       } catch {
         /* ignore */
       }
@@ -966,7 +971,9 @@ system.runInterval(() => {
     const loc = player.location;
     lastPos.set(player.id, loc);
     const still = prev && Math.abs(prev.x - loc.x) < 0.05 && Math.abs(prev.z - loc.z) < 0.05;
-    const focusing = player.isSneaking && still && chakra < max && !isTransformed(player);
+    const focusMult = nindoFocusMultiplier(player); // Revenge can't focus, Inner Sage focuses better
+    const focusing = player.isSneaking && still && chakra < max && !isTransformed(player) && focusMult > 0;
+    rate *= nindoRegenMultiplier(player, !still);
     const held = heldTypeId(player);
 
     // Ninja run: arms swept back while sprinting.
@@ -976,7 +983,7 @@ system.runInterval(() => {
       anim(player, "animation.aegis.ninja_run", "aegis_run", "!q.is_sprinting");
     } else if (!sprinting) running.delete(player.id);
     if (focusing) {
-      rate *= FOCUS_REGEN_BONUS;
+      rate *= FOCUS_REGEN_BONUS * focusMult;
       particle(player.dimension, "aegis:chakra_aura", loc);
     }
 
@@ -1049,11 +1056,13 @@ initStarter(npcApi);
 initEdoTensei(npcApi);
 initM1(npcApi);
 initLagClear();
+initNindos({ ...npcApi, refreshEffects: (p) => refreshClanEffects(p, true) });
 // new shinobi: choose a village → teleport + starter kit → clan roll → chakra nature → starter quests
 initVillages({ ...npcApi, refreshName: applyNameTag }, (player) => {
   system.runTimeout(() => isValid(player) && beginClanRoll(player), 30);
   system.runTimeout(() => isValid(player) && beginNatureRoll(player), 260);
-  system.runTimeout(() => isValid(player) && startStarterQuests(player), 400);
+  system.runTimeout(() => isValid(player) && beginNindoRoll(player), 350);
+  system.runTimeout(() => isValid(player) && startStarterQuests(player), 480);
 });
 initNpcs({ ...npcApi, spawnAkatsukiNear: (p, msg) => spawnAkatsukiNear(p, msg) });
 initEnemies(npcApi);

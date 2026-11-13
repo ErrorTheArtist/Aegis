@@ -142,6 +142,53 @@ Your clan shows above your head, e.g. `[Uchiha] Steve`.
 | Inuzuka | Common | 13% | 100 | Speed, Night Vision | Fang Over Fang dash / **Summon Ninja Hound** (tamed wolf) |
 | Yamanaka | Common | 13% | 100 | — | Mind Body Disturbance (nausea, blindness, slow) |
 
+### Nindō (your ninja way)
+
+Every shinobi rolls a **nindō** when they join — right after their clan and chakra nature (players from before this
+update roll one on their next join). Each has real advantages and real drawbacks; rarer ones are stronger with milder
+drawbacks. Odds by rarity: Common 48% · Uncommon 32% · Rare 13% · Epic 4% · Legendary 3%. Epic and Legendary rolls are announced to the server. Your nindō is shown in the
+**Shinobi Record** (*Nindō* button).
+
+| Nindō | Rarity (chance) | Advantages | Drawbacks |
+|---|---|---|---|
+| **Fast Feet** | Common (6.0%) | Speed I at all times<br>Body Flicker costs half the chakra and recharges twice as fast | You take 10% more damage |
+| **Heavy Handed** | Common (6.0%) | Fists and blades hit 30% harder<br>Your melee hits knock enemies back | Jutsu and clan abilities cost 20% more chakra |
+| **Iron Body** | Common (6.0%) | You take 15% less damage<br>Fall damage is cut by 40% | Slowness I at all times |
+| **Clever** | Common (6.0%) | All jutsu, clan abilities and sword specials recharge 20% faster<br>+10% XP | Fists and blades deal 20% less damage |
+| **Self Love** | Common (6.0%) | Fighting with no ally within 12 blocks: +15% damage, 10% less damage taken<br>Alone, you heal half a heart every 4s | With an ally nearby you deal 15% less damage |
+| **Soaked in Dread** | Common (6.0%) | 15% chance to evade any hit completely<br>When you're hit you get Speed II for 2s | You deal 10% less damage<br>Below 30% health you're shaken (Weakness I) |
+| **Deep Reserves** | Common (6.0%) | +60 max chakra<br>Chakra regenerates 15% faster | All jutsu, clan abilities and sword specials take 15% longer to recharge |
+| **Revenge** | Common (6.0%) | After you're hit, your next attack within 5s deals +50% of the damage you took (up to +10)<br>+15% damage against whoever hurt you last (for 15s) | You can't focus chakra (sneaking still gives no extra regen) |
+| **Will of Water** | Uncommon (4.0%) | Water Release jutsu cost 25% less chakra and deal 20% more damage<br>Water Breathing at all times<br>In water you take 20% less damage | Fire Release jutsu cost 30% more chakra<br>Fire and lava hurt you 20% more |
+| **Will of Leaf** | Uncommon (4.0%) | On natural ground (grass, dirt, leaves, wood…) chakra regenerates 50% faster<br>Standing still on natural ground gives Regeneration I | On stone, sand and everything else chakra regenerates 25% slower |
+| **Combat Medic** | Uncommon (4.0%) | Healing jutsu heal 50% more and cost 30% less chakra<br>Out of combat for 8s: Regeneration I | You deal 15% less damage |
+| **Weapon Prodigy** | Uncommon (4.0%) | Kunai and shuriken hit 50% harder<br>Sword specials recharge 25% faster<br>Blades hit 10% harder | Scroll jutsu cost 20% more chakra |
+| **Unyielding Blade** | Uncommon (4.0%) | Blades hit 25% harder<br>Sword specials cost 30% less chakra and recharge 20% faster | Bare-handed hits deal 30% less damage<br>Scroll jutsu cost 15% more chakra |
+| **A-B Teamwork** | Uncommon (4.0%) | With an ally (village-mate or your companion) within 10 blocks: +20% damage, 10% less damage taken | Alone you deal 15% less damage |
+| **Sky Pillar** | Uncommon (4.0%) | Jump Boost II at all times<br>No fall damage<br>+30% damage while you're in the air | You take 10% more damage |
+| **Reaper** | Uncommon (4.0%) | Every kill restores 1.5 hearts and 15 chakra<br>+20% damage to targets below 30% health | Chakra regenerates 20% slower<br>You take 10% more damage |
+| **Will of Fire** | Rare (2.6%) | Fire Release jutsu cost 25% less chakra and deal 25% more damage<br>Fire Resistance at all times<br>With an ally within 10 blocks: +10% damage | Water Release jutsu cost 30% more chakra |
+| **Never Give Up** | Rare (2.6%) | Below 35% health: +35% damage, 20% less damage taken, double chakra regen | -15% XP (a late bloomer) |
+| **Awakening of Youth** | Rare (2.6%) | Fists and blades hit 15% harder<br>The Eight Gates stay open 50% longer<br>Speed II while sprinting | Hunger I at all times (you burn through food) |
+| **Inner Sage** | Rare (2.6%) | Sage Mode without Sage Training<br>Natural energy gathers twice as fast and Sage Mode lasts 50% longer<br>Focusing chakra (sneaking still) works 50% better | Chakra regenerates 20% slower while you move |
+| **Passing the Will** | Rare (2.6%) | Your companions and summons deal 30% more damage<br>Allies within 16 blocks also get 20% of the XP you earn<br>When you fall, allies within 20 blocks gain Strength I and Regeneration I for 30s | You deal 10% less damage yourself |
+| **Genius** | Epic (2.0%) | Jutsu and clan abilities cost 20% less chakra<br>Techniques deal 15% more damage | Fists and blades deal 20% less damage<br>You take 10% more damage |
+| **Top Physique** | Epic (2.0%) | Fists and blades hit 40% harder<br>Speed I, Jump Boost I and +2 hearts at all times | Jutsu and clan abilities cost 50% more chakra<br>Techniques deal 25% less damage |
+| **Prodigy** | Legendary (1.5%) | +30% XP<br>All jutsu, clan abilities and sword specials recharge 15% faster and cost 10% less chakra | A frail body: chakra regenerates 20% slower |
+| **Phoenix of Rebirth** | Legendary (1.5%) | Once every 10 minutes, a hit that leaves you under 25% health makes you rise in flames: back to 70% health, Regeneration II, and a blast that burns enemies within 5 blocks<br>Fire Resistance at all times | While your rebirth recharges you deal 15% less damage |
+
+"Allies" are village-mates (or, if you have no village, other village-less players) and your own companions and
+summons. "Techniques" are jutsu, clan abilities, sword specials — anything scripted; melee bonuses apply to the M1
+combo hits.
+
+```
+/scriptevent aegis:nindo              (show yours)
+/scriptevent aegis:nindo list         (every nindō, its id and odds)
+/scriptevent aegis:nindo reroll       (roll again — admins / testing)
+/scriptevent aegis:nindo set <id>     (e.g. set never_give_up)
+/scriptevent aegis:nindo clear        (rolled again on the next join)
+```
+
 ### Chakra natures (basic releases)
 
 Everyone rolls a **chakra nature** a few seconds after their first join (older players get one on their next join):

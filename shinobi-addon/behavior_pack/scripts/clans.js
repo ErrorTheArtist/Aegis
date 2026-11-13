@@ -16,6 +16,7 @@ import { registerCast } from "./clash.js";
 
 import { noteCast } from "./starter.js";
 import { getVillage, villageTag } from "./villages.js";
+import { nindoEffects, nindoCostMultiplier, nindoHealMultiplier } from "./nindos.js";
 import { transformCinematic, impactFx, sfx, chargeFx } from "./cinematic.js";
 import { statEffectLevels, getLevel, getRank, RANKS } from "./levels.js";
 
@@ -315,6 +316,7 @@ function refreshEffects(player, force = false) {
   const merged = new Map(); // effect id -> amplifier
   const put = (id, amp) => merged.set(id, Math.max(merged.get(id) ?? -1, amp));
   for (const [id, amp] of clan?.effects ?? []) put(id, amp);
+  for (const [id, amp] of nindoEffects(player)) put(id, amp);
   const dojutsu = activeDojutsu.get(player.id);
   if (dojutsu) put("night_vision", 0);
   if (dojutsu === "mangekyo") put("strength", 0);
@@ -532,7 +534,7 @@ const ABILITIES = {
       cast: (p) => {
         for (const pl of p.dimension.getPlayers({ location: p.location, maxDistance: 8 })) {
           eff(pl, "instant_health", 1, 1);
-          eff(pl, "regeneration", 200, 1);
+          eff(pl, "regeneration", Math.round(200 * nindoHealMultiplier(p)), 1);
           api.particle(pl.dimension, "aegis:chakra_aura", pl.location);
           api.particle(pl.dimension, "minecraft:villager_happy", api.add(pl.location, { x: 0, y: 1, z: 0 }));
         }
@@ -809,15 +811,16 @@ export function handleClanItemUse(player, itemStack) {
     return true;
   }
   const chakra = api.getChakra(player);
-  if (chakra < move.cost) {
-    player.onScreenDisplay.setActionBar(`§cNot enough chakra! §7(${Math.floor(chakra)}/${move.cost})`);
+  const cost = Math.round(move.cost * nindoCostMultiplier(player, "clan", key));
+  if (chakra < cost) {
+    player.onScreenDisplay.setActionBar(`§cNot enough chakra! §7(${Math.floor(chakra)}/${cost})`);
     return true;
   }
   if (move.cast(player) === false) return true;
-  if (move.cost) registerCast(player, `${itemStack.typeId}#${move.name}`, move.cost);
+  if (cost) registerCast(player, `${itemStack.typeId}#${move.name}`, cost);
   noteCast(player);
-  if (move.cost) api.setChakra(player, api.getChakra(player) - move.cost);
-  api.gainJutsuXp(player, move.cost);
+  if (cost) api.setChakra(player, api.getChakra(player) - cost);
+  api.gainJutsuXp(player, cost);
   api.startCooldown(player, key, Math.round(move.cd * (1 - 0.1 * mastery(player))));
   if (move.cost) player.onScreenDisplay.setActionBar(`${CLANS[ability.clan].color}${move.name}!`);
   return true;

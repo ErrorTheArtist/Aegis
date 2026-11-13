@@ -9,6 +9,7 @@ import { world, system } from "@minecraft/server";
 import { showTitle } from "./hud.js";
 import { isTransformed } from "./bijuu.js";
 import { transformCinematic, aura } from "./cinematic.js";
+import { nindoSage } from "./nindos.js";
 
 const SAGE_PROP = "aegis:sage";
 const GATHER_TICKS = 100;
@@ -47,7 +48,7 @@ function eff(p, id, amp) {
 }
 
 function enter(player) {
-  active.set(player.id, system.currentTick + DURATION);
+  active.set(player.id, system.currentTick + Math.round(DURATION * (nindoSage(player)?.duration ?? 1)));
   gathering.delete(player.id);
   api.setChakra(player, api.getMaxChakra(player));
   transformCinematic(player, { color: [0.35, 0.95, 0.35], title: "§6Sage Mode", subtitle: "§7Natural energy flows through you" });
@@ -63,7 +64,7 @@ function leave(player) {
 function tick() {
   const now = system.currentTick;
   for (const p of world.getAllPlayers()) {
-    if (!hasSageTraining(p)) continue;
+    if (!hasSageTraining(p) && !nindoSage(p)?.free) continue; // Inner Sage needs no training
     const loc = p.location;
     const prev = lastPos.get(p.id);
     lastPos.set(p.id, loc);
@@ -98,12 +99,13 @@ function tick() {
     }
     const g = (gathering.get(p.id) ?? 0) + 5;
     gathering.set(p.id, g);
+    const need = Math.round(GATHER_TICKS * (nindoSage(p)?.gather ?? 1));
     if (g >= 20) {
       api.particle(p.dimension, "aegis:beast_aura", loc, GREEN);
-      const n = Math.min(10, Math.floor((g / GATHER_TICKS) * 10));
+      const n = Math.min(10, Math.floor((g / need) * 10));
       p.onScreenDisplay.setActionBar(`§aGathering natural energy ${"§2■".repeat(n)}${"§8■".repeat(10 - n)}`);
     }
-    if (g >= GATHER_TICKS) enter(p);
+    if (g >= need) enter(p);
   }
 }
 

@@ -8,6 +8,8 @@
 
 import { world, system } from "@minecraft/server";
 import { getStat } from "./levels.js";
+import { nindoDamage, NINDOS, getNindoId } from "./nindos.js";
+import { boostHit, isEcho, healBack } from "./dmgutil.js";
 
 const WINDOW = 28; // ticks between hits to keep the combo going
 const FISTS = [
@@ -24,7 +26,6 @@ const BLADE = [
 const BLADES = /sword|kunai|kusanagi|samehada|kubikiribocho|hiramekarei|kiba|nuibari|shibuki|chakra_blades|_axe$|trident|mace/;
 
 let api;
-let applying = false; // true while the bonus is being applied (it raises another hurt event)
 const combo = new Map(); // player id -> { step, tick, target }
 
 function heldId(player) {
@@ -50,17 +51,13 @@ function onHit(player, target, damage) {
   api.sound(dim, move.finisher ? "aegis.hit_heavy" : blade ? "aegis.slash" : "aegis.hit", at, move.finisher ? 1.3 : 0.9, 0.95 + (c.step % 3) * 0.08);
   if (!blade) api.particle(dim, "aegis:slash", at, [1, 0.95, 0.8]);
 
-  // bonus damage: fists scale with Taijutsu. Applied as (this hit + bonus) so it lands inside the hurt cooldown.
+  // bonus damage: fists scale with Taijutsu; then the nindō (Heavy Handed, Top Physique, Clever …) scales the hit.
+  // A bigger hit is applied as (this hit + bonus) so it lands inside the hurt cooldown; a weaker one is healed back.
   const bonus = Math.round(move.bonus * (blade ? 1 : 1 + getStat(player, "taijutsu") / 100));
-  if (bonus > 0) {
-    applying = true;
-    try {
-      target.applyDamage(damage + bonus, { cause: "entityAttack", damagingEntity: player });
-    } catch {
-      /* ignore */
-    }
-    applying = false;
-  }
+  const total = nindoDamage(player, target, damage, blade ? "blade" : "fist") + bonus;
+  if (total > damage) boostHit(target, damage, total, player);
+  else healBack(target, damage - total);
+  const knock = NINDOS[getNindoId(player)]?.knock;
 
   const d = api.norm({ x: target.location.x - player.location.x, y: 0, z: target.location.z - player.location.z });
   const gap = Math.hypot(target.location.x - player.location.x, target.location.z - player.location.z);
@@ -81,18 +78,19 @@ function onHit(player, target, damage) {
   } else if (gap > 1.6) {
     api.knockback(player, d.x, d.z, 0.35, 0); // step in so the next hit connects
   }
+  if (knock && !move.finisher) api.knockback(target, d.x, d.z, knock, 0.2);
 }
 
 export function initM1(helpers) {
   api = helpers;
   world.afterEvents.entityHurt.subscribe(({ hurtEntity, damage, damageSource }) => {
-    if (applying || damageSource?.cause !== "entityAttack") return;
+    if (damageSource?.cause !== "entityAttack" || isEcho(hurtEntity, damage)) return;
     const p = damageSource.damagingEntity;
     if (p?.typeId !== "minecraft:player" || !api.isValid(hurtEntity) || !api.canBeHit(hurtEntity, p)) return;
     try {
       onHit(p, hurtEntity, damage);
     } catch {
-      applying = false;
+      /* ignore */
     }
   });
   system.runInterval(() => {

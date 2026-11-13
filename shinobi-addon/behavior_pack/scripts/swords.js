@@ -3,6 +3,7 @@
 
 import { world, system } from "@minecraft/server";
 import { sameVillage } from "./villages.js";
+import { nindoCostMultiplier } from "./nindos.js";
 import { impactFx, sfx } from "./cinematic.js";
 
 let api;
@@ -495,8 +496,9 @@ export function handleSwordUse(player, itemStack) {
     player.onScreenDisplay.setActionBar(`§7${s.special} ready in §f${(left / 20).toFixed(1)}s`);
     return true;
   }
-  if (api.getChakra(player) < s.cost) {
-    player.onScreenDisplay.setActionBar(`§cNot enough chakra! §7(${Math.floor(api.getChakra(player))}/${s.cost})`);
+  const cost = Math.round((s.cost ?? 0) * nindoCostMultiplier(player, "sword", key));
+  if (api.getChakra(player) < cost) {
+    player.onScreenDisplay.setActionBar(`§cNot enough chakra! §7(${Math.floor(api.getChakra(player))}/${cost})`);
     return true;
   }
   if (s.cast(player) === false) return true;
@@ -504,8 +506,8 @@ export function handleSwordUse(player, itemStack) {
   if (["hiramekarei", "shibuki", "kiba", "kubikiribocho", "samehada"].includes(s.id)) {
     system.runTimeout(() => api.isValid(player) && impactFx(player.dimension, player.location, C[s.id], 1.5), 8);
   }
-  if (s.cost) api.setChakra(player, api.getChakra(player) - s.cost);
-  api.gainJutsuXp(player, s.cost);
+  if (cost) api.setChakra(player, api.getChakra(player) - cost);
+  api.gainJutsuXp(player, cost);
   api.startCooldown(player, key, s.cd);
   player.onScreenDisplay.setActionBar(`§l${s.text ?? "§b"}${s.special}!`);
   return true;

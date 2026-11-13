@@ -37488,6 +37488,88 @@
      }
     }
    }
+  },
+  "animation.aegis.hold_samehada": {
+   "animation_length": 1.0,
+   "blend_weight": "v.is_first_person ? 0.0 : 1.0 - math.clamp(v.attack_time * 6.0, 0.0, 1.0)",
+   "bones": {
+    "rightArm": {
+     "rotation": {
+      "0": [
+       -183.5,
+       49.5,
+       -47.5
+      ],
+      "1": [
+       -183.5,
+       49.5,
+       -47.5
+      ]
+     }
+    }
+   },
+   "loop": true
+  },
+  "animation.aegis.hold_kusanagi": {
+   "animation_length": 1.0,
+   "blend_weight": "v.is_first_person ? 0.0 : 1.0 - math.clamp(v.attack_time * 6.0, 0.0, 1.0)",
+   "bones": {
+    "waist": {
+     "rotation": {
+      "0": [
+       0,
+       15,
+       0
+      ],
+      "1": [
+       0,
+       15,
+       0
+      ]
+     }
+    },
+    "rightArm": {
+     "rotation": {
+      "0": [
+       -23.5,
+       -62,
+       51
+      ],
+      "1": [
+       -23.5,
+       -62,
+       51
+      ]
+     }
+    },
+    "leftArm": {
+     "rotation": {
+      "0": [
+       -82.5,
+       -50,
+       123.5
+      ],
+      "1": [
+       -82.5,
+       -50,
+       123.5
+      ]
+     }
+    }
+   },
+   "loop": true
+  },
+  "animation.aegis.sword_pose_clear": {
+   "animation_length": 0.05,
+   "bones": {
+    "rightArm": {
+     "rotation": [
+      0,
+      0,
+      0
+     ]
+    }
+   }
   }
  }
 }

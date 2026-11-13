@@ -26,7 +26,7 @@
       "scripts": {
         "animate": [
           {
-            "worn": "!c.is_first_person && c.item_slot == 'main_hand'"
+            "third": "!c.is_first_person && c.item_slot == 'main_hand'"
           },
           {
             "first": "c.is_first_person && c.item_slot == 'main_hand'"

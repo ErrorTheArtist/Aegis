@@ -472,6 +472,46 @@ function wear(p) {
   else lastHeld.delete(p.id);
 }
 
+// ---------------------------------------------------------------------------
+// Carrying poses: while you hold Samehada it rests across the back of your neck, your arm raised to its grip (like
+// Kisame); the Kusanagi is held sheathed across your body, ready to draw. The pose steps aside for every swing (the
+// animation fades out while the arm swings, and each hit or sword special stops it) and comes back a moment later.
+// The Kusanagi's scabbard hides while you swing (the attachable), so the blade is drawn for the strike.
+// ---------------------------------------------------------------------------
+const POSES = { "aegis:samehada": "animation.aegis.hold_samehada", "aegis:kusanagi": "animation.aegis.hold_kusanagi" };
+const posed = new Map(); // player id -> the sword their pose is playing for
+const lastSwing = new Map(); // player id -> tick of their last hit or sword special
+const POSE_AFTER = 14; // ticks after a strike before the pose returns
+
+function poseTick() {
+  const now = system.currentTick;
+  for (const p of world.getAllPlayers()) {
+    const id = heldStack(p)?.typeId;
+    const want = POSES[id];
+    if (!want) {
+      posed.delete(p.id); // its stop expression has already ended it
+      continue;
+    }
+    if (posed.get(p.id) === id || now - (lastSwing.get(p.id) ?? -1e9) < POSE_AFTER) continue;
+    try {
+      p.playAnimation(want, { controller: "aegis_sword_pose", blendOutTime: 0.25, stopExpression: `!q.is_item_name_any('slot.weapon.mainhand', 0, '${id}')` });
+      posed.set(p.id, id);
+    } catch {
+      /* ignore */
+    }
+  }
+}
+
+function clearPose(p) {
+  lastSwing.set(p.id, system.currentTick);
+  if (!posed.delete(p.id)) return;
+  try {
+    p.playAnimation("animation.aegis.sword_pose_clear", { controller: "aegis_sword_pose", blendOutTime: 0.1 });
+  } catch {
+    /* ignore */
+  }
+}
+
 function repairHeld(player, amount) {
   try {
     const inv = player.getComponent("minecraft:inventory").container;
@@ -501,6 +541,7 @@ export function handleSwordUse(player, itemStack) {
     player.onScreenDisplay.setActionBar(`§cNot enough chakra! §7(${Math.floor(api.getChakra(player))}/${cost})`);
     return true;
   }
+  clearPose(player); // the special's own animation takes the arms
   if (s.cast(player) === false) return true;
   sfx(player.dimension, "aegis.slash", player.location, 1.3, 0.9 + Math.random() * 0.2);
   if (["hiramekarei", "shibuki", "kiba", "kubikiribocho", "samehada"].includes(s.id)) {
@@ -550,6 +591,13 @@ export function initSwords(helpers) {
       /* ignore */
     }
   });
+
+  // Carrying poses step aside for every hit
+  world.afterEvents.entityHitEntity.subscribe(({ damagingEntity }) => {
+    if (damagingEntity?.typeId === "minecraft:player") clearPose(damagingEntity);
+  });
+  system.runInterval(poseTick, 4);
+  world.afterEvents.playerSpawn.subscribe(({ player }) => posed.delete(player.id));
 
   // Putting a sword away / drawing it
   system.runInterval(sheathTick, 2);

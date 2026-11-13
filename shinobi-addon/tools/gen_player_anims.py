@@ -945,6 +945,21 @@ A["animation.aegis.jin_transform_m"] = anim(5.3, [
 ])
 
 
+# ---------------------------------------------------------------------------
+# Carrying poses for two legendary swords, played by swords.js while the sword is in the main hand (third person only;
+# they fade out for every swing — v.attack_time — and swords.js stops them on each hit or sword special).
+# The arm angles are solved for the held model (tools/gen_swords.py: the vanilla trident grip, plus the -18° the
+# vanilla holding pose adds): Samehada rests across the back of the neck, the arm raised to its grip, like Kisame;
+# the Kusanagi is held sheathed across the body from the right hip, the left hand on the scabbard, ready to draw.
+# ---------------------------------------------------------------------------
+SWING_FADE = "v.is_first_person ? 0.0 : 1.0 - math.clamp(v.attack_time * 6.0, 0.0, 1.0)"
+A["animation.aegis.hold_samehada"] = {**anim(1.0, [(0.0, "lin", {"ra": [-183.5, 49.5, -47.5]})], plant=False, loop=True),
+                                      "blend_weight": SWING_FADE}
+A["animation.aegis.hold_kusanagi"] = {**anim(1.0, [(0.0, "lin", {"w": ([0, 15, 0], Z), "ra": [-23.5, -62, 51], "la": [-82.5, -50, 123.5]})],
+                                             plant=False, loop=True), "blend_weight": SWING_FADE}
+A["animation.aegis.sword_pose_clear"] = {"animation_length": 0.05, "bones": {"rightArm": {"rotation": [0, 0, 0]}}}
+
+
 def mirrored(a):
     """The same motion for the other hand: left and right limbs swapped, turns and sideways moves reversed."""
     swap = {"rightArm": "leftArm", "leftArm": "rightArm", "rightLeg": "leftLeg", "leftLeg": "rightLeg"}

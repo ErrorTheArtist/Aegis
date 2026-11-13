@@ -630,6 +630,13 @@ abilities live in `behavior_pack/scripts/swords.js`.
   `/scriptevent aegis:sheath off` keeps swords in the hotbar instead.
 - **On your shoulder:** stand still with a sword in hand for a moment and the blade is swung up to rest against your
   shoulder until you move or sneak.
+- **Samehada** is carried like Kisame does: while you hold it, it rests across the back of your neck and shoulders, your
+  arm raised to its grip.
+- **Kusanagi** has its **scabbard**: while you hold it, it stays sheathed, held across your body from the right hip
+  with your other hand on the scabbard, ready to draw. Every swing draws the blade (the scabbard disappears for the
+  strike), and put away on your back it sits in its scabbard.
+- Both carrying poses step aside the moment you swing, land a hit or use the sword's special, and come back a moment
+  later; in first person you just see the sword.
 - **Kisame** now carries **Samehada** and **Sasuke** his **Kusanagi** (they never drop from them).
 
 ## HUD

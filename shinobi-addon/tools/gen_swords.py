@@ -27,7 +27,7 @@ def w(path, obj):
 # Grip centre in player model space: the right fist (right arm spans x -8..-4, bottom at y 12).
 G = (-6.0, 13.0, 0.0)
 # 8x8 swatches on a 64x64 palette texture
-SW = {"steel": 0, "edge": 1, "dark": 2, "wrap": 3, "accent": 4, "accent2": 5, "light": 6, "red": 7}
+SW = {"steel": 0, "edge": 1, "dark": 2, "wrap": 3, "accent": 4, "accent2": 5, "light": 6, "red": 7, "sheath": 8}
 
 
 def box(o, s, sw):
@@ -112,6 +112,16 @@ for z in (-11, -19, -26):
     c.append(box((-2.2, -3.2, z), (4.4, 6.4, 1.6), "accent2"))  # bandage wraps
 SWORDS["samehada"]["cubes"] = c
 
+# --- Kusanagi's scabbard: dark lacquer, a metal collar at the mouth, the purple cord, a metal chape at the tip
+SWORDS["kusanagi"]["sheath"] = [
+    box((-1.0, -1.35, -27.6), (2.0, 3.2, 23.5), "sheath"),
+    box((-1.15, -1.5, -5.4), (2.3, 3.5, 1.3), "dark"),
+    box((-1.12, -1.48, -9.2), (2.24, 3.46, 1.2), "accent"),
+    box((-1.12, -1.48, -11.0), (2.24, 3.46, 0.6), "accent"),
+    box((-1.12, -1.48, -28.8), (2.24, 3.46, 1.3), "dark"),
+]
+SWORDS["kusanagi"]["colors"]["sheath"] = (38, 34, 46)
+
 # --- Kubikiribōchō: huge cleaver with the round hole near the tip
 c = [box((-1, -1, -5), (2, 2, 10), "wrap"), box((-1.3, -1.3, 5), (2.6, 2.6, 1), "dark"),
      box((-0.5, -2, -30), (1, 12, 25), "steel"),
@@ -167,9 +177,9 @@ SWORDS["chakra_blades"]["cubes"] = [
 
 def palette(colors):
     img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
-    random.seed(sum(sum(v) for v in colors.values()))
+    random.seed(sum(sum(v) for k, v in colors.items() if k != "sheath"))
     for name, idx in SW.items():
-        col = colors[name]
+        col = colors.get(name, colors["dark"])
         u, v = (idx % 8) * 8, (idx // 8) * 8
         for x in range(8):
             for y in range(8):
@@ -266,7 +276,10 @@ w(RP / "animations" / "swords.animation.json", {"format_version": "1.10.0", "ani
     # which copy shows: the one in the hand (main hand) or the one on the back (put away in the off hand)
     "animation.aegis.sword.hide_back": {"loop": True, "bones": {"back": {"scale": 0}}},
     "animation.aegis.sword.hide_hand": {"loop": True, "bones": {"sword": {"scale": 0}}},
+    # a swing draws the blade: the scabbard is hidden while the arm swings
+    "animation.aegis.sword.draw": {"loop": True, "bones": {"sheath": {"scale": 0}}},
 }})
+POSED = {"samehada", "kusanagi"}   # held in a carrying pose (player animations, see swords.js)
 w(RP / "animation_controllers" / "swords.animation_controllers.json", {"format_version": "1.10.0", "animation_controllers": {
     "controller.animation.aegis.sword_carry": {"initial_state": "hold", "states": {
         "hold": {"animations": ["third"], "blend_transition": 0.15,
@@ -306,13 +319,17 @@ for sid, sd in SWORDS.items():
     icon(cubes, cols).save(RP / "textures" / "items" / "aegis" / f"{sid}.png")
     (RP / "textures" / "models" / "swords").mkdir(parents=True, exist_ok=True)
     palette(cols).save(RP / "textures" / "models" / "swords" / f"{sid}.png")
+    sheath = sd.get("sheath", [])
+    bones = [{"name": "sword", "pivot": [0, 24, 0], "binding": "q.item_slot_to_bone_name(c.item_slot)",
+              "cubes": [held_cube(cu) for cu in cubes]}]
+    if sheath:   # held sheathed; the scabbard is a bone of its own so a swing can hide it (the blade is drawn)
+        bones.append({"name": "sheath", "parent": "sword", "pivot": [0, 24, 0], "cubes": [held_cube(cu) for cu in sheath]})
+    bones += [{"name": "body", "pivot": [0, 24, 0]}, back_bone([held_cube(cu) for cu in cubes + sheath], sid)]
     w(RP / "models" / "entity" / f"sword_{sid}.geo.json", {"format_version": "1.16.0", "minecraft:geometry": [{
         "description": {"identifier": f"geometry.aegis.sword_{sid}", "texture_width": 64, "texture_height": 64,
                         "visible_bounds_width": 5, "visible_bounds_height": 5, "visible_bounds_offset": [0, 1.5, 0]},
-        "bones": [{"name": "sword", "pivot": [0, 24, 0], "binding": "q.item_slot_to_bone_name(c.item_slot)",
-                   "cubes": [held_cube(cu) for cu in cubes]},
-                  {"name": "body", "pivot": [0, 24, 0]},
-                  back_bone([held_cube(cu) for cu in cubes], sid)]}]})
+        "bones": bones}]})
+    posed = sid in POSED
     w(RP / "attachables" / f"sword_{sid}.json", {"format_version": "1.10.0", "minecraft:attachable": {"description": {
         "identifier": f"aegis:{sid}",
         "materials": {"default": "entity_alphatest", "enchanted": "entity_alphatest_glint"},
@@ -321,12 +338,15 @@ for sid, sd in SWORDS.items():
         "animations": {"third": "animation.aegis.sword.hold_third_person", "first": "animation.aegis.sword.hold_first_person",
                        "carry": "animation.aegis.sword.carry", "settle": "animation.aegis.sword.settle",
                        "worn": "controller.animation.aegis.sword_carry",
-                       "hide_back": "animation.aegis.sword.hide_back", "hide_hand": "animation.aegis.sword.hide_hand"},
-        # c.item_slot / c.is_first_person are read here (like the vanilla shield does), never in a render controller
-        "scripts": {"animate": [{"worn": "!c.is_first_person && c.item_slot == 'main_hand'"},
+                       "hide_back": "animation.aegis.sword.hide_back", "hide_hand": "animation.aegis.sword.hide_hand",
+                       **({"draw": "animation.aegis.sword.draw"} if sheath else {})},
+        # c.item_slot / c.is_first_person are read here (like the vanilla shield does), never in a render controller.
+        # Samehada and the Kusanagi keep the plain grip: the player's carrying pose (swords.js) does the rest.
+        "scripts": {"animate": [{("third" if posed else "worn"): "!c.is_first_person && c.item_slot == 'main_hand'"},
                                 {"first": "c.is_first_person && c.item_slot == 'main_hand'"},
                                 {"hide_back": "c.item_slot == 'main_hand' || c.is_first_person"},
-                                {"hide_hand": "c.item_slot != 'main_hand'"}]},
+                                {"hide_hand": "c.item_slot != 'main_hand'"},
+                                *([{"draw": "c.item_slot == 'main_hand' && variable.attack_time > 0.0"}] if sheath else [])]},
         "render_controllers": ["controller.render.item_default"]}}})
 
     w(BP / "items" / f"{sid}.json", {"format_version": "1.21.60", "minecraft:item": {

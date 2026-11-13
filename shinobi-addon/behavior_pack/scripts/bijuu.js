@@ -11,18 +11,23 @@
 // Uzumaki with 100 Chakra + 100 Vitality can seal a weakened beast alive (into themselves or another
 // player) and, once they carry a beast, open the seal and master it through an inner trial.
 //
-// Jinchūriki get a wearable Tailed Beast Cloak (chest slot). Wearing it = Tailed Beast Mode.
-// Hold sneak for 1.5s while transformed to charge and fire a Tailed Beast Bomb.
+// Jinchūriki get a wearable Tailed Beast Cloak (chest slot). Wearing it = Tailed Beast Mode: a transformation
+// cinematic (jinchuriki.js + jin_shots.js), a chakra shroud with the beast's ears and tails (tools/gen_jinchuriki.py),
+// strong buffs, beast-chakra punches, and two techniques:
+//   hold sneak (~1.7 s)   — charge and fire a Tailed Beast Bomb (the orb grows as it charges)
+//   double-tap sneak      — the beast's own Beast Art (Sand Coffin, Blue Fire, … Chakra Arms)
+// Mastering the beast turns the cloak into its golden Tailed Beast Chakra Mode form.
 
 import { world, system, ItemStack, ItemLockMode } from "@minecraft/server";
 import { ActionFormData, MessageFormData } from "@minecraft/server-ui";
 import { showTitle } from "./hud.js";
-import { transformCinematic, beastAwakenFx, impactFx, aura, sfx } from "./cinematic.js";
+import { transformCinematic, beastAwakenFx, impactFx, aura, sfx, inCinematic } from "./cinematic.js";
+import { initJinchuriki, jinTransform, beastArt, beastPunch, jinCleanup } from "./jinchuriki.js";
 import { getStat, gainXp } from "./levels.js";
 
 const BIJUU_PROP = "aegis:bijuu";
 const OLD_CLOAK_ITEM = "aegis:bijuu_cloak";
-const cloakItemOf = (id) => `aegis:cloak_${id}`;
+const cloakItemOf = (id, mastered = false) => `aegis:cloak_${id}${mastered ? "_m" : ""}`; // _m: Tailed Beast Chakra Mode
 const isCloakItem = (typeId) => typeof typeId === "string" && (typeId.startsWith("aegis:cloak_") || typeId === OLD_CLOAK_ITEM);
 const SCROLL_ITEM = "aegis:bijuu_scroll";
 const DIMENSIONS = ["overworld", "nether", "the_end"];
@@ -40,18 +45,20 @@ export const BEASTS = {
   kurama: { name: "Kurama", title: "the Nine-Tailed Fox", tails: 9, text: "§6", color: [1.0, 0.45, 0.05], element: kuramaRoar },
 };
 
-// Extra effects while in Tailed Beast Mode, on top of the shared ones.
+// Extra effects while in Tailed Beast Mode, on top of the shared ones (the stronger amplifier wins).
 const CLOAK_PERKS = {
-  shukaku: [["resistance", 2]],
-  matatabi: [["fire_resistance", 0]],
-  isobu: [["water_breathing", 0], ["resistance", 2]],
-  son_goku: [["fire_resistance", 0], ["strength", 2]],
-  kokuo: [["speed", 2]],
-  saiken: [["water_breathing", 0], ["regeneration", 0]],
-  chomei: [["jump_boost", 3], ["slow_falling", 0]],
-  gyuki: [["strength", 2], ["water_breathing", 0]],
-  kurama: [["regeneration", 1], ["strength", 2]],
+  shukaku: [["resistance", 3]],                               // a skin of sand
+  matatabi: [["fire_resistance", 0], ["speed", 2]],           // cat-quick, born of fire
+  isobu: [["water_breathing", 0], ["resistance", 2]],         // the shell
+  son_goku: [["fire_resistance", 0], ["strength", 3]],        // lava and an ape's strength
+  kokuo: [["speed", 3]],                                      // a horse's speed
+  saiken: [["water_breathing", 0], ["regeneration", 1]],      // the slug heals
+  chomei: [["jump_boost", 3], ["slow_falling", 0]],           // wings
+  gyuki: [["strength", 3], ["water_breathing", 0]],           // eight tentacles of muscle
+  kurama: [["regeneration", 1], ["strength", 3]],             // the strongest of the nine
 };
+// Bonus hearts (Health Boost levels, added to the clan/Vitality ones by clans.js) while transformed.
+const SHROUD_HEARTS = { normal: 2, mastered: 4 };
 
 // Boss damage scales with tail count.
 const pw = (b, base) => Math.round(base * (1.3 + b.tails * 0.09));
@@ -123,6 +130,19 @@ export function isBijuuMastered(player) {
 
 export function isTransformed(player) {
   return cloakActive.has(player.id);
+}
+
+// Effect levels clans.js merges into the player's long-lasting effects while they are transformed.
+export function jinchurikiEffectLevels(player) {
+  if (!cloakActive.has(player?.id)) return {};
+  return { health_boost: isBijuuMastered(player) ? SHROUD_HEARTS.mastered : SHROUD_HEARTS.normal, night_vision: 1 };
+}
+
+// Extra damage on a melee hit while transformed (the M1 combo adds it to the punch) — 0 otherwise.
+export function bijuuMeleeBonus(player, target) {
+  if (!cloakActive.has(player?.id)) return 0;
+  const b = BEASTS[sealedBeastId(player)];
+  return b ? beastPunch(player, target, b, isBijuuMastered(player)) : 0;
 }
 
 export function bijuuRegenMultiplier(player) {
@@ -589,13 +609,38 @@ function chestItem(player) {
   }
 }
 
+function freshCloak(typeId) {
+  const stack = new ItemStack(typeId, 1);
+  stack.keepOnDeath = true;
+  return stack;
+}
+
+// Turns this player's cloak of the other form (V1 ↔ mastered) into `want`, in the inventory and on the chest.
+function swapCloak(player, id, want) {
+  const forms = [cloakItemOf(id, false), cloakItemOf(id, true)];
+  try {
+    const inv = player.getComponent("minecraft:inventory")?.container;
+    if (inv) {
+      for (let i = 0; i < inv.size; i++) {
+        const t = inv.getItem(i)?.typeId;
+        if (t !== want && forms.includes(t)) inv.setItem(i, freshCloak(want));
+      }
+    }
+    const worn = chestItem(player)?.typeId;
+    if (worn !== want && forms.includes(worn)) player.getComponent("minecraft:equippable").setEquipment("Chest", freshCloak(want));
+  } catch {
+    /* ignore */
+  }
+}
+
 function giveCloak(player) {
   const id = sealedBeastId(player);
-  if (!id || hasItem(player, cloakItemOf(id))) return;
+  if (!id) return;
+  const want = cloakItemOf(id, isBijuuMastered(player));
+  swapCloak(player, id, want);
+  if (hasItem(player, want)) return;
   try {
-    const stack = new ItemStack(cloakItemOf(id), 1);
-    stack.keepOnDeath = true;
-    player.getComponent("minecraft:inventory").container.addItem(stack);
+    player.getComponent("minecraft:inventory").container.addItem(freshCloak(want));
   } catch {
     /* inventory full — retried on next spawn */
   }
@@ -666,61 +711,129 @@ function release(player) {
 
 function startTransformation(player, b) {
   cloakActive.add(player.id);
-  const mastered = isBijuuMastered(player);
-  transformCinematic(player, {
-    color: mastered ? [1, 0.8, 0.25] : b.color,
-    title: `${b.text}${mastered ? "Tailed Beast Mode §6(Mastered)" : "Tailed Beast Mode"}`,
-    subtitle: `§7${b.name}'s chakra surges`,
-  });
+  sneak.delete(player.id);
+  api.refreshEffects?.(player); // the shroud's extra hearts and beast eyes (merged by clans.js)
+  jinTransform(player, b, isBijuuMastered(player), () => cloakActive.has(player.id));
 }
 
 function endTransformation(player) {
-  cloakActive.delete(player.id);
+  const was = cloakActive.delete(player.id);
   const ch = bombCharge.get(player.id);
   if (ch) api.removeFx(ch.orb);
   bombCharge.delete(player.id);
+  sneak.delete(player.id);
+  if (!was) return;
+  try {
+    player.removeEffect("health_boost");
+    player.removeEffect("night_vision");
+  } catch {
+    /* ignore */
+  }
+  api.refreshEffects?.(player); // back to the clan / Vitality levels
 }
 
-// Hold sneak while transformed: charge for 1.5s, then fire.
-const BOMB_CHARGE = 30;
+// ---------------------------------------------------------------------------
+// Sneak input while transformed (checked every tick): a double tap is the Beast Art, a hold charges the bomb.
+// ---------------------------------------------------------------------------
+const sneak = new Map(); // player id -> { down, since, taps: [ticks], art }
+const joinedAt = new Map(); // player id -> tick they (re)spawned
+const TAP_WINDOW = 9;    // two presses within this many ticks
+const HOLD_BOMB = 8;     // the bomb starts charging after holding this long
+
+function updateSneak(player, b) {
+  const now = system.currentTick;
+  const s = sneak.get(player.id) ?? { down: false, since: 0, taps: [], art: false };
+  sneak.set(player.id, s);
+  if (player.isSneaking && !s.down) {
+    s.down = true;
+    s.since = now;
+    s.taps = s.taps.filter((t) => now - t <= TAP_WINDOW);
+    s.taps.push(now);
+    if (s.taps.length >= 2 && !inCinematic(player)) {
+      s.taps = [];
+      s.art = true; // this press was the art, not a bomb
+      beastArt(player, sealedBeastId(player), b, isBijuuMastered(player));
+    }
+  } else if (!player.isSneaking && s.down) {
+    s.down = false;
+    s.art = false;
+  }
+}
+
+// Held long enough for the bomb (and not the second press of a double tap)?
+function holdingForBomb(player) {
+  const s = sneak.get(player.id);
+  return !!s && s.down && !s.art && system.currentTick - s.since >= HOLD_BOMB && !inCinematic(player);
+}
+
+// Hold sneak while transformed: the orb forms and grows for 1.25 s (three stages), then fires.
+const BOMB_CHARGE = 25;
+const BOMB = { normal: { cost: 60, cd: 280, dmg: 40, radius: 7 }, mastered: { cost: 30, cd: 160, dmg: 60, radius: 9 } };
+const BOMB_STAGES = [[0, "aegis:bomb_grow_1", 0.55], [10, "aegis:bomb_grow_2", 1.0], [20, "aegis:bomb_grow_3", 1.6]];
 function updateBombCharge(player, b) {
   let ch = bombCharge.get(player.id);
-  if (!player.isSneaking) {
+  if (!holdingForBomb(player)) {
     if (ch) api.removeFx(ch.orb);
     bombCharge.delete(player.id);
     return;
   }
   if (ch?.done) return;
-  const front = () => api.add(player.getHeadLocation(), api.add(api.scale(player.getViewDirection(), 2.5), { x: 0, y: 0.6, z: 0 }));
+  const mastered = isBijuuMastered(player);
+  const stats = mastered ? BOMB.mastered : BOMB.normal;
+  const front = () => api.add(player.getHeadLocation(), api.add(api.scale(player.getViewDirection(), 2.6), { x: 0, y: 0.7, z: 0 }));
   if (!ch) {
     const left = api.cooldownLeft(player, "bijuudama");
-    if (left > 0 || api.getChakra(player) < (isBijuuMastered(player) ? 40 : 80)) {
-      player.onScreenDisplay.setActionBar(left > 0 ? `§7Tailed Beast Bomb ready in §f${(left / 20).toFixed(1)}s` : `§cNot enough chakra for a Tailed Beast Bomb (${isBijuuMastered(player) ? 40 : 80})`);
+    if (left > 0 || api.getChakra(player) < stats.cost) {
+      player.onScreenDisplay.setActionBar(left > 0 ? `§7Tailed Beast Bomb ready in §f${(left / 20).toFixed(1)}s` : `§cNot enough chakra for a Tailed Beast Bomb (${stats.cost})`);
       bombCharge.set(player.id, { done: true });
       return;
     }
-    ch = { ticks: 0, orb: api.spawnFx(player.dimension, "aegis:jutsu_orb", "aegis:as_bijuudama", front()) };
-    api.follow(ch.orb, () => (api.isValid(player) && bombCharge.get(player.id)?.orb === ch.orb ? api.sub(front(), { x: 0, y: 0.25, z: 0 }) : undefined), BOMB_CHARGE + 20);
+    ch = { ticks: 0, scale: 0.55, orb: api.spawnFx(player.dimension, "aegis:jutsu_orb", "aegis:bomb_grow_1", front()) };
+    api.follow(ch.orb, () => (api.isValid(player) && bombCharge.get(player.id)?.orb === ch.orb ? api.sub(front(), { x: 0, y: 0.25 * ch.scale, z: 0 }) : undefined), BOMB_CHARGE + 20);
     api.anim(player, "animation.aegis.rasengan_hold");
     api.sound(player.dimension, "mob.warden.sonic_charge", player.location, 1, 0.9);
     bombCharge.set(player.id, ch);
   }
   ch.ticks += 5;
+  const stage = BOMB_STAGES.find(([t]) => t > 0 && t === ch.ticks); // the orb grows
+  if (stage) {
+    try {
+      ch.orb?.triggerEvent(stage[1]);
+    } catch {
+      /* ignore */
+    }
+    ch.scale = stage[2];
+    api.sound(player.dimension, "aegis.charge", player.location, 0.8, 0.8 + stage[2] * 0.3);
+  }
   api.particle(player.dimension, "aegis:bijuudama_charge", front());
+  if (ch.ticks % 10 === 0) aura(player, mastered ? [1, 0.8, 0.25] : b.color, true);
   player.onScreenDisplay.setActionBar(`§5Charging Tailed Beast Bomb ${"§d■".repeat(ch.ticks / 5)}${"§8■".repeat(Math.max(0, (BOMB_CHARGE - ch.ticks) / 5))}`);
   if (ch.ticks < BOMB_CHARGE) return;
 
   ch.done = true;
   api.removeFx(ch.orb);
-  const mastered = isBijuuMastered(player);
-  api.setChakra(player, api.getChakra(player) - (mastered ? 40 : 80));
-  api.startCooldown(player, "bijuudama", mastered ? 200 : 400);
+  api.setChakra(player, api.getChakra(player) - stats.cost);
+  api.startCooldown(player, "bijuudama", stats.cd);
   api.anim(player, "animation.aegis.both_palms");
-  api.launchProjectile(player, front(), player.getViewDirection(), {
-    speed: 1.5, maxAge: 50, damage: mastered ? 45 : 32, radius: mastered ? 7 : 6, knock: 2.8, fire: 0,
-    orbEvent: "aegis:as_bijuudama", trail: "aegis:beast_aura", burst: "aegis:beast_burst", color: b.color,
-    hitRadius: 2, sound: "random.explode",
-    power: 3,
+  const big = mastered ? 2.1 : 1.6;
+  // fly from the orb toward whatever the crosshair is on (the orb hangs above the eyes)
+  const start = front();
+  let aim = api.add(player.getHeadLocation(), api.scale(player.getViewDirection(), 30));
+  try {
+    const hit = player.getEntitiesFromViewDirection({ maxDistance: 40 }).map((h) => h.entity).find((e) => api.canBeHit(e, player));
+    if (hit) aim = api.add(hit.location, { x: 0, y: 1, z: 0 });
+    else {
+      const blk = player.getBlockFromViewDirection({ maxDistance: 40 });
+      if (blk) aim = api.add(blk.block.location, { x: 0.5, y: 0.5, z: 0.5 });
+    }
+  } catch {
+    /* keep the straight line */
+  }
+  api.launchProjectile(player, start, api.sub(aim, start), {
+    speed: 1.5, maxAge: 50, damage: stats.dmg, radius: stats.radius, knock: 3, fire: 0,
+    orbEvent: mastered ? "aegis:as_bijuudama_big" : "aegis:bomb_grow_3", orbOffset: 0.25 * big,
+    trail: "aegis:beast_aura", burst: "aegis:beast_burst", color: b.color, hitRadius: 1.4 + big * 0.5, sound: "random.explode",
+    power: mastered ? 3.6 : 3,
   });
   api.sound(player.dimension, "mob.warden.sonic_boom", player.location, 1.5, 0.9);
   player.onScreenDisplay.setActionBar("§5Tailed Beast Bomb!");
@@ -737,13 +850,19 @@ function updateCloak(player) {
     }
     return;
   }
-  if (!id || worn !== cloakItemOf(id)) {
+  if (!id || (worn !== cloakItemOf(id, false) && worn !== cloakItemOf(id, true))) {
     unequipCloak(player);
     player.onScreenDisplay.setActionBar("§cThis chakra rejects you — it isn't your Tailed Beast.");
     return;
   }
+  const mastered = isBijuuMastered(player);
+  if (worn !== cloakItemOf(id, mastered)) {
+    swapCloak(player, id, cloakItemOf(id, mastered)); // mastered since (or mastery reset): the other form
+    return;
+  }
   const b = BEASTS[id];
   if (!cloakActive.has(player.id)) {
+    if (system.currentTick - (joinedAt.get(player.id) ?? -1e9) < 40) return; // let the join reset run first
     if (api.getChakra(player) < 20) {
       unequipCloak(player);
       player.onScreenDisplay.setActionBar("§cNot enough chakra to transform!");
@@ -751,13 +870,13 @@ function updateCloak(player) {
     }
     startTransformation(player, b);
   }
-  const mastered = isBijuuMastered(player);
-  let drain = mastered ? 0 : 3; // per second — a mastered beast lends its chakra freely
+  let drain = mastered ? 0 : 2; // per second — a mastered beast lends its chakra freely
   try {
-    if (!mastered && player.getDynamicProperty("aegis:clan") === "uzumaki") drain = 1.5; // Uzumaki chakra
+    if (!mastered && player.getDynamicProperty("aegis:clan") === "uzumaki") drain = 1; // Uzumaki chakra
   } catch {
     /* ignore */
   }
+  if (inCinematic(player)) drain = 0; // not while the shroud is still forming
   const c = api.getChakra(player) - drain * 0.25;
   api.setChakra(player, c);
   if (c <= 0) {
@@ -766,14 +885,16 @@ function updateCloak(player) {
     player.onScreenDisplay.setActionBar("§7Out of chakra — the transformation fades.");
     return;
   }
-  // short effects, refreshed while transformed so they end on their own
-  eff(player, "strength", 30, mastered ? 2 : 1, false);
-  eff(player, "speed", 30, 1, false);
+  // short effects, refreshed while transformed so they end on their own (hearts and night vision: clans.js)
+  eff(player, "strength", 30, mastered ? 3 : 2, false);
+  eff(player, "speed", 30, mastered ? 2 : 1, false);
   eff(player, "resistance", 30, mastered ? 2 : 1, false);
-  eff(player, "jump_boost", 30, 1, false);
-  if (mastered) eff(player, "regeneration", 30, 0, false);
+  eff(player, "jump_boost", 30, mastered ? 2 : 1, false);
+  eff(player, "regeneration", 30, mastered ? 1 : 0, false);
+  if (mastered) eff(player, "fire_resistance", 30, 0, false);
   for (const [effect, amp] of CLOAK_PERKS[id] ?? []) eff(player, effect, 30, amp, false);
   api.particle(player.dimension, "aegis:beast_aura", player.location, b.color);
+  if (system.currentTick % 10 < 5) api.particle(player.dimension, "aegis:jin_bubble", player.location, mastered ? [1, 0.85, 0.3] : b.color);
   if (mastered) api.particle(player.dimension, "aegis:beast_aura", player.location, [1, 0.85, 0.3]);
   if (system.currentTick % 10 < 5) aura(player, mastered ? [1, 0.8, 0.25] : b.color);
   updateBombCharge(player, b);
@@ -792,6 +913,7 @@ export function handleBijuuItemUse(player, itemStack) {
 // ---------------------------------------------------------------------------
 export function initBijuu(helpers) {
   api = helpers;
+  initJinchuriki(helpers);
 
   // Boss AI every 10 ticks
   system.runInterval(() => {
@@ -860,6 +982,22 @@ export function initBijuu(helpers) {
       }
     }
   }, 5);
+  // Every tick: the transformation starts the moment the cloak goes on (in step with the cloak's form animation),
+  // and the sneak taps / holds of transformed players are read.
+  system.runInterval(() => {
+    for (const player of world.getAllPlayers()) {
+      try {
+        if (cloakActive.has(player.id)) {
+          const b = BEASTS[sealedBeastId(player)];
+          if (b) updateSneak(player, b);
+        } else if (isCloakItem(chestItem(player)?.typeId) && sealedBeastId(player)) {
+          updateCloak(player);
+        }
+      } catch {
+        /* ignore */
+      }
+    }
+  }, 1);
 
   // Killing blow seals the beast.
   world.afterEvents.entityDie.subscribe(({ deadEntity, damageSource }) => {
@@ -897,9 +1035,14 @@ export function initBijuu(helpers) {
     } else world.sendMessage(`§7${fullName(b)}§7 was defeated, but no one sealed it.`);
   });
 
-  world.afterEvents.playerSpawn.subscribe(({ player }) => {
+  world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
     const mine = sealedBeastId(player);
     if (mine && !holderOf(mine)) setHolder(mine, player);
+    joinedAt.set(player.id, system.currentTick);
+    if (initialSpawn) {
+      endTransformation(player); // back on the server: wearing the cloak transforms again, with its cinematic
+      jinCleanup(player);
+    }
   });
 
   world.afterEvents.playerSpawn.subscribe(({ player }) => {
@@ -1148,10 +1291,11 @@ function masterBeast(player) {
   if (!id) return;
   const b = BEASTS[id];
   player.setDynamicProperty(MASTERED_PROP, true);
+  swapCloak(player, id, cloakItemOf(id, true)); // the cloak becomes Tailed Beast Chakra Mode
   transformCinematic(player, { color: [1, 0.8, 0.25], title: `§6${b.name} Mastered`, subtitle: "§7Your Tailed Beast now fights alongside you" });
   api.particle(player.dimension, "aegis:beast_burst", api.add(player.location, { x: 0, y: 1, z: 0 }), GOLD);
   api.particle(player.dimension, "aegis:beast_burst", api.add(player.location, { x: 0, y: 1, z: 0 }), b.color);
   api.sound(player.dimension, "ui.toast.challenge_complete", player.location, 1, 0.7);
-  player.sendMessage(`§6You opened the seal and mastered ${fullName(b)}§6! §7Tailed Beast Mode no longer drains chakra, and its power has grown.`);
+  player.sendMessage(`§6You opened the seal and mastered ${fullName(b)}§6! §7Your cloak became §6Tailed Beast Chakra Mode§7: no chakra drain, stronger buffs, a cheaper and bigger Tailed Beast Bomb, and a faster Beast Art.`);
   world.sendMessage(`§e${player.name} has fully mastered ${fullName(b)}§e!`);
 }

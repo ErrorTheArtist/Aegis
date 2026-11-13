@@ -720,6 +720,54 @@
           "load_on_low_memory": true
         }
       ]
+    },
+    "aegis.heartbeat": {
+      "category": "player",
+      "min_distance": 4,
+      "max_distance": 40,
+      "sounds": [
+        {
+          "name": "sounds/aegis/heartbeat",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "aegis.jin_erupt": {
+      "category": "player",
+      "min_distance": 4,
+      "max_distance": 40,
+      "sounds": [
+        {
+          "name": "sounds/aegis/jin_erupt",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "aegis.jin_tail": {
+      "category": "player",
+      "min_distance": 4,
+      "max_distance": 40,
+      "sounds": [
+        {
+          "name": "sounds/aegis/jin_tail",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
+    },
+    "aegis.jin_gold": {
+      "category": "player",
+      "min_distance": 4,
+      "max_distance": 40,
+      "sounds": [
+        {
+          "name": "sounds/aegis/jin_gold",
+          "volume": 1.0,
+          "load_on_low_memory": true
+        }
+      ]
     }
   }
 }

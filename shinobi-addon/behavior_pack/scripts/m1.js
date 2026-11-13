@@ -10,6 +10,7 @@ import { world, system } from "@minecraft/server";
 import { getStat } from "./levels.js";
 import { nindoDamage, NINDOS, getNindoId } from "./nindos.js";
 import { boostHit, isEcho, healBack, scriptedHit } from "./dmgutil.js";
+import { bijuuMeleeBonus } from "./bijuu.js";
 
 const WINDOW = 28; // ticks between hits to keep the combo going
 const FISTS = [
@@ -54,7 +55,8 @@ function onHit(player, target, damage) {
   // bonus damage: fists scale with Taijutsu; then the nindō (Heavy Handed, Top Physique, Clever …) scales the hit.
   // A bigger hit is applied as (this hit + bonus) so it lands inside the hurt cooldown; a weaker one is healed back.
   const bonus = Math.round(move.bonus * (blade ? 1 : 1 + getStat(player, "taijutsu") / 100));
-  const total = nindoDamage(player, target, damage, blade ? "blade" : "fist") + bonus;
+  // …and in Tailed Beast Mode every hit carries the beast's chakra
+  const total = nindoDamage(player, target, damage, blade ? "blade" : "fist") + bonus + bijuuMeleeBonus(player, target);
   if (total > damage) boostHit(target, damage, total, player);
   else healBack(target, damage - total);
   const knock = NINDOS[getNindoId(player)]?.knock;

@@ -9,6 +9,7 @@ Adds aegis.<name> to sound_definitions.json.   Run from the shinobi-addon folder
 """
 import json
 import subprocess
+import sys
 import tempfile
 from pathlib import Path
 
@@ -367,7 +368,45 @@ def s_hound():   # Lightning Hound: an electric howl over crackle
     return master(howl * 0.8 + crk + buzz, 0.85)
 
 
-SOUNDS = {"hound": s_hound, "hit": s_hit, "hit_heavy": s_hit_heavy, "draw": s_draw, "sheathe": s_sheathe, "handsign": s_handsign, "swish": s_swish, "spin": s_spin, "leap": s_leap, "land": s_land, "step": s_step, "inhale": s_inhale, "poof": s_poof,
+def s_heartbeat():   # the seal throbs: lub-DUB, deep and close
+    def beat(amp, sec=0.34):
+        return thump(sec, 64, 38, 11) * amp + filt(noise(sec), "lowpass", 190) * np.exp(-T(sec) * 22) * 0.6 * amp
+    return master(mix(0.8, (0, beat(0.72)), (0.18, beat(1.0, 0.5))), 0.95, 1.6)
+
+
+def s_jin_erupt():   # Tailed Beast chakra boiling over: a surging hiss, a boil, crackle and a low rumble
+    sec = 1.6
+    t = T(sec)
+    surge = sweep(noise(sec), 180, 2400, q=0.9) * hann(len(t), 0.35) * 1.4
+    boil = filt(noise(sec), "bandpass", [80, 400]) * (0.6 + 0.4 * np.sin(2 * np.pi * 9 * t) ** 2) * hann(len(t), 0.25)
+    crk = clicks(sec, 420, 900, 7000, 12) * 0.9 * np.minimum(1, t / 0.15)
+    rumble = thump(sec, 52, 34, 1.6) * 0.9
+    return master(surge + boil + crk + rumble, 0.95, 1.5)
+
+
+def s_jin_tail():    # a tail of chakra flaring out: a short fiery whoomp
+    sec = 0.55
+    t = T(sec)
+    whoosh = sweep(noise(sec), 1800, 260, q=0.8) * hann(len(t), 0.18) * 1.3
+    low = thump(sec, 120, 55, 9) * 0.8
+    crk = clicks(sec, 40, 1500, 6000, 10) * 0.5
+    return master(whoosh + low + crk, 0.9)
+
+
+def s_jin_gold():    # mastered: a shimmering golden swell
+    sec = 1.8
+    t = T(sec)
+    out = np.zeros(len(t))
+    for k, (ratio, amp) in enumerate(((1, 0.5), (1.5, 0.35), (2, 0.4), (3, 0.25), (4, 0.18), (5.04, 0.12))):
+        f = 220.0 * ratio * (1 + 0.004 * np.sin(2 * np.pi * (5 + k) * t))
+        out += amp * np.sin(2 * np.pi * np.cumsum(f) / SR)
+    out *= hann(len(t), 0.55)
+    shimmer = filt(noise(sec), "bandpass", [4000, 9000]) * hann(len(t), 0.6) * 0.35
+    whoom = sweep(noise(sec), 300, 1600, q=0.6) * hann(len(t), 0.5) * 0.6
+    return master(out + shimmer + whoom, 0.9, 1.2)
+
+
+SOUNDS = {"heartbeat": s_heartbeat, "jin_erupt": s_jin_erupt, "jin_tail": s_jin_tail, "jin_gold": s_jin_gold, "hound": s_hound, "hit": s_hit, "hit_heavy": s_hit_heavy, "draw": s_draw, "sheathe": s_sheathe, "handsign": s_handsign, "swish": s_swish, "spin": s_spin, "leap": s_leap, "land": s_land, "step": s_step, "inhale": s_inhale, "poof": s_poof,
           "water": s_water, "water_burst": s_water_burst, "wind": s_wind, "wind_cut": s_wind_cut, "earth": s_earth, "earth_break": s_earth_break,
           "ice": s_ice, "ice_shatter": s_ice_shatter, "wood": s_wood, "lava": s_lava, "fire_roar": s_fire_roar, "thunder": s_thunder, "heal": s_heal,
           "push": s_push, "pull": s_pull, "eye": s_eye, "shadow": s_shadow, "gates": s_gates, "summon": s_summon, "dome": s_dome}
@@ -376,7 +415,10 @@ if __name__ == "__main__":
     SND.mkdir(parents=True, exist_ok=True)
     report = []
     with tempfile.TemporaryDirectory() as tmp:
+        only = set(sys.argv[1:])      # e.g. `gen_jutsu_sounds.py heartbeat jin_tail` re-makes just those
         for name, fn in SOUNDS.items():
+            if only and name not in only:
+                continue
             x = fn()
             assert np.isfinite(x).all() and np.max(np.abs(x)) > 0.3, name
             report.append(f"{name} {len(x) / SR:.2f}s rms {np.sqrt(np.mean(x ** 2)):.2f}")

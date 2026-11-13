@@ -433,16 +433,44 @@ creative inventory too.
 Land the **killing blow** and the beast is sealed inside you (a new one replaces the old):
 
 - +50 max chakra, plus 10 per tail (Kurama: +140), and 1.3× chakra regen
-- You get that beast's **Tailed Beast Cloak**, a wearable (chest slot) item. **Wear it to transform**:
-  your body is wrapped in a glowing chakra shell in the beast's colour, with chakra ears and the
-  beast's tails swaying behind you.
-- While transformed: Strength II, Speed II, Resistance II, Jump Boost II, plus a beast perk
-  (e.g. Kurama: Regeneration II + Strength III; Shukaku: Resistance III; Chomei: high jumps + slow falling;
-  Matatabi/Son Goku: fire resistance; Isobu/Saiken/Gyuki: water breathing).
-  Drains 3 chakra/sec (Uzumaki: 1.5) and natural chakra regen stops. When chakra runs out the cloak
-  comes off by itself.
-- **Hold sneak for 1.5s** while transformed to charge and fire a **Tailed Beast Bomb** (80 chakra, 20s cooldown).
-- Only the beast's own Jinchūriki can wear its cloak.
+- You get that beast's **Tailed Beast Cloak**, a wearable (chest slot) item. **Put it on to transform**; take it off to
+  return to normal. Only the beast's own Jinchūriki can wear its cloak.
+
+**The transformation** (≈5 s, and nothing can hurt you while it plays): the seal on your stomach burns — *ba-dum,
+BA-DUM* — the chakra erupts, you drop onto all fours as the shroud bubbles up around you, your tails sprout one by one,
+and you **roar**: the shockwave blasts away everything within 7 blocks (6 damage +1 per tail). The camera follows every
+beat; your view and controls come back when it ends. Mastered Jinchūriki transform calmly instead — hands in the Ram
+seal, a golden flash, the flames rising around a steady stance, a shout of power.
+
+**The cloak** is a glowing, bubbling chakra shroud in your beast's colour, with flame wisps licking off it, chakra
+claws, a beast face (slit eyes, fangs; Kurama's whiskers) and the beast's own ears or horns and tails: Shukaku's
+tanuki ears and one thick tail, Matatabi's cat ears, Isobu's spiked shell, Son Goku's horns, Kokuo's horse horns,
+Saiken's eye-stalks, Chomei's beetle horn and six insect wings, Gyuki's ox horns and eight tentacle tails, Kurama's fox
+ears and nine fanned tails. The tails ripple like flame and the chakra shimmers.
+
+| While transformed | Tailed Beast Mode | Mastered (Tailed Beast Chakra Mode) |
+|---|---|---|
+| Effects | Strength III, Speed II, Resistance II, Jump Boost II, Regeneration I, +4 hearts, Night Vision | Strength IV, Speed III, Resistance III, Jump Boost III, Regeneration II, Fire Resistance, +8 hearts, Night Vision |
+| Chakra | −2/s (Uzumaki −1/s), no natural regen; the cloak comes off at 0 | no drain, regen keeps working |
+| Melee | every punch and sword hit carries the beast's chakra: +2, +0.4 per tail (Kurama +5.6) | ×1.5 |
+| **Hold sneak** (~1.7 s): Tailed Beast Bomb | the orb grows in your hands, then flies where you aim: 40 damage, 7-block blast · 60 chakra · 14 s | 60 damage, 9-block blast, a bigger orb · 30 chakra · 8 s |
+| **Double-tap sneak**: Beast Art | 30 chakra · 10 s | 15 chakra · 6 s · 1.5× damage |
+
+Each beast adds its perk: Shukaku Resistance IV · Matatabi Fire Resistance + Speed III · Isobu Water Breathing +
+Resistance III · Son Goku Fire Resistance + Strength IV · Kokuo Speed IV · Saiken Water Breathing + Regeneration II ·
+Chomei Jump Boost IV + Slow Falling · Gyuki Strength IV + Water Breathing · Kurama Regeneration II + Strength IV.
+
+| Beast | Beast Art (double-tap sneak) |
+|---|---|
+| Shukaku | **Sand Coffin**: sand engulfs the enemy you look at (24 blocks) and holds them still, then **Sand Burial** crushes them — 14 damage (6 to anyone beside them) and weakness |
+| Matatabi | **Blue Fire**: a 10-block cone of blue cat-fire — 9 damage and burning |
+| Isobu | **Coral Spikes**: four rings of coral burst out around you — 10 damage, knock-up, Slowness III — while a shell gives you Resistance III for 3 s |
+| Son Goku | **Lava Globs**: three globs of lava at your target — 8 fire damage each in a 2.6-block splash, burning |
+| Kokuo | **Steam Rush**: a boiling charge forward — 10 damage, a big push and scalding to everything in your path |
+| Saiken | **Acid Bubbles**: a fan of five corrosive bubbles — 5 damage, Poison II and slowness where they burst |
+| Chomei | **Scale Powder**: your wings lift you up and you glide down while blinding scales rain on everyone within 7 blocks — 6 damage, blindness, weakness |
+| Gyuki | **Ink & Lariat**: an ink spray (5 damage, blindness), then Killer B's **Lariat** — a dash that hits the first enemy for 14 and launches them |
+| Kurama | **Chakra Arms**: two chakra claws stretch out up to 14 blocks; the first enemy they reach is dragged back to you and slammed into the ground for 14 (bosses are too big to drag, but still get slammed). Nothing in reach: the claws smash the ground (8) |
 
 ### One Jinchūriki per Tailed Beast
 
@@ -466,9 +494,11 @@ Only the **Uzumaki** can do this (sneak + use the **Sealing Chains**):
   You get the XP. 60 s cooldown. Stay within 40 blocks or the seal breaks.
 - **Open the seal** — an Uzumaki who carries a beast (sneak + use the chains with no beast in sight) can face the
   **dark half of their beast** (60% health, 4 minutes). Defeat it to **master** your beast, like Naruto with Kurama:
-  - Tailed Beast Mode **no longer drains chakra** and chakra regen keeps working
-  - Strength III, Resistance III and Regeneration while transformed (plus the beast's perk), golden aura
-  - Tailed Beast Bomb costs **40** chakra, **10 s** cooldown, 45 damage with a bigger blast
+  - Your cloak becomes **Tailed Beast Chakra Mode**: a golden shroud with black seal markings (the spiral seal on the
+    belly, bands on the limbs), a flame crest and coat tails, golden tails tipped with your beast's colour — and a
+    calm golden transformation
+  - **No chakra drain**, chakra regen keeps working, and every buff goes up a level (see the table above)
+  - Tailed Beast Bomb: **30** chakra, **8 s** cooldown, 60 damage, a 9-block blast · Beast Art: 15 chakra, 6 s, 1.5× damage
 
   Sealing a different beast into you later resets mastery.
 
@@ -484,7 +514,11 @@ fell and all Jinchūriki powers (chakra bonus, cloak, mastery) are gone. Sealing
 /scriptevent aegis:bijuu info
 ```
 
-Models/textures are generated by `tools/gen_bijuu.py`; boss AI lives in `behavior_pack/scripts/bijuu.js`.
+Beast models: `tools/gen_bijuu.py`. The Jinchūriki cloaks (both forms, their glow layer and their form/sway animations):
+`tools/gen_jinchuriki.py` — preview every cloak, or the transformation shot by shot, with
+`python3 tools/jin_preview.py sheet -o cloaks.png` / `python3 tools/jin_preview.py story -o story.png --beast kurama`.
+Boss AI and Tailed Beast Mode: `behavior_pack/scripts/bijuu.js`, the transformation and Beast Arts:
+`jinchuriki.js` (shot list: `jin_shots.js`).
 
 ## Armor & clothing
 
@@ -620,10 +654,12 @@ everything (camera, sky, controls) is restored afterwards.
 
 | Triggers the cinematic | Colour |
 |---|---|
-| Entering Tailed Beast Mode (wearing your cloak) | your beast's colour (gold when mastered) |
 | Mastering your Tailed Beast | gold |
 | Sage Mode | green |
 | Awakening the Mangekyō / Eternal Mangekyō | red / purple |
+
+Tailed Beast Mode has its own transformation sequence (the seal, the eruption, the tails, the roar — see
+Jinchūriki & Tailed Beast Mode), and so do Edo Tensei and the Jutsu Clash.
 
 Other effects: Tailed Beasts **awaken** (summon / rage) with lightning pillars, a vortex, a red-tinted sky for nearby
 players, screen shake and a roar; Tailed Beast Bombs, Rasengan, Chidori, Rasenshuriken, Fireball, Water Dragon, Earth
@@ -885,7 +921,7 @@ python3 tools/anim_preview.py gif fireball_jutsu -o fireball.gif
 
 ## Sound effects
 
-Every sound is synthesized (no samples) by the `tools/gen_*_sounds.py` scripts — 55 in all.
+Every sound is synthesized (no samples) by the `tools/gen_*_sounds.py` scripts — 64 in all.
 
 - **Foley, cued from the animations** (`behavior_pack/scripts/sfx.js`): hand seals snap one by one, thrusts and throws
   swish, spins whirl, leaps take off and land with a thud, the chest fills before a breath jutsu, feet pound in the
@@ -895,7 +931,9 @@ Every sound is synthesized (no samples) by the `tools/gen_*_sounds.py` scripts �
   **wood** creaking as it grows, bubbling **lava**, a roaring stream of **fire**, real **thunder** for Kirin,
   healing shimmer, Almighty **Push** and Universal **Pull**, the dōjutsu "shing", the Nara **shadow**, the Eight
   **Gates** opening, summoning, and the hum of the clash **dome**.
-- **Cinematics**: `gen_clash_sounds.py` (Jutsu Clash) and `gen_edo_sounds.py` (Edo Tensei).
+- **Cinematics**: `gen_clash_sounds.py` (Jutsu Clash) and `gen_edo_sounds.py` (Edo Tensei); Tailed Beast Mode's
+  heartbeat, chakra eruption, tail flares and golden swell come from `gen_jutsu_sounds.py`
+  (`python3 tools/gen_jutsu_sounds.py heartbeat jin_tail` re-makes just the named ones).
 
 ## Particles
 

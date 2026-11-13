@@ -112,6 +112,9 @@ export const LAYERS = {
   "aegis:ash_cloud": [
     "aegis:ash_cloud_embers"
   ],
+  "aegis:jin_flare": [
+    "aegis:jin_flare_flash"
+  ],
   "aegis:ice_burst": [
     "aegis:ice_burst_flash",
     "aegis:ice_burst_mist",

@@ -896,6 +896,55 @@ A["animation.aegis.front_lotus"] = anim(1.4, [
 ], plant=False)
 
 
+# ---------------------------------------------------------------------------
+# Tailed Beast Mode transformation (played by the cinematic in jinchuriki.js, timed with jin_shots.js and the cloak's
+# form animation): the seal burns — ba-dum, BA-DUM — the chakra erupts, down on all fours as the shroud bubbles up,
+# the tails sprout one by one, a coil, the ROAR, then a feral ready stance.
+# ---------------------------------------------------------------------------
+_CLUTCH = {"w": HIPS(26, drop=2), "ra": [-52, -38, 0], "la": [-52, 38, 0], "h": [32, 0, 0], "rl": [-10, 0, 6], "ll": [8, 0, -6]}
+_ALL_FOURS = {"w": HIPS(72, drop=0), "ra": [-96, -6, 12], "la": [-96, 6, -12], "h": [-60, 0, 0], "rl": [-66, 0, 18], "ll": [-60, 0, -18]}
+A["animation.aegis.jin_transform"] = anim(5.3, [
+    (0.16, "out", _CLUTCH),                                                                                    # the seal burns
+    (0.42, "snap", {"w": HIPS(34, drop=2.6), "h": [40, 0, 0], "ra": [-58, -42, 0], "la": [-58, 42, 0]}),        # ba-dum
+    (0.6, "io", {"w": HIPS(28, drop=2.2), "h": [34, 0, 0], "ra": [-52, -38, 0], "la": [-52, 38, 0]}),
+    (0.88, "snap", {"w": HIPS(40, drop=3.2), "h": [46, 0, 0], "ra": [-60, -46, 0], "la": [-60, 46, 0]}),        # BA-DUM
+    *tremble(0.92, 1.18, "w", [38, 0, 0], 2.5),
+    (1.22, "snap", {"w": HIPS(-22, drop=0), "rt": (Z, [0, 2, 0]), "ra": [-34, 0, 104], "la": [-34, 0, -104], "h": [-42, 0, 0],
+                    "rl": [0, 0, 14], "ll": [0, 0, -14]}),                                                     # the chakra erupts
+    (1.45, "back", {"w": HIPS(-18, drop=0.5), "rt": (Z, [0, 1, 0])}),
+    (1.8, "in", {"w": HIPS(48, drop=2), "rt": (Z, Z), "ra": [-70, -10, 10], "la": [-70, 10, -10], "h": [-20, 0, 0],
+                 "rl": [-34, 0, 14], "ll": [-30, 0, -14]}),
+    (2.05, "out", _ALL_FOURS),                                                                                 # down on all fours
+    (2.3, "io", {"w": HIPS(76, drop=0.4)}),
+    *[(round(2.42 + k * 0.26, 2), "snap" if k % 2 == 0 else "io", {"w": HIPS(70 + 4 * (k % 2), drop=0.2 * (k % 2)), "h": [-60 - 6 * (k % 2), 0, 0]})
+      for k in range(4)],                                                                                      # each tail jolts the body
+    (3.35, "in", {"w": HIPS(80, drop=0.8), "h": [-56, 0, 0], "ra": [-100, -8, 16], "la": [-100, 8, -16]}),      # coil
+    (3.62, "snap", {"w": HIPS(-20, drop=0), "rt": (Z, [0, 2.5, 0]), "ra": [-56, 0, 112], "la": [-56, 0, -112], "h": [-48, 0, 0],
+                    "rl": [-6, 0, 22], "ll": [6, 0, -22]}),                                                    # ROAR
+    *tremble(3.7, 4.3, "h", [-48, 0, 0], 3),
+    (4.45, "io", {"w": HIPS(30, drop=2.5), "rt": (Z, Z), "ra": [-74, -18, 22], "la": [-74, 18, -22], "h": [-18, 0, 0],
+                  "rl": [-30, 0, 12], "ll": [26, 0, -12]}),                                                    # feral ready stance
+    (5.0, "io", {"w": HIPS(26, drop=2.2)}),
+    (5.3, "io", REST),
+])
+
+# Mastered (Tailed Beast Chakra Mode): no struggle — hands in the Ram seal, a golden flash, the flames rise around a
+# steady stance, a shout of power, then a confident ready stance.
+A["animation.aegis.jin_transform_m"] = anim(5.3, [
+    (0.2, "io", {**seal("ram"), "w": HIPS(6, drop=1), "h": [18, 0, 0]}),                                       # calm, eyes closed
+    (0.95, "io", {"w": HIPS(8, drop=1.4), "h": [24, 0, 0]}),
+    (1.22, "snap", {"w": HIPS(-10, drop=0), "rt": (Z, [0, 1.5, 0]), "ra": [-20, 0, 48], "la": [-20, 0, -48], "h": [-10, 0, 0], **WIDE}),  # golden flash
+    (1.5, "back", {"rt": (Z, Z), "w": HIPS(-4, drop=0.6)}),
+    (2.0, "io", {"w": HIPS(4, drop=1), "ra": [-10, 0, 30], "la": [-10, 0, -30], "h": [0, 0, 0]}),            # stands in the rising flames
+    (3.3, "io", {"w": HIPS(6, drop=1.2), "ra": [-14, 0, 34], "la": [-14, 0, -34]}),
+    (3.62, "snap", {"w": HIPS(-14, drop=0), "ra": [-30, 0, 70], "la": [-30, 0, -70], "h": [-28, 0, 0], **WIDE}),  # a shout of power
+    *tremble(3.7, 4.2, "h", [-28, 0, 0], 2),
+    (4.45, "back", {"w": HIPS(10, -14, drop=1.8), "ra": [-82, 6, 0], "la": [-30, 0, -24], "h": [0, 14, 0], **STANCE_READY}),  # ready
+    (5.0, "io", {"w": HIPS(8, -12, drop=1.6)}),
+    (5.3, "io", REST),
+])
+
+
 def mirrored(a):
     """The same motion for the other hand: left and right limbs swapped, turns and sideways moves reversed."""
     swap = {"rightArm": "leftArm", "leftArm": "rightArm", "rightLeg": "leftLeg", "leftLeg": "rightLeg"}

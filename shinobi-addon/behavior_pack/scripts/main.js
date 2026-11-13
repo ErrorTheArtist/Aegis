@@ -1089,7 +1089,7 @@ initClans({
 initBijuu({
   add, sub, scale, norm, dot, particle, sound, knockback, hurt, isValid, canBeHit, isSafeSpot,
   getChakra, setChakra, getMaxChakra, cooldownLeft, startCooldown, anim, handPos, spawnFx, removeFx,
-  follow, launchProjectile,
+  follow, launchProjectile, lungeStrike, gainJutsuXp, refreshEffects: (p) => refreshClanEffects(p, true),
 });
 
 initSwords({

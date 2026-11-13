@@ -1,0 +1,39 @@
+{
+  "format_version": "1.8.0",
+  "render_controllers": {
+    "controller.render.aegis.jin_cloak": {
+      "geometry": "Geometry.default",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.default"
+      ],
+      "ignore_lighting": true
+    },
+    "controller.render.aegis.jin_glow": {
+      "geometry": "Geometry.glow",
+      "materials": [
+        {
+          "*": "Material.glow"
+        }
+      ],
+      "textures": [
+        "Texture.glow"
+      ],
+      "ignore_lighting": true,
+      "uv_anim": {
+        "offset": [
+          0.0,
+          "math.mod(q.life_time * 0.35, 1.0)"
+        ],
+        "scale": [
+          1.0,
+          1.0
+        ]
+      }
+    }
+  }
+}

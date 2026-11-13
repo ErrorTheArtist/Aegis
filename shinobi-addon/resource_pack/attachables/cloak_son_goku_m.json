@@ -1,0 +1,34 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:attachable": {
+    "description": {
+      "identifier": "aegis:cloak_son_goku_m",
+      "materials": {
+        "default": "entity_alphablend",
+        "glow": "charged_creeper"
+      },
+      "textures": {
+        "default": "textures/models/armor/jin_son_goku_m",
+        "glow": "textures/models/armor/jin_glow_gold"
+      },
+      "geometry": {
+        "default": "geometry.aegis.jin_son_goku_m",
+        "glow": "geometry.aegis.jin_son_goku_glow"
+      },
+      "animations": {
+        "form": "animation.aegis.jin_son_goku_m.form",
+        "sway": "animation.aegis.jin_son_goku_m.sway"
+      },
+      "scripts": {
+        "animate": [
+          "form",
+          "sway"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.aegis.jin_cloak",
+        "controller.render.aegis.jin_glow"
+      ]
+    }
+  }
+}

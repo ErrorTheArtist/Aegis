@@ -1,0 +1,31 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:item": {
+    "description": {
+      "identifier": "aegis:cloak_matatabi_m",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "aegis_cloak_matatabi_m"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "Tailed Beast Chakra Mode (Matatabi)"
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:glint": true,
+      "minecraft:wearable": {
+        "slot": "slot.armor.chest",
+        "protection": 10
+      },
+      "minecraft:enchantable": {
+        "slot": "armor_torso",
+        "value": 15
+      }
+    }
+  }
+}

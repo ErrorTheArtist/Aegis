@@ -730,6 +730,18 @@ P["swamp_bubble"] = dict(tex="droplet", mat="blend", n=3, shape=("disc", 1.2, [0
                          size=(0.12, 0.1, [(0, 0.4), (0.7, 1.1), (1, 1.4)]),
                          color=colfix([(0, (0.45, 0.36, 0.22, 0.9)), (0.8, (0.5, 0.42, 0.28, 0.8)), (1, (0.55, 0.45, 0.3, 0))]))
 
+# Tailed Beast Mode: chakra bubbling off the shroud, the seal burning on the stomach, a tail flaring out
+P["jin_bubble"] = dict(tex="glow", mat="add", n=6, shape=("box", [0.5, 1.0, 0.5], [0, 1.0, 0], [0, 1, 0]), life=(0.5, 1.0), speed=(0.5, 1.4),
+                       drag=1.0, accel=[0, 0.8, 0], size=(0.2, 0.18, [(0, 0.3), (0.55, 1.0), (0.8, 1.25), (1, 0)]),
+                       color=colvar([(0, ("W", 0.5), 0.9), (0.4, "C", 0.85), (1, ("K", 0.5), 0)]), prev=(1, 0.45, 0.1))
+P["jin_seal"] = dict(tex="swirl", mat="add", n=1, shape=("point", [0, 0, 0]), life=(0.45, 0.45), speed=(0, 0),
+                     size=(0.55, 0, [(0, 0.5), (0.3, 1.0), (1, 1.3)]), spin=(500, 640), rot=(0, 360),
+                     color=colvar([(0, ("W", 0.6), 0), (0.25, ("W", 0.3), 1), (1, "C", 0)]), prev=(1, 0.45, 0.1))
+P["jin_flare"] = dict(tex="flame", mat="add", n=12, shape=("sphere", 0.25, [0, 0, 0], "outwards"), life=(0.3, 0.6), speed=(2, 5), drag=3,
+                      accel=[0, 2, 0], size=(0.5, 0.3, [(0, 0.6), (0.25, 1.1), (1, 0.3)]), rot=(-10, 10), spin=(-40, 40),
+                      color=HOT(1, 0.9), prev=(1, 0.45, 0.1), layers=["jin_flare_flash"])
+L["jin_flare_flash"] = flash(TINT(0.9), 1.4, 0.12)
+
 # ---- dedicated effects for the releases that used to borrow generic ones ----
 P["ice_burst"] = chips("shard", colfix([(0, (0.95, 0.99, 1, 1)), (1, (0.7, 0.9, 1, 1))]), n=16, speed=(4, 10), size=0.2, grav=-13, radius=0.3)
 P["ice_burst"]["layers"] = ["ice_burst_flash", "ice_burst_mist", "ice_burst_sparkle", "ice_burst_shock"]

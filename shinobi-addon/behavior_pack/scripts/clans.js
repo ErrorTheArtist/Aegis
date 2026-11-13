@@ -19,6 +19,7 @@ import { getVillage, villageTag } from "./villages.js";
 import { nindoEffects, nindoCostMultiplier, nindoHealMultiplier } from "./nindos.js";
 import { transformCinematic, impactFx, sfx, chargeFx } from "./cinematic.js";
 import { statEffectLevels, getLevel, getRank, RANKS } from "./levels.js";
+import { jinchurikiEffectLevels } from "./bijuu.js";
 
 const CLAN_PROP = "aegis:clan";
 const MS_XP_PROP = "aegis:sharingan_xp";
@@ -326,6 +327,11 @@ function refreshEffects(player, force = false) {
   }
   for (const [id, lv] of Object.entries(statEffectLevels(player))) {
     if (lv > 0) merged.set(id, (merged.has(id) ? merged.get(id) + 1 : 0) + lv - 1);
+  }
+  // Tailed Beast Mode: the shroud's extra hearts stack on top; beast eyes see in the dark
+  for (const [id, lv] of Object.entries(jinchurikiEffectLevels(player))) {
+    if (id === "night_vision") put(id, 0);
+    else if (lv > 0) merged.set(id, (merged.has(id) ? merged.get(id) + 1 : 0) + lv - 1);
   }
   for (const [id, amp] of merged) {
     try {

@@ -5,25 +5,29 @@
       "identifier": "aegis:cloak_chomei",
       "materials": {
         "default": "entity_alphablend",
-        "enchanted": "armor_enchanted"
+        "glow": "charged_creeper"
       },
       "textures": {
-        "default": "textures/models/armor/cloak_chomei",
-        "enchanted": "textures/misc/enchanted_item_glint"
+        "default": "textures/models/armor/jin_chomei",
+        "glow": "textures/models/armor/jin_glow_chomei"
       },
       "geometry": {
-        "default": "geometry.aegis.cloak_7"
+        "default": "geometry.aegis.jin_chomei",
+        "glow": "geometry.aegis.jin_chomei_glow"
       },
       "animations": {
-        "sway": "animation.aegis.cloak_7"
+        "form": "animation.aegis.jin_chomei.form",
+        "sway": "animation.aegis.jin_chomei.sway"
       },
       "scripts": {
         "animate": [
+          "form",
           "sway"
         ]
       },
       "render_controllers": [
-        "controller.render.armor"
+        "controller.render.aegis.jin_cloak",
+        "controller.render.aegis.jin_glow"
       ]
     }
   }

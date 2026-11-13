@@ -5,25 +5,29 @@
       "identifier": "aegis:cloak_son_goku",
       "materials": {
         "default": "entity_alphablend",
-        "enchanted": "armor_enchanted"
+        "glow": "charged_creeper"
       },
       "textures": {
-        "default": "textures/models/armor/cloak_son_goku",
-        "enchanted": "textures/misc/enchanted_item_glint"
+        "default": "textures/models/armor/jin_son_goku",
+        "glow": "textures/models/armor/jin_glow_son_goku"
       },
       "geometry": {
-        "default": "geometry.aegis.cloak_4"
+        "default": "geometry.aegis.jin_son_goku",
+        "glow": "geometry.aegis.jin_son_goku_glow"
       },
       "animations": {
-        "sway": "animation.aegis.cloak_4"
+        "form": "animation.aegis.jin_son_goku.form",
+        "sway": "animation.aegis.jin_son_goku.sway"
       },
       "scripts": {
         "animate": [
+          "form",
           "sway"
         ]
       },
       "render_controllers": [
-        "controller.render.armor"
+        "controller.render.aegis.jin_cloak",
+        "controller.render.aegis.jin_glow"
       ]
     }
   }

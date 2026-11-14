@@ -19,7 +19,7 @@ import { initCurrency } from "./currency.js";
 import { initQuests } from "./quests.js";
 import { initClash, registerCast, projectilesMet } from "./clash.js";
 import { initKamui, handleKamuiUse } from "./kamui.js";
-import { initVillages, sameVillage, handleGourdUse } from "./villages.js";
+import { initVillages, sameVillage, handleGourdUse, villageRegenMultiplier, HEADBANDS } from "./villages.js";
 import { animSfx } from "./sfx.js";
 import { initM1 } from "./m1.js";
 import { spawnLayered } from "./particles.js";
@@ -282,7 +282,7 @@ function setChakra(player, value) {
 function wearingHeadband(player) {
   try {
     const eq = player.getComponent("minecraft:equippable");
-    return eq?.getEquipment("Head")?.typeId === "aegis:headband";
+    return HEADBANDS.has(eq?.getEquipment("Head")?.typeId); // any village's headband
   } catch {
     return false;
   }
@@ -1083,7 +1083,7 @@ system.runInterval(() => {
     const max = getMaxChakra(player);
 
     // Regeneration
-    let rate = isTransformed(player) && !isBijuuMastered(player) ? 0 : REGEN_PER_SECOND * clanRegenMultiplier(player) * bijuuRegenMultiplier(player) * levelRegenMultiplier(player) * armorRegenMultiplier(player);
+    let rate = isTransformed(player) && !isBijuuMastered(player) ? 0 : REGEN_PER_SECOND * clanRegenMultiplier(player) * bijuuRegenMultiplier(player) * levelRegenMultiplier(player) * armorRegenMultiplier(player) * villageRegenMultiplier(player);
     if (wearingHeadband(player)) rate *= HEADBAND_REGEN_BONUS;
 
     const prev = lastPos.get(player.id);
@@ -1125,7 +1125,7 @@ world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
       "§7and look out for the §6Travelling Merchant§7 — cheap ramen, rare finds, even §dBloodline Reroll Scrolls§7.",
       "§7Right-click a jutsu scroll to cast it. Each jutsu costs §bchakra§7.",
       "§7Sneak and stand still to §3focus§7 and regenerate chakra faster.",
-      "§7Wear a §fHidden Leaf Headband§7 for faster regen. Eat §aSoldier Pills§7 for a boost.",
+      "§7Wear your §fvillage's headband§7 for faster regen. Eat §aSoldier Pills§7 for a boost.",
       "§eYour clan is about to be decided... good luck!",
     ].join("\n")
   );

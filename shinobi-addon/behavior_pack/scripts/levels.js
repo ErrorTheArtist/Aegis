@@ -15,7 +15,7 @@ import { showTitle } from "./hud.js";
 import { ActionFormData, ModalFormData, MessageFormData } from "@minecraft/server-ui";
 import { applyNameTag, refreshClanEffects } from "./clans.js";
 import { getRyo, fmtRyo, walletMenu } from "./currency.js";
-import { getVillage, villageLabel, villageMenu } from "./villages.js";
+import { getVillage, villageLabel, villageMenu, villageCooldownMultiplier } from "./villages.js";
 import { starterLine } from "./starter.js";
 
 export const MAX_LEVEL = 200;
@@ -95,7 +95,7 @@ export const levelChakraBonus = (player) => getStat(player, "chakra") * 2;
 export const levelRegenMultiplier = (player) => 1 + getStat(player, "chakra") * 0.005;
 export const ninjutsuMultiplier = (player) => 1 + getStat(player, "ninjutsu") * 0.01;
 export const taijutsuMultiplier = (player) => 1 + getStat(player, "taijutsu") * 0.01;
-export const cooldownMultiplier = (player) => 1 - getStat(player, "agility") * 0.0025;
+export const cooldownMultiplier = (player) => (1 - getStat(player, "agility") * 0.0025) * villageCooldownMultiplier(player);
 
 // Extra "levels" of potion-style effects, merged with clan passives in clans.js.
 export function statEffectLevels(player) {

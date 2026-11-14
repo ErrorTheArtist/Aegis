@@ -1,4 +1,6 @@
 // Legendary bosses: Naruto, Sasuke, Tsunade, Sarutobi (Third Hokage), Minato — and the reanimated Madara Uchiha.
+// v1.51: a legend for every other village too — Gaara (Sand), Zabuza (Mist), Killer B (Cloud), Ōnoki (Stone) and
+// Hanzō of the Salamander (Rain).
 // They never spawn naturally — place an NPC Spawner and choose them. Each has a signature moveset and a
 // second phase at half health. Called from enemies.js for entities of type aegis:legend.
 
@@ -20,7 +22,32 @@ export const LEGENDS = {
   madara: { name: "§4Madara Uchiha §8[Edo Tensei]", skin: 29, color: [0.35, 0.45, 1], phase: "Perfect Susanoo", entrance: "§7returns from the dead!",
     drops: [["aegis:great_fire_scroll", 1, 1], ["aegis:ryo", 64, 1], ["aegis:ryo", 64, 1], ["aegis:phoenix_scroll", 1, 0.5],
       ["aegis:wood_dragon_scroll", 1, 0.35], ["aegis:edo_tensei_scroll", 1, 0.15]] },
+  // ---- v1.51: the other villages' legends ----
+  gaara: { name: "§6Gaara of the Desert", skin: 64, color: [0.86, 0.72, 0.45], phase: "Ultimate Defence: Shukaku Shield", village: "sand",
+    entrance: "§7The sand begins to stir…",
+    drops: [["aegis:wind_scroll", 1, 1], ["aegis:sand_gourd", 1, 0.35], ["aegis:pressure_damage_scroll", 1, 0.4], ["aegis:sand_headband", 1, 0.5]] },
+  zabuza: { name: "§bZabuza Momochi", skin: 65, color: [0.6, 0.78, 0.95], phase: "Demon of the Hidden Mist", village: "mist",
+    entrance: "§7steps out of the mist…",
+    drops: [["aegis:hiding_mist_scroll", 1, 1], ["aegis:kubikiribocho", 1, 0.3], ["aegis:water_dragon_scroll", 1, 0.5], ["aegis:mist_headband", 1, 0.5]] },
+  killer_bee: { name: "§eKiller B", skin: 66, color: [0.85, 0.3, 0.45], phase: "Eight-Tails Chakra Mode", village: "cloud",
+    entrance: "§7drops in with a beat!",
+    drops: [["aegis:lightning_hound_scroll", 1, 1], ["aegis:lightning_armor_scroll", 1, 0.4], ["aegis:bijuu_scroll", 1, 0.15], ["aegis:cloud_headband", 1, 0.5]] },
+  onoki: { name: "§6Ōnoki §7the Third Tsuchikage", skin: 67, color: [0.92, 0.95, 1], phase: "Dust Release", village: "stone",
+    entrance: "§7floats down from the sky!",
+    drops: [["aegis:earth_dragon_scroll", 1, 1], ["aegis:earth_spikes_scroll", 1, 0.5], ["aegis:headhunter_scroll", 1, 0.4], ["aegis:stone_headband", 1, 0.5]] },
+  hanzo: { name: "§5Hanzō of the Salamander", skin: 68, color: [0.55, 0.3, 0.75], phase: "Salamander's Venom", village: "rain",
+    entrance: "§7The rain falls harder…",
+    drops: [["aegis:water_prison_scroll", 1, 1], ["aegis:water_shockwave_scroll", 1, 0.4], ["aegis:ryo", 64, 1], ["aegis:rain_headband", 1, 0.5]] },
 };
+// v1.51 colours
+const SAND = [0.86, 0.72, 0.45];
+const MIST = [0.6, 0.78, 0.95];
+const WATER = [0.3, 0.6, 1];
+const BOLT = [0.6, 0.85, 1];
+const GYUKI = [0.85, 0.3, 0.45];
+const DUST = [0.92, 0.95, 1];
+const ROCK = [0.6, 0.45, 0.3];
+const VENOM = [0.55, 0.3, 0.75];
 const WOOD = [0.45, 0.32, 0.18];
 const reformed = new Set(); // Edo Madara: his body reforms once
 
@@ -118,6 +145,88 @@ function teleportStrike(boss, t, dmg, color) {
     api.particle(boss.dimension, "aegis:slash", chest(t), color);
     sfx(boss.dimension, "aegis.slash", t.location, 1, 1.3);
   }, 4);
+}
+
+const rot = (d, a) => ({ x: d.x * Math.cos(a) - d.z * Math.sin(a), y: d.y ?? 0, z: d.x * Math.sin(a) + d.z * Math.cos(a) });
+const lerp = (a, b, f) => ({ x: a.x + (b.x - a.x) * f, y: a.y + (b.y - a.y) * f, z: a.z + (b.z - a.z) * f });
+const flat = (a, b) => Math.hypot(a.x - b.x, a.z - b.z);
+
+function heal(e, n) {
+  try {
+    const h = e.getComponent("minecraft:health");
+    h.setCurrentValue(Math.min(h.effectiveMax, h.currentValue + n));
+  } catch {
+    /* ignore */
+  }
+}
+
+function hpOf(e) {
+  try {
+    return e.getComponent("minecraft:health").currentValue;
+  } catch {
+    return 0;
+  }
+}
+
+// Several projectiles in a fan toward the target.
+function fan(boss, t, n, step, opts) {
+  const d = dirTo(boss, t);
+  const start = boss.getHeadLocation();
+  const dy = (t.location.y + 1 - start.y) / Math.max(2, flat(t.location, boss.location));
+  for (let i = 0; i < n; i++) {
+    const dir = rot({ x: d.x, y: dy, z: d.z }, (i - (n - 1) / 2) * step);
+    api.launchProjectile(boss, add(start, { x: dir.x, y: 0, z: dir.z }), dir, { ignoreFamily: "ninja", ...opts });
+  }
+}
+
+// Living-thing targets inside a radius (never the boss, its clones or other bosses).
+function victims(boss, pos, r) {
+  try {
+    return boss.dimension.getEntities({ location: pos, maxDistance: r })
+      .filter((e) => e.id !== boss.id && api.canBeHit(e, boss) && e.typeId !== "aegis:legend" && e.typeId !== "aegis:hostile_ninja");
+  } catch {
+    return [];
+  }
+}
+
+const clonesOf = (boss) => {
+  try {
+    return boss.dimension.getEntities({ tags: [`aegis_lclone_${boss.id}`] }).length;
+  } catch {
+    return 0;
+  }
+};
+
+// Clones that vanish when hit (the shadow-clone rule in initLegends) and on their own after 20 seconds.
+function clones(boss, skin, name, max, puff = "aegis:smoke_puff") {
+  api.anim(boss, "animation.aegis.clone_seal");
+  sfx(boss.dimension, "aegis.whoosh", boss.location, 1.5, 1);
+  for (let i = clonesOf(boss); i < max; i++) {
+    const a = Math.random() * Math.PI * 2;
+    const at = add(boss.location, { x: Math.cos(a) * 2, y: 0, z: Math.sin(a) * 2 });
+    try {
+      const c = boss.dimension.spawnEntity("aegis:hostile_ninja", at);
+      c.addTag(`aegis_lclone_${boss.id}`);
+      c.setDynamicProperty("aegis:role", "rogue");
+      c.setDynamicProperty("aegis:no_xp", true);
+      c.setProperty("aegis:skin", skin);
+      c.nameTag = name;
+      c.triggerEvent("aegis:persist");
+      api.particle(boss.dimension, puff, at);
+      system.runTimeout(() => {
+        if (api.isValid(c)) {
+          api.particle(c.dimension, puff, c.location);
+          c.remove();
+        }
+      }, 400);
+    } catch {
+      /* ignore */
+    }
+  }
+}
+
+function warnAll(boss, pos, r, title, subtitle) {
+  for (const p of playersAround(boss.dimension, pos, r)) showTitle(p, title, { subtitle, fadeInDuration: 0, stayDuration: 30, fadeOutDuration: 5 });
 }
 
 // ---------------------------------------------------------------------------
@@ -382,7 +491,607 @@ const AI = {
     dashStrike(boss, t, [0.4, 0.75, 1], p2 ? 20 : 15, 8);
     return 80;
   },
+
+  // --- Gaara (Sand): the sand does everything — and often blocks your blows (see initLegends) ---
+  gaara(boss, t, dist, p2) {
+    const r = Math.random();
+    if (p2 && r < 0.22) {
+      sandFuneral(boss, t);
+      return 150;
+    }
+    if (r < 0.32 && dist < 16) {
+      sandCoffin(boss, t, p2);
+      return 110;
+    }
+    if (dist < 4.5) {
+      // a fist of sand
+      api.anim(boss, "animation.aegis.palm_thrust");
+      sfx(boss.dimension, "dig.sand", boss.location, 1.2, 0.7);
+      system.runTimeout(() => {
+        if (!api.isValid(boss) || !api.isValid(t)) return;
+        const d = dirTo(boss, t);
+        api.particle(boss.dimension, "aegis:earth_burst", chest(t));
+        api.particle(boss.dimension, "aegis:dust", t.location);
+        api.hurt(t, p2 ? 16 : 12, boss);
+        api.knockback(t, d.x, d.z, 3.2, 0.6);
+      }, 6);
+      return 55;
+    }
+    if (r < 0.66) {
+      sandShuriken(boss, t, p2);
+      return 60;
+    }
+    sandWave(boss, t, p2);
+    return 100;
+  },
+
+  // --- Zabuza (Mist): the Hidden Mist, silent killing, water jutsu and the Kubikiribōchō ---
+  zabuza(boss, t, dist, p2) {
+    const r = Math.random();
+    if (p2 && r < 0.18 && clonesOf(boss) < 2) {
+      clones(boss, LEGENDS.zabuza.skin, "§bZabuza §7(Water Clone)", 2, "aegis:water_splash");
+      return 60;
+    }
+    if (r < (p2 ? 0.4 : 0.25)) {
+      hiddenMist(boss, t, p2);
+      return 130;
+    }
+    if (dist < 4.5) {
+      cleaverSweep(boss, p2);
+      return 60;
+    }
+    if (r < 0.55 && dist > 6) {
+      waterDragon(boss, t);
+      return 100;
+    }
+    if (r < 0.75 && dist < 10) {
+      waterPrison(boss, t, p2);
+      return 110;
+    }
+    sfx(boss.dimension, "aegis.whoosh", boss.location, 1.2, 0.8);
+    dashStrike(boss, t, MIST, p2 ? 19 : 15, 10, "animation.aegis.sword_raise", 3.4);
+    return 70;
+  },
+
+  // --- Killer B (Cloud): Lariat, seven swords, octopus ink — and the Eight-Tails ---
+  killer_bee(boss, t, dist, p2) {
+    const r = Math.random();
+    if (Math.random() < 0.3) rap(boss);
+    if (p2 && r < 0.25) {
+      bijuuBomb(boss, t, GYUKI);
+      return 110;
+    }
+    if (p2 && r < 0.5) {
+      octopusHold(boss, t);
+      return 100;
+    }
+    if (dist < 4.5 && r < 0.75) {
+      swordDance(boss, p2);
+      return 70;
+    }
+    if (r < 0.45 && dist > 5) {
+      inkShot(boss, t);
+      return 60;
+    }
+    lariat(boss, t, p2);
+    return 75;
+  },
+
+  // --- Ōnoki (Stone): Added Weight Rock, Flight, earth — and Dust Release. Mind his back. ---
+  onoki(boss, t, dist, p2) {
+    const r = Math.random();
+    if (p2 && r < 0.25) {
+      dustRelease(boss, t);
+      backPain(boss, 0.4);
+      return 160;
+    }
+    if (r < 0.22) {
+      addedWeight(boss, t);
+      return 100;
+    }
+    if (dist < 4.5) {
+      rockFist(boss, t, p2);
+      return 55;
+    }
+    if (r < 0.55 && dist > 6) {
+      flightBarrage(boss, t, p2);
+      backPain(boss, 0.25);
+      return 110;
+    }
+    rockLine(boss, t, p2);
+    return 100;
+  },
+
+  // --- Hanzō (Rain): the salamander's poison and the chain-sickle ---
+  hanzo(boss, t, dist, p2) {
+    const r = Math.random();
+    if (p2 && r < 0.22) {
+      venomRain(boss);
+      return 140;
+    }
+    if (r < 0.3) {
+      poisonMist(boss, t, p2);
+      return 120;
+    }
+    if (dist < 4.5) {
+      sickleSlash(boss, p2);
+      return 55;
+    }
+    if (r < 0.65 && dist < 13) {
+      chainSickle(boss, t, p2);
+      return 80;
+    }
+    poisonFan(boss, t, p2);
+    return 75;
+  },
 };
+
+// --- Gaara --------------------------------------------------------------------
+// Sand Coffin: the sand gathers where the target stood, then closes; in the second phase Sand Burial crushes whoever it caught.
+function sandCoffin(boss, t, p2) {
+  const dim = boss.dimension;
+  const spot = { ...t.location };
+  api.anim(boss, "animation.aegis.palm_thrust");
+  sfx(dim, "aegis.earth", spot, 1.2, 1.3);
+  showTitle(t, "§6Sand Coffin", { subtitle: "§7The sand is closing in — move!", fadeInDuration: 0, stayDuration: 25, fadeOutDuration: 5 });
+  for (let k = 0; k < 18; k += 3) {
+    system.runTimeout(() => {
+      api.particle(dim, "aegis:cine_ring", spot, SAND);
+      api.particle(dim, "aegis:dust", add(spot, { x: (Math.random() - 0.5) * 2, y: 0.2, z: (Math.random() - 0.5) * 2 }));
+    }, k);
+  }
+  const caught = new Set();
+  system.runTimeout(() => {
+    if (!api.isValid(boss)) return;
+    for (let y = 0; y < 2.4; y += 0.6) api.particle(dim, "aegis:earth_burst", add(spot, { x: 0, y, z: 0 }));
+    sfx(dim, "dig.sand", spot, 2, 0.6);
+    blast(boss, spot, 2.6, p2 ? 16 : 13, 0.2, (e) => {
+      caught.add(e.id);
+      eff(e, "slowness", 60, 5);
+      eff(e, "mining_fatigue", 60, 2);
+      if (e.typeId === "minecraft:player") e.onScreenDisplay?.setActionBar("§6The sand holds you fast!");
+    });
+  }, 18);
+  if (!p2) return;
+  system.runTimeout(() => {
+    if (!api.isValid(boss)) return;
+    let crushed = false;
+    for (const id of caught) {
+      const e = world.getEntity(id);
+      if (!e || !api.isValid(e) || flat(e.location, spot) > 3.5) continue;
+      crushed = true;
+      api.hurt(e, 18, boss);
+      api.particle(dim, "aegis:earth_burst", chest(e));
+      if (e.typeId === "minecraft:player") showTitle(e, "§6Sand Burial", { subtitle: "§7Crushed by the sand!", fadeInDuration: 0, stayDuration: 20, fadeOutDuration: 5 });
+    }
+    if (crushed) {
+      impactFx(dim, spot, SAND, 2);
+      sfx(dim, "aegis.impact", spot, 2, 0.5);
+    }
+  }, 40);
+}
+
+// Sand Shuriken: a fan of hardened sand.
+function sandShuriken(boss, t, p2) {
+  api.anim(boss, "animation.aegis.throw_overhead");
+  sfx(boss.dimension, "aegis.wind", boss.location, 1, 1.4);
+  system.runTimeout(() => api.isValid(boss) && api.isValid(t) && fan(boss, t, p2 ? 7 : 5, 0.14, {
+    noOrb: true, speed: 1.6, maxAge: 24, damage: 5, radius: 1.5, knock: 0.4, fire: 0, trail: "aegis:dust", burst: "aegis:earth_burst",
+    color: SAND, hitRadius: 1.2, power: 0.4, sound: "dig.sand" }), 8);
+}
+
+// Sand Tsunami: a wave of sand rolls out toward the target and sweeps everyone along.
+function sandWave(boss, t, p2) {
+  const dim = boss.dimension;
+  const o = { ...boss.location };
+  const d = dirTo(boss, t);
+  api.anim(boss, "animation.aegis.both_palms");
+  chargeFx(boss, SAND, 10, "aegis.earth");
+  const hit = new Set();
+  for (let i = 2; i <= 18; i += 2) {
+    system.runTimeout(() => {
+      if (!api.isValid(boss)) return;
+      const at = add(o, { x: d.x * i, y: 0, z: d.z * i });
+      for (const side of [-1.5, 0, 1.5]) api.particle(dim, "aegis:earth_burst", add(at, { x: -d.z * side, y: 0.4, z: d.x * side }));
+      api.particle(dim, "aegis:dust", at);
+      if (i % 4 === 0) sfx(dim, "dig.sand", at, 1.5, 0.6);
+      blast(boss, at, 2.6, p2 ? 13 : 10, 0, (e) => {
+        hit.add(e.id);
+        api.knockback(e, d.x, d.z, 2.2, 0.55);
+      }, hit);
+    }, 10 + i);
+  }
+}
+
+// Phase 2 — Sand Waterfall Funeral: the ground around the target becomes a tidal wave of sand.
+function sandFuneral(boss, t) {
+  const dim = boss.dimension;
+  const spot = { ...t.location };
+  api.anim(boss, "animation.aegis.earth_slam");
+  sfx(dim, "aegis.charge", boss.location, 2, 0.6);
+  warnAll(boss, spot, 32, "§6Sand Waterfall Funeral", "§7A tidal wave of sand — get clear!");
+  for (let k = 0; k < 36; k += 4) {
+    system.runTimeout(() => {
+      const rr = 1 + k / 6;
+      for (let a = 0; a < 6; a++) api.particle(dim, "aegis:dust", add(spot, { x: Math.cos(a + k) * rr, y: 0.2, z: Math.sin(a + k) * rr }));
+      api.particle(dim, "aegis:cine_ring", spot, SAND);
+    }, k);
+  }
+  system.runTimeout(() => {
+    if (!api.isValid(boss)) return;
+    for (let y = 0; y < 8; y += 2) api.particle(dim, "aegis:cine_pillar", add(spot, { x: 0, y, z: 0 }), SAND);
+    for (let a = 0; a < 8; a++) api.particle(dim, "aegis:earth_burst", add(spot, { x: Math.cos(a) * 4, y: 0.5, z: Math.sin(a) * 4 }));
+    sfx(dim, "aegis.earth", spot, 3, 0.5);
+    shake(dim, spot, 0.8, 1.2, 32);
+    blast(boss, spot, 6.5, 24, 2.4, (e) => eff(e, "slowness", 80, 3));
+  }, 38);
+}
+
+// --- Zabuza -------------------------------------------------------------------
+// Hidden Mist Jutsu → Silent Killing: a blinding fog rolls in, he vanishes, and strikes from behind.
+function hiddenMist(boss, t, p2) {
+  const dim = boss.dimension;
+  const c = { ...boss.location };
+  api.anim(boss, "animation.aegis.hand_signs");
+  sfx(dim, "aegis.water", c, 1.4, 0.6);
+  for (const p of playersAround(dim, c, 24)) {
+    showTitle(p, "§bHidden Mist Jutsu", { subtitle: "§7You can't see a thing…", fadeInDuration: 2, stayDuration: 30, fadeOutDuration: 8 });
+    eff(p, "blindness", 90, 0);
+  }
+  for (let k = 0; k < 80; k += 8) {
+    system.runTimeout(() => {
+      for (let a = 0; a < 8; a++) api.particle(dim, "aegis:mist_cloud", add(c, { x: Math.cos(a) * (2 + k / 16), y: 0.6, z: Math.sin(a) * (2 + k / 16) }));
+    }, k);
+  }
+  eff(boss, "invisibility", 50, 0);
+  system.runTimeout(() => {
+    if (!api.isValid(boss) || !api.isValid(t)) return;
+    showTitle(t, "§bSilent Killing", { subtitle: "§7…right behind you.", fadeInDuration: 0, stayDuration: 20, fadeOutDuration: 5 });
+    teleportStrike(boss, t, p2 ? 20 : 16, MIST);
+    system.runTimeout(() => {
+      try {
+        if (api.isValid(boss)) boss.removeEffect("invisibility");
+      } catch {
+        /* ignore */
+      }
+    }, 6);
+  }, 40);
+}
+
+// The Kubikiribōchō sweeps round him — and drinks the blood it spills.
+function cleaverSweep(boss, p2) {
+  api.anim(boss, "animation.aegis.sword_spin");
+  sfx(boss.dimension, "aegis.slash", boss.location, 1.5, 0.6);
+  system.runTimeout(() => {
+    if (!api.isValid(boss)) return;
+    impactFx(boss.dimension, boss.location, MIST, 1.5);
+    let drank = 0;
+    blast(boss, boss.location, 4.6, p2 ? 18 : 14, 2.4, (e) => {
+      drank += p2 ? 6 : 4;
+      api.particle(e.dimension, "aegis:slash", chest(e), [0.8, 0.15, 0.15]);
+    });
+    if (drank) heal(boss, drank);
+  }, 6);
+}
+
+function waterDragon(boss, t) {
+  api.anim(boss, "animation.aegis.water_seals");
+  chargeFx(boss, WATER, 14, "aegis.water");
+  system.runTimeout(() => {
+    if (!api.isValid(boss) || !api.isValid(t)) return;
+    api.anim(boss, "animation.aegis.both_palms");
+    shoot(boss, t, { orbEvent: "aegis:as_water", speed: 1.0, maxAge: 40, damage: 15, radius: 4.2, knock: 2.6, fire: 0, trail: "aegis:water_splash",
+      burst: "aegis:water_splash", hitRadius: 2, sound: "aegis.water_burst", effects: [["slowness", 60, 2]], color: WATER });
+  }, 14);
+}
+
+// Water Prison: a sphere of water holds the target in place for four seconds — hurt him enough and it bursts.
+function waterPrison(boss, t, p2) {
+  const dim = boss.dimension;
+  api.anim(boss, "animation.aegis.water_seals");
+  sfx(dim, "aegis.water", t.location, 1.4, 0.7);
+  showTitle(t, "§bWater Prison", { subtitle: "§7Hit him hard to break free!", fadeInDuration: 0, stayDuration: 30, fadeOutDuration: 5 });
+  const hp0 = hpOf(boss);
+  eff(boss, "slowness", 80, 6); // he has to keep a hand in the prison
+  let open = true;
+  for (let k = 0; k < 80; k += 5) {
+    system.runTimeout(() => {
+      if (!open || !api.isValid(boss) || !api.isValid(t)) return;
+      if (hpOf(boss) < hp0 - 20) {
+        open = false;
+        try {
+          boss.removeEffect("slowness");
+          for (const id of ["slowness", "mining_fatigue", "weakness"]) t.removeEffect(id);
+        } catch {
+          /* ignore */
+        }
+        api.particle(dim, "aegis:water_splash", chest(t));
+        if (t.typeId === "minecraft:player") t.onScreenDisplay?.setActionBar("§bThe Water Prison bursts — you're free!");
+        return;
+      }
+      const a = k * 0.16;
+      api.particle(dim, "aegis:water_splash", add(t.location, { x: Math.cos(a) * 1.1, y: 1, z: Math.sin(a) * 1.1 }));
+      eff(t, "slowness", 10, 6);
+      eff(t, "mining_fatigue", 10, 2);
+      eff(t, "weakness", 10, 1);
+      if (k % 20 === 0) api.hurt(t, p2 ? 4 : 3, boss, "drowning"); // (water breathing keeps you safe)
+    }, k);
+  }
+}
+
+// --- Killer B -----------------------------------------------------------------
+const RAPS = [
+  "♪ Eight tails, one host — I'm the one you fear the most! ♪",
+  "♪ Seven swords spinning, no chance you're winning! ♪",
+  "♪ Lightning in my fist — you're the next on my list! ♪",
+  "♪ Ink in your eyes, now ain't that a surprise! ♪",
+  "♪ You're too slow, let the Octopus show! ♪",
+  "♪ Cloud Village pride — there's nowhere to hide! ♪",
+];
+
+function rap(boss) {
+  const line = RAPS[Math.floor(Math.random() * RAPS.length)];
+  for (const p of playersAround(boss.dimension, boss.location, 24)) p.onScreenDisplay?.setActionBar(`§eKiller B: §f${line}`);
+}
+
+// Lightning Release: Lariat — a charging arm wrapped in lightning.
+function lariat(boss, t, p2) {
+  sfx(boss.dimension, "aegis.thunder", boss.location, 1.2, 1.4);
+  api.particle(boss.dimension, "aegis:lightning_burst", chest(boss));
+  dashStrike(boss, t, BOLT, p2 ? 22 : 17, 10, "animation.aegis.lightning_burst", 3.8);
+}
+
+// Acrobat: seven swords spinning in a whirlwind of cuts.
+function swordDance(boss, p2) {
+  api.anim(boss, "animation.aegis.sword_spin");
+  for (let k = 0; k < 3; k++) {
+    system.runTimeout(() => {
+      if (!api.isValid(boss)) return;
+      for (let a = 0; a < 6; a++) api.particle(boss.dimension, "aegis:slash", add(boss.location, { x: Math.cos(a + k) * 2.4, y: 1.1, z: Math.sin(a + k) * 2.4 }), [0.9, 0.9, 1]);
+      sfx(boss.dimension, "aegis.slash", boss.location, 1.2, 1.2 + k * 0.1);
+      blast(boss, boss.location, 4.2, p2 ? 9 : 7, 1.0);
+    }, 4 + k * 6);
+  }
+}
+
+// Octopus ink: blinds and slows whoever it splashes.
+function inkShot(boss, t) {
+  api.anim(boss, "animation.aegis.jutsu_breath");
+  sfx(boss.dimension, "aegis.water", boss.location, 1.2, 0.6);
+  system.runTimeout(() => api.isValid(boss) && api.isValid(t) && shoot(boss, t, {
+    noOrb: true, speed: 1.3, maxAge: 30, damage: 7, radius: 3.2, knock: 0.6, fire: 0, trail: "aegis:shadow", burst: "aegis:smoke_puff",
+    color: [0.08, 0.08, 0.12], hitRadius: 1.6, power: 0.6, sound: "aegis.water", effects: [["blindness", 60, 0], ["slowness", 60, 1]] }), 8);
+}
+
+function bijuuBomb(boss, t, color) {
+  api.anim(boss, "animation.aegis.both_palms");
+  chargeFx(boss, color, 20, "aegis.charge");
+  system.runTimeout(() => api.isValid(boss) && api.isValid(t) && shoot(boss, t, {
+    speed: 1.2, maxAge: 50, damage: 24, radius: 5.5, knock: 2.5, fire: 0, orbEvent: "aegis:as_bijuudama",
+    trail: "aegis:beast_aura", burst: "aegis:beast_burst", color, hitRadius: 2, power: 2.5 }), 20);
+}
+
+// Phase 2 — Octopus Hold: eight tentacles burst up round the target and slam down.
+function octopusHold(boss, t) {
+  const dim = boss.dimension;
+  const spot = { ...t.location };
+  api.anim(boss, "animation.aegis.earth_slam");
+  sfx(dim, "aegis.charge", boss.location, 1.6, 0.7);
+  showTitle(t, "§dOctopus Hold", { subtitle: "§7Tentacles all around you — move!", fadeInDuration: 0, stayDuration: 25, fadeOutDuration: 5 });
+  for (let k = 0; k < 20; k += 4) {
+    system.runTimeout(() => {
+      for (let a = 0; a < 8; a++) {
+        const ang = (a * Math.PI) / 4;
+        api.particle(dim, "aegis:cine_pillar", add(spot, { x: Math.cos(ang) * 3, y: k / 6, z: Math.sin(ang) * 3 }), GYUKI);
+      }
+    }, k);
+  }
+  system.runTimeout(() => {
+    if (!api.isValid(boss)) return;
+    impactFx(dim, spot, GYUKI, 2.5);
+    sfx(dim, "aegis.impact", spot, 2, 0.5);
+    shake(dim, spot, 0.6, 0.8, 24);
+    blast(boss, spot, 3.6, 18, 1.4, (e) => eff(e, "slowness", 60, 2));
+  }, 22);
+}
+
+// --- Ōnoki --------------------------------------------------------------------
+// He's not as young as he was: after a big jutsu his back sometimes gives out — a moment to strike.
+function backPain(boss, chance) {
+  if (Math.random() > chance) return;
+  system.runTimeout(() => {
+    if (!api.isValid(boss)) return;
+    eff(boss, "slowness", 60, 10);
+    eff(boss, "weakness", 60, 2);
+    sfx(boss.dimension, "aegis.impact", boss.location, 0.6, 1.6);
+    for (const p of playersAround(boss.dimension, boss.location, 24)) p.onScreenDisplay?.setActionBar("§6Ōnoki: §fOw, ow — my back! §7(now's your chance)");
+  }, 70);
+}
+
+// Added Weight Rock: a touch of earth chakra makes the target so heavy they can barely move.
+function addedWeight(boss, t) {
+  api.anim(boss, "animation.aegis.palm_thrust");
+  chargeFx(boss, ROCK, 8, "aegis.earth");
+  system.runTimeout(() => {
+    if (!api.isValid(boss) || !api.isValid(t)) return;
+    api.particle(t.dimension, "aegis:earth_burst", t.location);
+    api.particle(t.dimension, "aegis:cine_ring", t.location, ROCK);
+    api.hurt(t, 6, boss);
+    for (const [id, amp] of [["slowness", 4], ["mining_fatigue", 2], ["weakness", 1]]) eff(t, id, 120, amp);
+    showTitle(t, "§6Added Weight Rock", { subtitle: "§7You're suddenly impossibly heavy!", fadeInDuration: 0, stayDuration: 30, fadeOutDuration: 5 });
+  }, 10);
+}
+
+function rockFist(boss, t, p2) {
+  api.anim(boss, "animation.aegis.palm_thrust");
+  system.runTimeout(() => {
+    if (!api.isValid(boss) || !api.isValid(t)) return;
+    const d = dirTo(boss, t);
+    api.hurt(t, p2 ? 18 : 14, boss);
+    api.knockback(t, d.x, d.z, 4.0, 0.7);
+    impactFx(boss.dimension, t.location, ROCK, 1.5);
+    api.particle(boss.dimension, "aegis:earth_burst", chest(t));
+  }, 6);
+}
+
+// Earth spikes burst out of the ground in a line toward the target and toss whoever they catch.
+function rockLine(boss, t, p2) {
+  const dim = boss.dimension;
+  const o = { ...boss.location };
+  const d = dirTo(boss, t);
+  api.anim(boss, "animation.aegis.earth_slam");
+  chargeFx(boss, ROCK, 10, "aegis.earth");
+  const hit = new Set();
+  for (let i = 2; i <= 16; i += 2) {
+    system.runTimeout(() => {
+      if (!api.isValid(boss)) return;
+      const at = add(o, { x: d.x * i, y: 0, z: d.z * i });
+      for (let y = 0; y < 2.5; y += 0.8) api.particle(dim, "aegis:earth_burst", add(at, { x: 0, y, z: 0 }));
+      api.particle(dim, "aegis:dust", at);
+      if (i % 4 === 0) sfx(dim, "aegis.earth", at, 1, 0.8);
+      blast(boss, at, 2.1, p2 ? 15 : 12, 0, (e) => {
+        hit.add(e.id);
+        api.knockback(e, 0, 0, 0, 1.0);
+      }, hit);
+    }, 12 + i);
+  }
+}
+
+// Flight: he floats up out of reach and rains rock down on the target.
+function flightBarrage(boss, t, p2) {
+  sfx(boss.dimension, "aegis.whoosh", boss.location, 1.4, 0.8);
+  eff(boss, "levitation", 22, 4);
+  system.runTimeout(() => eff(boss, "slow_falling", 80, 0), 22);
+  for (let k = 0; k < (p2 ? 4 : 3); k++) {
+    system.runTimeout(() => {
+      if (!api.isValid(boss) || !api.isValid(t)) return;
+      api.anim(boss, "animation.aegis.palm_thrust");
+      shoot(boss, t, { noOrb: true, speed: 1.4, maxAge: 30, damage: 9, radius: 2.8, knock: 1.2, fire: 0, trail: "aegis:dust", burst: "aegis:earth_burst",
+        color: ROCK, hitRadius: 1.4, power: 0.8, sound: "aegis.earth" });
+    }, 24 + k * 7);
+  }
+}
+
+// Phase 2 — Dust Release, Detachment of the Primitive World: a cube of light grows round the target, then erases what's in it.
+const CUBE = [-1, 0, 1].flatMap((x) => [-1, 0, 1].flatMap((y) => [-1, 0, 1].map((z) => [x, y, z])))
+  .filter((p) => p.filter((v) => v !== 0).length >= 2); // the corners and the middle of each edge
+function dustRelease(boss, t) {
+  const dim = boss.dimension;
+  const spot = add(t.location, { x: 0, y: 1, z: 0 });
+  api.anim(boss, "animation.aegis.both_palms");
+  chargeFx(boss, DUST, 30, "aegis.charge");
+  warnAll(boss, spot, 32, "§fDust Release", "§7Get out of the cube — now!");
+  for (let k = 0; k < 36; k += 3) {
+    system.runTimeout(() => {
+      const h = 0.6 + (k / 36) * 2.2;
+      for (const [x, y, z] of CUBE) api.particle(dim, "aegis:cine_bolt", add(spot, { x: x * h, y: y * h, z: z * h }), DUST);
+      api.particle(dim, "aegis:cine_ring", add(spot, { x: 0, y: -1, z: 0 }), DUST);
+    }, k);
+  }
+  system.runTimeout(() => {
+    if (!api.isValid(boss)) return;
+    for (let y = -1; y < 4; y += 1) api.particle(dim, "aegis:cine_pillar", add(spot, { x: 0, y, z: 0 }), DUST);
+    impactFx(dim, spot, DUST, 3);
+    sfx(dim, "aegis.lightning", spot, 2.5, 1.6);
+    shake(dim, spot, 0.8, 1, 32);
+    blast(boss, spot, 3.4, 30, 0.3);
+  }, 38);
+}
+
+// --- Hanzō --------------------------------------------------------------------
+// The salamander's poison: a cloud of venom settles where the target stands.
+function poisonMist(boss, t, p2) {
+  const dim = boss.dimension;
+  const spot = { ...t.location };
+  const r = p2 ? 5 : 3.5;
+  api.anim(boss, "animation.aegis.jutsu_breath");
+  sfx(dim, "aegis.wind", boss.location, 1.2, 0.5);
+  showTitle(t, "§5Salamander Poison", { subtitle: "§7Don't breathe the mist!", fadeInDuration: 0, stayDuration: 25, fadeOutDuration: 5 });
+  for (let k = 0; k < 100; k += 10) {
+    system.runTimeout(() => {
+      if (!api.isValid(boss)) return;
+      for (let a = 0; a < 6; a++) api.particle(dim, "aegis:beast_mist", add(spot, { x: Math.cos(a + k) * r * 0.6, y: 0.5, z: Math.sin(a + k) * r * 0.6 }), VENOM);
+      api.particle(dim, "aegis:swamp_bubble", spot);
+      for (const e of victims(boss, spot, r)) {
+        eff(e, "poison", 50, p2 ? 1 : 0);
+        api.hurt(e, 1, boss, "magic");
+      }
+    }, k);
+  }
+}
+
+// Kusarigama: the chain wraps the target and drags them in for the sickle.
+function chainSickle(boss, t, p2) {
+  const dim = boss.dimension;
+  api.anim(boss, "animation.aegis.chains_cast");
+  sfx(dim, "aegis.whoosh", boss.location, 1.2, 1.2);
+  const from = chest(boss);
+  const to = chest(t);
+  for (let i = 1; i <= 8; i++) system.runTimeout(() => api.particle(dim, "aegis:slash", lerp(from, to, i / 8), [0.7, 0.7, 0.76]), i);
+  system.runTimeout(() => {
+    if (!api.isValid(boss) || !api.isValid(t)) return;
+    const d = dirTo(t, boss);
+    api.knockback(t, d.x, d.z, 2.6, 0.35);
+    api.hurt(t, 6, boss);
+    eff(t, "poison", 60, 0);
+    sfx(dim, "aegis.impact", t.location, 1, 1.4);
+    if (t.typeId === "minecraft:player") t.onScreenDisplay?.setActionBar("§5The chain drags you in!");
+  }, 9);
+  system.runTimeout(() => {
+    if (!api.isValid(boss) || !api.isValid(t)) return;
+    api.anim(boss, "animation.aegis.sword_slash");
+    if (flat(t.location, boss.location) < 4.5) {
+      api.hurt(t, p2 ? 12 : 9, boss);
+      api.particle(dim, "aegis:slash", chest(t), VENOM);
+      sfx(dim, "aegis.slash", t.location, 1, 1.1);
+    }
+  }, 18);
+}
+
+function sickleSlash(boss, p2) {
+  api.anim(boss, "animation.aegis.sword_slash");
+  system.runTimeout(() => {
+    if (!api.isValid(boss)) return;
+    api.particle(boss.dimension, "aegis:slash", chest(boss), VENOM);
+    sfx(boss.dimension, "aegis.slash", boss.location, 1.2, 0.9);
+    blast(boss, boss.location, 3.8, p2 ? 15 : 12, 1.6, (e) => eff(e, "poison", 60, p2 ? 1 : 0));
+  }, 5);
+}
+
+// Venom spat in a fan.
+function poisonFan(boss, t, p2) {
+  api.anim(boss, "animation.aegis.jutsu_breath");
+  chargeFx(boss, VENOM, 10);
+  system.runTimeout(() => api.isValid(boss) && api.isValid(t) && fan(boss, t, p2 ? 5 : 3, 0.18, {
+    noOrb: true, speed: 1.2, maxAge: 30, damage: 7, radius: 2.4, knock: 0.6, fire: 0, trail: "aegis:beast_mist", burst: "aegis:smoke_puff",
+    color: VENOM, hitRadius: 1.4, power: 0.6, sound: "aegis.wind", effects: [["poison", 80, 1]] }), 10);
+}
+
+// Phase 2 — Venom Rain: poison falls like rain all around him.
+function venomRain(boss) {
+  const dim = boss.dimension;
+  const c = { ...boss.location };
+  api.anim(boss, "animation.aegis.sword_raise");
+  sfx(dim, "aegis.charge", c, 1.6, 0.6);
+  warnAll(boss, c, 24, "§5Venom Rain", "§7Get out from under the cloud!");
+  for (let k = 0; k < 80; k += 4) {
+    system.runTimeout(() => {
+      if (!api.isValid(boss)) return;
+      for (let n = 0; n < 6; n++) {
+        const a = Math.random() * Math.PI * 2;
+        const rr = Math.random() * 7;
+        api.particle(dim, "aegis:cine_bolt", add(c, { x: Math.cos(a) * rr, y: 3 + Math.random() * 3, z: Math.sin(a) * rr }), VENOM);
+      }
+      if (k % 16 === 0) api.particle(dim, "aegis:beast_mist", add(c, { x: 0, y: 5, z: 0 }), VENOM);
+      if (k % 12 === 0) {
+        for (const e of victims(boss, c, 7)) {
+          api.hurt(e, 3, boss, "magic");
+          eff(e, "poison", 60, 1);
+        }
+      }
+    }, 12 + k);
+  }
+}
 
 // --- Madara ------------------------------------------------------------------
 // Great Fire Annihilation: a wall of flame in a wide fan.
@@ -527,6 +1236,18 @@ function enterPhase2(boss, id) {
     const model = api.spawnFx(boss.dimension, "aegis:susanoo", undefined, boss.location);
     if (model) susanoo.set(boss.id, model);
   }
+  if (id === "gaara") {
+    // the Shukaku Shield: a wall of sand rises round him
+    for (let a = 0; a < 12; a++) api.particle(boss.dimension, "aegis:earth_burst", add(boss.location, { x: Math.cos(a / 1.9) * 2, y: 0.5, z: Math.sin(a / 1.9) * 2 }));
+    sfx(boss.dimension, "dig.sand", boss.location, 2, 0.5);
+  }
+  if (id === "zabuza") clones(boss, L.skin, "§bZabuza §7(Water Clone)", 2, "aegis:water_splash");
+  if (id === "killer_bee") eff(boss, "regeneration", 200, 1); // the Eight-Tails' chakra
+  if (id === "hanzo") {
+    // a burst of venom
+    for (let a = 0; a < 8; a++) api.particle(boss.dimension, "aegis:beast_mist", add(boss.location, { x: Math.cos(a) * 2.5, y: 0.8, z: Math.sin(a) * 2.5 }), VENOM);
+    blast(boss, boss.location, 5, 8, 1.5, (e) => eff(e, "poison", 100, 1));
+  }
 }
 
 // Runs every AI tick (twice a second): phase change + phase-2 aura.
@@ -543,7 +1264,16 @@ export function legendTick(boss) {
   }
   if (!phase2.has(boss.id) && hp <= 0.5) enterPhase2(boss, id);
   if (id === "madara" && hp <= 0.12 && !reformed.has(boss.id)) edoReform(boss);
-  if (phase2.has(boss.id)) aura(boss, L.color, id === "naruto");
+  if (phase2.has(boss.id)) aura(boss, L.color, id === "naruto" || id === "killer_bee");
+  if (id === "hanzo") {
+    try {
+      if (boss.getEffect("poison")) boss.removeEffect("poison"); // the salamander's master is immune to its venom
+    } catch {
+      /* ignore */
+    }
+    // Salamander's Venom: in the second phase, poison seeps from him onto anyone close
+    if (phase2.has(boss.id)) for (const e of victims(boss, boss.location, 2.8)) eff(e, "poison", 40, 0);
+  }
 }
 
 // Picks and runs a move; returns the cooldown in ticks.
@@ -592,6 +1322,25 @@ export function initLegends(helpers) {
         showTitle(p, L.name, { subtitle: L.entrance ?? "§7has appeared!", fadeInDuration: 3, stayDuration: 40, fadeOutDuration: 10 });
       }
     }, 3);
+  });
+
+  // Gaara — Shield of Sand: the sand often blocks a blow outright (more often behind the Shukaku Shield).
+  world.afterEvents.entityHurt.subscribe(({ hurtEntity, damage, damageSource }) => {
+    if (hurtEntity.typeId !== "aegis:legend" || damage <= 0) return;
+    try {
+      if (hurtEntity.getDynamicProperty("aegis:member") !== "gaara") return;
+      if (Math.random() > (phase2.has(hurtEntity.id) ? 0.4 : 0.25)) return;
+      const h = hurtEntity.getComponent("minecraft:health");
+      if (h.currentValue <= 0) return;
+      h.setCurrentValue(Math.min(h.effectiveMax, h.currentValue + damage));
+    } catch {
+      return;
+    }
+    api.particle(hurtEntity.dimension, "aegis:earth_burst", chest(hurtEntity));
+    api.particle(hurtEntity.dimension, "aegis:cine_ring", hurtEntity.location, SAND);
+    sfx(hurtEntity.dimension, "dig.sand", hurtEntity.location, 1.2, 0.8);
+    const by = damageSource?.damagingEntity;
+    if (by?.typeId === "minecraft:player") by.onScreenDisplay?.setActionBar("§6The sand blocks your attack!");
   });
 
   // Shadow clones vanish in a puff of smoke when hit (no loot, no XP).

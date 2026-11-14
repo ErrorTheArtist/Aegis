@@ -11,7 +11,7 @@
           "type": "int",
           "range": [
             0,
-            63
+            68
           ],
           "default": 0,
           "client_sync": true
@@ -92,6 +92,45 @@
         "minecraft:health": {
           "value": 1800,
           "max": 1800
+        }
+      },
+      "aegis:legend_gaara": {
+        "minecraft:health": {
+          "value": 950,
+          "max": 950
+        }
+      },
+      "aegis:legend_zabuza": {
+        "minecraft:health": {
+          "value": 850,
+          "max": 850
+        },
+        "minecraft:equipment": {
+          "table": "loot_tables/equipment/aegis_zabuza.json",
+          "slot_drop_chance": [
+            {
+              "slot": "slot.weapon.mainhand",
+              "drop_chance": 0.0
+            }
+          ]
+        }
+      },
+      "aegis:legend_killer_bee": {
+        "minecraft:health": {
+          "value": 1000,
+          "max": 1000
+        }
+      },
+      "aegis:legend_onoki": {
+        "minecraft:health": {
+          "value": 900,
+          "max": 900
+        }
+      },
+      "aegis:legend_hanzo": {
+        "minecraft:health": {
+          "value": 900,
+          "max": 900
         }
       }
     },
@@ -295,6 +334,41 @@
         "add": {
           "component_groups": [
             "aegis:legend_madara"
+          ]
+        }
+      },
+      "aegis:legend_gaara": {
+        "add": {
+          "component_groups": [
+            "aegis:legend_gaara"
+          ]
+        }
+      },
+      "aegis:legend_zabuza": {
+        "add": {
+          "component_groups": [
+            "aegis:legend_zabuza"
+          ]
+        }
+      },
+      "aegis:legend_killer_bee": {
+        "add": {
+          "component_groups": [
+            "aegis:legend_killer_bee"
+          ]
+        }
+      },
+      "aegis:legend_onoki": {
+        "add": {
+          "component_groups": [
+            "aegis:legend_onoki"
+          ]
+        }
+      },
+      "aegis:legend_hanzo": {
+        "add": {
+          "component_groups": [
+            "aegis:legend_hanzo"
           ]
         }
       }

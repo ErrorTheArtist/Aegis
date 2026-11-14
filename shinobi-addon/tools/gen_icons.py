@@ -467,6 +467,40 @@ def headband():
     return img
 
 
+def village_headband(band, band_d, mark):
+    """Every village's headband, drawn like the Leaf's: the cloth band, its tail and the plate with the village's mark."""
+    img = new()
+    tail = tuple(int(c * 0.86) for c in band)
+    shape(img, lambda d: d.polygon([(4, 50), (124, 46), (124, 80), (4, 84)], fill=255), band, band_d)
+    shape(img, lambda d: d.polygon([(100, 70), (118, 76), (110, 118), (96, 112)], fill=255), tail, band_d)
+    shape(img, lambda d: d.rounded_rectangle([36, 40, 92, 88], radius=6, fill=255), (230, 235, 245), (120, 125, 140))
+    d = ImageDraw.Draw(img)
+    for x, y in ((42, 46), (86, 46), (42, 82), (86, 82)):
+        d.ellipse([x - 3, y - 3, x + 3, y + 3], fill=(90, 90, 100, 255))
+    ink = (50, 50, 60, 255)
+    if mark == "sand":      # hourglass
+        d.rectangle([48, 49, 80, 53], fill=ink)
+        d.rectangle([48, 75, 80, 79], fill=ink)
+        d.polygon([(52, 53), (76, 53), (64, 64)], fill=ink)
+        d.polygon([(52, 75), (76, 75), (64, 64)], fill=ink)
+    elif mark == "mist":    # slanting strokes
+        for x in (46, 58, 70):
+            d.line([x, 78, x + 12, 50], fill=ink, width=5)
+    elif mark == "cloud":   # a cloud over a line
+        for box in ((48, 54, 64, 70), (58, 48, 78, 68), (70, 56, 84, 70)):
+            d.ellipse(box, fill=ink)
+        d.rectangle([48, 62, 84, 70], fill=ink)
+        d.rectangle([46, 75, 86, 78], fill=ink)
+    elif mark == "stone":   # mountain
+        d.line([(46, 78), (64, 48), (82, 78)], fill=ink, width=5)
+        d.line([(56, 78), (64, 64), (72, 78)], fill=ink, width=4)
+        d.line([44, 79, 84, 79], fill=ink, width=3)
+    elif mark == "rain":    # falling rain
+        for x in (49, 58, 67, 76):
+            d.line([x, 50, x, 78], fill=ink, width=4)
+    return img
+
+
 def pill():
     img = new()
     shape(img, lambda d: d.ellipse([22, 30, 106, 98], fill=255), (130, 220, 120), (30, 110, 40), "radial", center=(54, 50), radius=60)
@@ -694,6 +728,8 @@ if __name__ == "__main__":
     finish(kunai(), "kunai")
     finish(shuriken(), "shuriken")
     finish(headband(), "headband")
+    for v, band in (("sand", (150, 116, 80)), ("mist", (70, 84, 112)), ("cloud", (78, 78, 92)), ("stone", (170, 60, 52)), ("rain", (100, 106, 124))):
+        finish(village_headband(band, tuple(int(c * 0.55) for c in band), v), f"{v}_headband")
     finish(pill(), "chakra_pill")
     finish(ramen(), "ramen")
     finish(ramen((200, 150, 80), (120, 170, 80)), "miso_ramen")

@@ -8,7 +8,7 @@ import { world, system, ItemStack } from "@minecraft/server";
 import { showTitle } from "./hud.js";
 import { addRyo, fmtRyo } from "./currency.js";
 import { getLevel, gainXp, getRank } from "./levels.js";
-import { getVillage, VILLAGES } from "./villages.js";
+import { getVillage, VILLAGES, gearOf } from "./villages.js";
 import { JUTSU_NATURE } from "./natures.js";
 
 const PROP = "aegis:starter";
@@ -18,7 +18,7 @@ const CHAIN = [
   { title: "Chakra Control", text: "Cast 3 jutsu or clan abilities", kind: "cast", need: 3, xp: 500, items: [["aegis:flash_scroll", 1]] },
   { title: "Rogue Hunter", text: "Defeat 3 enemy ninja", kind: "kill", match: "ninja", need: 3, ryo: 2500, xp: 800, items: [["aegis:chakra_pill", 3]] },
   { title: "Growing Stronger", text: "Reach level 10", kind: "level", need: 10, ryo: 3000, items: [["aegis:clone_scroll", 1]] },
-  { title: "The Chūnin Exam", text: "Pass the Chūnin exam at an Exam Proctor", kind: "rank", need: 1, ryo: 5000, items: [["aegis:flak_jacket", 1]] },
+  { title: "The Chūnin Exam", text: "Pass the Chūnin exam at an Exam Proctor", kind: "rank", need: 1, ryo: 5000, items: (p) => [[gearOf(p).jacket, 1]] },
   { title: "Akatsuki Sighting", text: "Defeat any Akatsuki member", kind: "kill", match: "akatsuki", need: 1, ryo: 10000, xp: 5000, items: [["aegis:sphere_scroll", 1]] },
 ];
 
@@ -36,7 +36,7 @@ const VCHAINS = {
     ["Desert Patrol", "Desert Winds", "Puppet Thieves"]),
   mist: vline("aegis:water_dragon_scroll", "water", "Water Release", "anbu", "Defeat 5 Rogue Anbu (hunt them like a hunter-nin)", "The Seven Swordsmen", "aegis:kubikiribocho", "blade Kubikiribōchō",
     ["Fog Patrol", "The Hidden Mist", "Hunter-nin"]),
-  cloud: vline("aegis:chidori_scroll", "lightning", "Lightning Release", "ninja", "Defeat 5 enemy ninja", "Lightning Armor", "aegis:chidori_current_scroll", "Chidori Current scroll",
+  cloud: vline("aegis:chidori_scroll", "lightning", "Lightning Release", "ninja", "Defeat 5 enemy ninja", "Lightning Armor", "aegis:lightning_armor_scroll", "Lightning Release Armour scroll",
     ["Mountain Patrol", "Storm Training", "Kumo's Rivals"]),
   stone: vline("aegis:earth_wall_scroll", "earth", "Earth Release", "ninja", "Defeat 5 enemy ninja (border skirmish)", "The Unmovable Stone", "aegis:earth_spikes_scroll", "Earth Spikes scroll",
     ["Quarry Patrol", "Solid as Rock", "Border Skirmish"]),
@@ -88,15 +88,18 @@ function announce(player, step, key = "starter") {
     if (!api.isValid(player)) return;
     const head = `${label(player, key)} ${step + 1}/${list.length}`;
     showTitle(player, `§e${q.title}`, { subtitle: `§7${head.replace(/§./g, "")}: ${q.text}`, fadeInDuration: 8, stayDuration: 60, fadeOutDuration: 15 });
-    player.sendMessage(`${head}: §e${q.title}§7 — ${q.text}. ${rewardText(q)}`);
+    player.sendMessage(`${head}: §e${q.title}§7 — ${q.text}. ${rewardText(q, player)}`);
   }, 40);
 }
 
-function rewardText(q) {
+// A quest's item rewards (some depend on who earns them, e.g. the Chūnin flak jacket of your own village).
+const itemsOf = (q, player) => (typeof q.items === "function" ? q.items(player) : q.items ?? []);
+
+function rewardText(q, player) {
   const r = [];
   if (q.ryo) r.push(`§6${fmtRyo(q.ryo)}`);
   if (q.xp) r.push(`§b${q.xp} XP`);
-  for (const [id, n] of q.items ?? []) r.push(`§f${n}× ${id.split(":")[1].replace(/_/g, " ")}`);
+  for (const [id, n] of itemsOf(q, player)) r.push(`§f${n}× ${id.split(":")[1].replace(/_/g, " ")}`);
   return r.length ? `§7Reward: ${r.join("§7, ")}` : "";
 }
 
@@ -116,7 +119,7 @@ function advance(player, amount = 1, absolute, key = "starter") {
   if (q.ryo) addRyo(player, q.ryo, true);
   if (q.xp) gainXp(player, q.xp);
   const inv = player.getComponent("minecraft:inventory")?.container;
-  for (const [id, n] of q.items ?? []) {
+  for (const [id, n] of itemsOf(q, player)) {
     const st = new ItemStack(id, n);
     try {
       const left = inv ? inv.addItem(st) : st;
@@ -126,7 +129,7 @@ function advance(player, amount = 1, absolute, key = "starter") {
     }
   }
   showTitle(player, "§aQuest complete!", { subtitle: `§e${q.title}`, stayDuration: 40 });
-  player.sendMessage(`§a${label(player, key).replace(/§./g, "")} complete: §e${q.title}§a. ${rewardText(q)}`);
+  player.sendMessage(`§a${label(player, key).replace(/§./g, "")} complete: §e${q.title}§a. ${rewardText(q, player)}`);
   api.sound(player.dimension, "random.levelup", player.location, 1, 1.2);
   set(player, { ...s, step: s.step + 1, progress: 0 }, key);
   if (s.step + 1 >= list.length) {

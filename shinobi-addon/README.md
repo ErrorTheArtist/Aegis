@@ -16,8 +16,9 @@ Uses the real Naruto names (Rasengan, Shadow Clone Jutsu, etc.) — personal use
 ## Joining: choose your village
 
 The first time a player joins they choose one of the villages, are **teleported there** (it becomes their spawn point)
-and receive a **starter kit** (Kusanagi, 8 kunai, 3 Soldier Pills, 2 ramen). Then they roll their clan, their chakra
-nature, and start the starter quests. Players from before this update are asked once on their next join.
+and receive a **starter kit** (Kusanagi, 8 kunai, 3 Soldier Pills, 2 ramen and **their village's headband**). Then they
+roll their clan, their chakra nature, and start the starter quests. Players from before this update are asked once on
+their next join (and everyone who chose their village before v1.51 is sent their village's headband once).
 
 | Village | Coordinates |
 |---|---|
@@ -31,6 +32,23 @@ nature, and start the starter quests. Players from before this update are asked 
 `/scriptevent aegis:village` (show) · `… home` (go back) · `… choose` (pick again). Coordinates live in
 `behavior_pack/scripts/villages.js`.
 
+### Village perks
+
+Every village has its own spirit — a small, always-on perk (shown when you choose, and in the Shinobi Record →
+*Village*). Each one makes **its own element's jutsu hit 10% harder** (on top of your chakra-nature affinity), plus:
+
+| Village | Perk | Element (+10% damage) | Extra |
+|---|---|---|---|
+| Hidden Leaf | **Will of Fire** | Fire Release | +10% chakra regen |
+| Hidden Sand | **Desert Shield** | Wind Release | 6% chance the sand blocks a hit completely |
+| Hidden Mist | **Born of the Mist** | Water Release | breathe underwater (and you can't drown in a Water Prison) |
+| Hidden Cloud | **Lightning Reflexes** | Lightning Release | jutsu cooldowns 10% shorter |
+| Hidden Stone | **Unbreakable** | Earth Release | take 8% less damage |
+| Hidden Rain | **Endless Rain** | **every** jutsu, while it's raining | immune to poison |
+
+Each village also has its own **headband** and **flak jacket** (the Rain's is a long cloak), a **set bonus** for wearing
+them, a **Weaponsmith** who forges them, and its own **legendary boss** — see *Armor & clothing* and *Legendary bosses*.
+
 ### Starter quests
 
 An automatic chain — progress on the action bar, rewards paid instantly, shown in the Shinobi Record:
@@ -41,7 +59,7 @@ An automatic chain — progress on the action bar, rewards paid instantly, shown
 | 2 | Chakra Control | cast 3 jutsu / clan abilities | Body Flicker scroll, 500 XP |
 | 3 | Rogue Hunter | defeat 3 enemy ninja | 2,500 Ryō, 3 Soldier Pills, 800 XP |
 | 4 | Growing Stronger | reach level 10 | 3,000 Ryō, Shadow Clone scroll |
-| 5 | The Chūnin Exam | pass the Chūnin exam | 5,000 Ryō, Leaf Flak Jacket |
+| 5 | The Chūnin Exam | pass the Chūnin exam | 5,000 Ryō, **your village's flak jacket** (the Rain Cloak for the Rain) |
 | 6 | Akatsuki Sighting | defeat any Akatsuki member | 10,000 Ryō, 5,000 XP, Rasengan scroll |
 
 `/scriptevent aegis:starter` shows your current quests.
@@ -57,7 +75,7 @@ reach level 25 for its **signature reward**:
 | Leaf | Konoha Patrol · The Fire Within · Snakes in the Grass · The Will of Fire | Fireball | 5 Sound Ninja | **Toad Summoning** scroll |
 | Sand | Desert Patrol · Desert Winds · Puppet Thieves · The Sand's Shield | Great Breakthrough | 5 Rogue Ninja | **Sand Gourd** |
 | Mist | Fog Patrol · The Hidden Mist · Hunter-nin · The Seven Swordsmen | Water Dragon | 5 Rogue Anbu | **Kubikiribōchō** |
-| Cloud | Mountain Patrol · Storm Training · Kumo's Rivals · Lightning Armor | Chidori | 5 enemy ninja | **Chidori Current** scroll |
+| Cloud | Mountain Patrol · Storm Training · Kumo's Rivals · Lightning Armor | Chidori | 5 enemy ninja | **Lightning Release Armour** scroll |
 | Stone | Quarry Patrol · Solid as Rock · Border Skirmish · The Unmovable Stone | Earth Wall | 5 enemy ninja | **Earth Spikes** scroll |
 | Rain | Rain Patrol · Endless Rain · Orphans of War · The God of Rain | Water Prison | 5 Rogue Ninja | **Akatsuki cloak** |
 
@@ -82,7 +100,7 @@ Quest 2 is "cast 5 jutsu of your village's release". Rewards along the way: 1,00
 
 - You have **100 chakra** (more depending on your clan, Tailed Beast and stats), shown on the chakra bar in the top-left.
 - Regenerates 4/sec. **Sneak and stand still** to *focus* (3× regen).
-- Wearing the **Hidden Leaf Headband** gives 1.5× regen. **Soldier Pills** restore 50 instantly.
+- Wearing **any village's headband** gives 1.5× regen (the Leaf's *Will of Fire* adds another 10%). **Soldier Pills** restore 50 instantly.
 
 ## Levels & Stats
 
@@ -480,6 +498,11 @@ Boss AI and Tailed Beast Mode: `behavior_pack/scripts/bijuu.js`, the transformat
 | Set | Pieces | Set bonus |
 |---|---|---|
 | **Leaf Shinobi** | Hidden Leaf Headband, Leaf Flak Jacket, Shinobi Pants, Ninja Sandals | Speed, Resistance, +25% chakra regen |
+| **Sand Shinobi** | Hidden Sand Headband, Sand Flak Jacket, Shinobi Pants, Ninja Sandals | Resistance, +25% chakra regen, 15% chance the sand blocks a hit |
+| **Mist Shinobi** | Hidden Mist Headband, Mist Flak Jacket, Shinobi Pants, Ninja Sandals | Speed, Conduit Power (breathe and see underwater), +25% chakra regen |
+| **Cloud Shinobi** | Hidden Cloud Headband, Cloud Flak Jacket, Shinobi Pants, Ninja Sandals | Speed, +25% chakra regen, 15% of punches crackle with lightning |
+| **Stone Shinobi** | Hidden Stone Headband, Stone Flak Jacket, Shinobi Pants, Ninja Sandals | Resistance, Jump Boost, +25% chakra regen |
+| **Rain Shinobi** | Hidden Rain Headband, Rain Cloak, Shinobi Pants, Ninja Sandals | Speed, Night Vision, +25% chakra regen |
 | **Anbu** | Anbu Mask, Anbu Armor (+ Shinobi Pants, Ninja Sandals) | Speed II, night vision, **invisible while sneaking** |
 | **Akatsuki** | Akatsuki Straw Hat, Akatsuki Cloak | +60 max chakra, +20% technique damage, fire resistance |
 | **Samurai** | Kabuto, Dō, Haidate, Suneate | Resistance II, Strength |
@@ -489,9 +512,17 @@ mouth (red lining inside), wide sleeves that swallow the hands, a red-lined hem,
 back, sleeves and skirt; the hat is a round conical kasa in woven rings with a curtain of white paper strips (open at
 the front) and a small bell on a red cord.
 
-No armour is crafted. The **Weaponsmith** sells the Leaf, Anbu and Samurai pieces; the **Travelling Merchant** sometimes
-has one of them 30% off, and sells the **Akatsuki Cloak** (1,600 Ryō, Lv 20) and **Straw Hat** (600 Ryō, Lv 10) when
-he has them; Akatsuki members drop their gear.
+The **village gear**: every headband is the cloth band and steel plate with its village's mark — the Sand's
+hourglass, the Mist's slanting strokes, the Cloud's cloud, the Stone's mountain, the Rain's four falling lines — in the
+village's colour, with ties at the back. The flak jackets follow each village's cut: the Sand's tan jacket with big
+shoulder guards and a high collar, the Mist's quilted grey-blue one with a dark sash, the Cloud's white one-shouldered
+jacket, the Stone's red-brown one with a flared collar and one shoulder guard, and the Rain's long slate cloak with
+caped shoulders that hangs to the knees.
+
+No armour is crafted. **Every village's Weaponsmith forges its own headband and flak jacket** — and, for a customer from
+another village, that village's too — plus the Anbu and Samurai pieces; the **Travelling Merchant** sometimes has a
+headband (any village's) or a jacket 30% off, and sells the **Akatsuki Cloak** (1,600 Ryō, Lv 20) and **Straw Hat**
+(600 Ryō, Lv 10) when he has them; Akatsuki members drop their gear, and each village's legend can drop its headband.
 
 ### The Five Kage sets
 
@@ -675,7 +706,7 @@ Players talk to the Quest Giver to accept, see their progress, claim the reward 
 | NPC | What they do |
 |---|---|
 | **Jutsu Sensei** | Teaches by school — pick **Fire, Water, Wind, Lightning, Earth, Ninjutsu, Taijutsu, Genjutsu & Medical** or **Summoning & Forbidden**, then a scroll (each page shows how many you've unlocked at your level and has a « Back button). **Services**: Chakra Nature Training, emerald exchange. **Sage Training** (Lv 60) is under Summoning & Forbidden |
-| **Weaponsmith** | Kunai, shuriken, headbands, seven legendary swords (Lv 15–35 — Samehada is quest-only), Leaf / Anbu / Samurai armour, repairs the item in your hand |
+| **Weaponsmith** | Kunai, shuriken, its village's headband and flak jacket (and the customer's own village's), seven legendary swords (Lv 15–35 — Samehada is quest-only), Anbu / Samurai armour, repairs the item in your hand |
 | **Ramen Shop** | Ichiraku Ramen (heal + 60 chakra + regen), Miso Ramen (+30 chakra + speed), Soldier Pills |
 | **Travelling Merchant** | **Random wares that change every 20 minutes** (set per spawner): cheap ramen every time, plus 4–5 random finds — Bloodline Reroll Scrolls, bargain jutsu scrolls, swords and armour, Akatsuki gear, pills, kunai… Limited stock shared by everyone. Buys back old Blank Scrolls. See *The Travelling Merchant* below |
 | **Kage / village leader (Mission Desk)** | D/C/B/A/S missions (kill mobs, ninja, a Tailed Beast, an Akatsuki member) for XP, Ryō and items |
@@ -768,6 +799,11 @@ S-rank missions and gives big XP.
 | **Hiruzen Sarutobi** | 800 | Fire Dragon (triple fireball), Shuriken Shadow Clone storm, Enma staff sweep | **Reaper Death Seal** — weakness, slowness & nausea | Phoenix Flower, Great Fire Annihilation, 32 shuriken |
 | **Minato Namikaze** | 750 | Flying Raijin teleport-slash, kunai volley, Rasengan from behind | **Flying Raijin barrage** — 5 blinks + Rasengan | Body Flicker scroll, 16 kunai, Rasengan |
 | **Madara Uchiha [Edo Tensei]** (raid boss) | 1800 | Great Fire Annihilation (a wall of 7–9 fireballs), Wood Release roots racing along the ground (bind), Susanoo blade, gunbai sweep | **Perfect Susanoo** + **Tengai Shinsei** — a meteor falls on your spot after 3s (radius 8, 30 dmg — run!). His **Edo body reforms once** from 12% back to 45% HP | Great Fire Annihilation, 12,800 Ryō, Phoenix Flower (50%), Wood Dragon (35%), **Edo Tensei scroll (15%)** |
+| **Gaara of the Desert** (Sand) | 950 | **Sand Coffin** (the sand gathers where you stand — move!), Sand Shuriken fan, Sand Tsunami wave, a fist of sand. **Shield of Sand**: 25% of your blows are blocked outright | **Ultimate Defence: Shukaku Shield** — blocks 40%; **Sand Burial** crushes whoever the coffin caught; **Sand Waterfall Funeral** (radius 6.5, 24 dmg) | Great Breakthrough scroll, Sand Gourd (35%), Pressure Damage (40%), Sand headband (50%) |
+| **Zabuza Momochi** (Mist) | 850 | **Hidden Mist Jutsu** (blinds everyone) → **Silent Killing** from behind, Water Dragon, **Water Prison** (hit him hard to break free; Mist shinobi don't drown), Kubikiribōchō sweep that heals him | **Demon of the Hidden Mist** — two Water Clones, more silent kills | Hiding in Mist scroll, Kubikiribōchō (30%), Water Dragon (50%), Mist headband (50%) |
+| **Killer B** (Cloud) | 1000 | **Lightning Release: Lariat**, seven-sword spin, octopus ink (blinds, slows) — and he raps while he fights | **Eight-Tails Chakra Mode** — Tailed Beast Bomb, **Octopus Hold** (eight tentacles slam down round you), regeneration | Lightning Hound scroll, Lightning Armour (40%), Tailed Beast Summoning scroll (15%), Cloud headband (50%) |
+| **Ōnoki, the Third Tsuchikage** (Stone) | 900 | **Added Weight Rock** (you're too heavy to move), **Flight** — floats up and rains rock on you, earth spikes in a line, stone fist. His **back gives out** sometimes after a big jutsu — strike then! | **Dust Release: Detachment of the Primitive World** — a cube of light grows round you for 2 seconds, then erases what's inside (30 dmg) | Earth Dragon scroll, Earth Spikes (50%), Headhunter (40%), Stone headband (50%) |
+| **Hanzō of the Salamander** (Rain) | 900 | **Salamander Poison** mist, kusarigama chain that drags you in, poisoned sickle, venom spat in a fan (Rain shinobi are immune to the poison, not the hits) | **Salamander's Venom** — poison seeps from him onto anyone close; **Venom Rain** all around him | Water Prison scroll, Water Shockwave (40%), 6,400 Ryō, Rain headband (50%) |
 
 All also drop 1,600–3,200 Ryō, diamonds and pills.
 
@@ -827,11 +863,11 @@ enemies or given out by quests (and everything is still in the creative inventor
 |---|---|
 | Jutsu scrolls | **Jutsu Sensei** (by school, level-gated) · Travelling Merchant bargains (40% off) · Legend drops |
 | Kekkei genkai release scrolls | the **Clan Elder** of that clan |
-| Kunai, shuriken, Hidden Leaf Headband | **Weaponsmith** · Travelling Merchant · enemy ninja drop kunai and shuriken |
+| Kunai, shuriken, village headbands | **Weaponsmith** (its village's headband, and yours) · Travelling Merchant · starter kit · legend drops · enemy ninja drop kunai and shuriken |
 | Soldier Pills | **Ramen Shop** · Travelling Merchant · enemy ninja · C-rank missions |
 | Ichiraku / Miso Ramen | **Ramen Shop** (300 / 200 Ryō) · **Travelling Merchant** (50 / 30 Ryō, while stocks last) |
 | Legendary swords | **Weaponsmith** · Travelling Merchant bargains · Legend / Akatsuki drops · Samehada: its quest chain only |
-| Armour (Leaf, Anbu, Samurai) | **Weaponsmith** · Travelling Merchant bargains |
+| Armour (every village's flak jacket, Anbu, Samurai) | **Weaponsmith** · Travelling Merchant bargains · the Chūnin exam quest (your village's jacket) |
 | Akatsuki Cloak & Straw Hat | **Travelling Merchant** · Akatsuki drops |
 | Bloodline Reroll Scroll | **Travelling Merchant** (rare) · Tailed Beast and Akatsuki drops (chance) · quest rewards |
 | Tailed Beast Summoning Scroll | S-rank missions · Akatsuki drops (chance) · Travelling Merchant (very rare) |
@@ -972,6 +1008,25 @@ python3 tools/gen_particles.py --preview fire_burst ice_burst heal -o sheet.png
 ```
 
 The timers start when the server starts. Intervals are the two constants at the top of `behavior_pack/scripts/lagclear.js`.
+
+## Every village, not just the Leaf (v1.51)
+
+- **Village gear** — the Sand, Mist, Cloud, Stone and Rain get their own **headband** (each with its village's mark) and
+  **flak jacket** (the Rain a long cloak), with a **set bonus** for each (headband + jacket + Shinobi Pants + Ninja
+  Sandals). Any village's headband now counts for the headband's chakra regen.
+- **Village perks** — each village's element hits 10% harder for its shinobi, plus one perk each (see *Village perks*).
+- **Your village's gear, everywhere**: the starter kit includes your headband (everyone who joined before v1.51 is sent
+  theirs once), the Chūnin exam pays your village's jacket, every village's Weaponsmith forges its own gear (and a
+  visitor's), and the Travelling Merchant's headband deal can be any village's.
+- **The Cloud quest line** ends with the **Lightning Release Armour** scroll, as its title always promised.
+- **Five new legendary bosses** — Gaara (Sand), Zabuza (Mist), Killer B (Cloud), Ōnoki (Stone) and Hanzō of the
+  Salamander (Rain), each with a new model, its own moveset and second phase, and its village's headband among its
+  drops. Choose them on an NPC Spawner (*Legend: …*); Quest Givers can ask for them too. See *Legendary bosses*.
+- Models: Gaara in his battle coat with the great sand gourd on his back; Zabuza bare-chested with the bandage mask,
+  camouflage warmers, the headband askew and the Kubikiribōchō in hand; Killer B in the white Cloud jacket with shades,
+  a horned tattoo, a goatee and seven swords fanned across his back; Ōnoki without his hat — white topknot, big red
+  nose, beard — in a green coat; Hanzō with long wild hair, the venom-sac respirator, chain mail under a dark cloak,
+  armoured shoulders and a chain-sickle at his hip. Preview: `python3 tools/gen_npc_gear.py --preview legends.png --only gaara,zabuza,killer_bee,onoki,hanzo`.
 
 ## NPCs for every village (v1.50)
 

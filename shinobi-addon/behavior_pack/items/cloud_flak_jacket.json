@@ -1,0 +1,44 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:item": {
+    "description": {
+      "identifier": "aegis:cloud_flak_jacket",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "aegis_cloud_flak_jacket"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "Cloud Flak Jacket"
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:wearable": {
+        "slot": "slot.armor.chest",
+        "protection": 6
+      },
+      "minecraft:durability": {
+        "max_durability": 360
+      },
+      "minecraft:enchantable": {
+        "slot": "armor_torso",
+        "value": 12
+      },
+      "minecraft:repairable": {
+        "repair_items": [
+          {
+            "items": [
+              "minecraft:iron_ingot",
+              "minecraft:leather"
+            ],
+            "repair_amount": 80
+          }
+        ]
+      }
+    }
+  }
+}

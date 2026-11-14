@@ -6,7 +6,7 @@ import { world, system } from "@minecraft/server";
 import { ActionFormData } from "@minecraft/server-ui";
 import { showTitle } from "./hud.js";
 import { spendRyo, fmtRyo } from "./currency.js";
-import { getVillage } from "./villages.js";
+import { getVillage, villagePerk, isRaining, VILLAGE_ELEMENT_BONUS } from "./villages.js";
 
 export const NATURES = {
   fire: { name: "Fire Release", color: "§c", rgb: [1, 0.45, 0.1] },
@@ -58,6 +58,7 @@ const BOOST_TICKS = 100; // damage dealt within 5s of casting an affinity jutsu 
 
 let api;
 const boosted = new Map(); // player id -> tick the affinity damage boost ends
+const villageBoost = new Map(); // player id -> tick the village-element boost ends
 
 export function getNatures(player) {
   try {
@@ -85,11 +86,17 @@ export function onJutsuCast(player, itemId) {
   const n = JUTSU_NATURE[itemId];
   if (n && hasNature(player, n)) boosted.set(player.id, system.currentTick + BOOST_TICKS);
   else boosted.delete(player.id);
+  // your village's spirit: its element (the Rain: any jutsu while it rains)
+  const el = villagePerk(player)?.element;
+  if ((n && n === el) || (el === "rain" && isRaining())) villageBoost.set(player.id, system.currentTick + BOOST_TICKS);
+  else villageBoost.delete(player.id);
 }
 
 export function natureDamageMultiplier(attacker) {
+  const now = system.currentTick;
   const until = boosted.get(attacker?.id);
-  return until && system.currentTick <= until ? AFFINITY_DAMAGE : 1;
+  const vUntil = villageBoost.get(attacker?.id);
+  return (until && now <= until ? AFFINITY_DAMAGE : 1) * (vUntil && now <= vUntil ? VILLAGE_ELEMENT_BONUS : 1);
 }
 
 export function natureTag(player, itemId) {

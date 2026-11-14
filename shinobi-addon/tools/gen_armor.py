@@ -315,6 +315,90 @@ SANNIN = {
 ARMOR.update(SANNIN)
 
 
+# ---- Every village's shinobi gear (v1.51): its headband (worn for faster chakra regen, like the Leaf's) and its flak
+# jacket, matching the village NPCs (tools/gen_npc_models.py). Each makes a set with Shinobi Pants + Ninja Sandals.
+Z, D = -5.07, 0.12   # the village mark: thin black bars standing on the plate
+
+
+def mark_bar(x, y, w_, h_, deg=0):
+    return rotz([x, y, Z], [w_, h_, D], "black", deg, [x + w_ / 2, y + h_ / 2, Z + D / 2]) if deg else c([x, y, Z], [w_, h_, D], "black")
+
+
+MARKS = {
+    "sand": [mark_bar(-1.1, 28.6, 2.2, 0.3), mark_bar(-1.1, 27.3, 2.2, 0.3),                                   # hourglass
+             mark_bar(-0.14, 27.4, 0.28, 1.5, 38), mark_bar(-0.14, 27.4, 0.28, 1.5, -38)],
+    "mist": [mark_bar(x - 0.14, 27.35, 0.28, 1.6, -25) for x in (-1.0, 0.0, 1.0)],                             # slanting strokes
+    "cloud": [mark_bar(-1.1, 28.3, 1.0, 0.6), mark_bar(0.1, 28.4, 1.0, 0.55), mark_bar(-1.3, 27.85, 2.6, 0.5),
+              mark_bar(-1.3, 27.3, 2.6, 0.25)],                                                                  # a cloud over a line
+    "stone": [mark_bar(-0.64, 27.35, 0.28, 1.7, -32), mark_bar(0.36, 27.35, 0.28, 1.7, 32), mark_bar(-1.3, 27.3, 2.6, 0.28)],  # mountain
+    "rain": [mark_bar(x - 0.12, 27.35, 0.24, 1.55) for x in (-1.05, -0.35, 0.35, 1.05)],                       # falling rain
+}
+
+
+def village_headband(v, name, band):
+    dark = tuple(int(x * 0.7) for x in band)
+    return dict(name=name, slot="head", prot=2, dur=250,
+                colors=dict(base=band, dark=dark, metal=(196, 200, 210), black=(44, 44, 52)),
+                bones={"head": [c([-4, 27, -4], [8, 2, 8], "base", 0.6), c([-2.6, 27, -4.95], [5.2, 2.2, 0.5], "metal"), *MARKS[v],
+                                c([-1.4, 23.0, 4.5], [1.1, 4.4, 0.35], "base"), c([0.4, 23.5, 4.5], [1.1, 3.9, 0.35], "base")]},
+                recipe=None)
+
+
+SHOULDER_R = lambda h, sw, inf=0.0: c([-8.8, 24 - h - 0.2, -2.8], [5.6, h, 5.6], sw, inf)
+SHOULDER_L = lambda h, sw, inf=0.0: c([3.2, 24 - h - 0.2, -2.8], [5.6, h, 5.6], sw, inf)
+VILLAGE_GEAR = {
+    "sand_headband": village_headband("sand", "Hidden Sand Headband", (84, 64, 48)),
+    "mist_headband": village_headband("mist", "Hidden Mist Headband", (42, 50, 66)),
+    "cloud_headband": village_headband("cloud", "Hidden Cloud Headband", (44, 44, 52)),
+    "stone_headband": village_headband("stone", "Hidden Stone Headband", (118, 42, 38)),
+    "rain_headband": village_headband("rain", "Hidden Rain Headband", (62, 66, 78)),
+    # Sand: tan, padded ribs, a high collar, big shoulder guards, a cross-strap with a pouch
+    "sand_flak_jacket": dict(name="Sand Flak Jacket", slot="chest", prot=6, dur=360,
+        colors=dict(base=(192, 158, 102), dark=(150, 118, 72), light=(216, 186, 130), accent=(98, 68, 44)),
+        bones={"body": [BODY(0.6, "base"), *[c([-4.4, y, -2.66], [8.8, 0.35, 0.12], "dark") for y in (15.2, 18.4, 21.2)],
+                        c([-4.5, 22.3, -2.6], [9, 2.4, 5.2], "light", 0.3),
+                        rotz([-0.5, 12.6, -2.85], [1.0, 12.4, 0.25], "accent", -38, [0, 18.5, -2.75]),
+                        c([-1.3, 16.2, -3.05], [2.6, 2.3, 0.5], "accent")],
+               "rightArm": [SHOULDER_R(3.6, "light")], "leftArm": [SHOULDER_L(3.6, "light")]},
+        recipe=None),
+    # Mist: blue-grey, quilted in vertical ribs, a tall collar, a dark sash with its tail at the hip
+    "mist_flak_jacket": dict(name="Mist Flak Jacket", slot="chest", prot=6, dur=360,
+        colors=dict(base=(112, 130, 142), dark=(86, 102, 114), light=(140, 158, 170), accent=(34, 40, 54)),
+        bones={"body": [BODY(0.6, "base"), *[c([x - 0.15, 12.6, -2.66], [0.3, 10.6, 0.12], "dark") for x in (-3.0, -1.6, 0.0, 1.6, 3.0)],
+                        c([-4.5, 22.0, -2.6], [9, 3.0, 5.2], "light", 0.3), c([-4.7, 12.0, -2.8], [9.4, 1.7, 5.6], "accent"),
+                        c([3.4, 9.4, -3.0], [1.3, 3.0, 0.5], "accent")],
+               "rightArm": [SHOULDER_R(1.8, "base", 0.1)], "leftArm": [SHOULDER_L(1.8, "base", 0.1)]},
+        recipe=None),
+    # Cloud: white, one-shouldered — a broad strap over the left shoulder, one guard on that shoulder, a belt
+    "cloud_flak_jacket": dict(name="Cloud Flak Jacket", slot="chest", prot=6, dur=360,
+        colors=dict(base=(234, 228, 210), dark=(198, 190, 168), light=(248, 244, 230), accent=(120, 100, 70)),
+        bones={"body": [c([-4, 13, -2], [8, 10, 4], "base", 0.6), *[c([-4.4, y, -2.66], [8.8, 0.3, 0.12], "dark") for y in (16.6, 19.8)],
+                        c([1.2, 13, -2.85], [2.4, 11.6, 0.3], "light"), c([1.2, 13, 2.55], [2.4, 11.6, 0.3], "light"),
+                        c([1.2, 23.9, -2.85], [2.4, 0.7, 5.7], "light"), c([-4.7, 12.0, -2.8], [9.4, 1.2, 5.6], "accent")],
+               "leftArm": [SHOULDER_L(3.4, "light")]},
+        recipe=None),
+    # Stone: brown, a tall flared collar, a guard on the right shoulder, a wide red sash with a hanging end
+    "stone_flak_jacket": dict(name="Stone Flak Jacket", slot="chest", prot=6, dur=360,
+        colors=dict(base=(130, 94, 64), dark=(100, 70, 46), light=(158, 118, 84), red=(150, 50, 44)),
+        bones={"body": [BODY(0.6, "base"), c([-0.3, 12.4, -2.7], [0.6, 10.6, 0.15], "dark"), c([-4.4, 17.8, -2.66], [8.8, 0.3, 0.12], "dark"),
+                        c([-4.5, 22.0, -2.6], [9, 2.4, 5.2], "light", 0.3), c([-5.0, 24.0, -3.1], [10, 1.2, 6.2], "light"),
+                        c([-4.7, 11.9, -2.8], [9.4, 1.9, 5.6], "red"), c([-3.6, 8.2, -3.0], [2.0, 4.2, 0.4], "red")],
+               "rightArm": [SHOULDER_R(3.4, "light")]},
+        recipe=None),
+    # Rain: a long slate cloak to the knees, caped shoulders, a high collar, closed down the middle
+    "rain_cloak": dict(name="Rain Cloak", slot="chest", prot=6, dur=360,
+        colors=dict(base=(90, 98, 114), dark=(66, 72, 86), light=(114, 124, 142), accent=(50, 54, 66)),
+        bones={"body": [BODY(0.75, "base"), c([-0.3, 12, -2.9], [0.6, 12, 0.2], "accent"),
+                        *[c([-4.6, y, -2.85], [9.2, 0.3, 0.12], "dark") for y in (15.0, 19.0)],
+                        c([-4.5, 22.2, -2.6], [9, 2.8, 5.2], "light", 0.35)],
+               "rightArm": [SHOULDER_R(5.8, "base")], "leftArm": [SHOULDER_L(5.8, "base")],
+               "rightLeg": [c([-4.5, 5.6, -2.6], [5.0, 6.4, 5.2], "base")], "leftLeg": [c([-0.5, 5.6, -2.6], [5.0, 6.4, 5.2], "base")]},
+        recipe=None),
+}
+ARMOR.update(VILLAGE_GEAR)
+DRAWN_ICONS = {f"{v}_headband" for v in ("sand", "mist", "cloud", "stone", "rain")}
+
+
 SLOT = {"head": ("slot.armor.head", "armor_head"), "chest": ("slot.armor.chest", "armor_torso"),
         "legs": ("slot.armor.legs", "armor_legs"), "feet": ("slot.armor.feet", "armor_feet")}
 
@@ -394,7 +478,8 @@ for aid, a in ARMOR.items():
     tex_dir = RP / "textures" / "models" / "armor" / "aegis"
     tex_dir.mkdir(parents=True, exist_ok=True)
     palette(a["colors"]).save(tex_dir / f"{aid}.png")
-    render_icon(a["bones"], a["colors"], a["slot"], aid.endswith("_hat") or aid == "jiraiya_headband").save(RP / "textures" / "items" / "aegis" / f"{aid}.png")
+    if aid not in DRAWN_ICONS:   # (the village headbands' icons are drawn by tools/gen_icons.py, like the Leaf's)
+        render_icon(a["bones"], a["colors"], a["slot"], aid.endswith("_hat") or aid.endswith("_headband")).save(RP / "textures" / "items" / "aegis" / f"{aid}.png")
     bones = [{"name": b, "pivot": PIVOTS[b], "cubes": [{k: v for k, v in cu.items() if k != "_sw"} for cu in cubes]} for b, cubes in a["bones"].items()]
     w(RP / "models" / "entity" / f"armor_{aid}.geo.json", {"format_version": "1.12.0", "minecraft:geometry": [{
         "description": {"identifier": f"geometry.aegis.armor_{aid}", "texture_width": 64, "texture_height": 64,

@@ -17,6 +17,7 @@ import { natureTraining } from "./natures.js";
 import { getRyo, spendRyo, addRyo, fmtRyo, exchangeEmeralds, EMERALD_RATE } from "./currency.js";
 import { RELEASE_SCROLLS } from "./releases.js";
 import { questGiver, questEditor, defaultQuest } from "./quests.js";
+import { VILLAGE_GEAR, getVillage } from "./villages.js";
 
 const SPAWNER = "aegis:npc_spawner";
 const INDEX_PROP = "aegis:spawners";
@@ -63,6 +64,12 @@ export const NPC_TYPES = {
   sarutobi_boss: { label: "§cLegend: Hiruzen Sarutobi (boss)", entity: "aegis:legend", skin: 19, name: "§cHiruzen Sarutobi", boss: true, legend: "sarutobi" },
   minato_boss: { label: "§eLegend: Minato Namikaze (boss)", entity: "aegis:legend", skin: 20, name: "§eMinato Namikaze", boss: true, legend: "minato" },
   madara_boss: { label: "§4Legend: Edo Madara Uchiha (raid boss)", entity: "aegis:legend", skin: 29, name: "§4Madara Uchiha §8[Edo Tensei]", boss: true, legend: "madara" },
+  // v1.51: a legend for every other village
+  gaara_boss: { label: "§6Legend: Gaara of the Desert (Hidden Sand)", entity: "aegis:legend", skin: 64, name: "§6Gaara of the Desert", boss: true, legend: "gaara" },
+  zabuza_boss: { label: "§bLegend: Zabuza Momochi (Hidden Mist)", entity: "aegis:legend", skin: 65, name: "§bZabuza Momochi", boss: true, legend: "zabuza" },
+  killer_bee_boss: { label: "§eLegend: Killer B (Hidden Cloud)", entity: "aegis:legend", skin: 66, name: "§eKiller B", boss: true, legend: "killer_bee" },
+  onoki_boss: { label: "§6Legend: Ōnoki, the Third Tsuchikage (Hidden Stone)", entity: "aegis:legend", skin: 67, name: "§6Ōnoki §7the Third Tsuchikage", boss: true, legend: "onoki" },
+  hanzo_boss: { label: "§5Legend: Hanzō of the Salamander (Hidden Rain)", entity: "aegis:legend", skin: 68, name: "§5Hanzō of the Salamander", boss: true, legend: "hanzo" },
 };
 const TYPE_IDS = Object.keys(NPC_TYPES);
 
@@ -693,7 +700,6 @@ const SHOPS = {
   weaponsmith: [
     ["aegis:kunai", 8, "Kunai ×8", 3, 1],
     ["aegis:shuriken", 16, "Shuriken ×16", 3, 1],
-    ["aegis:headband", 1, "Hidden Leaf Headband", 6, 1],
     ["aegis:chakra_blades", 1, "Chakra Blades", 30, 15],
     ["aegis:nuibari", 1, "Nuibari", 36, 20],
     ["aegis:kusanagi", 1, "Kusanagi", 40, 25],
@@ -701,7 +707,6 @@ const SHOPS = {
     ["aegis:kiba", 1, "Kiba", 44, 30],
     ["aegis:hiramekarei", 1, "Hiramekarei", 44, 30],
     ["aegis:kubikiribocho", 1, "Kubikiribōchō", 48, 35],
-    ["aegis:flak_jacket", 1, "Leaf Flak Jacket", 8, 1],
     ["aegis:shinobi_pants", 1, "Shinobi Pants", 6, 1],
     ["aegis:ninja_sandals", 1, "Ninja Sandals", 3, 1],
     ["aegis:anbu_mask", 1, "Anbu Mask", 12, 30],
@@ -719,6 +724,17 @@ const SHOPS = {
     ["aegis:chakra_pill", 3, "Soldier Pills ×3", 4, 1],
   ],
 };
+
+// A village's headband and flak jacket (the Rain's is a cloak), as shop entries: [id, amount, label, price ×100 Ryō, level].
+const villageGear = (g) => [[g.headband, 1, g.headbandName, 6, 1], [g.jacket, 1, g.jacketName, 8, 1]];
+// Every Weaponsmith forges their own village's gear — and, for a customer from another village, that village's too.
+function smithList(village, player) {
+  const here = VILLAGE_GEAR[village] ?? VILLAGE_GEAR.leaf;
+  const theirs = VILLAGE_GEAR[getVillage(player)];
+  const gear = villageGear(here);
+  if (theirs && theirs !== here) gear.push(...villageGear(theirs));
+  return [...SHOPS.weaponsmith.slice(0, 2), ...gear, ...SHOPS.weaponsmith.slice(2)];
+}
 
 async function shop(player, npc, cfg, list, title, back) {
   const ems = getRyo(player);
@@ -781,7 +797,7 @@ const WARES = [
   { id: "aegis:chakra_pill", n: 3, label: "Soldier Pills ×3", price: 2, was: 4, weight: 14, stock: [2, 4] },
   { id: "aegis:kunai", n: 16, label: "Kunai ×16", price: 4, was: 6, weight: 9, stock: [1, 3] },
   { id: "aegis:shuriken", n: 32, label: "Shuriken ×32", price: 4, was: 6, weight: 9, stock: [1, 3] },
-  { id: "aegis:headband", n: 1, label: "Hidden Leaf Headband", price: 4, was: 6, weight: 5, stock: [1, 2] },
+  { pick: () => Object.values(VILLAGE_GEAR).map((g) => ({ id: g.headband, label: g.headbandName })), n: 1, price: 4, was: 6, weight: 5, stock: [1, 2] },
   { id: "aegis:reroll_scroll", n: 1, label: "Bloodline Reroll Scroll (new clan)", price: 30, weight: 8, stock: [1, 1], rare: true },
   { id: "aegis:bijuu_scroll", n: 1, label: "Tailed Beast Summoning Scroll", price: 45, lvl: 50, weight: 2, stock: [1, 1], rare: true },
   { id: "aegis:akatsuki_cloak", n: 1, label: "Akatsuki Cloak", price: 16, lvl: 20, weight: 4, stock: [1, 1] },
@@ -793,12 +809,12 @@ const WARES = [
   { deal: "armor", weight: 6 },
 ];
 const MERCHANT_SWORDS = ["aegis:chakra_blades", "aegis:nuibari", "aegis:kusanagi", "aegis:shibuki", "aegis:kiba", "aegis:hiramekarei", "aegis:kubikiribocho"];
-const MERCHANT_ARMOR = ["aegis:flak_jacket", "aegis:shinobi_pants", "aegis:ninja_sandals", "aegis:anbu_mask", "aegis:anbu_armor",
+const MERCHANT_ARMOR = ["aegis:shinobi_pants", "aegis:ninja_sandals", "aegis:anbu_mask", "aegis:anbu_armor",
   "aegis:samurai_helmet", "aegis:samurai_armor", "aegis:samurai_leggings", "aegis:samurai_boots"];
 const DEALS = {
   scroll: { cut: 0.6, list: () => SENSEI.flatMap(([, l]) => l).filter(([id]) => !id.startsWith("__")) },
   weapon: { cut: 0.7, list: () => SHOPS.weaponsmith.filter(([id]) => MERCHANT_SWORDS.includes(id)) },
-  armor: { cut: 0.7, list: () => SHOPS.weaponsmith.filter(([id]) => MERCHANT_ARMOR.includes(id)) },
+  armor: { cut: 0.7, list: () => [...Object.values(VILLAGE_GEAR).map((g) => villageGear(g)[1]), ...SHOPS.weaponsmith.filter(([id]) => MERCHANT_ARMOR.includes(id))] },
 };
 const MERCHANT_PICKS = [4, 5];
 const BLANK_SCROLL = "aegis:blank_scroll";
@@ -813,7 +829,14 @@ function offerOf(w, taken) {
     const [id, n, label, base, lvl] = options[Math.floor(Math.random() * options.length)];
     return { id, n, label, price: Math.round(base * DEALS[w.deal].cut * 10) / 10, was: base, lvl, left: 1 };
   }
-  const o = { id: w.id, n: w.n, label: w.label, price: w.price, lvl: w.lvl ?? 1, left: rnd(w.stock[0], w.stock[1]) };
+  let { id, label } = w;
+  if (w.pick) {
+    // one of several items (e.g. any village's headband)
+    const options = w.pick().filter((o) => !taken.has(o.id));
+    if (!options.length) return undefined;
+    ({ id, label } = options[Math.floor(Math.random() * options.length)]);
+  }
+  const o = { id, n: w.n, label, price: w.price, lvl: w.lvl ?? 1, left: rnd(w.stock[0], w.stock[1]) };
   if (w.was) o.was = w.was;
   if (w.rare) o.rare = true;
   return o;
@@ -1184,7 +1207,7 @@ async function talk(player, npc) {
     case "sensei":
       return senseiMenu(player, npc, cfg);
     case "weaponsmith":
-      return shop(player, npc, cfg, SHOPS.weaponsmith, look.title ?? "§lWeaponsmith");
+      return shop(player, npc, cfg, smithList(village, player), look.title ?? "§lWeaponsmith");
     case "ramen":
       return shop(player, npc, cfg, SHOPS.ramen, "§lRamen Shop");
     case "merchant":

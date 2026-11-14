@@ -70,8 +70,9 @@ export const QUEST_TARGETS = {
   bijuu: { label: "Any Tailed Beast", match: (e) => BEASTS.some((b) => e.typeId === `aegis:${b}`),
     spawn: (dim, at, tags) => spawnPlain(`aegis:${BEASTS[Math.floor(Math.random() * BEASTS.length)]}`)(dim, at, tags) },
   ...Object.fromEntries(BEASTS.map((b) => [b, { label: `Tailed Beast: ${cap(b)}`, match: (e) => e.typeId === `aegis:${b}`, spawn: spawnPlain(`aegis:${b}`) }])),
-  ...Object.fromEntries(["naruto", "sasuke", "tsunade", "sarutobi", "minato", "madara"].map((l) => [`legend_${l}`, {
-    label: `Legend: ${{ sarutobi: "Hiruzen Sarutobi", madara: "Edo Madara Uchiha" }[l] ?? cap(l)}`,
+  ...Object.fromEntries(["naruto", "sasuke", "tsunade", "sarutobi", "minato", "madara", "gaara", "zabuza", "killer_bee", "onoki", "hanzo"].map((l) => [`legend_${l}`, {
+    label: `Legend: ${{ sarutobi: "Hiruzen Sarutobi", madara: "Edo Madara Uchiha", zabuza: "Zabuza Momochi", killer_bee: "Killer B", onoki: "Ōnoki",
+      hanzo: "Hanzō of the Salamander" }[l] ?? cap(l)}`,
     match: (e) => e.typeId === "aegis:legend" && member(e) === l,
     spawn: spawnNinja(`${l}_boss`),
   }])),

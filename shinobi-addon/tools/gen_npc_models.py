@@ -576,7 +576,7 @@ def kage_skin(c, face, seed, sleeveless=False):
     return s.img
 
 
-def kage_gear(c, kanji, ident, extra=None):
+def kage_gear(c, kanji, ident, extra=None, with_hat=True):
     """The Kage hat (woven rings rising to a point, the village's badge on the front, a veil down the back), the robe's
     standing collar, sash and skirts. extra(g, tex) adds the Kage's own pieces in the texture's free corner (x ≥ 48)."""
     g = G.Gear(ident)
@@ -595,23 +595,24 @@ def kage_gear(c, kanji, ident, extra=None):
     tex_fill(tex, SKIRT, lambda u, v, wd, ht: c["trim"] if v >= ht - 2 else mul(c["robe"], 1.0 - 0.1 * v / ht - (0.05 if u == wd // 2 else 0)))
     tex_fill(tex, SKIRT_S, lambda u, v, wd, ht: c["trim"] if v >= ht - 2 else mul(c["robe_d"], 1.02 - 0.08 * v / ht))
     tex_fill(tex, COLLAR, lambda u, v, wd, ht: c["trim"] if v == 0 else c["robe"])
-    hat = g.bone("g_kasa", "head", (0, 31, 0))
-    y = 31.0
-    for i, wd in enumerate([15.6, 14.4, 12.6, 10.4, 8.0, 5.4, 2.8]):
-        side = TEDGE if i in (0, 4) else EDGE
-        for turn in (0, 22.5, 45, 67.5):
-            k = 0.94 if turn else 0.92
-            g.cube(hat, (-wd * k / 2, y + i * 1.0, -wd * k / 2), (wd * k, 1.05, wd * k),
-                   uv(up=TOP, down=UNDER, rest=side), rotation=(0, turn, 0) if turn else None, pivot=(0, y + i * 1.0, 0))
-    g.cube(hat, (-0.7, y + 6.8, -0.7), (1.4, 1.2, 1.4), uv(rest=TEDGE))
-    g.cube(hat, (-2.6, y + 1.1, -7.6), (5.2, 4.6, 0.5), uv(north=PANEL, rest=(PANEL[0], PANEL[1], 1, 1)),
-           rotation=(-28, 0, 0), pivot=(0, y + 1.1, -7.35))                                   # the badge
-    for (o, sz, rot, pv) in (((-4.8, 24.2, 4.5), (9.6, 6.8, 0.35), None, None),
-                             ((-4.85, 24.6, -0.6), (0.35, 6.4, 5.4), (0, -8, 0), (-4.7, 31, 4.5)),
-                             ((4.5, 24.6, -0.6), (0.35, 6.4, 5.4), (0, 8, 0), (4.7, 31, 4.5))):
-        cl = g.bone("g_hatcloth", "g_kasa", (0, 31, 4.5)) if "g_hatcloth" not in g.idx else "g_hatcloth"
-        g.cube(cl, o, sz, uv(north=CLOTH, south=CLOTH, east=CLOTH, west=CLOTH, rest=(CLOTH[0], CLOTH[1], 1, 1)),
-               rotation=rot, pivot=pv)
+    if with_hat:
+        hat = g.bone("g_kasa", "head", (0, 31, 0))
+        y = 31.0
+        for i, wd in enumerate([15.6, 14.4, 12.6, 10.4, 8.0, 5.4, 2.8]):
+            side = TEDGE if i in (0, 4) else EDGE
+            for turn in (0, 22.5, 45, 67.5):
+                k = 0.94 if turn else 0.92
+                g.cube(hat, (-wd * k / 2, y + i * 1.0, -wd * k / 2), (wd * k, 1.05, wd * k),
+                       uv(up=TOP, down=UNDER, rest=side), rotation=(0, turn, 0) if turn else None, pivot=(0, y + i * 1.0, 0))
+        g.cube(hat, (-0.7, y + 6.8, -0.7), (1.4, 1.2, 1.4), uv(rest=TEDGE))
+        g.cube(hat, (-2.6, y + 1.1, -7.6), (5.2, 4.6, 0.5), uv(north=PANEL, rest=(PANEL[0], PANEL[1], 1, 1)),
+               rotation=(-28, 0, 0), pivot=(0, y + 1.1, -7.35))                                   # the badge
+        for (o, sz, rot, pv) in (((-4.8, 24.2, 4.5), (9.6, 6.8, 0.35), None, None),
+                                 ((-4.85, 24.6, -0.6), (0.35, 6.4, 5.4), (0, -8, 0), (-4.7, 31, 4.5)),
+                                 ((4.5, 24.6, -0.6), (0.35, 6.4, 5.4), (0, 8, 0), (4.7, 31, 4.5))):
+            cl = g.bone("g_hatcloth", "g_kasa", (0, 31, 4.5)) if "g_hatcloth" not in g.idx else "g_hatcloth"
+            g.cube(cl, o, sz, uv(north=CLOTH, south=CLOTH, east=CLOTH, west=CLOTH, rest=(CLOTH[0], CLOTH[1], 1, 1)),
+                   rotation=rot, pivot=pv)
     robe = g.bone("g_robe", "body", (0, 24, 0))
     g.cube(robe, (-4.1, 22.6, -2.3), (8.2, 1.6, 4.6), ring(COLLAR), inflate=0.4)
     g.cube(robe, (-4, 13.4, -2), (8, 2.0, 4), ring(SASH), inflate=0.42)
@@ -1139,11 +1140,11 @@ def respirator(g, tex, c, R):
     g.cube(rb, (-4.25, 26.2, -4.25), (8.5, 0.5, 8.5), ring((R["MASK"][0], R["MASK"][1], 10, 1)))
 
 
-def lower_wrap(g, tex, c, R, col):
+def lower_wrap(g, tex, c, R, col, height=3.6):
     """Cloth wrapped round the lower face (and neck)."""
     tex_fill(tex, R["MASK"], lambda u, v, wd, ht: col if (u + v * 2) % 4 < 2 else mul(col, 0.86))
     lw = g.bone("g_facewrap", "head", (0, 26, 0))
-    g.cube(lw, (-4, 23.6, -4), (8, 3.6, 8), ring(R["MASK"]), inflate=0.3)
+    g.cube(lw, (-4, 23.6, -4), (8, height, 8), ring(R["MASK"]), inflate=0.3)
 
 
 def hood(g, tex, c, R, col):
@@ -1555,6 +1556,214 @@ VG = {
 }
 
 # ===========================================================================
+# v1.51: the villages' legends (skins 64-68) — the bosses of the Sand, Mist, Cloud, Stone and Rain
+# ===========================================================================
+# --- Gaara of the Desert: the Fifth Kazekage in his battle coat, the great sand gourd on his back ----------------------
+GAARA_PAL = dict(KZ, robe=(122, 34, 40), robe_d=(92, 24, 30), trim=(156, 146, 124), trim_d=(118, 108, 90), under=(46, 40, 44), under_d=(30, 26, 30),
+          sandal=(70, 56, 44), vest=(156, 146, 124), vest_d=(126, 116, 96), vest_h=(178, 168, 146), gourd=(222, 196, 150), gourd_d=(176, 148, 104),
+          strap=(112, 82, 54), cork=(150, 60, 50))
+
+
+def gaara_skin():
+    return kage_skin(GAARA_PAL, GAARA, 64)
+
+
+def gourd(g, tex, c):
+    """The great sand gourd strapped to his back, its strap across the chest."""
+    G1, G2, CORK, STRAP = (0, 42, 16, 12), (16, 42, 8, 12), (24, 42, 4, 4), (28, 42, 2, 12)
+    tex_fill(tex, G1, lambda u, v, wd, ht: mul(c["gourd"], (1.1 - 0.25 * v / ht) * (0.9 if u in (0, wd - 1) else 1.0) * (0.94 if (u * 7 + v * 3) % 11 == 0 else 1)))
+    tex_fill(tex, G2, lambda u, v, wd, ht: mul(c["gourd_d"], 1.05 - 0.1 * v / ht))
+    tex_fill(tex, CORK, lambda u, v, wd, ht: mul(c["cork"], 1.1 if v == 0 else 0.95))
+    tex_fill(tex, STRAP, lambda u, v, wd, ht: c["strap"] if u else mul(c["strap"], 0.75))
+    z = 2.75
+    gd = g.bone("g_gourd", "body", (0, 18, z + 3.6), (0, 0, -8))
+    for turn in (0, 45):
+        rt = (0, turn, 0) if turn else None
+        g.cube(gd, (-3.6, 10.2, z), (7.2, 8.0, 7.2), uv(rest=G1, up=G2, down=G2), rotation=rt, pivot=(0, 14, z + 3.6))        # the big bulb
+        g.cube(gd, (-2.6, 9.4, z + 1.0), (5.2, 0.9, 5.2), uv(rest=G2), rotation=rt, pivot=(0, 9.8, z + 3.6))                   # rounded below
+        g.cube(gd, (-2.6, 18.1, z + 1.0), (5.2, 0.9, 5.2), uv(rest=G2), rotation=rt, pivot=(0, 18.5, z + 3.6))                 # … and above
+        g.cube(gd, (-2.3, 19.0, z + 1.3), (4.6, 4.6, 4.6), uv(rest=G1, up=G2, down=G2), rotation=rt, pivot=(0, 21.3, z + 3.6))  # the small bulb
+    g.cube(gd, (-1.1, 23.6, z + 2.5), (2.2, 1.6, 2.2), uv(rest=G2))                                                            # the neck
+    g.cube(gd, (-0.9, 25.2, z + 2.7), (1.8, 1.2, 1.8), uv(rest=CORK))                                                          # the cork
+    st = g.bone("g_gourdstrap", "body", (0, 18, 0), (0, 0, -38))
+    g.cube(st, (-0.8, 9.6, -2.8), (1.6, 17.0, 0.35), uv(north=STRAP, south=STRAP, rest=(STRAP[0], STRAP[1], 1, 1)))
+
+
+def gaara_gear():
+    c = GAARA_PAL
+    g = G.Gear("geometry.aegis.gear_gaara")
+    tex = Image.new("RGBA", (GW, GW), (0, 0, 0, 0))
+    R = NR
+    spikes(g, tex, R["HAIR"], c["hair"], "head", SHORT_SPIKY)
+
+    def front(u, v, wd, ht):
+        k = 1.05 - 0.12 * v / ht
+        if u in (7, 8):
+            return mul(c["vest_d"], k)
+        return mul(c["vest"], k * (0.95 if (u * 3 + v) % 7 == 0 else 1))
+    vest = g.bone("g_vest", "body", (0, 24, 0))                                                    # the vest over the coat
+    shell(g, tex, c, R, vest, y0=12.6, h=10.8, inflate=0.5, front=front)
+    tex_fill(tex, R["COLLAR"], lambda u, v, wd, ht: mul(c["robe"], 1.04 - 0.08 * v))
+    g.cube(vest, (-4.0, 22.8, -2.3), (8.0, 2.4, 4.6), ring(R["COLLAR"]), inflate=0.48)            # the coat's high collar
+    SK, SKS = (32, 42, 10, 12), (42, 42, 5, 12)                                                    # the coat's long skirts
+    tex_fill(tex, SK, lambda u, v, wd, ht: mul(c["robe"], 1.0 - 0.14 * v / ht - (0.05 if u == wd // 2 else 0)))
+    tex_fill(tex, SKS, lambda u, v, wd, ht: mul(c["robe_d"], 1.02 - 0.1 * v / ht))
+    for leg, x in (("rightLeg", -3.9), ("leftLeg", -0.1)):
+        sk = g.bone(f"g_skirt_{leg[0]}", leg, G.BONE_PIVOT[leg])
+        g.cube(sk, (x, 3.6, -2), (4, 8.4, 4), uv(north=SK, south=SK, east=SKS, west=SKS, rest=(SK[0], SK[1], 1, 1)), inflate=0.55)
+    gourd(g, tex, c)
+    return g, tex
+
+
+# --- Zabuza Momochi, the Demon of the Hidden Mist: bare-chested, bandaged face, camouflage warmers, headband askew ---------
+ZB = dict(MI, skin=(226, 198, 176), skin_d=(194, 164, 140), hair=(28, 28, 34), iris=(40, 36, 40), band=(42, 50, 66),
+          bandage=(226, 222, 210), pants=(72, 84, 100), camo=(178, 182, 188), camo_d=(94, 98, 108), sandal=(40, 44, 54), strap=(98, 72, 50))
+ZABUZA = masked(dict(FACE_M, front=["HhHHhHHh", "HSHhSHHS", "BBBBBBBB", "SSSSSSSS", "SEISSIES", "SSSssSSS", "SSsQQsSS", "sSSSSSSs"]), (5, 6, 7), "X")
+
+
+def camo(c, u, v):
+    """The mottled grey of Zabuza's arm and leg warmers."""
+    return c["camo_d"] if ((u * 5 + v * 3) % 7 in (0, 3) and (u + v) % 3 != 1) else c["camo"]
+
+
+def zabuza_skin():
+    c = ZB
+    s = Skin(65)
+    paint_head(s, dict(c, cloth=c["bandage"]), ZABUZA)                                             # no eyebrows; bandages from the nose down
+    S, s_ = c["skin"], c["skin_d"]
+
+    def torso(f, u, v, wd, ht):
+        if v >= 10:
+            return c["strap"] if v == 10 else s.cloth(c["pants"], f, u, v, wd, ht)
+        if f == "front":
+            if v == 3 and 1 <= u <= 6:
+                return s_
+            if 5 <= v <= 9 and u in (3, 4):
+                return mul(S, 0.94)
+            if v in (6, 8) and 2 <= u <= 5:
+                return s_
+        if f == "back" and v in (2, 3) and u in (1, 2, 5, 6):
+            return mul(S, 0.94)
+        return s.cloth(S, f, u, v, wd, ht, 0.02)
+    s.paint("body", SIDES, torso)
+    s.paint("body", ("top",), lambda f, u, v, wd, ht: S)
+    s.paint("body", ("bottom",), lambda f, u, v, wd, ht: c["pants"])
+    for arm in ("rarm", "larm"):
+        s.paint(arm, SIDES, lambda f, u, v, wd, ht: s.cloth(S, f, u, v, wd, ht, 0.02) if v < 4 or v >= 11 else camo(c, u, v))
+        s.paint(arm, ("top",), lambda f, u, v, wd, ht: S)
+        s.paint(arm, ("bottom",), lambda f, u, v, wd, ht: s_)
+    for leg in ("rleg", "lleg"):
+        s.paint(leg, SIDES, lambda f, u, v, wd, ht: s.cloth(c["pants"], f, u, v, wd, ht) if v < 7 else (camo(c, u, v) if v < 11 else c["sandal"]))
+        s.paint(leg, ("top",), lambda f, u, v, wd, ht: c["pants"])
+        s.paint(leg, ("bottom",), lambda f, u, v, wd, ht: c["sandal"])
+        s.put(leg, "front", 1, 11, S)
+        s.paint(leg, SIDES, lambda f, u, v, wd, ht: s.cloth(mul(c["pants"], 0.88), f, u, v, wd, ht, 0.03) if v < 6 else None, layer=1)
+    return s.img
+
+
+def chest_strap(g, tex, c, R):
+    """A leather strap across the bare chest."""
+    r = R["STRAP"]
+    tex_fill(tex, r, lambda u, v, wd, ht: c["strap"] if u else mul(c["strap"], 0.72))
+    st = g.bone("g_strap", "body", (0, 18, 0), (0, 0, 36))
+    for z in (-2.3, 2.0):
+        g.cube(st, (-0.8, 9.4, z), (1.6, 17.2, 0.3), uv(north=r, south=r, rest=(r[0], r[1], 1, 1)))
+
+
+def zabuza_gear():
+    c = dict(ZB, forearm="glove", cloth=ZB["camo"], cloth_d=ZB["camo_d"])
+    return ninja_gear(c, "geometry.aegis.gear_zabuza", MIST, band="tilt", hair=SHORT_SPIKY,
+                      extras=(lambda g, t, c_, R: lower_wrap(g, t, c_, R, ZB["bandage"], height=2.9), chest_strap))
+
+
+# --- Killer B, the Eight-Tails' host: Cloud flak jacket, shades, a horned tattoo, a goatee — and seven swords -----------
+KB = dict(CL, skin=(112, 74, 52), skin_d=(88, 56, 38), hair=(234, 222, 176), hair_h=(250, 242, 210), iris=(40, 30, 24), brow=(214, 200, 150),
+          beard=(214, 200, 150), ring=(46, 30, 24), mouth=(78, 44, 36), shirt=(40, 40, 46), sleeve=(40, 40, 46), sleeve_to=4, forearm="wrap",
+          cloth=(236, 232, 222), cloth_d=(196, 192, 182), pants=(46, 46, 52), sandal=(36, 36, 42), grip=(172, 40, 40), rope=(232, 226, 210))
+BEE = dict(FACE_M, front=["HhHHhHHh", "HSHhSHHS", "BBBBBBBB", "SKKSSKKS", "SOOSSOOS", "SSSssSRS", "SSsQQsRS", "sSGGGGSs"],
+           side=["HHHHHHHH", "HHHHHHHS", "BBBBBBBB", "HHHSSSSS", "HHHsSSSS", "HHHsSSSS", "HHSSSSSS", "HSSSSSGS"])
+
+
+def seven_swords(g, tex, c, r):
+    """Seven swords fanned out across the back, hilts over the shoulders."""
+    tex_fill(tex, (r[0], r[1], 2, 8), lambda u, v, wd, ht: (36, 32, 30) if (u + v) % 2 else c.get("grip", (172, 40, 40)))
+    tex_fill(tex, (r[0] + 2, r[1], 4, 2), lambda u, v, wd, ht: (210, 180, 80) if v == 0 else (160, 128, 46))
+    tex_fill(tex, (r[0] + 6, r[1], 2, 10), lambda u, v, wd, ht: (196, 202, 212) if u == 0 else (140, 146, 158))
+    fan = g.bone("g_swords", "body", (0, 18.5, 3.2))
+    for i, ang in enumerate((-60, -40, -20, 0, 20, 40, 60)):
+        piv = (0, 18.5, 3.0 + i * 0.05)
+        z = 2.75 + i * 0.05
+        g.cube(fan, (-0.45, 18.5, z), (0.9, 8.6, 0.6), uv(rest=(r[0] + 6, r[1], 2, 10)), rotation=(0, 0, ang), pivot=piv)        # blade
+        g.cube(fan, (-1.1, 27.1, z - 0.1), (2.2, 0.5, 0.8), uv(rest=(r[0] + 2, r[1], 4, 2)), rotation=(0, 0, ang), pivot=piv)    # guard
+        g.cube(fan, (-0.5, 27.6, z - 0.05), (1.0, 3.2, 0.7), uv(rest=(r[0], r[1], 2, 8)), rotation=(0, 0, ang), pivot=piv)       # grip
+
+
+def killer_bee_gear():
+    return ninja_gear(KB, "geometry.aegis.gear_killer_bee", CLOUD, vest=kumo_vest, hair=SHORT_SPIKY,
+                      extras=(lambda g, t, c_, R: sunglasses(g, t, c_, R["X1"]), lambda g, t, c_, R: seven_swords(g, t, c_, R["X2"]),
+                              lambda g, t, c_, R: rope_belt(g, t, c_, R["X3"])))
+
+
+# --- Ōnoki, the Third Tsuchikage, dressed for battle: no hat — a white topknot, the big red nose, the beard -------------
+OK = dict(TK, robe=(96, 112, 64), robe_d=(72, 86, 46), trim=(206, 168, 72), trim_d=(160, 126, 48), under=(150, 50, 44), under_d=(112, 36, 32),
+          sandal=(80, 62, 44), sash=(118, 84, 52))
+
+
+def onoki_gear():
+    def extra(g, tex):
+        big_nose(g, tex, TK, (48, 0, 4, 4))
+        r = (52, 0, 8, 6)
+        tex_fill(tex, r, lambda u, v, wd, ht: mul(TK["hair"], 1.06 - 0.14 * v / 4 - (0.05 if u % 3 == 0 else 0)) if v < 4 else (118, 84, 52))
+        tk = g.bone("g_topknot", "head", (0, 32, 1.5))
+        g.cube(tk, (-1.3, 32.0, 0.3), (2.6, 2.4, 2.6), uv(rest=(r[0], r[1], 8, 4)))                # the bun
+        g.cube(tk, (-1.5, 31.8, 0.1), (3.0, 0.7, 3.0), uv(rest=(r[0], r[1] + 4, 8, 2)))             # its tie
+    return kage_gear(OK, EARTH, "geometry.aegis.gear_onoki", extra, with_hat=False)
+
+
+# --- Hanzō of the Salamander: long wild hair, the venom-sac respirator, chain mail under a dark cloak, a chain-sickle -----
+HZ = dict(RA, hair=(38, 38, 46), iris=(70, 50, 90), vest=(54, 52, 60), vest_d=(40, 38, 46), vest_h=(74, 72, 82), vest_dd=(30, 28, 34),
+          torso=(54, 52, 60), shirt=(32, 32, 38), sleeve=(32, 32, 38), pants=(38, 38, 44), armor=(122, 112, 100), rope=(118, 64, 150),
+          metal=(126, 110, 140), cloth=(150, 146, 156), cloth_d=(116, 112, 122), mask=(60, 56, 70), sandal=(34, 34, 40), forearm="glove",
+          glove=(40, 38, 46), mail=(92, 92, 100))
+HANZO = masked(dict(FACE_M, front=["HhHHhHHh", "HHHhHHHH", "HSSSSSSH", "SKKSSKKS", "SEISSIES", "SSSssSSS", "SSsQQsSS", "sSSSSSSs"],
+                    back=["HHhHHhHH"] + ["HHHHHHHH"] * 7), (5, 6, 7), "D")
+
+
+def hanzo_cloak(g, tex, c, R):
+    """A dark cloak hanging open over chain mail, with a high collar."""
+    def front(u, v, wd, ht):
+        k = 1.04 - 0.14 * v / ht
+        if 4 <= u <= 11:
+            return mul(c["mail"], k * (1.25 if (u + v) % 2 == 0 else 0.8))
+        return mul(c["vest"], k * (0.95 if (u * 3 + v) % 7 == 0 else 1))
+    vest = g.bone("g_vest", "body", (0, 24, 0))
+    shell(g, tex, c, R, vest, y0=10.4, h=13.6, inflate=0.72, front=front, back=lambda u, v, wd, ht: mul(c["vest"], 1.04 - 0.14 * v / ht))
+    tex_fill(tex, R["COLLAR"], lambda u, v, wd, ht: mul(c["vest_h"], 1.04 - 0.08 * v))
+    g.cube(vest, (-4.0, 23.2, -2.3), (8.0, 2.7, 4.6), ring(R["COLLAR"]), inflate=0.52)
+
+
+def kusarigama(g, tex, c, r):
+    """A chain-sickle hanging at the left hip, its chain looped round to the back."""
+    tex_fill(tex, (r[0], r[1], 2, 6), lambda u, v, wd, ht: (96, 70, 46) if u else (70, 50, 32))
+    tex_fill(tex, (r[0] + 2, r[1], 6, 2), lambda u, v, wd, ht: (200, 204, 212) if v == 0 else (140, 144, 154))
+    tex_fill(tex, (r[0], r[1] + 6, 4, 2), lambda u, v, wd, ht: (150, 150, 160) if (u + v) % 2 else (100, 100, 110))
+    ks = g.bone("g_sickle", "body", (4.8, 12, -1), (0, 0, 12))
+    g.cube(ks, (4.4, 7.0, -1.4), (0.9, 5.6, 0.9), uv(rest=(r[0], r[1], 2, 6)))                     # the handle
+    g.cube(ks, (4.35, 12.4, -1.5), (1.0, 0.9, 1.1), uv(rest=(r[0] + 2, r[1], 6, 2)))               # its collar
+    g.cube(ks, (4.5, 12.9, -4.1), (0.7, 0.8, 3.2), uv(rest=(r[0] + 2, r[1], 6, 2)))                 # the blade, pointing forward
+    g.cube(ks, (4.5, 12.1, -4.6), (0.7, 0.9, 0.7), uv(rest=(r[0] + 2, r[1], 6, 2)), rotation=(30, 0, 0))   # its hooked tip
+    for x, y, z in ((4.3, 6.6, 0.2), (3.6, 6.2, 1.6), (2.3, 6.0, 2.6)):                           # the chain
+        g.cube(ks, (x, y, z), (0.6, 0.6, 0.6), uv(rest=(r[0], r[1] + 6, 4, 2)))
+
+
+def hanzo_gear():
+    return ninja_gear(HZ, "geometry.aegis.gear_hanzo", RAIN, vest=hanzo_cloak, band=None, hair=SPIKY,
+                      extras=(respirator, lambda g, t, c_, R: long_hair(g, t, c_, R, length=13.0),
+                              lambda g, t, c_, R: shoulder_plates(g, t, c_, R["X1"]), lambda g, t, c_, R: rope_belt(g, t, c_, R["X3"]),
+                              lambda g, t, c_, R: kusarigama(g, t, c_, R["X4"])))
+
+
+# ===========================================================================
 # Registry
 # ===========================================================================
 MODELS = {
@@ -1596,6 +1805,12 @@ MODELS = {
     **{n: ((lambda n=n, i=i: genin_skin(VG[n], 56 + i, girl=n.endswith("_b"))),
            (lambda n=n: genin_gear(VG[n], f"geometry.aegis.gear_{n}", VG[n]["_mark"], girl=n.endswith("_b"))))
        for i, n in enumerate(VG)},
+    # v1.51: the villages' legends (skin numbers 64-68)
+    "gaara": (gaara_skin, gaara_gear),
+    "zabuza": (zabuza_skin, zabuza_gear),
+    "killer_bee": (lambda: ninja_skin(KB, BEE, 66), killer_bee_gear),
+    "onoki": (lambda: kage_skin(OK, ONOKI, 67), onoki_gear),
+    "hanzo": (lambda: ninja_skin(HZ, HANZO, 68), hanzo_gear),
 }
 
 FLUTTER = {

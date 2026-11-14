@@ -71,6 +71,11 @@
         "s61": "textures/entity/aegis/npc/stone_genin_b",
         "s62": "textures/entity/aegis/npc/rain_genin_a",
         "s63": "textures/entity/aegis/npc/rain_genin_b",
+        "s64": "textures/entity/aegis/npc/gaara",
+        "s65": "textures/entity/aegis/npc/zabuza",
+        "s66": "textures/entity/aegis/npc/killer_bee",
+        "s67": "textures/entity/aegis/npc/onoki",
+        "s68": "textures/entity/aegis/npc/hanzo",
         "gear_rogue": "textures/entity/aegis/npc/gear_rogue",
         "gear_sound": "textures/entity/aegis/npc/gear_sound",
         "gear_chunin": "textures/entity/aegis/npc/gear_chunin",
@@ -105,7 +110,12 @@
         "gear_stone_genin_a": "textures/entity/aegis/npc/gear_stone_genin_a",
         "gear_stone_genin_b": "textures/entity/aegis/npc/gear_stone_genin_b",
         "gear_rain_genin_a": "textures/entity/aegis/npc/gear_rain_genin_a",
-        "gear_rain_genin_b": "textures/entity/aegis/npc/gear_rain_genin_b"
+        "gear_rain_genin_b": "textures/entity/aegis/npc/gear_rain_genin_b",
+        "gear_gaara": "textures/entity/aegis/npc/gear_gaara",
+        "gear_zabuza": "textures/entity/aegis/npc/gear_zabuza",
+        "gear_killer_bee": "textures/entity/aegis/npc/gear_killer_bee",
+        "gear_onoki": "textures/entity/aegis/npc/gear_onoki",
+        "gear_hanzo": "textures/entity/aegis/npc/gear_hanzo"
       },
       "geometry": {
         "default": "geometry.humanoid.custom",
@@ -143,7 +153,12 @@
         "gear_stone_genin_a": "geometry.aegis.gear_stone_genin_a",
         "gear_stone_genin_b": "geometry.aegis.gear_stone_genin_b",
         "gear_rain_genin_a": "geometry.aegis.gear_rain_genin_a",
-        "gear_rain_genin_b": "geometry.aegis.gear_rain_genin_b"
+        "gear_rain_genin_b": "geometry.aegis.gear_rain_genin_b",
+        "gear_gaara": "geometry.aegis.gear_gaara",
+        "gear_zabuza": "geometry.aegis.gear_zabuza",
+        "gear_killer_bee": "geometry.aegis.gear_killer_bee",
+        "gear_onoki": "geometry.aegis.gear_onoki",
+        "gear_hanzo": "geometry.aegis.gear_hanzo"
       },
       "animations": {
         "humanoid_base_pose": "animation.humanoid.base_pose",
@@ -272,6 +287,21 @@
         },
         {
           "controller.render.aegis.npc_gear_rain_genin_b": "q.property('aegis:skin') == 63"
+        },
+        {
+          "controller.render.aegis.npc_gear_gaara": "q.property('aegis:skin') == 64"
+        },
+        {
+          "controller.render.aegis.npc_gear_zabuza": "q.property('aegis:skin') == 65"
+        },
+        {
+          "controller.render.aegis.npc_gear_killer_bee": "q.property('aegis:skin') == 66"
+        },
+        {
+          "controller.render.aegis.npc_gear_onoki": "q.property('aegis:skin') == 67"
+        },
+        {
+          "controller.render.aegis.npc_gear_hanzo": "q.property('aegis:skin') == 68"
         }
       ],
       "enable_attachables": true,

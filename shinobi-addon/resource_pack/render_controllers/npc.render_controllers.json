@@ -68,7 +68,12 @@
             "Texture.s60",
             "Texture.s61",
             "Texture.s62",
-            "Texture.s63"
+            "Texture.s63",
+            "Texture.s64",
+            "Texture.s65",
+            "Texture.s66",
+            "Texture.s67",
+            "Texture.s68"
           ]
         }
       },
@@ -465,6 +470,61 @@
       ],
       "textures": [
         "Texture.gear_rain_genin_b"
+      ]
+    },
+    "controller.render.aegis.npc_gear_gaara": {
+      "geometry": "Geometry.gear_gaara",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_gaara"
+      ]
+    },
+    "controller.render.aegis.npc_gear_zabuza": {
+      "geometry": "Geometry.gear_zabuza",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_zabuza"
+      ]
+    },
+    "controller.render.aegis.npc_gear_killer_bee": {
+      "geometry": "Geometry.gear_killer_bee",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_killer_bee"
+      ]
+    },
+    "controller.render.aegis.npc_gear_onoki": {
+      "geometry": "Geometry.gear_onoki",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_onoki"
+      ]
+    },
+    "controller.render.aegis.npc_gear_hanzo": {
+      "geometry": "Geometry.gear_hanzo",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_hanzo"
       ]
     }
   }

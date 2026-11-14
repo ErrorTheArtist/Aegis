@@ -306,6 +306,12 @@ SKINS = [
     ("stone_genin_b", dict(hair=(36, 32, 36), top=(130, 94, 64), pants=(80, 62, 50), band=((118, 42, 38), STEEL))),
     ("rain_genin_a", dict(hair=(50, 48, 60), top=(110, 118, 134), pants=(54, 58, 68), band=((62, 66, 78), STEEL))),
     ("rain_genin_b", dict(hair=(92, 62, 112), top=(150, 132, 172), pants=(64, 62, 78), band=((62, 66, 78), STEEL))),
+    # v1.51: the villages' legends (gen_npc_models.py) — Gaara, Zabuza, Killer B, Ōnoki, Hanzō of the Salamander
+    ("gaara", dict(hair=(178, 54, 44), top=(122, 34, 40), sleeve_len=11, pants=(46, 40, 44), vest=(156, 146, 124))),
+    ("zabuza", dict(hair=(28, 28, 34), top=(226, 198, 176), pants=(72, 84, 100), band=((42, 50, 66), STEEL), mask="lower")),
+    ("killer_bee", dict(skin=(112, 74, 52), hair=(234, 222, 176), top=(40, 40, 46), pants=(46, 46, 52), vest=(234, 228, 210), band=((44, 44, 52), STEEL))),
+    ("onoki", dict(hair=(236, 236, 232), top=(96, 112, 64), sleeve_len=11, pants=(150, 50, 44), belt=(118, 84, 52))),
+    ("hanzo", dict(hair=(38, 38, 46), top=(54, 52, 60), sleeve_len=11, pants=(38, 38, 44), mask="lower", long_hair=True)),
 ]
 (RP / "textures" / "entity" / "aegis" / "npc").mkdir(parents=True, exist_ok=True)
 for name, o in SKINS:
@@ -456,7 +462,9 @@ entity("akatsuki", {**BASE_MOVE,
 client_humanoid("akatsuki", ("#141418", "#c81419"))
 
 # Legendary bosses — only ever created by an NPC Spawner (no spawn rules).
-LEGEND_HP = {"naruto": 900, "sasuke": 850, "tsunade": 950, "sarutobi": 800, "minato": 750, "madara": 1800}
+LEGEND_HP = {"naruto": 900, "sasuke": 850, "tsunade": 950, "sarutobi": 800, "minato": 750, "madara": 1800,
+             "gaara": 950, "zabuza": 850, "killer_bee": 1000, "onoki": 900, "hanzo": 900}
+LEGEND_EQUIP = {"sasuke": "aegis:kusanagi_drawn", "zabuza": "aegis:kubikiribocho"}   # what they hold (it never drops)
 entity("legend", {**BASE_MOVE,
     "minecraft:type_family": {"family": ["legend", "ninja", "monster", "mob"]},
     "minecraft:health": {"value": 800, "max": 800},
@@ -479,7 +487,7 @@ entity("legend", {**BASE_MOVE,
                                                   {"test": "is_family", "subject": "other", "value": "ninja_companion"}]}, "max_dist": 32}]},
     "minecraft:behavior.random_stroll": {"priority": 7, "speed_multiplier": 0.7},
     "minecraft:behavior.look_at_player": {"priority": 8, "look_distance": 16}},
-    groups={f"aegis:legend_{k}": {"minecraft:health": {"value": hp, "max": hp}, **(equip("sasuke", "aegis:kusanagi_drawn") if k == "sasuke" else {})}
+    groups={f"aegis:legend_{k}": {"minecraft:health": {"value": hp, "max": hp}, **(equip(k, LEGEND_EQUIP[k]) if k in LEGEND_EQUIP else {})}
             for k, hp in LEGEND_HP.items()},
     events={f"aegis:legend_{k}": {"add": {"component_groups": [f"aegis:legend_{k}"]}} for k in LEGEND_HP})
 client_humanoid("legend", ("#f0782a", "#1e1e28"))

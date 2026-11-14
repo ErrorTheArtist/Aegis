@@ -15,7 +15,7 @@ import { getKage, KAGE_VILLAGES, isSannin } from "./armor.js";
 import { registerCast } from "./clash.js";
 
 import { noteCast } from "./starter.js";
-import { getVillage, villageTag } from "./villages.js";
+import { getVillage, villageTag, villageEffectLevels } from "./villages.js";
 import { transformCinematic, impactFx, sfx, chargeFx } from "./cinematic.js";
 import { statEffectLevels, getLevel, getRank, RANKS } from "./levels.js";
 import { jinchurikiEffectLevels } from "./bijuu.js";
@@ -331,6 +331,7 @@ function refreshEffects(player, force = false) {
     if (id === "night_vision") put(id, 0);
     else if (lv > 0) merged.set(id, (merged.has(id) ? merged.get(id) + 1 : 0) + lv - 1);
   }
+  for (const [id, amp] of Object.entries(villageEffectLevels(player))) put(id, amp); // the village's spirit (the Mist: water breathing)
   for (const [id, amp] of merged) {
     try {
       const cur = player.getEffect(id);

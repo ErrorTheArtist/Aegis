@@ -448,6 +448,36 @@
     },
     "aegis_cloak_kurama_m": {
       "textures": "textures/items/aegis/cloak_kurama_m"
+    },
+    "aegis_sand_headband": {
+      "textures": "textures/items/aegis/sand_headband"
+    },
+    "aegis_mist_headband": {
+      "textures": "textures/items/aegis/mist_headband"
+    },
+    "aegis_cloud_headband": {
+      "textures": "textures/items/aegis/cloud_headband"
+    },
+    "aegis_stone_headband": {
+      "textures": "textures/items/aegis/stone_headband"
+    },
+    "aegis_rain_headband": {
+      "textures": "textures/items/aegis/rain_headband"
+    },
+    "aegis_sand_flak_jacket": {
+      "textures": "textures/items/aegis/sand_flak_jacket"
+    },
+    "aegis_mist_flak_jacket": {
+      "textures": "textures/items/aegis/mist_flak_jacket"
+    },
+    "aegis_cloud_flak_jacket": {
+      "textures": "textures/items/aegis/cloud_flak_jacket"
+    },
+    "aegis_stone_flak_jacket": {
+      "textures": "textures/items/aegis/stone_flak_jacket"
+    },
+    "aegis_rain_cloak": {
+      "textures": "textures/items/aegis/rain_cloak"
     }
   }
 }

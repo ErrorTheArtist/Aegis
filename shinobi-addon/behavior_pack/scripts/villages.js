@@ -25,6 +25,45 @@ export const VILLAGES = {
   mist: { name: "Hidden Mist", jp: "Kirigakure", color: "§b", pos: { x: 2135, y: 77, z: -641 } },
 };
 const SHORT = { leaf: "Leaf", sand: "Sand", rain: "Rain", stone: "Stone", cloud: "Cloud", mist: "Mist" };
+
+// Village spirit: every village's own element hits 10% harder after you cast one of its jutsu (the Rain: any jutsu,
+// while it rains), and each village has one more perk of its own.
+export const VILLAGE_PERKS = {
+  leaf: { element: "fire", name: "Will of Fire", text: "Fire Release jutsu +10% damage · +10% chakra regen", regen: 1.1 },
+  sand: { element: "wind", name: "Desert Shield", text: "Wind Release jutsu +10% damage · 6% chance the sand blocks a hit", block: 0.06 },
+  mist: { element: "water", name: "Born of the Mist", text: "Water Release jutsu +10% damage · breathe underwater", effects: { water_breathing: 0 } },
+  cloud: { element: "lightning", name: "Lightning Reflexes", text: "Lightning Release jutsu +10% damage · jutsu cooldowns 10% shorter", cooldown: 0.9 },
+  stone: { element: "earth", name: "Unbreakable", text: "Earth Release jutsu +10% damage · take 8% less damage", guard: 0.08 },
+  rain: { element: "rain", name: "Endless Rain", text: "Every jutsu +10% damage while it rains · immune to poison", immune: ["poison"] },
+};
+export const VILLAGE_ELEMENT_BONUS = 1.1;
+export const villagePerk = (player) => VILLAGE_PERKS[getVillage(player)];
+export const villageRegenMultiplier = (player) => villagePerk(player)?.regen ?? 1;
+export const villageCooldownMultiplier = (player) => villagePerk(player)?.cooldown ?? 1;
+export const villageEffectLevels = (player) => villagePerk(player)?.effects ?? {};
+let raining = false;
+export const isRaining = () => raining;
+
+// Every village's shinobi gear: its headband (worn for faster chakra regen) and its flak jacket.
+export const VILLAGE_GEAR = {
+  leaf: { headband: "aegis:headband", headbandName: "Hidden Leaf Headband", jacket: "aegis:flak_jacket", jacketName: "Leaf Flak Jacket" },
+  sand: { headband: "aegis:sand_headband", headbandName: "Hidden Sand Headband", jacket: "aegis:sand_flak_jacket", jacketName: "Sand Flak Jacket" },
+  mist: { headband: "aegis:mist_headband", headbandName: "Hidden Mist Headband", jacket: "aegis:mist_flak_jacket", jacketName: "Mist Flak Jacket" },
+  cloud: { headband: "aegis:cloud_headband", headbandName: "Hidden Cloud Headband", jacket: "aegis:cloud_flak_jacket", jacketName: "Cloud Flak Jacket" },
+  stone: { headband: "aegis:stone_headband", headbandName: "Hidden Stone Headband", jacket: "aegis:stone_flak_jacket", jacketName: "Stone Flak Jacket" },
+  rain: { headband: "aegis:rain_headband", headbandName: "Hidden Rain Headband", jacket: "aegis:rain_cloak", jacketName: "Rain Cloak" },
+};
+// One block per blow: the Sand perk and the Sand / Kazekage sets never both refund the same hit.
+const blockTick = new Map();
+export function claimBlock(entity) {
+  const t = system.currentTick;
+  if (blockTick.get(entity.id) === t) return false;
+  blockTick.set(entity.id, t);
+  return true;
+}
+export const HEADBANDS = new Set(Object.values(VILLAGE_GEAR).map((g) => g.headband));
+export const gearOf = (player) => VILLAGE_GEAR[getVillage(player)] ?? VILLAGE_GEAR.leaf;
+const GEAR_PROP = "aegis:vgear"; // got their village's headband (v1.51)
 const KAGE_OF = { hokage: "leaf", kazekage: "sand", mizukage: "mist", raikage: "cloud", tsuchikage: "stone" };
 const STATS_PROP = "aegis:vstats"; // world: { leaf: { members, honor, top: [[name, honor], ...] }, ... }
 const COUNTED_PROP = "aegis:vcounted"; // player: the village this player is counted as a member of
@@ -164,6 +203,7 @@ export async function villageMenu(player) {
     .body(
       [
         `§8${V.jp}`,
+        `§7Village spirit — §f${VILLAGE_PERKS[v].name}§7: ${VILLAGE_PERKS[v].text}`,
         `§7Your honor: §e${getHonor(player)}`,
         `§7Online village-mates: ${mates.length ? mates.map((p) => `§f${p.name}`).join("§7, ") : "§8none"}`,
         friendlyFire() ? "§cFriendly fire is ON (event)" : "§aVillage-mates can't hurt each other.",
@@ -290,11 +330,28 @@ function goHome(player, v) {
   }
 }
 
+// Players who chose their village before v1.51 (whose starter kit had no headband): one headband of their own village.
+function giftHeadband(player) {
+  if (player.getDynamicProperty(GEAR_PROP)) return;
+  player.setDynamicProperty(GEAR_PROP, true);
+  const v = getVillage(player);
+  if (!v) return;
+  const s = new ItemStack(VILLAGE_GEAR[v].headband, 1);
+  try {
+    const left = player.getComponent("minecraft:inventory")?.container?.addItem(s);
+    if (left) player.dimension.spawnItem(left, player.location);
+  } catch {
+    player.dimension.spawnItem(s, player.location);
+  }
+  player.sendMessage(`${VILLAGES[v].color}A gift from your village: §fyour ${VILLAGE_GEAR[v].headbandName}§7. Wear it for faster chakra regen.`);
+}
+
 function giveKit(player) {
   if (player.getDynamicProperty(KIT_PROP)) return;
   player.setDynamicProperty(KIT_PROP, true);
   const inv = player.getComponent("minecraft:inventory")?.container;
-  for (const [id, n] of STARTER_KIT) {
+  player.setDynamicProperty(GEAR_PROP, true);
+  for (const [id, n] of [...STARTER_KIT, [gearOf(player).headband, 1]]) {
     const s = new ItemStack(id, n);
     try {
       const left = inv ? inv.addItem(s) : s;
@@ -303,7 +360,7 @@ function giveKit(player) {
       player.dimension.spawnItem(s, player.location);
     }
   }
-  player.sendMessage("§7You received your starter kit: §fKusanagi§7, kunai, Soldier Pills and ramen.");
+  player.sendMessage(`§7You received your starter kit: §fKusanagi§7, kunai, Soldier Pills, ramen and your §f${gearOf(player).headbandName}§7.`);
 }
 
 // Shows the choice until the player picks (forms can't open while the world is still loading).
@@ -314,8 +371,9 @@ export async function askVillage(player, force = false) {
     const ids = Object.keys(VILLAGES);
     const f = new ActionFormData()
       .title("§lChoose your village")
-      .body("§7Every shinobi swears loyalty to a village. Choose where your journey begins — you'll be sent there and it becomes your home.");
-    for (const v of ids) f.button(`${VILLAGES[v].color}${VILLAGES[v].name}\n§r§8${VILLAGES[v].jp}`);
+      .body("§7Every shinobi swears loyalty to a village. Choose where your journey begins — you'll be sent there and it becomes your home.\n\n" +
+        ids.map((v) => `${VILLAGES[v].color}${SHORT[v]}§7 — §f${VILLAGE_PERKS[v].name}§7: ${VILLAGE_PERKS[v].text}`).join("\n"));
+    for (const v of ids) f.button(`${VILLAGES[v].color}${VILLAGES[v].name}\n§r§8${VILLAGES[v].jp} · ${VILLAGE_PERKS[v].name}`);
     const r = await f.show(player);
     if (r.canceled || r.selection === undefined) {
       asking.delete(player.id);
@@ -334,6 +392,7 @@ export async function askVillage(player, force = false) {
       showTitle(player, `${VILLAGES[v].color}§l${VILLAGES[v].name}`, { subtitle: `§7${VILLAGES[v].jp} — your new home`, fadeInDuration: 10, stayDuration: 60, fadeOutDuration: 20 });
       api.particle(player.dimension, "aegis:smoke_puff", player.location);
       world.sendMessage(`§e${player.name} has joined the ${VILLAGES[v].color}${VILLAGES[v].name}§e!`);
+      player.sendMessage(`${VILLAGES[v].color}${VILLAGE_PERKS[v].name}§7: ${VILLAGE_PERKS[v].text}.`);
       giveKit(player);
       after(player);
     }, 20);
@@ -348,7 +407,55 @@ export function initVillages(helpers, onChosen) {
   if (onChosen) after = onChosen;
   world.afterEvents.playerSpawn.subscribe(({ player }) => {
     if (!getVillage(player)) system.runTimeout(() => api.isValid(player) && askVillage(player), 40);
-    else syncMember(player); // players from before the leaderboard existed
+    else {
+      syncMember(player); // players from before the leaderboard existed
+      if (!player.getDynamicProperty(GEAR_PROP)) system.runTimeout(() => api.isValid(player) && giftHeadband(player), 60);
+    }
+  });
+
+  // The Rain's spirit follows the weather.
+  try {
+    const w = world.getDimension("overworld").getWeather?.();
+    if (w) raining = String(w) !== "Clear";
+  } catch {
+    /* ignore */
+  }
+  world.afterEvents.weatherChange?.subscribe(({ newWeather, dimension }) => {
+    if (!dimension || String(dimension).includes("overworld")) raining = String(newWeather) !== "Clear";
+  });
+
+  // Village perks that need a moment of their own: poison immunity (Rain), the sand's block (Sand), less damage (Stone).
+  system.runInterval(() => {
+    for (const p of world.getAllPlayers()) {
+      for (const id of villagePerk(p)?.immune ?? []) {
+        try {
+          if (p.getEffect(id)) p.removeEffect(id);
+        } catch {
+          /* ignore */
+        }
+      }
+    }
+  }, 10);
+  world.afterEvents.entityHurt.subscribe(({ hurtEntity, damage }) => {
+    if (hurtEntity.typeId !== "minecraft:player" || damage <= 0) return;
+    const perk = villagePerk(hurtEntity);
+    if (!perk) return;
+    let back = (perk.guard ?? 0) * damage;
+    const blocked = perk.block && Math.random() < perk.block && claimBlock(hurtEntity);
+    if (blocked) back = damage;
+    if (back <= 0) return;
+    try {
+      const h = hurtEntity.getComponent("minecraft:health");
+      if (h.currentValue <= 0) return;
+      h.setCurrentValue(Math.min(h.effectiveMax, h.currentValue + back));
+      if (blocked) {
+        api.particle(hurtEntity.dimension, "aegis:dust", hurtEntity.location);
+        api.sound(hurtEntity.dimension, "dig.sand", hurtEntity.location, 0.8, 0.8);
+        hurtEntity.onScreenDisplay.setActionBar("§6The sand blocks the blow!");
+      }
+    } catch {
+      /* ignore */
+    }
   });
 
   // Village honor for every kill (yours or your companions' / summons')

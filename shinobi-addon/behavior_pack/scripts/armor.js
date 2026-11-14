@@ -1,6 +1,7 @@
 // Armor sets: wearing a full set gives a bonus on top of each piece's protection.
 
 import { world, system, ItemStack } from "@minecraft/server";
+import { claimBlock } from "./villages.js";
 
 function kagePieces(v) {
   return { Head: `aegis:${v}_hat`, Chest: `aegis:${v}_robe`, Legs: `aegis:${v}_pants`, Feet: `aegis:${v}_sandals` };
@@ -29,6 +30,37 @@ const SETS = {
     pieces: { Head: "aegis:headband", Chest: "aegis:flak_jacket", Legs: "aegis:shinobi_pants", Feet: "aegis:ninja_sandals" },
     effects: [["speed", 0], ["resistance", 0]], regen: 1.25,
     desc: "Speed, Resistance, +25% chakra regen",
+  },
+  // ---- The other villages' standard gear (headband + flak jacket/cloak + shinobi pants + ninja sandals) ----
+  sand: {
+    name: "§6Sand Shinobi",
+    pieces: { Head: "aegis:sand_headband", Chest: "aegis:sand_flak_jacket", Legs: "aegis:shinobi_pants", Feet: "aegis:ninja_sandals" },
+    effects: [["resistance", 0]], regen: 1.25, sandShield: 0.15,
+    desc: "Resistance, +25% chakra regen, 15% chance the sand blocks a hit",
+  },
+  mist: {
+    name: "§9Mist Shinobi",
+    pieces: { Head: "aegis:mist_headband", Chest: "aegis:mist_flak_jacket", Legs: "aegis:shinobi_pants", Feet: "aegis:ninja_sandals" },
+    effects: [["speed", 0], ["conduit_power", 0]], regen: 1.25,
+    desc: "Speed, Conduit Power (breathe and see underwater), +25% chakra regen",
+  },
+  cloud: {
+    name: "§eCloud Shinobi",
+    pieces: { Head: "aegis:cloud_headband", Chest: "aegis:cloud_flak_jacket", Legs: "aegis:shinobi_pants", Feet: "aegis:ninja_sandals" },
+    effects: [["speed", 0]], regen: 1.25, lightningFists: 0.15,
+    desc: "Speed, +25% chakra regen, 15% of punches crackle with lightning",
+  },
+  stone: {
+    name: "§cStone Shinobi",
+    pieces: { Head: "aegis:stone_headband", Chest: "aegis:stone_flak_jacket", Legs: "aegis:shinobi_pants", Feet: "aegis:ninja_sandals" },
+    effects: [["resistance", 0], ["jump_boost", 0]], regen: 1.25,
+    desc: "Resistance, Jump Boost, +25% chakra regen",
+  },
+  rain: {
+    name: "§3Rain Shinobi",
+    pieces: { Head: "aegis:rain_headband", Chest: "aegis:rain_cloak", Legs: "aegis:shinobi_pants", Feet: "aegis:ninja_sandals" },
+    effects: [["speed", 0], ["night_vision", 0]], regen: 1.25,
+    desc: "Speed, Night Vision, +25% chakra regen",
   },
   anbu: {
     name: "§7Anbu",
@@ -236,11 +268,11 @@ export function initArmor(helpers) {
   system.runInterval(tick, 20);
   system.runInterval(floatTick, 4);
 
-  // Kazekage — Sand Shield: sometimes the sand blocks a hit completely.
+  // Kazekage / Sand Shinobi — Sand Shield: sometimes the sand blocks a hit completely.
   world.afterEvents.entityHurt.subscribe(({ hurtEntity, damage }) => {
     if (hurtEntity.typeId !== "minecraft:player" || damage <= 0) return;
     const chance = has(hurtEntity, "sandShield")[0];
-    if (!chance || Math.random() > chance) return;
+    if (!chance || Math.random() > chance || !claimBlock(hurtEntity)) return;
     try {
       const h = hurtEntity.getComponent("minecraft:health");
       if (h.currentValue <= 0) return;
@@ -254,7 +286,7 @@ export function initArmor(helpers) {
     }
   });
 
-  // Raikage — Lightning Armor: punches crackle with lightning.
+  // Raikage / Cloud Shinobi — Lightning Armor: punches crackle with lightning.
   world.afterEvents.entityHitEntity.subscribe(({ damagingEntity, hitEntity }) => {
     if (damagingEntity?.typeId !== "minecraft:player" || !api.isValid(hitEntity)) return;
     const chance = has(damagingEntity, "lightningFists")[0];

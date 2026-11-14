@@ -76,6 +76,7 @@
         "s66": "textures/entity/aegis/npc/killer_bee",
         "s67": "textures/entity/aegis/npc/onoki",
         "s68": "textures/entity/aegis/npc/hanzo",
+        "s69": "textures/entity/aegis/npc/travel_master",
         "gear_rogue": "textures/entity/aegis/npc/gear_rogue",
         "gear_sound": "textures/entity/aegis/npc/gear_sound",
         "gear_chunin": "textures/entity/aegis/npc/gear_chunin",
@@ -115,7 +116,8 @@
         "gear_zabuza": "textures/entity/aegis/npc/gear_zabuza",
         "gear_killer_bee": "textures/entity/aegis/npc/gear_killer_bee",
         "gear_onoki": "textures/entity/aegis/npc/gear_onoki",
-        "gear_hanzo": "textures/entity/aegis/npc/gear_hanzo"
+        "gear_hanzo": "textures/entity/aegis/npc/gear_hanzo",
+        "gear_travel_master": "textures/entity/aegis/npc/gear_travel_master"
       },
       "geometry": {
         "default": "geometry.humanoid.custom",
@@ -158,7 +160,8 @@
         "gear_zabuza": "geometry.aegis.gear_zabuza",
         "gear_killer_bee": "geometry.aegis.gear_killer_bee",
         "gear_onoki": "geometry.aegis.gear_onoki",
-        "gear_hanzo": "geometry.aegis.gear_hanzo"
+        "gear_hanzo": "geometry.aegis.gear_hanzo",
+        "gear_travel_master": "geometry.aegis.gear_travel_master"
       },
       "animations": {
         "humanoid_base_pose": "animation.humanoid.base_pose",
@@ -302,6 +305,9 @@
         },
         {
           "controller.render.aegis.npc_gear_hanzo": "q.property('aegis:skin') == 68"
+        },
+        {
+          "controller.render.aegis.npc_gear_travel_master": "q.property('aegis:skin') == 69"
         }
       ],
       "enable_attachables": true,

@@ -1764,6 +1764,116 @@ def hanzo_gear():
 
 
 # ===========================================================================
+# v1.52: the Travel Master (skin 69) — the Fast Travel NPC
+# ===========================================================================
+# A courier of the five nations: a teal travel coat with a cream collar, a map satchel on a strap across the chest
+# with rolled maps poking out, a straw hat slung on his back, a low ponytail — and his messenger hawk perched on his
+# left shoulder, turning its head to watch the road.
+TM = dict(skin=(230, 196, 166), skin_d=(198, 162, 132), hair=(92, 62, 40), hair_h=(124, 86, 58), iris=(54, 92, 70), brow=(70, 46, 30),
+          mouth=(160, 96, 84), coat=(38, 98, 106), coat_d=(26, 70, 78), coat_h=(56, 124, 132), collar=(226, 214, 186), collar_d=(186, 174, 146),
+          belt=(104, 72, 44), buckle=(206, 172, 82), pants=(62, 60, 70), cloth=(214, 204, 180), cloth_d=(178, 168, 144), sandal=(76, 56, 40),
+          straw=(212, 182, 112), straw_d=(164, 134, 72), leather=(122, 84, 50), leather_d=(88, 58, 32), paper=(238, 228, 200),
+          hawk=(120, 82, 50), hawk_d=(78, 52, 32), hawk_h=(234, 226, 210), beak=(232, 186, 60))
+TRAVELLER = dict(front=["HhHHhHHh", "HSHhSHHh", "SSSSSSSS", "SKKSSKKS", "SEISSIES", "SSSssSSS", "SSsQQsSS", "sSSSSSSs"],
+                 side=["HHHHHHHH", "HHHHHHHS", "HHHHSSSS", "HHHSSSSS", "HHHsSSSS", "HHHsSSSS", "HHSSSSSS", "HSSSSSSS"],
+                 back=["HHhHHhHH", "HHHHHHHH", "HhHHHHhH", "HHHHHHHH", "HHhHHhHH", "HHHHHHHH", "HHHHHHHH", "sHHHHHHs"],
+                 front1=["HhHH.hHh", "H....H.."], side1=["HhHHhHHh", "HHH.HH.."], back1=["HhHHhHHh", "HHHHHHHH"])
+
+
+def travel_master_skin():
+    c = TM
+    s = Skin(69)
+    paint_head(s, c, TRAVELLER)
+    S, s_ = c["skin"], c["skin_d"]
+    C, Cd, L, Ld = c["coat"], c["coat_d"], c["collar"], c["collar_d"]
+
+    def body(f, u, v, wd, ht):
+        if v == 9:
+            return c["buckle"] if (f == "front" and u in (3, 4)) else c["belt"]
+        if f == "front" and v < 9 and u in (3, 4):
+            return L if v < 4 else mul(C, 0.86)                       # the collar's V, then the coat closing
+        return s.cloth(C, f, u, v, wd, ht, 0.04)
+    s.paint("body", SIDES, body)
+    s.paint("body", ("top",), lambda f, u, v, wd, ht: C)
+    s.paint("body", ("bottom",), lambda f, u, v, wd, ht: Cd)
+    s.paint("body", ("front", "back", "right", "left"), lambda f, u, v, wd, ht: s.cloth(Cd, f, u, v, wd, ht, 0.03) if v >= 10 else None, layer=1)
+    for arm in ("rarm", "larm"):
+        s.paint(arm, SIDES, lambda f, u, v, wd, ht: s.cloth(C, f, u, v, wd, ht) if v < 8 else
+                (L if v == 8 else ((c["cloth"] if (u + v * 2) % 4 < 2 else c["cloth_d"]) if v < 11 else S)))
+        s.paint(arm, ("top",), lambda f, u, v, wd, ht: C)
+        s.paint(arm, ("bottom",), lambda f, u, v, wd, ht: s_)
+    for leg in ("rleg", "lleg"):
+        s.paint(leg, SIDES, lambda f, u, v, wd, ht: s.cloth(c["pants"], f, u, v, wd, ht) if v < 7 else
+                ((c["cloth"] if (u + v * 2) % 4 < 2 else c["cloth_d"]) if v < 11 else c["sandal"]))
+        s.paint(leg, ("top",), lambda f, u, v, wd, ht: c["pants"])
+        s.paint(leg, ("bottom",), lambda f, u, v, wd, ht: c["sandal"])
+        s.put(leg, "front", 1, 11, S)
+    return s.img
+
+
+def travel_master_gear():
+    c = TM
+    g = G.Gear("geometry.aegis.gear_travel_master")
+    tex = Image.new("RGBA", (GW, GW), (0, 0, 0, 0))
+    HAT, HAT_E, PONY, COLLAR = (0, 0, 16, 16), (16, 0, 16, 2), (16, 2, 6, 10), (32, 16, 16, 3)
+    HB, HW, HH, BEAK, TAIL, CHEST, TALON = (32, 0, 8, 8), (40, 0, 8, 8), (48, 0, 4, 4), (52, 0, 2, 2), (54, 0, 4, 6), (32, 8, 6, 6), (38, 8, 2, 2)
+    SAT, FLAP, STRAP, MAPS = (0, 16, 8, 8), (8, 16, 8, 4), (16, 16, 2, 12), (18, 16, 6, 8)
+    # --- textures
+    tex_fill(tex, HAT, lambda u, v, wd, ht: mul(c["straw"], (1.06 if (u + v) % 2 else 0.95) * (0.9 if int(math.hypot(u - 7.5, v - 7.5)) % 3 == 0 else 1)))
+    tex_fill(tex, HAT_E, lambda u, v, wd, ht: c["straw_d"] if v else mul(c["straw"], 0.92))
+    tex_fill(tex, PONY, lambda u, v, wd, ht: mul(c["hair"], 1.2 - 0.38 * v / ht - (0.05 if u % 2 else 0)) if v else c["leather_d"])
+    tex_fill(tex, COLLAR, lambda u, v, wd, ht: c["collar"] if v < 2 else c["collar_d"])
+    tex_fill(tex, HB, lambda u, v, wd, ht: mul(c["hawk"], 1.08 - 0.12 * v / ht + (0.06 if (u + v * 2) % 5 == 0 else 0)))
+    tex_fill(tex, HW, lambda u, v, wd, ht: c["hawk_h"] if v == ht - 1 and u % 2 else mul(c["hawk_d"], 1.1 - 0.1 * v / ht + (0.08 if (u + v) % 3 == 0 else 0)))
+    tex_fill(tex, HH, lambda u, v, wd, ht: c["hawk_h"] if v < 3 else mul(c["hawk_h"], 0.86))
+    tex_fill(tex, BEAK, lambda u, v, wd, ht: c["beak"] if v == 0 else mul(c["beak"], 0.8))
+    tex_fill(tex, TAIL, lambda u, v, wd, ht: c["hawk_h"] if v == ht - 1 else (c["hawk_d"] if v % 2 else c["hawk"]))
+    tex_fill(tex, CHEST, lambda u, v, wd, ht: c["hawk_h"] if (u + v) % 3 else mul(c["hawk_h"], 0.82))
+    tex_fill(tex, TALON, lambda u, v, wd, ht: c["beak"])
+    tex_fill(tex, SAT, lambda u, v, wd, ht: c["leather_d"] if u in (0, wd - 1) or v == ht - 1 else mul(c["leather"], 1.04 - 0.08 * v / ht))
+    tex_fill(tex, FLAP, lambda u, v, wd, ht: c["buckle"] if (u in (3, 4) and v == ht - 1) else mul(c["leather"], 1.12 - 0.05 * v))
+    tex_fill(tex, STRAP, lambda u, v, wd, ht: c["leather"] if u else c["leather_d"])
+    tex_fill(tex, MAPS, lambda u, v, wd, ht: (176, 60, 52) if v == 1 else mul(c["paper"], 1.0 - 0.06 * (u % 2)))
+    # --- the coat's standing collar
+    co = g.bone("g_collar", "body", (0, 24, 0))
+    g.cube(co, (-4.1, 22.8, -2.3), (8.2, 1.5, 4.6), ring(COLLAR), inflate=0.42)
+    # --- a low ponytail
+    pt = g.bone("g_ponytail", "head", (0, 27.6, 4.0), (14, 0, 0))
+    g.cube(pt, (-0.9, 26.9, 3.9), (1.8, 1.2, 1.2), uv(rest=(PONY[0], PONY[1], 6, 1)))                 # the tie
+    g.cube(pt, (-1.1, 21.6, 4.2), (2.2, 5.4, 1.6), uv(rest=PONY))
+    g.cube(pt, (-0.7, 19.6, 4.5), (1.4, 2.2, 1.1), uv(rest=PONY))
+    # --- the straw travel hat, slung on his back
+    hat = g.bone("g_backhat", "body", (0, 17.5, 3.0), (0, 0, 8))
+    for i, wd in enumerate((12.6, 10.4, 7.8, 5.0, 2.4)):
+        for turn in (0, 45):
+            g.cube(hat, (-wd / 2, 17.5 - wd / 2, 2.6 + i * 0.55), (wd, wd, 0.6), uv(north=HAT, south=HAT, rest=HAT_E),
+                   rotation=(0, 0, turn) if turn else None, pivot=(0, 17.5, 2.9 + i * 0.55))
+    # --- the map satchel on the right hip, its strap over the left shoulder, rolled maps poking out
+    st = g.bone("g_satchelstrap", "body", (0, 18, 0), (0, 0, -40))
+    g.cube(st, (-0.7, 9.6, -2.75), (1.4, 17.0, 0.3), uv(north=STRAP, south=STRAP, rest=(STRAP[0], STRAP[1], 1, 1)))
+    sb = g.bone("g_satchel", "body", (-5, 12, 0))
+    g.cube(sb, (-6.2, 9.4, -1.9), (2.2, 3.8, 3.8), uv(rest=SAT, west=SAT, east=SAT))
+    g.cube(sb, (-6.35, 11.6, -2.0), (2.5, 1.7, 4.0), uv(rest=FLAP))
+    for z, h in ((-1.2, 3.2), (0.2, 2.6)):
+        g.cube(sb, (-5.6, 12.8, z), (1.0, h, 1.0), uv(rest=MAPS))
+    # --- the messenger hawk on his left shoulder (on the body, so it rides steady when the arm swings)
+    hk = g.bone("g_hawk", "body", (6.6, 24.0, 0.4))
+    for x in (5.8, 7.0):
+        g.cube(hk, (x, 24.0, -0.2), (0.6, 0.7, 0.6), uv(rest=TALON))                                    # talons
+    g.cube(hk, (5.0, 24.6, -1.6), (3.2, 3.5, 4.2), uv(north=CHEST, rest=HB))                            # body
+    for x in (4.6, 7.8):
+        g.cube(hk, (x, 24.9, -1.2), (0.6, 3.0, 4.6), uv(rest=HW))                                       # folded wings
+    g.cube(hk, (5.7, 24.5, 2.4), (1.8, 0.5, 3.4), uv(rest=TAIL), rotation=(-30, 0, 0), pivot=(6.6, 24.8, 2.4))   # tail
+    hh = g.bone("g_hawk_head", "g_hawk", (6.6, 28.0, -1.0))
+    g.cube(hh, (5.4, 27.9, -2.6), (2.4, 2.3, 2.5), uv(rest=HH))
+    g.cube(hh, (6.15, 28.1, -3.5), (0.9, 1.0, 1.0), uv(rest=BEAK))                                     # hooked beak
+    g.cube(hh, (6.25, 27.6, -3.6), (0.7, 0.6, 0.5), uv(rest=BEAK))
+    G.wraps(g, tex, "g_shin_r", "rightLeg", (-3.9, 1.3, -2), (4, 3.4, 4), (32, 20, 16, 4), c["cloth"], c["cloth_d"], 0.15)
+    G.wraps(g, tex, "g_shin_l", "leftLeg", (-0.1, 1.3, -2), (4, 3.4, 4), (32, 20, 16, 4), c["cloth"], c["cloth_d"], 0.15)
+    return g, tex
+
+
+# ===========================================================================
 # Registry
 # ===========================================================================
 MODELS = {
@@ -1811,6 +1921,8 @@ MODELS = {
     "killer_bee": (lambda: ninja_skin(KB, BEE, 66), killer_bee_gear),
     "onoki": (lambda: kage_skin(OK, ONOKI, 67), onoki_gear),
     "hanzo": (lambda: ninja_skin(HZ, HANZO, 68), hanzo_gear),
+    # v1.52: the Travel Master (skin 69) — Fast Travel
+    "travel_master": (travel_master_skin, travel_master_gear),
 }
 
 FLUTTER = {
@@ -1819,6 +1931,7 @@ FLUTTER = {
     "g_veil": {"rotation": ["math.sin(q.life_time * 150) * 3 - q.modified_move_speed * 6", 0, "math.sin(q.life_time * 110) * 2"]},
     "g_hatcloth": {"rotation": ["math.sin(q.life_time * 140) * 3 + q.modified_move_speed * 22", 0, 0]},
     "g_ponytail": {"rotation": ["math.sin(q.life_time * 190) * 5 + q.modified_move_speed * 26", 0, "math.sin(q.life_time * 140) * 5"]},
+    "g_hawk_head": {"rotation": ["math.sin(q.life_time * 50) * 6", "math.sin(q.life_time * 70) * 30", 0]},
     "g_bow_t0": {"rotation": ["math.sin(q.life_time * 230) * 6 + q.modified_move_speed * 34", 0, "math.sin(q.life_time * 170) * 5"]},
     "g_bow_t1": {"rotation": ["math.sin(q.life_time * 210 + 50) * 6 + q.modified_move_speed * 30", 0, "math.sin(q.life_time * 190 + 30) * 5"]},
 }

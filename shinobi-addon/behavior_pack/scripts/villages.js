@@ -192,6 +192,8 @@ export function leaderboardText() {
 // Village menu (from the Shinobi Record)
 // ---------------------------------------------------------------------------
 const lastHurt = new Map(); // player id -> tick
+// Hit by an enemy in the last 10 seconds (no Return Home or Fast Travel then).
+export const inFight = (player) => (lastHurt.get(player.id) ?? -1e9) > system.currentTick - 200;
 
 export async function villageMenu(player) {
   const v = getVillage(player);
@@ -236,7 +238,7 @@ async function villageChat(player) {
 
 function returnHome(player) {
   const v = getVillage(player);
-  if ((lastHurt.get(player.id) ?? -1e9) > system.currentTick - 200) return player.sendMessage("§cYou can't return home in the middle of a fight.");
+  if (inFight(player)) return player.sendMessage("§cYou can't return home in the middle of a fight.");
   const left = api.cooldownLeft(player, "aegis:return_home");
   if (left > 0) return player.sendMessage(`§7Return Home is ready in §f${Math.ceil(left / 20)}s§7.`);
   api.startCooldown(player, "aegis:return_home", HOME_CD);

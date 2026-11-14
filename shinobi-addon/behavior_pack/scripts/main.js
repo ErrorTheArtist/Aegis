@@ -30,6 +30,7 @@ import { initEdoTensei, handleEdoUse } from "./edotensei.js";
 import { beginNatureRoll } from "./natures.js";
 import { breakTobiPhase } from "./akatsuki2.js";
 import { initNatures, natureCostMultiplier, natureDamageMultiplier, onJutsuCast, natureTag } from "./natures.js";
+import { initXpShards } from "./xpshards.js";
 import { initLevels, handleRecordUse, levelChakraBonus, levelRegenMultiplier, ninjutsuMultiplier, taijutsuMultiplier, cooldownMultiplier, gainJutsuXp, getLevel, xpInfo } from "./levels.js";
 
 // ---------------------------------------------------------------------------
@@ -1173,6 +1174,7 @@ initQuests(npcApi);
 initClash(npcApi);
 initKamui(npcApi, breakTobiPhase);
 initStarter(npcApi);
+initXpShards(npcApi);
 initEdoTensei(npcApi);
 initM1(npcApi);
 initLagClear();

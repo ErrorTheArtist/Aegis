@@ -2,9 +2,9 @@
 
 import { world, system } from "@minecraft/server";
 import { ActionFormData } from "@minecraft/server-ui";
-import { getRyo, spendRyo, fmtRyo } from "./currency.js";
+import { getRyo, spendRyo, fmtRyo, price } from "./currency.js";
 
-const RECRUIT_COST = 1500; // Ryō
+const RECRUIT_COST = price(1500); // Ryō (1,800 since v1.52's +20%)
 const MAX_COMPANION_LEVEL = 10;
 const SUMMONS = {
   "aegis:summon_toad_scroll": { entity: "aegis:summon_toad", name: "Toad", sound: "mob.slime.big" },

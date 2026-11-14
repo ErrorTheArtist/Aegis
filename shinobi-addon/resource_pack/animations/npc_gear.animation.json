@@ -88,6 +88,13 @@
             "math.sin(q.life_time * 140) * 5"
           ]
         },
+        "g_hawk_head": {
+          "rotation": [
+            "math.sin(q.life_time * 50) * 6",
+            "math.sin(q.life_time * 70) * 30",
+            0
+          ]
+        },
         "g_bow_t0": {
           "rotation": [
             "math.sin(q.life_time * 230) * 6 + q.modified_move_speed * 34",

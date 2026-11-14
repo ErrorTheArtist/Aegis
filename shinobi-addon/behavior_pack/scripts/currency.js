@@ -8,6 +8,10 @@ import { ActionFormData, ModalFormData } from "@minecraft/server-ui";
 export const RYO_ITEM = "aegis:ryo";
 export const NOTE_VALUE = 100; // one Ryō note
 export const EMERALD_RATE = 100; // one emerald exchanges for 100 Ryō
+// v1.52: everything you buy costs 20% more (shops, the merchant, training, hiring genin, fast travel). Rewards, the
+// emerald exchange and what the merchant pays you are unchanged.
+export const PRICE_MULTIPLIER = 1.2;
+export const price = (ryo) => Math.max(1, Math.round(ryo * PRICE_MULTIPLIER));
 const PROP = "aegis:ryo";
 
 let api;

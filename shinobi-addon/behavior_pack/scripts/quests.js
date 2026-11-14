@@ -1,6 +1,9 @@
-// Quest Givers — NPCs you place with the NPC Spawner and design yourself: their name and outfit (spawner settings),
-// the quest text, which enemies the player has to fight (and whether they spawn when the quest starts),
-// how many, the rewards (Ryō, XP, any item — even the one in your hand), level requirement, time limit, repeatable.
+// Quest Givers — NPCs you place with the NPC Spawner: their name and outfit (spawner settings), and their quest:
+//   • Quest Board (the default since v1.52) — the NPC offers every premade quest; each player picks one for their level.
+//   • One premade quest — pick it from the list (and tweak it if you like).
+//   • Your own quest — the quest text, which enemies the player has to fight (and whether they spawn when the quest
+//     starts), how many, the rewards (Ryō, XP, any item — even the one in your hand), level requirement, time limit,
+//     repeatable.
 
 import { world, system } from "@minecraft/server";
 import { ActionFormData, ModalFormData, MessageFormData } from "@minecraft/server-ui";
@@ -14,6 +17,8 @@ const QUEST_PROP = "aegis:quest";
 const DONE_PROP = "aegis:quests_done";
 
 const BEASTS = ["shukaku", "matatabi", "isobu", "son_goku", "kokuo", "saiken", "chomei", "gyuki", "kurama"];
+const LEGEND_IDS = ["naruto", "sasuke", "tsunade", "sarutobi", "minato", "madara", "gaara", "zabuza", "killer_bee", "onoki", "hanzo"];
+const RANDOM_LEGENDS = LEGEND_IDS.filter((l) => l !== "madara"); // (the raid boss only comes when asked for by name)
 const cap = (s) => s.split("_").map((w) => w[0].toUpperCase() + w.slice(1)).join(" ");
 const member = (e) => {
   try {
@@ -70,7 +75,9 @@ export const QUEST_TARGETS = {
   bijuu: { label: "Any Tailed Beast", match: (e) => BEASTS.some((b) => e.typeId === `aegis:${b}`),
     spawn: (dim, at, tags) => spawnPlain(`aegis:${BEASTS[Math.floor(Math.random() * BEASTS.length)]}`)(dim, at, tags) },
   ...Object.fromEntries(BEASTS.map((b) => [b, { label: `Tailed Beast: ${cap(b)}`, match: (e) => e.typeId === `aegis:${b}`, spawn: spawnPlain(`aegis:${b}`) }])),
-  ...Object.fromEntries(["naruto", "sasuke", "tsunade", "sarutobi", "minato", "madara", "gaara", "zabuza", "killer_bee", "onoki", "hanzo"].map((l) => [`legend_${l}`, {
+  legend: { label: "Any legendary shinobi", match: (e) => e.typeId === "aegis:legend",
+    spawn: (dim, at, tags) => spawnNinja(`${RANDOM_LEGENDS[Math.floor(Math.random() * RANDOM_LEGENDS.length)]}_boss`)(dim, at, tags) },
+  ...Object.fromEntries(LEGEND_IDS.map((l) => [`legend_${l}`, {
     label: `Legend: ${{ sarutobi: "Hiruzen Sarutobi", madara: "Edo Madara Uchiha", zabuza: "Zabuza Momochi", killer_bee: "Killer B", onoki: "Ōnoki",
       hanzo: "Hanzō of the Salamander" }[l] ?? cap(l)}`,
     match: (e) => e.typeId === "aegis:legend" && member(e) === l,
@@ -78,7 +85,7 @@ export const QUEST_TARGETS = {
   }])),
 };
 const TARGET_IDS = Object.keys(QUEST_TARGETS);
-const BIG = (id) => id === "bijuu" || BEASTS.includes(id) || id.startsWith("legend_") || ["akatsuki", "itachi", "kisame", "deidara", "pain", "konan", "hidan", "kakuzu", "sasori", "zetsu", "tobi"].includes(id);
+const BIG = (id) => id === "bijuu" || BEASTS.includes(id) || id.startsWith("legend") || ["akatsuki", "itachi", "kisame", "deidara", "pain", "konan", "hidan", "kakuzu", "sasori", "zetsu", "tobi"].includes(id);
 
 // Reward items offered in the quest editor ("Item in my hand" covers everything else).
 const REWARD_ITEMS = [
@@ -91,6 +98,43 @@ const REWARD_ITEMS = [
   "minecraft:diamond", "minecraft:golden_apple", "minecraft:enchanted_golden_apple", "minecraft:netherite_ingot", "minecraft:totem_of_undying",
 ];
 const itemLabel = (id) => cap(id.split(":")[1].replace(/_scroll$/, " scroll"));
+
+// ---------------------------------------------------------------------------
+// Premade quests (v1.52) — ready to use: give one to a Quest Giver, or let it offer them all (Quest Board).
+// Enemies appear around the player when the quest starts (except the hunts), every quest can be done again, and the XP
+// is generous on purpose — each one is worth several levels at the level it's meant for.
+// ---------------------------------------------------------------------------
+const pm = (id, minLevel, title, text, target, count, xp, ryo, item = "", itemCount = 1, spawn = true) =>
+  ({ id: `pm_${id}`, premade: true, title, text, target, count, spawn, ryo, xp, item, itemCount, minLevel, repeatable: true, timeLimit: 0 });
+export const PREMADE = [
+  pm("pests", 1, "Pest Control", "Zombies keep wandering into the training grounds. Clear them out.", "zombie", 8, 250, 300, "aegis:ramen", 1),
+  pm("bones", 1, "Bone Collectors", "Skeleton archers are shooting at the academy students.", "skeleton", 8, 250, 300, "aegis:ramen", 1),
+  pm("webs", 1, "Eight Legs", "Spiders have nested by the river. Nobody can fetch water.", "spider", 6, 250, 300, "aegis:ramen", 1),
+  pm("creepers", 5, "Creeper Clearance", "Something keeps blowing holes in the village wall.", "creeper", 5, 450, 500, "aegis:chakra_pill", 2),
+  pm("night", 5, "Night Watch", "Keep the village safe tonight: defeat 15 hostile mobs, wherever you find them.", "monster", 15, 500, 600, "aegis:chakra_pill", 2, false),
+  pm("rogues", 10, "Rogue Patrol", "Rogue ninja are robbing travellers on the roads.", "rogue", 5, 700, 1000, "aegis:chakra_pill", 3),
+  pm("bandits", 15, "Road Bandits", "A whole band of rogue ninja has set up camp. Break it up.", "rogue", 8, 1000, 1500, "aegis:kunai", 16),
+  pm("sound", 20, "Sound Infiltrators", "Orochimaru's spies have slipped over the border.", "sound", 5, 1500, 2000, "aegis:chakra_pill", 4),
+  pm("traitors", 25, "Traitors of the Village", "Anbu who abandoned the village must be stopped.", "anbu", 4, 2000, 2500, "aegis:xp_shard", 1),
+  pm("border", 30, "Border Defence", "Enemy ninja are probing our defences. Drive them back.", "ninja", 10, 3000, 3000, "aegis:xp_shard", 1),
+  pm("anbu_hunt", 35, "Anbu Hunt", "A squad of rogue Anbu is on the move.", "anbu", 6, 3500, 3500, "aegis:xp_shard", 2),
+  pm("ambush", 40, "Sound Ambush", "The Sound is massing for an attack. Strike first.", "sound", 10, 4500, 4000, "aegis:xp_shard", 2),
+  pm("bounty", 50, "Akatsuki Bounty", "An Akatsuki member has been sighted nearby. Bring them down.", "akatsuki", 1, 7000, 6000, "aegis:xp_shard", 3),
+  pm("itachi", 55, "The Uchiha Prodigy", "Itachi Uchiha has been seen near the village.", "itachi", 1, 8000, 7000, "aegis:xp_shard", 3),
+  pm("kisame", 55, "The Tailless Tailed Beast", "Kisame Hoshigaki is hunting along the coast.", "kisame", 1, 8000, 7000, "aegis:xp_shard", 3),
+  pm("deidara", 55, "Art is an Explosion", "Deidara is blowing up the countryside.", "deidara", 1, 8000, 7000, "aegis:xp_shard", 3),
+  pm("pain", 65, "The Six Paths", "Pain has come looking for a Jinchūriki.", "pain", 1, 10000, 8000, "aegis:xp_shard", 4),
+  pm("beast", 70, "Tailed Beast Subjugation", "A Tailed Beast is rampaging. Subdue it before it reaches the village.", "bijuu", 1, 12000, 10000, "aegis:xp_shard", 4),
+  pm("legend", 80, "A Legend's Challenge", "A legendary shinobi wants to test your strength.", "legend", 1, 15000, 12000, "aegis:xp_shard", 5),
+  pm("kurama", 90, "The Nine-Tailed Fox", "Kurama, the strongest of the Tailed Beasts, is loose.", "kurama", 1, 20000, 15000, "aegis:xp_shard", 6),
+  pm("purge", 100, "Akatsuki Purge", "End the Akatsuki threat: defeat three of its members.", "akatsuki", 3, 25000, 20000, "aegis:xp_shard", 6),
+  pm("legends", 120, "Clash of Legends", "Three legendary shinobi stand in your way.", "legend", 3, 40000, 30000, "aegis:xp_shard", 8),
+  pm("madara", 150, "The Reanimated Uchiha", "Madara Uchiha has returned from the dead. Only the strongest can stop him.", "legend_madara", 1, 60000, 50000, "aegis:xp_shard", 10),
+];
+const PREMADE_BY_ID = Object.fromEntries(PREMADE.map((q) => [q.id, q]));
+const boardOf = (cfg) => !cfg?.quest || cfg.quest.board; // no quest of its own → it offers the premade quests
+// The quest a player is on with this giver: a premade one is looked up by id (a Quest Board holds all of them).
+const questFor = (cfg, cur) => (cur?.id && PREMADE_BY_ID[cur.id]) || cfg?.quest;
 
 export function defaultQuest() {
   return {
@@ -115,6 +159,51 @@ const getDone = (p) => {
     return [];
   }
 };
+
+const goalOf = (q) => `Defeat ${q.count} × ${QUEST_TARGETS[q.target]?.label ?? q.target}`;
+
+// ---------------------------------------------------------------------------
+// Quest settings (creative, from the NPC Spawner menu): the Quest Board, one premade quest, or your own
+// ---------------------------------------------------------------------------
+export async function questSetup(player, cfg, save) {
+  const cur = cfg.quest;
+  const now = boardOf(cfg) ? "§6Quest Board §7(every premade quest)" : `§e${cur.title}${cur.premade ? " §7(premade)" : ""}`;
+  const r = await new ActionFormData()
+    .title("§lQuest Settings")
+    .body(`§7What should this Quest Giver offer?
+§7Right now: ${now}`)
+    .button("§6Quest Board\n§r§7every premade quest — players pick one for their level")
+    .button(`§ePick one premade quest\n§r§7${PREMADE.length} ready-made quests, Lv 1–150`)
+    .button("§bDesign your own quest\n§r§7story, enemies, rewards, level, time limit")
+    .show(player);
+  if (r.canceled || r.selection === undefined) return;
+  if (r.selection === 0) {
+    cfg.quest = { board: true };
+    save(cfg);
+    return player.sendMessage("§aThis Quest Giver is now a §6Quest Board§a: players can pick any premade quest for their level.");
+  }
+  if (r.selection === 1) return pickPremade(player, cfg, save);
+  if (cfg.quest?.board) cfg.quest = undefined; // the editor starts from the example quest
+  return questEditor(player, cfg, save);
+}
+
+async function pickPremade(player, cfg, save) {
+  const f = new ActionFormData().title("§lPremade Quests").body("§7Pick the quest this NPC gives. You can change the details afterwards.");
+  for (const q of PREMADE) f.button(`§0[Lv ${q.minLevel}] ${q.title}\n§r§7${goalOf(q)} · ${q.xp.toLocaleString("en-US")} XP`);
+  const r = await f.show(player);
+  if (r.canceled || r.selection === undefined) return;
+  const q = PREMADE[r.selection];
+  cfg.quest = { ...q };
+  save(cfg);
+  player.sendMessage(`§aQuest set: §e${q.title}§a — ${goalOf(q)}. ${rewardText(q)}`);
+  const m = await new MessageFormData()
+    .title(`§l${q.title}`)
+    .body(`§f${q.text}\n\n§7${goalOf(q)}${q.spawn ? " §7(they appear around the player)" : " §7(hunted in the world)"}\n${rewardText(q)}\n§7Level ${q.minLevel}+ · repeatable`)
+    .button1("§aDone")
+    .button2("Change the details")
+    .show(player);
+  if (m.selection === 1) return questEditor(player, cfg, save);
+}
 
 // ---------------------------------------------------------------------------
 // Quest editor (creative, from the NPC Spawner menu)
@@ -144,7 +233,7 @@ export async function questEditor(player, cfg, save) {
   const v = r.formValues;
   const num = (x, d) => (Number.isFinite(Number(x)) ? Math.max(0, Math.floor(Number(x))) : d);
   const out = {
-    id: q.id,
+    id: q.premade ? newId() : q.id,
     title: String(v[0] || "").trim() || "A Shinobi's Task",
     text: String(v[1] || "").trim() || "I need your help.",
     target: TARGET_IDS[Number(v[2])] ?? "rogue",
@@ -189,13 +278,14 @@ function rewardText(q) {
 // Talking to a Quest Giver
 // ---------------------------------------------------------------------------
 export async function questGiver(player, npc, cfg) {
-  const q = cfg?.quest;
   const name = npc.nameTag || "Quest Giver";
-  if (!q) return player.sendMessage(`§e${name}§f: I have nothing for you right now.`);
+  const giver = cfg?.key ?? `npc_${npc.id}`;
+  const board = boardOf(cfg);
   const cur = getQuest(player);
 
-  // Turning in / checking this giver's quest
-  if (cur && cur.giver === cfg.key) {
+  // Turning in / checking this giver's quest (a premade quest can be handed in at any Quest Board)
+  if (cur && (cur.giver === giver || (board && PREMADE_BY_ID[cur.id]))) {
+    const q = questFor(cfg, cur) ?? {};
     const done = cur.progress >= cur.count;
     const f = new ActionFormData().title(`§l${cur.title}`)
       .body(`§7${done ? "You did it! The village is grateful." : "Keep going — I'm counting on you."}\n\n§7Progress: §f${Math.min(cur.progress, cur.count)}/${cur.count} ${QUEST_TARGETS[cur.target].label}${timeLeft(cur)}\n${rewardText(q)}`);
@@ -216,18 +306,14 @@ export async function questGiver(player, npc, cfg) {
     return;
   }
 
-  if (cur) {
-    const r = await new MessageFormData().title(`§l${name}`)
-      .body(`§7You're already on a quest: §e${cur.title}§7 (${Math.min(cur.progress, cur.count)}/${cur.count}).\n\nAbandon it to take mine?`)
-      .button1("§cAbandon and take this quest").button2("Not now").show(player);
-    if (r.selection !== 0) return;
-    abandon(player, cur, "§7Previous quest abandoned.");
-  }
+  if (board) return questBoard(player, npc, cfg, giver, cur);
+  const q = cfg.quest;
   if (!q.repeatable && getDone(player).includes(q.id)) return player.sendMessage(`§e${name}§f: You've already helped me. Thank you, shinobi.`);
   if (q.requires && !getDone(player).includes(q.requires)) {
     const pre = listQuests().find((o) => o.id === q.requires);
     return player.sendMessage(`§e${name}§f: You're not ready yet. §7(Finish §e${pre?.title ?? "an earlier quest"}§7 first.)`);
   }
+  if (cur && !(await swapQuest(player, name, cur))) return;
 
   const f = new ActionFormData().title(`§l${q.title}`)
     .body(`§f${q.text}\n\n§7Objective: §fDefeat ${q.count} × ${QUEST_TARGETS[q.target].label}${q.spawn ? " §7(they'll appear near you)" : " §7(find them in the world)"}` +
@@ -237,7 +323,48 @@ export async function questGiver(player, npc, cfg) {
   const r = await f.show(player);
   if (r.canceled || r.selection !== 0) return;
   if (getLevel(player) < q.minLevel) return player.sendMessage(`§cYou need to be level ${q.minLevel} for this quest.`);
-  startQuest(player, cfg, q);
+  startQuest(player, giver, q);
+}
+
+// Already on another quest: drop it to take this one?
+async function swapQuest(player, name, cur) {
+  const r = await new MessageFormData().title(`§l${name}`)
+    .body(`§7You're already on a quest: §e${cur.title}§7 (${Math.min(cur.progress, cur.count)}/${cur.count}).\n\nAbandon it to take a new one?`)
+    .button1("§cAbandon it and take a new quest").button2("Not now").show(player);
+  if (r.selection !== 0) return false;
+  abandon(player, cur, "§7Previous quest abandoned.");
+  return true;
+}
+
+// The Quest Board: every premade quest, newest players at the top. Pick one, accept, come back to claim.
+async function questBoard(player, npc, cfg, giver, cur) {
+  const lvl = getLevel(player);
+  const greeting = cfg?.greeting || "Plenty of work posted today. Pick a quest that suits your level.";
+  const f = new ActionFormData()
+    .title("§lQuest Board")
+    .body(`§7${greeting}\n\n§7Enemies appear around you when a quest starts. Come back to any Quest Board to claim the reward — every quest can be done again.` +
+      (cur ? `\n\n§eYou're on: ${cur.title} §7(${Math.min(cur.progress, cur.count)}/${cur.count}) — taking another quest abandons it.` : ""));
+  for (const q of PREMADE) {
+    const locked = lvl < q.minLevel;
+    f.button(`${locked ? "§8" : "§2"}[Lv ${q.minLevel}] ${q.title}\n§r${locked ? "§8" : "§7"}${goalOf(q)} · ${q.xp.toLocaleString("en-US")} XP`);
+  }
+  const r = await f.show(player);
+  if (r.canceled || r.selection === undefined) return;
+  const q = PREMADE[r.selection];
+  if (lvl < q.minLevel) {
+    player.sendMessage(`§cYou need to be level ${q.minLevel} for §e${q.title}§c.`);
+    return questBoard(player, npc, cfg, giver, cur);
+  }
+  const d = await new ActionFormData()
+    .title(`§l${q.title}`)
+    .body(`§f${q.text}\n\n§7Objective: §f${goalOf(q)}${q.spawn ? " §7(they'll appear near you)" : " §7(find them in the world)"}\n${rewardText(q)}\n§7Requires §eLv ${q.minLevel}`)
+    .button("§2Accept")
+    .button("§l« Back")
+    .show(player);
+  if (d.canceled) return;
+  if (d.selection === 1) return questBoard(player, npc, cfg, giver, cur);
+  if (cur && !(await swapQuest(player, npc.nameTag || "Quest Board", cur))) return;
+  startQuest(player, giver, q);
 }
 
 function timeLeft(cur) {
@@ -246,9 +373,9 @@ function timeLeft(cur) {
   return `\n§7Time left: §f${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 }
 
-function startQuest(player, cfg, q) {
+function startQuest(player, giver, q) {
   const tag = `aegis_q_${player.id}`;
-  const cur = { giver: cfg.key, id: q.id, title: q.title, target: q.target, count: q.count, progress: 0, spawn: q.spawn, tag,
+  const cur = { giver, id: q.id, title: q.title, target: q.target, count: q.count, progress: 0, spawn: q.spawn, tag,
     deadline: q.timeLimit ? Date.now() + q.timeLimit * 60000 : 0 };
   setQuest(player, cur);
   if (q.spawn) {

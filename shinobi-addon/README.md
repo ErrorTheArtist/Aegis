@@ -111,6 +111,16 @@ You start at **Level 1**; the max is **Level 200**. Each level gives **3 stat po
 - Kills: 3 XP per point of the victim's max health (zombie ≈ 60, Kurama ≈ 8,250)
 - Player kills: 60 + 6 × their level
 - Casting any jutsu, clan ability or sword special: 3 + half its chakra cost
+- **XP Shards** (see below) and **quests** — the Quest Board's premade quests are worth several levels each
+
+### XP Shards
+
+Crystals of a fallen boss's chakra. **Right-click** one to absorb it — about **a third of the XP your next level
+needs**, whatever your level (at least 100 XP) — or **sneak + right-click** to absorb the whole stack at once.
+Almost every boss drops them when you (or your companion, clone or summon) bring it down: **Legendary shinobi** 4–5
+(Edo Madara 8), **Akatsuki members** 3, **Tailed Beasts** 5 (Kurama 7). B/A/S-rank missions pay 1 / 2 / 4, and the
+bigger premade quests pay 1–10. At level 200 they're not used up — give them to a friend.
+`/scriptevent aegis:xpshard 16` gives you 16 (testing).
 
 XP needed per level grows: 52 XP for level 2, ~1,800 around level 60, ~12,400 for the last levels
 (about 908,000 XP total from 1 to 200).
@@ -175,8 +185,8 @@ basic jutsu — affinity just makes them better.
 | Earth | Earth Wall, Earth Spikes, Earth Dragon Bullet, Headhunter Jutsu, Swamp of the Underworld |
 | Water | Water Dragon Bullet, Water Prison, Water Shark Bomb, Hiding in Mist, Exploding Water Shockwave |
 
-Learn more releases at the **Jutsu Sensei** (*Chakra Nature Training*): 2nd release Lv 25 / 2,400 Ryō, 3rd Lv 50 / 4,000,
-4th Lv 90 / 5,600, 5th Lv 140 / 6,400. `/scriptevent aegis:nature info|reroll|add <nature>|set <nature>` for testing.
+Learn more releases at the **Jutsu Sensei** (*Chakra Nature Training*): 2nd release Lv 25 / 2,880 Ryō, 3rd Lv 50 / 4,800,
+4th Lv 90 / 6,720, 5th Lv 140 / 7,680. `/scriptevent aegis:nature info|reroll|add <nature>|set <nature>` for testing.
 
 ### Kekkei genkai releases (clan-bound)
 
@@ -208,7 +218,7 @@ Check your progress with `/scriptevent aegis:clan info`.
 
 ### Eternal Mangekyō Sharingan (Uchiha)
 
-Uchiha with the Mangekyō can awaken the **Eternal Mangekyō** at an **Uchiha Clan Elder** (Lv 100, 6,400 Ryō).
+Uchiha with the Mangekyō can awaken the **Eternal Mangekyō** at an **Uchiha Clan Elder** (Lv 100, 7,680 Ryō).
 It replaces your Mangekyō item:
 
 - half the chakra drain (1.5/sec), **50% dodge**, Strength II + Speed while active
@@ -219,7 +229,7 @@ It replaces your Mangekyō item:
 
 ### Sage Mode
 
-Learn it from a **Jutsu Sensei** (Sage Training: Lv 60, 4,800 Ryō). Then **hold sneak and stand still for 5 seconds**
+Learn it from a **Jutsu Sensei** (Sage Training: Lv 60, 5,760 Ryō). Then **hold sneak and stand still for 5 seconds**
 to gather natural energy (a green bar fills on the action bar) and enter **Sage Mode** for 60 seconds:
 
 - **full chakra** on entering
@@ -240,7 +250,7 @@ to gather natural energy (a green bar fills on the action bar) and enter **Sage 
 
 ### Bloodline Reroll Scroll
 
-Where to get one: the **Travelling Merchant** (3,000 Ryō — one turns up in about 2 of every 5 restocks), Tailed
+Where to get one: the **Travelling Merchant** (3,600 Ryō — one turns up in about 2 of every 5 restocks), Tailed
 Beasts and Akatsuki (a chance in their drops), or a Quest Giver's reward. There is no crafting recipe.
 Right-click, then right-click again within 5s to confirm. Rolls a **different** clan
 (Mangekyō progress is lost).
@@ -319,7 +329,7 @@ The Eight Inner Gates count as taijutsu too.
 
 ### Forbidden: Reanimation Jutsu (Edo Tensei)
 
-Sold by the Jutsu Sensei (Lv 60, 9,000 Ryō; using it needs Lv 40, 100 chakra, 5 min cooldown). Choose a fallen shinobi —
+Sold by the Jutsu Sensei (Lv 60, 10,800 Ryō; using it needs Lv 40, 100 chakra, 5 min cooldown). Choose a fallen shinobi —
 **Hiruzen Sarutobi, Minato Namikaze, Itachi Uchiha, Nagato, Deidara, Sasori, Kakuzu, Hashirama Senju or Tobirama Senju**
 — a coffin rises from the earth and they fight beside you for **60 seconds** with their own jutsu (Fire Dragon, Flying
 Raijin + Rasengan, Amaterasu, Shinra Tensei + Banshō Ten'in, clay bombs, poison senbon, fire & wind masks, Wood Release
@@ -393,7 +403,7 @@ Attacks come every ~2–4.5 seconds (faster with more tails, ~40% faster when en
 Bring good armor, Soldier Pills and friends.
 
 **Summon:** use a **Tailed Beast Summoning Scroll** (the S-rank mission reward, a rare Akatsuki drop, or — very rarely —
-the Travelling Merchant's, Lv 50, 4,500 Ryō). A random beast is released 8 blocks in front of you after a short ritual
+the Travelling Merchant's, Lv 50, 5,400 Ryō). A random beast is released 8 blocks in front of you after a short ritual
 (fewer tails = more common). Only one beast can be summoned within 64 blocks at a time. Spawn eggs are in the
 creative inventory too.
 
@@ -521,8 +531,8 @@ caped shoulders that hangs to the knees.
 
 No armour is crafted. **Every village's Weaponsmith forges its own headband and flak jacket** — and, for a customer from
 another village, that village's too — plus the Anbu and Samurai pieces; the **Travelling Merchant** sometimes has a
-headband (any village's) or a jacket 30% off, and sells the **Akatsuki Cloak** (1,600 Ryō, Lv 20) and **Straw Hat**
-(600 Ryō, Lv 10) when he has them; Akatsuki members drop their gear, and each village's legend can drop its headband.
+headband (any village's) or a jacket 30% off, and sells the **Akatsuki Cloak** (1,920 Ryō, Lv 20) and **Straw Hat**
+(720 Ryō, Lv 10) when he has them; Akatsuki members drop their gear, and each village's legend can drop its headband.
 
 ### The Five Kage sets
 
@@ -668,7 +678,8 @@ Settings: NPC type · **village** (how village NPCs look and talk — see *Villa
 clan (Clan Elder) · Akatsuki member ·
 how many to keep spawned (1–6) · respawn on/off + delay (5–600 s) · stay in place / wander radius ·
 invulnerable · shop prices / mission rewards % · greeting line · spawn height (0 = first free space) ·
-restock time (Travelling Merchant, 5–120 min). A Travelling Merchant's spawner menu also has **Restock now**.
+restock time (Travelling Merchant, 5–120 min) · place name (Fast Travel stops). A Travelling Merchant's spawner menu also has
+**Restock now**, a Quest Giver's has **Quest settings**.
 Friendly NPCs are leashed to their spawner; breaking the spawner removes its NPCs.
 
 ### Ryō currency
@@ -682,15 +693,43 @@ Friendly NPCs are leashed to their spawner; breaking the spawner removes its NPC
   each** (also at the Jutsu Sensei, the Weaponsmith and the Travelling Merchant).
 - Admin: `/scriptevent aegis:ryo give 5000` · `take 5000` · `set 0` (the player who runs it).
 
-### Quest Givers (design your own quests)
+### Quest Givers (premade quests, or design your own)
 
 Place an **NPC Spawner** and choose **Quest Giver**. Its name, outfit, greeting and count come from the normal spawner
-settings; right after saving, the **Quest Settings** open (later: sneak-tap the spawner → *Quest settings*):
+settings; right after saving, the **Quest Settings** open (later: tap the spawner block in creative, or sneak + talk to
+the NPC → *Quest settings*). Choose what the Quest Giver offers:
+
+1. **Quest Board** *(the default)* — the NPC offers **every premade quest**. Players talk to it, see the whole list
+   sorted by level (quests above their level are greyed out), pick one, read it and press **Accept**. One NPC is all you
+   need for players to level up.
+2. **Pick one premade quest** — choose one from the list; the NPC gives only that quest. Press *Change the details*
+   afterwards to tweak it (that makes it your own quest).
+3. **Design your own quest** — the full editor below.
+
+**Playing a quest:** accept it → the enemies appear around you (except *Night Watch*, where you hunt mobs anywhere) →
+defeat them (the action bar counts them) → talk to the Quest Giver again and press **Claim reward**. A premade quest can
+be handed in at **any** Quest Board. Every premade quest can be done again and again. One quest at a time; taking a new
+one asks to abandon the current one. `/scriptevent aegis:quest` shows your quest, `/scriptevent aegis:quest abandon` drops it.
+
+**The premade quests** (XP is generous on purpose — each is worth several levels at its level):
+
+| Lv | Quest | Defeat | Reward |
+|---|---|---|---|
+| 1 | Pest Control · Bone Collectors · Eight Legs | 8 zombies · 8 skeletons · 6 spiders | 250 XP, 300 Ryō, a ramen |
+| 5 | Creeper Clearance · Night Watch | 5 creepers · 15 hostile mobs anywhere | 450–500 XP, 500–600 Ryō, 2 Soldier Pills |
+| 10 · 15 | Rogue Patrol · Road Bandits | 5 · 8 rogue ninja | 700 · 1,000 XP, 1,000 · 1,500 Ryō, pills · 16 kunai |
+| 20 · 25 | Sound Infiltrators · Traitors of the Village | 5 Sound ninja · 4 Rogue Anbu | 1,500 · 2,000 XP, 2,000 · 2,500 Ryō, pills · XP Shard |
+| 30–40 | Border Defence · Anbu Hunt · Sound Ambush | 10 enemy ninja · 6 Anbu · 10 Sound ninja | 3,000–4,500 XP, 3,000–4,000 Ryō, 1–2 XP Shards |
+| 50–65 | Akatsuki Bounty · The Uchiha Prodigy · The Tailless Tailed Beast · Art is an Explosion · The Six Paths | any Akatsuki · Itachi · Kisame · Deidara · Pain | 7,000–10,000 XP, 6,000–8,000 Ryō, 3–4 XP Shards |
+| 70 · 80 · 90 | Tailed Beast Subjugation · A Legend's Challenge · The Nine-Tailed Fox | a Tailed Beast · a legend · Kurama | 12,000–20,000 XP, 10,000–15,000 Ryō, 4–6 XP Shards |
+| 100 · 120 · 150 | Akatsuki Purge · Clash of Legends · The Reanimated Uchiha | 3 Akatsuki · 3 legends · Edo Madara | 25,000–60,000 XP, 20,000–50,000 Ryō, 6–10 XP Shards |
+
+Your own quest's settings:
 
 | Setting | |
 |---|---|
 | Quest title & story | what the NPC tells the player |
-| Enemy to fight | any hostile mob, zombies, skeletons, spiders, creepers, any enemy ninja, Rogue / Sound / Anbu, any Akatsuki or Itachi / Kisame / Deidara, any Tailed Beast or a specific one (Shukaku … Kurama), or a Legend (Naruto, Sasuke, Tsunade, Hiruzen, Minato) |
+| Enemy to fight | any hostile mob, zombies, skeletons, spiders, creepers, any enemy ninja, Rogue / Sound / Anbu, any Akatsuki or Itachi / Kisame / Deidara, any Tailed Beast or a specific one (Shukaku … Kurama), any legendary shinobi or a specific Legend (Naruto, Sasuke, Tsunade, Hiruzen, Minato, Madara, Gaara, Zabuza, Killer B, Ōnoki, Hanzō) |
 | How many | 1–30 |
 | Spawn them when the quest starts | on: they appear around the player (only those count) · off: hunt them anywhere in the world |
 | Rewards | Ryō, XP, and an item — pick one from the list or use **the item in your hand** (any item, any amount) |
@@ -711,9 +750,11 @@ Players talk to the Quest Giver to accept, see their progress, claim the reward 
 | **Travelling Merchant** | **Random wares that change every 20 minutes** (set per spawner): cheap ramen every time, plus 4–5 random finds — Bloodline Reroll Scrolls, bargain jutsu scrolls, swords and armour, Akatsuki gear, pills, kunai… Limited stock shared by everyone. Buys back old Blank Scrolls. See *The Travelling Merchant* below |
 | **Kage / village leader (Mission Desk)** | D/C/B/A/S missions (kill mobs, ninja, a Tailed Beast, an Akatsuki member) for XP, Ryō and items |
 | **Exam Proctor** | Rank exams: **Chūnin** (Lv 20, beat 4 rogue ninja in 90 s), **Jōnin** (Lv 60, 3 Anbu + 3 Sound in 2 min), nothing higher — exams stop at Jōnin. Ranks show on your name tag and give +5/+10 stat points |
-| **Clan Elder** | For their clan: **Clan Mastery** 1–3 (+10% clan max chakra, −10% clan ability cooldowns each); the Uchiha Elder also awakens the **Eternal Mangekyō**. Others: **Bloodline transfer** into that clan (6,400 Ryō, Lv 30) |
+| **Clan Elder** | For their clan: **Clan Mastery** 1–3 (+10% clan max chakra, −10% clan ability cooldowns each); the Uchiha Elder also awakens the **Eternal Mangekyō**. Others: **Bloodline transfer** into that clan (7,680 Ryō, Lv 30) |
 | **Village Shinobi** | Chatter and tips. In the Leaf each one is a shinobi or a kunoichi at random: the 3D chūnin flak jacket (a thick rolled collar, four raised scroll pouches, the vest over the shoulders, the red swirl crest on the back) over the navy uniform, the Leaf headband with its ties, a taped thigh holster; spiky black hair and a nose bandage, or auburn bangs and a swinging ponytail (the Quest Giver is the shinobi) |
-| **Genin** | Recruit for 1,500 Ryō — follows you, fights, levels up to 10 (Strength, Resistance, hearts). Talk to toggle follow/stay or dismiss |
+| **Quest Giver** | A **Quest Board** of every premade quest (the default), one premade quest, or a quest you design — see *Quest Givers* |
+| **Travel Master** (Fast Travel) | Flies you to any of the six villages or any other Travel Master for a fee — see *Fast Travel* |
+| **Genin** | Recruit for 1,800 Ryō — follows you, fights, levels up to 10 (Strength, Resistance, hearts). Talk to toggle follow/stay or dismiss |
 
 ### Village NPCs
 
@@ -748,7 +789,24 @@ The looks:
   cleaver; a blademaster in sunglasses and a white scarf with four swords fanned on his back; a bald, bearded smith in
   goggles and a leather apron with a stone hammer; an umbrella master with a respirator and a folded umbrella.
 
-The Ramen Shop, Clan Elder and Travelling Merchant serve every village as they are.
+The Ramen Shop, Clan Elder, Travelling Merchant and Travel Master serve every village as they are.
+
+### Fast Travel
+
+The **Travel Master** — a courier with a messenger hawk on his shoulder, a straw hat slung on his back and a satchel of
+maps — flies you from one place to another.
+
+**Set it up:** place an **NPC Spawner** (creative) → *Configure* → NPC type **Fast Travel (Travel Master)** → give it a
+**Place name** at the bottom of the form (e.g. *Konoha Main Gate*; left empty it's named after the nearest village) →
+save. Every Travel Master you place becomes a stop on the network, in any dimension.
+
+**Use it:** talk to a Travel Master → pick a destination: **the six villages** (your home village is marked) and **every
+other Travel Master** (nearest first), each with its distance and fee → you're flown there in a moment.
+
+- **Fee:** 150 Ryō + a quarter Ryō per block, +20% (Leaf → Cloud ≈ 710 Ryō); another dimension is 1,800 Ryō. The
+  spawner's *prices %* setting scales it (set it to 50% for cheap travel).
+- Not while you're in a fight (hit by an enemy in the last 10 seconds), and the hawks rest 10 seconds between trips.
+- A stop whose spawner block is buried puts you on the first free space above it.
 
 Shops use **Ryō** — see *Ryō currency* below.
 
@@ -865,13 +923,14 @@ enemies or given out by quests (and everything is still in the creative inventor
 | Kekkei genkai release scrolls | the **Clan Elder** of that clan |
 | Kunai, shuriken, village headbands | **Weaponsmith** (its village's headband, and yours) · Travelling Merchant · starter kit · legend drops · enemy ninja drop kunai and shuriken |
 | Soldier Pills | **Ramen Shop** · Travelling Merchant · enemy ninja · C-rank missions |
-| Ichiraku / Miso Ramen | **Ramen Shop** (300 / 200 Ryō) · **Travelling Merchant** (50 / 30 Ryō, while stocks last) |
+| Ichiraku / Miso Ramen | **Ramen Shop** (360 / 240 Ryō) · **Travelling Merchant** (60 / 36 Ryō, while stocks last) |
 | Legendary swords | **Weaponsmith** · Travelling Merchant bargains · Legend / Akatsuki drops · Samehada: its quest chain only |
 | Armour (every village's flak jacket, Anbu, Samurai) | **Weaponsmith** · Travelling Merchant bargains · the Chūnin exam quest (your village's jacket) |
 | Akatsuki Cloak & Straw Hat | **Travelling Merchant** · Akatsuki drops |
 | Bloodline Reroll Scroll | **Travelling Merchant** (rare) · Tailed Beast and Akatsuki drops (chance) · quest rewards |
 | Tailed Beast Summoning Scroll | S-rank missions · Akatsuki drops (chance) · Travelling Merchant (very rare) |
 | Shinobi Record | everyone has one, locked in the last hotbar slot — it can't be lost |
+| XP Shards | **bosses** (legends, Akatsuki, Tailed Beasts) · B/A/S-rank missions · the bigger premade quests |
 | Blank Scroll | no longer used — the Travelling Merchant buys old ones back for 25 Ryō each |
 
 ## M1 combos (basic attacks)
@@ -1008,6 +1067,21 @@ python3 tools/gen_particles.py --preview fire_burst ice_burst heal -o sheet.png
 ```
 
 The timers start when the server starts. Intervals are the two constants at the top of `behavior_pack/scripts/lagclear.js`.
+
+## Premade quests, Fast Travel, XP Shards, prices +20% (v1.52)
+
+- **Premade quests** — 23 ready-made quests from level 1 to 150. A new Quest Giver is a **Quest Board** that offers all
+  of them (players pick one for their level); or give a Quest Giver just one premade quest, or design your own as
+  before. Quests spawn their enemies around you, can be repeated, can be handed in at any Quest Board, and pay a lot
+  of XP so levelling is quick. See *Quest Givers*.
+- **Fast Travel** — the new **Travel Master** NPC (NPC Spawner → *Fast Travel*) flies you to any village or any other
+  Travel Master for a fee that grows with the distance. New model: a courier with a messenger hawk on his shoulder.
+  See *Fast Travel*.
+- **XP Shards** — dropped by almost every boss; right-click to absorb about a third of a level of XP (sneak to absorb
+  the whole stack). Also paid by B/A/S-rank missions and the bigger premade quests. See *XP Shards*.
+- **Everything costs 20% more** — every shop, the Travelling Merchant, training, Clan Elder services, hiring genin and
+  Fast Travel. Rewards (missions, quests, drops), the emerald exchange and what the merchant pays you are unchanged.
+- The spawner's *Outfit* list now includes the v1.51 legends and the Travel Master.
 
 ## Every village, not just the Leaf (v1.51)
 

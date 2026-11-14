@@ -312,6 +312,8 @@ SKINS = [
     ("killer_bee", dict(skin=(112, 74, 52), hair=(234, 222, 176), top=(40, 40, 46), pants=(46, 46, 52), vest=(234, 228, 210), band=((44, 44, 52), STEEL))),
     ("onoki", dict(hair=(236, 236, 232), top=(96, 112, 64), sleeve_len=11, pants=(150, 50, 44), belt=(118, 84, 52))),
     ("hanzo", dict(hair=(38, 38, 46), top=(54, 52, 60), sleeve_len=11, pants=(38, 38, 44), mask="lower", long_hair=True)),
+    # v1.52: the Travel Master (Fast Travel; gen_npc_models.py)
+    ("travel_master", dict(hair=(92, 62, 40), top=(38, 98, 106), sleeve_len=8, pants=(62, 60, 70), belt=(104, 72, 44))),
 ]
 (RP / "textures" / "entity" / "aegis" / "npc").mkdir(parents=True, exist_ok=True)
 for name, o in SKINS:

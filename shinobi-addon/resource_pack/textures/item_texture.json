@@ -478,6 +478,9 @@
     },
     "aegis_rain_cloak": {
       "textures": "textures/items/aegis/rain_cloak"
+    },
+    "aegis_xp_shard": {
+      "textures": "textures/items/aegis/xp_shard"
     }
   }
 }

@@ -14,10 +14,11 @@ import { getLevel, gainXp, getRank, setRank, addPoints, RANKS } from "./levels.j
 import { hasSageTraining, grantSage } from "./sage.js";
 import { hasEternalMangekyo, awakenEternal } from "./clans.js";
 import { natureTraining } from "./natures.js";
-import { getRyo, spendRyo, addRyo, fmtRyo, exchangeEmeralds, EMERALD_RATE } from "./currency.js";
+import { getRyo, spendRyo, addRyo, fmtRyo, exchangeEmeralds, EMERALD_RATE, PRICE_MULTIPLIER } from "./currency.js";
 import { RELEASE_SCROLLS } from "./releases.js";
-import { questGiver, questEditor, defaultQuest } from "./quests.js";
+import { questGiver, questSetup } from "./quests.js";
 import { VILLAGE_GEAR, getVillage } from "./villages.js";
+import { travelMenu, initTravel, postName } from "./travel.js";
 
 const SPAWNER = "aegis:npc_spawner";
 const INDEX_PROP = "aegis:spawners";
@@ -30,7 +31,7 @@ const SKIN_NAMES = ["Sensei", "Elder", "Weaponsmith", "Ramen chef", "Hokage", "P
   "Mizukage", "Raikage", "Tsuchikage", "Rain commander", "Mist shinobi", "Cloud kunoichi", "Stone kunoichi", "Rain shinobi",
   "Mist jōnin", "Cloud jōnin", "Stone jōnin", "Rain jōnin", "Mist swordsman", "Cloud blademaster", "Stone smith", "Umbrella master",
   "Mist genin (boy)", "Mist genin (girl)", "Cloud genin (boy)", "Cloud genin (girl)", "Stone genin (boy)", "Stone genin (girl)",
-  "Rain genin (boy)", "Rain genin (girl)"]; // index = skin number (tools/gen_npcs.py SKINS)
+  "Rain genin (boy)", "Rain genin (girl)", "Gaara", "Zabuza", "Killer B", "Ōnoki", "Hanzō", "Travel master"]; // index = skin number (tools/gen_npcs.py SKINS)
 
 export const NPC_TYPES = {
   sensei: { label: "Jutsu Sensei (jutsu shop)", entity: "aegis:npc", skin: 0, name: "§bJutsu Sensei", friendly: true,
@@ -43,13 +44,15 @@ export const NPC_TYPES = {
     greeting: "Welcome! One bowl or two?" },
   merchant: { label: "§6Travelling Merchant (random stock)", entity: "aegis:npc", skin: 32, name: "§6Travelling Merchant", friendly: true,
     greeting: "Fresh stock from all five great nations! Cheap ramen, rare scrolls… and if luck's with you, a Bloodline Reroll Scroll." },
+  travel: { label: "§bFast Travel (Travel Master)", entity: "aegis:npc", skin: 69, name: "§bTravel Master", friendly: true,
+    greeting: "My hawks know every road in the five nations. Where to?" },
   mission_desk: { label: "Kage / village leader (Mission Desk)", entity: "aegis:npc", skin: 4, name: "§cHokage", friendly: true,
     greeting: "The village has work for you." },
   proctor: { label: "Chūnin Exam Proctor (rank exams)", entity: "aegis:npc", skin: 5, name: "§8Exam Proctor", friendly: true,
     greeting: "Think you're ready to rank up?" },
   villager: { label: "Village Shinobi (chatter)", entity: "aegis:npc", skin: 15, skins: [15, 33], name: "§aLeaf Shinobi", friendly: true,
     greeting: "Nice weather for training, huh?" },
-  quest_giver: { label: "§eQuest Giver (design your own quest)", entity: "aegis:npc", skin: 15, name: "§eQuest Giver", friendly: true,
+  quest_giver: { label: "§eQuest Giver (premade quests, or design your own)", entity: "aegis:npc", skin: 15, name: "§eQuest Giver", friendly: true,
     greeting: "I have a job for a capable shinobi." },
   genin: { label: "Genin (recruitable companion)", entity: "aegis:genin", skin: -1, name: "§fGenin", friendly: true,
     greeting: "Hire me and I'll fight by your side!" },
@@ -273,8 +276,10 @@ const isCreative = (p) => {
   }
 };
 
-// Prices are written in "units" of 100 Ryō (the old emerald prices); a spawner's price % scales them.
-const priceOf = (base, cfg) => Math.max(1, Math.round(base * 100 * ((cfg?.price ?? 100) / 100)));
+// Prices are written in "units" of 100 Ryō (the old emerald prices); a spawner's price % scales them, and since v1.52
+// every price is 20% higher (PRICE_MULTIPLIER). Mission rewards use the same units without the markup (rewardOf).
+const priceOf = (base, cfg) => Math.max(1, Math.round(base * 100 * PRICE_MULTIPLIER * ((cfg?.price ?? 100) / 100)));
+const rewardOf = (base, cfg) => Math.max(1, Math.round(base * 100 * ((cfg?.price ?? 100) / 100)));
 
 // The default greeting of this NPC's own type (a Sand sensei greets differently from a Leaf one).
 function greetingOf(npc, fallback) {
@@ -517,12 +522,12 @@ async function spawnerMenu(player, cfg) {
   const t = NPC_TYPES[cfg.type];
   const form = new ActionFormData()
     .title("§lNPC Spawner")
-    .body(`§7Type: §f${t.label}${t.friendly ? `\n§7Village: ${VILLAGE_LABELS[Math.max(0, VILLAGE_IDS.indexOf(cfg.village ?? "leaf"))]}` : ""}\n§7Name: §f${cfg.name || lookOf(cfg.type, cfg.village).name || t.name}\n§7Count: §f${cfg.count}§7 · Respawn: §f${cfg.respawn ? cfg.delay + "s" : "off"}\n§7Position: §f${cfg.x} ${cfg.y} ${cfg.z}`)
+    .body(`§7Type: §f${t.label}${cfg.type === "travel" ? `\n§7Stop: §b${postName(cfg)}` : ""}${t.friendly ? `\n§7Village: ${VILLAGE_LABELS[Math.max(0, VILLAGE_IDS.indexOf(cfg.village ?? "leaf"))]}` : ""}\n§7Name: §f${cfg.name || lookOf(cfg.type, cfg.village).name || t.name}\n§7Count: §f${cfg.count}§7 · Respawn: §f${cfg.respawn ? cfg.delay + "s" : "off"}\n§7Position: §f${cfg.x} ${cfg.y} ${cfg.z}`)
     .button("§2Configure")
     .button("§9Respawn now")
     .button("§6Remove NPCs (they come back if respawn is on)")
     .button("§cDelete spawner");
-  if (roleOf(cfg.type) === "quest_giver") form.button("§eQuest settings\n§r§7enemies, rewards, story");
+  if (roleOf(cfg.type) === "quest_giver") form.button("§eQuest settings\n§r§7Quest Board, a premade quest, or your own");
   if (cfg.type === "merchant") form.button(`§6Restock now\n§r§7new random wares (they change every ${cfg.restock ?? 20} min anyway)`);
   const r = await form.show(player);
   if (r.canceled) return;
@@ -532,7 +537,7 @@ async function spawnerMenu(player, cfg) {
     save(cfg);
     return player.sendMessage("§6The merchant unpacks new wares.");
   }
-  if (r.selection === 4) return roleOf(cfg.type) === "quest_giver" ? questEditor(player, cfg, save) : undefined;
+  if (r.selection === 4) return roleOf(cfg.type) === "quest_giver" ? questSetup(player, cfg, save) : undefined;
   if (r.selection === 1) {
     removeNpcs(cfg);
     cfg.spawned = false;
@@ -573,7 +578,8 @@ async function configure(player, cfg) {
     .slider("Shop prices / mission rewards (%)", 50, 300, 10, cfg.price)
     .textField("Greeting line (empty = default)", "default", cfg.greeting)
     .slider("Spawn height above block (0 = first free space)", 0, 10, 1, cfg.height)
-    .slider("Restock every … minutes (Travelling Merchant only)", 5, 120, 5, cfg.restock ?? 20);
+    .slider("Restock every … minutes (Travelling Merchant only)", 5, 120, 5, cfg.restock ?? 20)
+    .textField("Place name (Fast Travel only — how travellers see this stop; empty = named after the nearest village)", "e.g. Konoha Main Gate", cfg.place ?? "");
   const r = await f.show(player);
   if (r.canceled || !r.formValues) return;
   const v = r.formValues;
@@ -600,6 +606,7 @@ async function configure(player, cfg) {
   cfg.greeting = String(v[13] ?? "").trim();
   cfg.height = Number(v[14]);
   cfg.restock = Number(v[15]) || cfg.restock || 20;
+  if (v[16] !== undefined) cfg.place = String(v[16]).trim() || undefined;
   cfg.stock = undefined; // a merchant re-rolls its wares with the new settings
   removeNpcs(cfg);
   cfg.spawned = false;
@@ -608,10 +615,10 @@ async function configure(player, cfg) {
   player.sendMessage(`§aSpawner saved: §f${NPC_TYPES[cfg.type].label}${NPC_TYPES[cfg.type].friendly ? ` §7(${VILLAGE_LABELS[VILLAGE_IDS.indexOf(cfg.village)]}§7)` : ""}§7. Cover the block if you like — the NPC spawns in the first free space above it.`);
   if (roleOf(cfg.type) === "quest_giver") {
     if (!cfg.quest) {
-      cfg.quest = defaultQuest();
+      cfg.quest = { board: true }; // a new Quest Giver starts as a Quest Board (every premade quest)
       save(cfg);
     }
-    system.runTimeout(() => questEditor(player, cfg, save).catch(() => {}), 10);
+    system.runTimeout(() => questSetup(player, cfg, save).catch(() => {}), 10);
   }
 }
 
@@ -958,9 +965,9 @@ async function senseiMenu(player, npc, cfg) {
 const MISSIONS = {
   D: { lvl: 1, kind: "monster", need: 10, xp: 400, ems: 5, items: [], text: "Defeat 10 hostile mobs" },
   C: { lvl: 10, kind: "ninja", need: 5, xp: 1200, ems: 10, items: [["aegis:chakra_pill", 3]], text: "Defeat 5 enemy ninja" },
-  B: { lvl: 25, kind: "ninja", need: 12, xp: 3000, ems: 16, items: [["minecraft:diamond", 3]], text: "Defeat 12 enemy ninja (rogue, Sound or Anbu)" },
-  A: { lvl: 50, kind: "bijuu", need: 1, xp: 8000, ems: 24, items: [["minecraft:diamond", 6]], text: "Defeat a Tailed Beast" },
-  S: { lvl: 80, kind: "akatsuki", need: 1, xp: 15000, ems: 40, items: [["aegis:bijuu_scroll", 1]], text: "Defeat an Akatsuki member (one will be sighted nearby)" },
+  B: { lvl: 25, kind: "ninja", need: 12, xp: 3000, ems: 16, items: [["minecraft:diamond", 3], ["aegis:xp_shard", 1]], text: "Defeat 12 enemy ninja (rogue, Sound or Anbu)" },
+  A: { lvl: 50, kind: "bijuu", need: 1, xp: 8000, ems: 24, items: [["minecraft:diamond", 6], ["aegis:xp_shard", 2]], text: "Defeat a Tailed Beast" },
+  S: { lvl: 80, kind: "akatsuki", need: 1, xp: 15000, ems: 40, items: [["aegis:bijuu_scroll", 1], ["aegis:xp_shard", 4]], text: "Defeat an Akatsuki member (one will be sighted nearby)" },
 };
 
 const getMission = (p) => {
@@ -990,7 +997,7 @@ async function missionDesk(player, npc, cfg) {
   } else {
     f.body(`§7${cfg?.greeting || greetingOf(npc, "mission_desk")}\n§7Choose a mission. Rewards scale with this desk's settings.`);
     for (const [rank, def] of Object.entries(MISSIONS)) {
-      f.button(`${lvl < def.lvl ? "§8" : "§0"}${rank}-rank: ${def.text}\n§r§7${Math.round(def.xp * (cfg?.price ?? 100) / 100)} XP · ${fmtRyo(priceOf(def.ems, cfg))}${lvl < def.lvl ? ` · Lv ${def.lvl}` : ""}`);
+      f.button(`${lvl < def.lvl ? "§8" : "§0"}${rank}-rank: ${def.text}\n§r§7${Math.round(def.xp * (cfg?.price ?? 100) / 100)} XP · ${fmtRyo(rewardOf(def.ems, cfg))}${lvl < def.lvl ? ` · Lv ${def.lvl}` : ""}`);
       opts.push(rank);
     }
   }
@@ -1005,9 +1012,9 @@ async function missionDesk(player, npc, cfg) {
     setMission(player, null);
     const mult = (cfg?.price ?? 100) / 100;
     gainXp(player, Math.round(def.xp * mult));
-    addRyo(player, priceOf(def.ems, cfg), true);
+    addRyo(player, rewardOf(def.ems, cfg), true);
     for (const [id, n] of def.items) giveItem(player, id, n);
-    showTitle(player, `§a${m.rank}-rank complete!`, { subtitle: `§7+${Math.round(def.xp * mult)} XP, ${fmtRyo(priceOf(def.ems, cfg))}`, stayDuration: 50 });
+    showTitle(player, `§a${m.rank}-rank complete!`, { subtitle: `§7+${Math.round(def.xp * mult)} XP, ${fmtRyo(rewardOf(def.ems, cfg))}`, stayDuration: 50 });
     api.sound(player.dimension, "random.levelup", player.location, 1, 1.2);
   } else if (choice) {
     const def = MISSIONS[choice];
@@ -1212,6 +1219,8 @@ async function talk(player, npc) {
       return shop(player, npc, cfg, SHOPS.ramen, "§lRamen Shop");
     case "merchant":
       return merchantMenu(player, npc, cfg);
+    case "travel":
+      return travelMenu(player, npc, cfg, cfg?.greeting || NPC_TYPES.travel.greeting);
     case "mission_desk":
       return missionDesk(player, npc, cfg);
     case "proctor":
@@ -1259,6 +1268,7 @@ function killKind(dead) {
 
 export function initNpcs(helpers) {
   api = helpers;
+  initTravel(helpers, () => [...configs.values()].filter((c) => roleOf(c.type) === "travel"));
   system.run(loadAll);
 
   system.runInterval(() => {

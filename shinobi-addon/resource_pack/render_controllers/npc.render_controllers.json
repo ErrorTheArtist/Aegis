@@ -73,7 +73,8 @@
             "Texture.s65",
             "Texture.s66",
             "Texture.s67",
-            "Texture.s68"
+            "Texture.s68",
+            "Texture.s69"
           ]
         }
       },
@@ -525,6 +526,17 @@
       ],
       "textures": [
         "Texture.gear_hanzo"
+      ]
+    },
+    "controller.render.aegis.npc_gear_travel_master": {
+      "geometry": "Geometry.gear_travel_master",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_travel_master"
       ]
     }
   }

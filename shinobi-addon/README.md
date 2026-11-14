@@ -574,12 +574,15 @@ abilities live in `behavior_pack/scripts/swords.js`.
   shoulder until you move or sneak.
 - **Samehada** is carried like Kisame does: while you hold it, it rests across the back of your neck and shoulders, your
   arm raised to its grip.
-- **Kusanagi** has its **scabbard**: while you hold it, it stays sheathed, held across your body from the right hip
-  with your other hand on the scabbard, ready to draw. Every swing draws the blade (the scabbard disappears for the
-  strike), and put away on your back it sits in its scabbard.
+- **Kusanagi** has its **scabbard** and is **drawn before it strikes**. While you hold it, it stays sheathed, held
+  across your body from the right hip with your other hand on the scabbard. Face an enemy within 5 blocks and you draw
+  it into a guard; land a hit while it's still sheathed and the hit is a horizontal **draw-cut** (the blade sweeps out
+  of the scabbard across your front, with a slash arc). Its technique draws it too. It stays out while you fight, then
+  after 4 quiet seconds you slide it back into the scabbard; switching away sheathes it at once, and on your back it
+  always sits in its scabbard.
 - Both carrying poses step aside the moment you swing, land a hit or use the sword's special, and come back a moment
   later; in first person you just see the sword.
-- **Kisame** now carries **Samehada** and **Sasuke** his **Kusanagi** (they never drop from them).
+- **Kisame** now carries **Samehada** and **Sasuke** his **Kusanagi**, drawn (they never drop from them).
 
 ## HUD
 
@@ -931,6 +934,22 @@ python3 tools/gen_particles.py --preview fire_burst ice_burst heal -o sheet.png
 ```
 
 The timers start when the server starts. Intervals are the two constants at the top of `behavior_pack/scripts/lagclear.js`.
+
+## The Kusanagi draws before it strikes (v1.48)
+
+The Kusanagi no longer fights in its scabbard. Before, the scabbard was meant to vanish during each swing, but the held
+model can't see the swing in-game, so the sword hit sheathed. Now the sword has two forms that the add-on swaps between:
+the sheathed one you carry, buy and keep, and the drawn blade (same stats, wear, enchantments, name and special
+cooldown; it's never in the creative inventory).
+
+- **Facing an enemy** within 5 blocks (hostile mobs, enemy ninja, Akatsuki, Legends, Tailed Beasts, players from other
+  villages) draws it into a guard, so your first swing is already with the bare blade.
+- **A hit while it's sheathed** draws it with a horizontal draw-cut: the hit itself is the cut.
+- **Its technique** (Chidori Nagashi) draws it as the dash begins.
+- It stays drawn while you keep fighting or facing an enemy; after **4 quiet seconds** you bring it across your body
+  and slide it home. Switching to another slot sheathes it at once.
+- In first person you see the scabbard vanish and the bare blade in your hand; the draw-cut, quick draw and sheathe
+  motions show in third person and to other players.
 
 ## The Shinobi Record's own slot (v1.47)
 

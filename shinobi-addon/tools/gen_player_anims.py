@@ -959,6 +959,34 @@ A["animation.aegis.hold_kusanagi"] = {**anim(1.0, [(0.0, "lin", {"w": ([0, 15, 0
                                              plant=False, loop=True), "blend_weight": SWING_FADE}
 A["animation.aegis.sword_pose_clear"] = {"animation_length": 0.05, "bones": {"rightArm": {"rotation": [0, 0, 0]}}}
 
+# The Kusanagi's draw (swords.js swaps the sheathed item for the drawn one as each motion starts, so the bare blade is
+# what moves). A hit while it's sheathed is a horizontal draw-cut: the blade sweeps out of the scabbard across the front
+# and finishes out to the right; an enemy within reach draws it into a guard; after a few quiet seconds it's brought
+# back across the body and slid into the scabbard (ending in the carrying pose and holding it until hold_kusanagi takes
+# over — the item turns sheathed again at 0.3 s). Arm angles checked against the held model like the carrying poses.
+KUSA_HOLD = {"w": ([0, 15, 0], Z), "ra": [-23.5, -62, 51], "la": [-82.5, -50, 123.5]}
+KUSA_OUT = {"w": HIPS(6, -5), "ra": [4, 0, 45], "la": [-20, -10, 30]}          # the blade out, level across the front
+A["animation.aegis.kusanagi_drawcut"] = anim(0.55, [
+    (0.0, "lin", KUSA_HOLD),
+    (0.07, "out", {**KUSA_OUT, "rl": [-10, 0, 6], "ll": [8, 0, -6]}),
+    (0.15, "snap", {"w": HIPS(10, -20, drop=1.6), "ra": [52, 25, 60], "la": [24, 10, -24], "rl": [-26, 0, 8], "ll": [20, 0, -8],
+                    "h": [0, -12, 0], "rt": R(f=1.0)}),                                                     # cut through, out right
+    (0.26, "back", {"w": HIPS(8, -17, drop=1.4)}),
+    (0.55, "io", REST),
+])
+A["animation.aegis.kusanagi_draw"] = anim(0.45, [
+    (0.0, "lin", KUSA_HOLD),
+    (0.09, "out", KUSA_OUT),
+    (0.2, "back", {"w": HIPS(4, -6, drop=1), "ra": [1, 15, 15], "la": [-20, 20, 0], "rl": [-12, 0, 8], "ll": [12, 0, -8]}),  # guard
+    (0.45, "io", REST),
+])
+A["animation.aegis.kusanagi_sheathe"] = anim(0.4, [
+    (0.0, "lin", "rest"),
+    (0.14, "io", {**KUSA_OUT, "la": [-82.5, -50, 123.5]}),                        # across the body, the left hand at the mouth
+    (0.3, "in", KUSA_HOLD),                                                        # tip first, slid home
+    (0.4, "lin", KUSA_HOLD),
+], plant=False, loop="hold")
+
 
 def mirrored(a):
     """The same motion for the other hand: left and right limbs swapped, turns and sideways moves reversed."""

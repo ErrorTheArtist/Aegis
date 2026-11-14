@@ -276,7 +276,7 @@ w(RP / "animations" / "swords.animation.json", {"format_version": "1.10.0", "ani
     # which copy shows: the one in the hand (main hand) or the one on the back (put away in the off hand)
     "animation.aegis.sword.hide_back": {"loop": True, "bones": {"back": {"scale": 0}}},
     "animation.aegis.sword.hide_hand": {"loop": True, "bones": {"sword": {"scale": 0}}},
-    # a swing draws the blade: the scabbard is hidden while the arm swings
+    # the drawn Kusanagi (aegis:kusanagi_drawn) hides the scabbard in the hand; on the back it's always sheathed
     "animation.aegis.sword.draw": {"loop": True, "bones": {"sheath": {"scale": 0}}},
 }})
 POSED = {"samehada", "kusanagi"}   # held in a carrying pose (player animations, see swords.js)
@@ -322,49 +322,55 @@ for sid, sd in SWORDS.items():
     sheath = sd.get("sheath", [])
     bones = [{"name": "sword", "pivot": [0, 24, 0], "binding": "q.item_slot_to_bone_name(c.item_slot)",
               "cubes": [held_cube(cu) for cu in cubes]}]
-    if sheath:   # held sheathed; the scabbard is a bone of its own so a swing can hide it (the blade is drawn)
+    if sheath:   # held sheathed; the scabbard is a bone of its own so the drawn form can hide it
         bones.append({"name": "sheath", "parent": "sword", "pivot": [0, 24, 0], "cubes": [held_cube(cu) for cu in sheath]})
     bones += [{"name": "body", "pivot": [0, 24, 0]}, back_bone([held_cube(cu) for cu in cubes + sheath], sid)]
     w(RP / "models" / "entity" / f"sword_{sid}.geo.json", {"format_version": "1.16.0", "minecraft:geometry": [{
         "description": {"identifier": f"geometry.aegis.sword_{sid}", "texture_width": 64, "texture_height": 64,
                         "visible_bounds_width": 5, "visible_bounds_height": 5, "visible_bounds_offset": [0, 1.5, 0]},
         "bones": bones}]})
-    posed = sid in POSED
-    w(RP / "attachables" / f"sword_{sid}.json", {"format_version": "1.10.0", "minecraft:attachable": {"description": {
-        "identifier": f"aegis:{sid}",
-        "materials": {"default": "entity_alphatest", "enchanted": "entity_alphatest_glint"},
-        "textures": {"default": f"textures/models/swords/{sid}", "enchanted": "textures/misc/enchanted_item_glint"},
-        "geometry": {"default": f"geometry.aegis.sword_{sid}"},
-        "animations": {"third": "animation.aegis.sword.hold_third_person", "first": "animation.aegis.sword.hold_first_person",
-                       "carry": "animation.aegis.sword.carry", "settle": "animation.aegis.sword.settle",
-                       "worn": "controller.animation.aegis.sword_carry",
-                       "hide_back": "animation.aegis.sword.hide_back", "hide_hand": "animation.aegis.sword.hide_hand",
-                       **({"draw": "animation.aegis.sword.draw"} if sheath else {})},
-        # c.item_slot / c.is_first_person are read here (like the vanilla shield does), never in a render controller.
-        # Samehada and the Kusanagi keep the plain grip: the player's carrying pose (swords.js) does the rest.
-        "scripts": {"animate": [{("third" if posed else "worn"): "!c.is_first_person && c.item_slot == 'main_hand'"},
-                                {"first": "c.is_first_person && c.item_slot == 'main_hand'"},
-                                {"hide_back": "c.item_slot == 'main_hand' || c.is_first_person"},
-                                {"hide_hand": "c.item_slot != 'main_hand'"},
-                                *([{"draw": "c.item_slot == 'main_hand' && variable.attack_time > 0.0"}] if sheath else [])]},
-        "render_controllers": ["controller.render.item_default"]}}})
+    # The Kusanagi is two items: aegis:kusanagi (sheathed — the one you get, buy and keep) and aegis:kusanagi_drawn (the
+    # bare blade). An attachable can't see the swing, so swords.js swaps them: it's drawn when you face an enemy or land
+    # a hit, and sheathed again after a few quiet seconds or when you put it away. Same model, stats and icon.
+    forms = [(sid, sid in POSED, False)] + ([(f"{sid}_drawn", False, True)] if sheath else [])
+    for ident, posed, drawn in forms:
+        w(RP / "attachables" / f"sword_{ident}.json", {"format_version": "1.10.0", "minecraft:attachable": {"description": {
+            "identifier": f"aegis:{ident}",
+            "materials": {"default": "entity_alphatest", "enchanted": "entity_alphatest_glint"},
+            "textures": {"default": f"textures/models/swords/{sid}", "enchanted": "textures/misc/enchanted_item_glint"},
+            "geometry": {"default": f"geometry.aegis.sword_{sid}"},
+            "animations": {"third": "animation.aegis.sword.hold_third_person", "first": "animation.aegis.sword.hold_first_person",
+                           "carry": "animation.aegis.sword.carry", "settle": "animation.aegis.sword.settle",
+                           "worn": "controller.animation.aegis.sword_carry",
+                           "hide_back": "animation.aegis.sword.hide_back", "hide_hand": "animation.aegis.sword.hide_hand",
+                           **({"draw": "animation.aegis.sword.draw"} if drawn else {})},
+            # c.item_slot / c.is_first_person are read here (like the vanilla shield does), never in a render controller.
+            # Samehada and the sheathed Kusanagi keep the plain grip: the player's carrying pose (swords.js) does the rest.
+            "scripts": {"animate": [{("third" if posed else "worn"): "!c.is_first_person && c.item_slot == 'main_hand'"},
+                                    {"first": "c.is_first_person && c.item_slot == 'main_hand'"},
+                                    {"hide_back": "c.item_slot == 'main_hand' || c.is_first_person"},
+                                    {"hide_hand": "c.item_slot != 'main_hand'"},
+                                    *([{"draw": "c.item_slot == 'main_hand'"}] if drawn else [])]},
+            "render_controllers": ["controller.render.item_default"]}}})
 
-    w(BP / "items" / f"{sid}.json", {"format_version": "1.21.60", "minecraft:item": {
-        "description": {"identifier": f"aegis:{sid}", "menu_category": {"category": "equipment", "group": "minecraft:itemGroup.name.sword"}},
-        "components": {
-            "minecraft:icon": {"textures": {"default": f"aegis_{sid}"}},
-            "minecraft:display_name": {"value": f"§b{sd['name']}§r\n§7{sd['owner']}"},
-            "minecraft:max_stack_size": 1,
-            "minecraft:hand_equipped": True,
-            "minecraft:allow_off_hand": {"value": True},
-            "minecraft:damage": sd["damage"],
-            "minecraft:durability": {"max_durability": sd["durability"]},
-            "minecraft:enchantable": {"slot": "sword", "value": 15},
-            "minecraft:repairable": {"repair_items": [{"items": ["minecraft:diamond"], "repair_amount": 400}]},
-            "minecraft:can_destroy_in_creative": False,
-            # makes right-click a real "use" so the special fires (swords are otherwise not usable)
-            "minecraft:use_modifiers": {"use_duration": 0.25, "movement_modifier": 1.0},
-            "minecraft:use_animation": "none"}}})
+        w(BP / "items" / f"{ident}.json", {"format_version": "1.21.60", "minecraft:item": {
+            "description": {"identifier": f"aegis:{ident}",
+                            # the drawn form only ever exists in someone's hand: keep it out of the creative inventory
+                            "menu_category": {"category": "none"} if drawn else {"category": "equipment", "group": "minecraft:itemGroup.name.sword"}},
+            "components": {
+                "minecraft:icon": {"textures": {"default": f"aegis_{sid}"}},
+                "minecraft:display_name": {"value": f"§b{sd['name']}§r\n§7{sd['owner']}"},
+                "minecraft:max_stack_size": 1,
+                "minecraft:hand_equipped": True,
+                "minecraft:allow_off_hand": {"value": True},
+                "minecraft:damage": sd["damage"],
+                "minecraft:durability": {"max_durability": sd["durability"]},
+                "minecraft:enchantable": {"slot": "sword", "value": 15},
+                "minecraft:repairable": {"repair_items": [{"items": ["minecraft:diamond"], "repair_amount": 400}]},
+                "minecraft:can_destroy_in_creative": False,
+                # makes right-click a real "use" so the special fires (swords are otherwise not usable)
+                "minecraft:use_modifiers": {"use_duration": 0.25, "movement_modifier": 1.0},
+                "minecraft:use_animation": "none"}}})
 
     # No crafting since v1.46: swords come from the Weaponsmith, the Travelling Merchant and legendary drops.
     (BP / "recipes" / f"{sid}.json").unlink(missing_ok=True)

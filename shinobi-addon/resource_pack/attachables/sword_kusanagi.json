@@ -21,8 +21,7 @@
         "settle": "animation.aegis.sword.settle",
         "worn": "controller.animation.aegis.sword_carry",
         "hide_back": "animation.aegis.sword.hide_back",
-        "hide_hand": "animation.aegis.sword.hide_hand",
-        "draw": "animation.aegis.sword.draw"
+        "hide_hand": "animation.aegis.sword.hide_hand"
       },
       "scripts": {
         "animate": [
@@ -37,9 +36,6 @@
           },
           {
             "hide_hand": "c.item_slot != 'main_hand'"
-          },
-          {
-            "draw": "c.item_slot == 'main_hand' && variable.attack_time > 0.0"
           }
         ]
       },

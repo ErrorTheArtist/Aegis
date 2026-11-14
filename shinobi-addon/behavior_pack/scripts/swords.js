@@ -1,7 +1,7 @@
 // Legendary swords: 3D held models (resource pack attachables), a passive on every hit,
 // and a right-click special with its own attack animation, slash arcs and particles.
 
-import { world, system } from "@minecraft/server";
+import { world, system, ItemStack } from "@minecraft/server";
 import { sameVillage } from "./villages.js";
 import { impactFx, sfx } from "./cinematic.js";
 import { RECORD_SLOT } from "./levels.js";
@@ -405,6 +405,12 @@ const SWORDS = {
   },
 };
 
+// The drawn Kusanagi (see "The Kusanagi's draw" below) is the same sword: same passive, special and cooldown.
+const SHEATHED = "aegis:kusanagi";
+const DRAWN = "aegis:kusanagi_drawn";
+SWORDS[DRAWN] = SWORDS[SHEATHED];
+const baseId = (id) => (id === DRAWN ? SHEATHED : id);
+
 function heldStack(player) {
   try {
     return player.getComponent("minecraft:inventory")?.container?.getItem(player.selectedSlotIndex);
@@ -460,7 +466,7 @@ function wear(p) {
   const was = lastHeld.get(p.id);
   if (was && was.slot !== sel && !off && !p.getDynamicProperty(SHEATH_OFF)) {
     const it = inv.getItem(was.slot);
-    if (it && it.typeId === was.typeId) {
+    if (it && baseId(it.typeId) === baseId(was.typeId)) {
       eq.setEquipment("Offhand", it);
       if (eq.getEquipment("Offhand")?.typeId === it.typeId) {
         inv.setItem(was.slot, undefined);
@@ -477,7 +483,7 @@ function wear(p) {
 // Carrying poses: while you hold Samehada it rests across the back of your neck, your arm raised to its grip (like
 // Kisame); the Kusanagi is held sheathed across your body, ready to draw. The pose steps aside for every swing (the
 // animation fades out while the arm swings, and each hit or sword special stops it) and comes back a moment later.
-// The Kusanagi's scabbard hides while you swing (the attachable), so the blade is drawn for the strike.
+// The Kusanagi is drawn before it strikes — see "The Kusanagi's draw" below.
 // ---------------------------------------------------------------------------
 const POSES = { "aegis:samehada": "animation.aegis.hold_samehada", "aegis:kusanagi": "animation.aegis.hold_kusanagi" };
 const posed = new Map(); // player id -> the sword their pose is playing for
@@ -531,7 +537,7 @@ export function handleSwordUse(player, itemStack) {
   if (s && (lastCast.get(player.id) ?? -99) > system.currentTick - 6 && lastCast.get(player.id) !== system.currentTick) return true;
   if (s) lastCast.set(player.id, system.currentTick);
   if (!s) return false;
-  const key = itemStack.typeId;
+  const key = baseId(itemStack.typeId);
   const left = api.cooldownLeft(player, key);
   if (left > 0) {
     player.onScreenDisplay.setActionBar(`§7${s.special} ready in §f${(left / 20).toFixed(1)}s`);
@@ -543,6 +549,7 @@ export function handleSwordUse(player, itemStack) {
     return true;
   }
   clearPose(player); // the special's own animation takes the arms
+  drawBlade(player, "quiet"); // the Kusanagi comes out of its scabbard for its technique
   if (s.cast(player) === false) return true;
   sfx(player.dimension, "aegis.slash", player.location, 1.3, 0.9 + Math.random() * 0.2);
   if (["hiramekarei", "shibuki", "kiba", "kubikiribocho", "samehada"].includes(s.id)) {
@@ -563,6 +570,160 @@ function trigger(player, itemStack) {
   if ((lastCast.get(player.id) ?? -99) > now - 6) return true;
   lastCast.set(player.id, now);
   return handleSwordUse(player, itemStack);
+}
+
+// ---------------------------------------------------------------------------
+// The Kusanagi's draw. It's carried sheathed (the carrying pose above) and drawn before it strikes: facing an enemy
+// within reach draws it into a guard, and a hit while it's still sheathed draws it with a horizontal draw-cut (the hit
+// is the cut). It stays out while you fight and slides back into the scabbard after 4 quiet seconds, or as soon as
+// you switch away from it. Sheathed and drawn are two items (aegis:kusanagi / aegis:kusanagi_drawn) because a held
+// item's model can't see the swing — the script swaps them, keeping wear, enchantments, name, lore and locks.
+// ---------------------------------------------------------------------------
+const DRAW_REACH = 5; // blocks: an enemy this close in front of you draws the blade
+const STAY_DRAWN = 80; // ticks without a hit or an enemy in reach before it's put away
+const SHEATHE_AT = 6; // ticks into the sheathe animation when the blade is home (the item turns sheathed)
+const FOES = /^aegis:(hostile_ninja|akatsuki|legend|shukaku|matatabi|isobu|son_goku|kokuo|saiken|chomei|gyuki|kurama)$/;
+const drawn = new Map(); // player id -> { active: tick of the last hit / enemy in reach, sheathing: tick the sheathe began }
+
+// The same sword in its other form.
+export function asForm(stack, id) {
+  const out = new ItemStack(id, 1);
+  try {
+    const a = stack.getComponent("minecraft:durability");
+    const b = out.getComponent("minecraft:durability");
+    if (a && b) b.damage = Math.min(b.maxDurability, a.damage);
+  } catch {
+    /* ignore */
+  }
+  try {
+    const a = stack.getComponent("minecraft:enchantable");
+    const b = out.getComponent("minecraft:enchantable");
+    if (a && b) {
+      for (const e of a.getEnchantments()) {
+        try {
+          b.addEnchantment(e);
+        } catch {
+          /* skip one that won't go on */
+        }
+      }
+    }
+  } catch {
+    /* ignore */
+  }
+  try {
+    if (stack.nameTag) out.nameTag = stack.nameTag;
+    const lore = stack.getLore();
+    if (lore?.length) out.setLore(lore);
+    out.keepOnDeath = stack.keepOnDeath;
+    out.lockMode = stack.lockMode;
+  } catch {
+    /* ignore */
+  }
+  return out;
+}
+
+function isFoe(p, e) {
+  if (!api.canBeHit(e, p)) return false;
+  if (e.typeId === "minecraft:player" || FOES.test(e.typeId)) return true;
+  try {
+    return e.matches({ families: ["monster"] });
+  } catch {
+    return false;
+  }
+}
+
+function foeInReach(p) {
+  try {
+    return p.getEntitiesFromViewDirection({ maxDistance: DRAW_REACH }).some((h) => isFoe(p, h.entity));
+  } catch {
+    return false;
+  }
+}
+
+// kind: "cut" (a hit drew it), "ready" (an enemy in reach) or "quiet" (a sword technique plays its own animation)
+function drawBlade(p, kind) {
+  const inv = p.getComponent("minecraft:inventory")?.container;
+  const sel = p.selectedSlotIndex;
+  const it = inv?.getItem(sel);
+  if (it?.typeId !== SHEATHED) return false;
+  inv.setItem(sel, asForm(it, DRAWN));
+  drawn.set(p.id, { active: system.currentTick, sheathing: undefined });
+  clearPose(p); // the carrying pose lets go of the scabbard
+  if (kind !== "quiet") {
+    // a tick later, so it replaces the punch-combo slash the same hit started
+    system.run(() => api.isValid(p) && api.anim(p, kind === "cut" ? "animation.aegis.kusanagi_drawcut" : "animation.aegis.kusanagi_draw"));
+  }
+  api.sound(p.dimension, "aegis.draw", p.location, 1, kind === "cut" ? 1.25 : 1.1);
+  if (kind === "cut") arcSweep(p, C.kusanagi, { radius: 2.4, from: -70, to: 80, height: 1.1, ticks: 3, points: 14 });
+  return true;
+}
+
+function startSheathe(p, st) {
+  st.sheathing = system.currentTick;
+  posed.delete(p.id);
+  lastSwing.set(p.id, system.currentTick - POSE_AFTER + 10); // the carrying pose takes over once the blade is home
+  try {
+    p.playAnimation("animation.aegis.kusanagi_sheathe", { controller: "aegis_sword_pose", blendOutTime: 0.2,
+      stopExpression: `!q.is_item_name_any('slot.weapon.mainhand', 0, '${SHEATHED}', '${DRAWN}')` });
+  } catch {
+    /* ignore */
+  }
+  system.runTimeout(() => {
+    if (!api.isValid(p) || drawn.get(p.id) !== st || st.sheathing === undefined) return; // a hit called it off
+    try {
+      const inv = p.getComponent("minecraft:inventory").container;
+      const it = inv.getItem(p.selectedSlotIndex);
+      if (it?.typeId === DRAWN) inv.setItem(p.selectedSlotIndex, asForm(it, SHEATHED));
+      sheatheStrays(p, inv, -1); // and if they switched away mid-sheathe, the one they left
+      api.sound(p.dimension, "aegis.sheathe", p.location, 0.8, 1.15);
+    } catch {
+      /* ignore */
+    }
+    drawn.delete(p.id);
+  }, SHEATHE_AT);
+}
+
+// A drawn blade anywhere but the hand that's using it (switched away, moved, put on the back) goes back in its scabbard.
+function sheatheStrays(p, inv, keep) {
+  for (let i = 0; i < inv.size; i++) {
+    if (i === keep) continue;
+    const it = inv.getItem(i);
+    if (it?.typeId === DRAWN) inv.setItem(i, asForm(it, SHEATHED));
+  }
+  try {
+    const eq = p.getComponent("minecraft:equippable");
+    const off = eq?.getEquipment("Offhand");
+    if (off?.typeId === DRAWN) eq.setEquipment("Offhand", asForm(off, SHEATHED));
+  } catch {
+    /* ignore */
+  }
+}
+
+function drawTick() {
+  const now = system.currentTick;
+  for (const p of world.getAllPlayers()) {
+    try {
+      const inv = p.getComponent("minecraft:inventory")?.container;
+      if (!inv) continue;
+      const sel = p.selectedSlotIndex;
+      const id = inv.getItem(sel)?.typeId;
+      let st = drawn.get(p.id);
+      if (id === SHEATHED) {
+        if (foeInReach(p)) drawBlade(p, "ready");
+      } else if (id === DRAWN) {
+        if (!st) drawn.set(p.id, (st = { active: now, sheathing: undefined })); // e.g. logged out with it drawn
+        if (st.sheathing === undefined) {
+          if (foeInReach(p)) st.active = now;
+          else if (now - st.active > STAY_DRAWN) startSheathe(p, st);
+        }
+      } else if (st && st.sheathing === undefined) {
+        drawn.delete(p.id);
+      }
+      if (st || now % 40 === 0) sheatheStrays(p, inv, id === DRAWN ? sel : -1);
+    } catch {
+      /* ignore */
+    }
+  }
 }
 
 export function initSwords(helpers) {
@@ -609,6 +770,28 @@ export function initSwords(helpers) {
     p.setDynamicProperty(SHEATH_OFF, off ? true : undefined);
     p.sendMessage(off ? "§7Swords stay in your hotbar when you switch away from them." : "§7Swords go on your back when you switch away from them.");
   });
+
+  // The Kusanagi's draw: a hit while it's sheathed draws it (the draw-cut); a hit while drawn keeps it out
+  world.afterEvents.entityHitEntity.subscribe(({ damagingEntity: p }) => {
+    if (p?.typeId !== "minecraft:player") return;
+    const id = heldStack(p)?.typeId;
+    if (id === SHEATHED) system.run(() => api.isValid(p) && drawBlade(p, "cut"));
+    else if (id === DRAWN) {
+      const st = drawn.get(p.id) ?? { active: 0, sheathing: undefined };
+      st.active = system.currentTick;
+      if (st.sheathing !== undefined) {
+        st.sheathing = undefined; // a sheathe that had started is called off: the blade stays out
+        try {
+          p.playAnimation("animation.aegis.sword_pose_clear", { controller: "aegis_sword_pose", blendOutTime: 0.1 });
+        } catch {
+          /* ignore */
+        }
+      }
+      drawn.set(p.id, st);
+    }
+  });
+  system.runInterval(drawTick, 2);
+  world.afterEvents.playerSpawn.subscribe(({ player }) => drawn.delete(player.id));
 
   // Ambient effects while a sword is held.
   system.runInterval(() => {

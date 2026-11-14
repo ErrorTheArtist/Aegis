@@ -445,7 +445,7 @@ entity("legend", {**BASE_MOVE,
                                                   {"test": "is_family", "subject": "other", "value": "ninja_companion"}]}, "max_dist": 32}]},
     "minecraft:behavior.random_stroll": {"priority": 7, "speed_multiplier": 0.7},
     "minecraft:behavior.look_at_player": {"priority": 8, "look_distance": 16}},
-    groups={f"aegis:legend_{k}": {"minecraft:health": {"value": hp, "max": hp}, **(equip("sasuke", "aegis:kusanagi") if k == "sasuke" else {})}
+    groups={f"aegis:legend_{k}": {"minecraft:health": {"value": hp, "max": hp}, **(equip("sasuke", "aegis:kusanagi_drawn") if k == "sasuke" else {})}
             for k, hp in LEGEND_HP.items()},
     events={f"aegis:legend_{k}": {"add": {"component_groups": [f"aegis:legend_{k}"]}} for k in LEGEND_HP})
 client_humanoid("legend", ("#f0782a", "#1e1e28"))

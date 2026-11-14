@@ -2,6 +2,7 @@
 // Natural rogue ninja spawn at night; Akatsuki hunt players who carry a Tailed Beast.
 
 import { world, system } from "@minecraft/server";
+import { isGraced } from "./grace.js";
 import { showTitle } from "./hud.js";
 import { NPC_TYPES, AKATSUKI, setupNpc } from "./npcs.js";
 import { initLegends, legendTick, updateLegend } from "./legends.js";
@@ -24,7 +25,7 @@ function survivalPlayersNear(dim, loc, r) {
   try {
     return dim.getPlayers({ location: loc, maxDistance: r }).filter((p) => {
       const gm = String(p.getGameMode()).toLowerCase();
-      return gm !== "creative" && gm !== "spectator";
+      return gm !== "creative" && gm !== "spectator" && !isGraced(p);
     });
   } catch {
     return [];

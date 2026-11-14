@@ -667,7 +667,7 @@ for bid, b in BEASTS.items():
         "minecraft:behavior.hurt_by_target": {"priority": 1},
         "minecraft:behavior.nearest_attackable_target": {"priority": 3, "must_see": False, "reselect_targets": True,
             "within_radius": 48, "entity_types": [
-                {"filters": {"any_of": [{"test": "is_family", "subject": "other", "value": "player"},
+                {"filters": {"any_of": [{"all_of": [{"test": "is_family", "subject": "other", "value": "player"}, {"test": "has_tag", "subject": "other", "operator": "!=", "value": "aegis_grace"}]},
                                         {"test": "is_family", "subject": "other", "value": "chakra_clone"}]},
                  "max_dist": 48}]},
         "minecraft:behavior.random_stroll": {"priority": 6, "speed_multiplier": 0.8},

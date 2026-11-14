@@ -3,6 +3,7 @@
 // (Hidan's curse & immortality, Kakuzu's hearts, Tobi's Kamui intangibility).
 
 import { world, system } from "@minecraft/server";
+import { isGraced } from "./grace.js";
 import { showTitle } from "./hud.js";
 import { impactFx, sfx, shake, chargeFx } from "./cinematic.js";
 import { onTobiDefeated, kamuiHolder } from "./kamui.js";
@@ -63,7 +64,7 @@ function playersNear(dim, loc, r) {
   try {
     return dim.getPlayers({ location: loc, maxDistance: r }).filter((p) => {
       const gm = String(p.getGameMode()).toLowerCase();
-      return gm !== "creative" && gm !== "spectator";
+      return gm !== "creative" && gm !== "spectator" && !isGraced(p);
     });
   } catch {
     return [];

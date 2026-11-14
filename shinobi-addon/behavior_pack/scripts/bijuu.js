@@ -19,6 +19,7 @@
 // Mastering the beast turns the cloak into its golden Tailed Beast Chakra Mode form.
 
 import { world, system, ItemStack, ItemLockMode } from "@minecraft/server";
+import { isGraced } from "./grace.js";
 import { ActionFormData, MessageFormData } from "@minecraft/server-ui";
 import { showTitle } from "./hud.js";
 import { transformCinematic, beastAwakenFx, impactFx, aura, sfx, inCinematic } from "./cinematic.js";
@@ -170,7 +171,7 @@ function playersNear(dim, loc, radius) {
   return list.filter((p) => {
     try {
       const gm = String(p.getGameMode()).toLowerCase();
-      return gm !== "creative" && gm !== "spectator";
+      return gm !== "creative" && gm !== "spectator" && !isGraced(p);
     } catch {
       return true;
     }

@@ -5,6 +5,7 @@
 // second phase at half health. Called from enemies.js for entities of type aegis:legend.
 
 import { world, system, ItemStack } from "@minecraft/server";
+import { isGraced } from "./grace.js";
 import { showTitle } from "./hud.js";
 import { impactFx, sfx, shake, aura, chargeFx } from "./cinematic.js";
 
@@ -80,7 +81,7 @@ function playersAround(dim, pos, r) {
   try {
     return dim.getPlayers({ location: pos, maxDistance: r }).filter((p) => {
       const gm = String(p.getGameMode()).toLowerCase();
-      return gm !== "creative" && gm !== "spectator";
+      return gm !== "creative" && gm !== "spectator" && !isGraced(p);
     });
   } catch {
     return [];

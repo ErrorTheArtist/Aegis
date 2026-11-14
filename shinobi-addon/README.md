@@ -89,6 +89,29 @@ Quest 2 is "cast 5 jutsu of your village's release". Rewards along the way: 1,00
 - **Village tag** over every player's head: `[Leaf] [Uchiha] Chūnin Lv.12 Name`.
 - **No friendly fire** — village-mates can't hurt each other with weapons, jutsu, arrows or summons.
   For an event (tournament, exam fights): `/scriptevent aegis:village friendlyfire on` / `off`.
+
+### Grace period (no fighting)
+
+A no-fighting window an admin can give everyone — when the server opens, before an event — or one player
+(commands need cheats / operator, like every `/scriptevent`):
+
+| Command | What it does |
+|---|---|
+| `/scriptevent aegis:grace 10` | **10 minutes of grace for everyone** (players who join during it get it too) |
+| `/scriptevent aegis:grace 5 Steve` | 5 minutes for one player (the start of their name is enough) |
+| `/scriptevent aegis:grace off` | end every grace period now |
+| `/scriptevent aegis:grace off Steve` | end one player's grace |
+| `/scriptevent aegis:grace` | show how long is left |
+
+While a player has grace:
+- **nothing can hurt them** — players, enemy ninja, Akatsuki, legends, Tailed Beasts, mobs (they get an invisible
+  Resistance V);
+- **the add-on's ninja and bosses ignore them** — they don't chase them or aim jutsu at them;
+- **they can't fight either** — their hits and jutsu do nothing to other players or to the add-on's ninja and bosses
+  (so nobody can farm bosses while untouchable). Hitting ordinary mobs, gathering, building, quests and shops all work.
+
+Everyone sees a title when it starts and when it ends, with a warning a minute and ten seconds before the end.
+Minecraft's own PvP setting only stops players hurting players — it doesn't stop mobs or bosses; grace does.
 - **Village menu** — Shinobi Record → *Village*:
   - **Village chat** — a message only your village sees.
   - **Village leaderboard** — the villages ranked by **Village Honor**, with member counts, the current Kage and the top 3 shinobi.
@@ -1067,6 +1090,12 @@ python3 tools/gen_particles.py --preview fire_burst ice_burst heal -o sheet.png
 ```
 
 The timers start when the server starts. Intervals are the two constants at the top of `behavior_pack/scripts/lagclear.js`.
+
+## Grace period command (v1.53)
+
+- `/scriptevent aegis:grace <minutes> [player]` gives everyone (or one player) a **no-fighting period**: nothing can
+  hurt them, the add-on's ninja and bosses ignore them, and they can't attack players or bosses. `… off` ends it,
+  `/scriptevent aegis:grace` shows the time left. See *Grace period*.
 
 ## Premade quests, Fast Travel, XP Shards, prices +20% (v1.52)
 

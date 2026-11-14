@@ -31,6 +31,7 @@ import { beginNatureRoll } from "./natures.js";
 import { breakTobiPhase } from "./akatsuki2.js";
 import { initNatures, natureCostMultiplier, natureDamageMultiplier, onJutsuCast, natureTag } from "./natures.js";
 import { initXpShards } from "./xpshards.js";
+import { initGrace, graceBlocks } from "./grace.js";
 import { initLevels, handleRecordUse, levelChakraBonus, levelRegenMultiplier, ninjutsuMultiplier, taijutsuMultiplier, cooldownMultiplier, gainJutsuXp, getLevel, xpInfo } from "./levels.js";
 
 // ---------------------------------------------------------------------------
@@ -109,6 +110,7 @@ function knockback(entity, dirX, dirZ, horizontal, vertical) {
 
 function hurt(target, amount, attacker, cause = "entityAttack", kind = "tech") {
   if (sameVillage(target, attacker)) return; // no friendly fire between village-mates
+  if (graceBlocks(target, attacker)) return; // grace period: no fighting
   // Ninjutsu stat boosts every scripted technique a player lands (taijutsu scrolls use the Taijutsu stat instead).
   if (attacker?.typeId === "minecraft:player") {
     amount *= (kind === "fist" ? taijutsuMultiplier(attacker) : ninjutsuMultiplier(attacker)) * sageMultiplier(attacker) * armorDamageMultiplier(attacker) * natureDamageMultiplier(attacker);
@@ -147,6 +149,8 @@ function canBeHit(e, caster) {
   if (e.typeId === "aegis:npc" && caster.typeId === "minecraft:player") return false;
   // no friendly fire between village-mates
   if (sameVillage(e, caster)) return false;
+  // grace period: players with grace can't be hit, and can't hit players or ninja / bosses
+  if (graceBlocks(e, caster)) return false;
   if (e.typeId.startsWith("aegis:")) {
     try {
       if (e.getDynamicProperty(OWNER_PROP) === caster.id) return false;
@@ -1175,6 +1179,7 @@ initClash(npcApi);
 initKamui(npcApi, breakTobiPhase);
 initStarter(npcApi);
 initXpShards(npcApi);
+initGrace(npcApi);
 initEdoTensei(npcApi);
 initM1(npcApi);
 initLagClear();

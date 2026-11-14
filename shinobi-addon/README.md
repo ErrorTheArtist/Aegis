@@ -97,8 +97,8 @@ You start at **Level 1**; the max is **Level 200**. Each level gives **3 stat po
 XP needed per level grows: 52 XP for level 2, ~1,800 around level 60, ~12,400 for the last levels
 (about 908,000 XP total from 1 to 200).
 
-**Stats** (max 100 each) — spend points with the **Shinobi Record** (you get one on first join; craft another
-from a book + Blank Scroll), or `/scriptevent aegis:stats`:
+**Stats** (max 100 each) — spend points with the **Shinobi Record** (you get one on first join; a lost one is replaced
+by the **Jutsu Sensei** → *Services* for 100 Ryō), or `/scriptevent aegis:stats`:
 
 | Stat | Effect |
 |---|---|
@@ -163,7 +163,7 @@ Learn more releases at the **Jutsu Sensei** (*Chakra Nature Training*): 2nd rele
 ### Kekkei genkai releases (clan-bound)
 
 These scrolls can **only be cast by their clan** (anyone else gets *"Only the Senju Clan can use Wood Release"*).
-They aren't craftable — a **Clan Elder** of that clan sells them to its members.
+Only a **Clan Elder** of that clan sells them, and only to its members.
 
 | Clan | Release scroll | Chakra / cd | Effect |
 |---|---|---|---|
@@ -222,7 +222,8 @@ to gather natural energy (a green bar fills on the action bar) and enter **Sage 
 
 ### Bloodline Reroll Scroll
 
-Craft: `D G D` / `G S G` / `D G D` (D = diamond, G = gold block, S = Blank Scroll).
+Where to get one: the **Travelling Merchant** (3,000 Ryō — one turns up in about 2 of every 5 restocks), Tailed
+Beasts and Akatsuki (a chance in their drops), or a Quest Giver's reward. There is no crafting recipe.
 Right-click, then right-click again within 5s to confirm. Rolls a **different** clan
 (Mangekyō progress is lost).
 
@@ -264,11 +265,12 @@ Clan odds, stats and abilities are all in `behavior_pack/scripts/clans.js`.
 
 Thousand Needles of Death is now a **Yuki-only Ice Release** (see Clans). Clan discounts on the new scrolls: **Uchiha** — Great Fire Annihilation, Kirin, Chidori Sharp Spear · **Sarutobi** — Great
 Fire Annihilation · **Senju** — Earth Spikes · **Hyuga** — Vacuum Bullets. All of them are sold by the Jutsu Sensei
-(unlocked from level 10 to 70) and are craftable.
+(unlocked from level 10 to 70).
 
 ### More jutsu — anyone can learn these (v1.40)
 
-19 more scrolls that belong to no clan. Buy them from the Jutsu Sensei (level and price below) or craft them.
+19 more scrolls that belong to no clan. Buy them from the Jutsu Sensei (level and price below), or catch one cheap at
+the Travelling Merchant.
 Elemental ones get your **chakra-nature affinity** (−25% chakra, +25% damage). Jutsu that need a target cost nothing
 if you aren't looking at one.
 
@@ -372,8 +374,8 @@ Attacks come every ~2–4.5 seconds (faster with more tails, ~40% faster when en
 
 Bring good armor, Soldier Pills and friends.
 
-**Summon:** craft a **Tailed Beast Summoning Scroll** (`E D E` / `D S D` / `E D E`: E = eye of ender,
-D = diamond, S = Blank Scroll) and use it. A random beast is released 8 blocks in front of you after a short ritual
+**Summon:** use a **Tailed Beast Summoning Scroll** (the S-rank mission reward, a rare Akatsuki drop, or — very rarely —
+the Travelling Merchant's, Lv 50, 4,500 Ryō). A random beast is released 8 blocks in front of you after a short ritual
 (fewer tails = more common). Only one beast can be summoned within 64 blocks at a time. Spawn eggs are in the
 creative inventory too.
 
@@ -487,11 +489,9 @@ mouth (red lining inside), wide sleeves that swallow the hands, a red-lined hem,
 back, sleeves and skirt; the hat is a round conical kasa in woven rings with a curtain of white paper strips (open at
 the front) and a small bell on a red cord.
 
-Recipes (crafting table): Flak Jacket `L L`/`GLG`/`GGG` (leather, green wool) · Shinobi Pants `BBB`/`B B`/`B B` (blue wool) ·
-Ninja Sandals `S S`/`B B` (string, blue wool) · Anbu Mask `BRB`/`BBB` (bone, red dye) · Anbu Armor `I I`/`IBI`/`III`
-(iron, black wool) · Akatsuki Cloak `B B`/`BRB`/`BBB` (black wool, red dye) · Akatsuki Hat `WWW`/`WSW` (wheat, string) ·
-Samurai: Kabuto `IGI`/`I I`, Dō `I I`/`IRI`/`III`, Haidate `III`/`R R`/`I I`, Suneate `R R`/`I I` (iron, gold, red wool).
-The Weaponsmith sells the Leaf, Anbu and Samurai pieces; Akatsuki drop their gear.
+No armour is crafted. The **Weaponsmith** sells the Leaf, Anbu and Samurai pieces; the **Travelling Merchant** sometimes
+has one of them 30% off, and sells the **Akatsuki Cloak** (1,600 Ryō, Lv 20) and **Straw Hat** (600 Ryō, Lv 10) when
+he has them; Akatsuki members drop their gear.
 
 ### The Five Kage sets
 
@@ -555,18 +555,9 @@ and a **right-click special** with its own attack animation and slash-arc effect
 
 Attack animations: wide slash, overhead slam, lunge thrust, full spin and sky raise.
 
-Recipes (crafting table):
-
-| Sword | Pattern | Key |
-|---|---|---|
-| Kusanagi | ` LD` / ` DL` / `S  ` | L lightning rod, D diamond, S stick |
-| Samehada | `PDP` / `PDP` / `PSP` | P prismarine shard |
-| Kubikiribōchō | `III` / `IDI` / ` S ` | I iron block |
-| Hiramekarei | `LDL` / `LDL` / `SLS` | L lapis block |
-| Kiba | ` D ` / `LDL` / ` S ` | L lightning rod |
-| Nuibari | `  I` / ` D ` / `S W` | I iron ingot, W string |
-| Shibuki | `TDT` / `TDT` / ` S ` | T TNT |
-| Chakra Blades | ` I ` / `FIF` / ` S ` | I iron ingot, F feather |
+Swords aren't crafted: the **Weaponsmith** sells seven of them (Lv 15–35), the **Travelling Merchant** sometimes has
+one 30% off, Sasuke drops the Kusanagi and the Akatsuki the Shibuki — and **Samehada** is only earned through its quest
+chain.
 
 **Use the special:** right-click (hold use on mobile) with the sword, **or sneak + hit an enemy**.
 All swords repair with diamonds and take sword enchantments. Models and icons are generated by `tools/gen_swords.py`
@@ -639,9 +630,10 @@ The **NPC Spawner** block is only in the creative inventory (no recipe, drops no
 3. Tap the block again in creative (or **sneak + talk** to one of its NPCs, or `/scriptevent aegis:spawner`
    while looking at it) to: **Configure**, **Respawn now**, **Remove NPCs**, or **Delete spawner**.
 
-Settings: NPC type · name (colour codes work) · outfit (16) · clan (Clan Elder) · Akatsuki member ·
+Settings: NPC type · name (colour codes work) · outfit (33) · clan (Clan Elder) · Akatsuki member ·
 how many to keep spawned (1–6) · respawn on/off + delay (5–600 s) · stay in place / wander radius ·
-invulnerable · shop prices / mission rewards % · greeting line · spawn height (0 = first free space).
+invulnerable · shop prices / mission rewards % · greeting line · spawn height (0 = first free space) ·
+restock time (Travelling Merchant, 5–120 min). A Travelling Merchant's spawner menu also has **Restock now**.
 Friendly NPCs are leashed to their spawner; breaking the spawner removes its NPCs.
 
 ### Ryō currency
@@ -652,7 +644,7 @@ Friendly NPCs are leashed to their spawner; breaking the spawner removes its NPC
   them straight into your wallet. Missions and quests pay Ryō too.
 - **Spend it:** every shop, the Clan Elder, Sage Training, nature training and recruiting Genin.
 - **Pay a player / exchange emeralds:** open your **Shinobi Record → Ryō Wallet**. Old emeralds exchange for **100 Ryō
-  each** (also at the Jutsu Sensei and Weaponsmith).
+  each** (also at the Jutsu Sensei, the Weaponsmith and the Travelling Merchant).
 - Admin: `/scriptevent aegis:ryo give 5000` · `take 5000` · `set 0` (the player who runs it).
 
 ### Quest Givers (design your own quests)
@@ -678,9 +670,10 @@ Players talk to the Quest Giver to accept, see their progress, claim the reward 
 
 | NPC | What they do |
 |---|---|
-| **Jutsu Sensei** | Teaches by school — pick **Fire, Water, Wind, Lightning, Earth, Ninjutsu, Taijutsu, Genjutsu & Medical** or **Summoning & Forbidden**, then a scroll (each page shows how many you've unlocked at your level and has a « Back button). **Services**: blank scrolls, Chakra Nature Training, emerald exchange. **Sage Training** (Lv 60) is under Summoning & Forbidden |
-| **Weaponsmith** | Kunai, shuriken, headbands, all 8 legendary swords (Lv 15–35), repairs the item in your hand |
+| **Jutsu Sensei** | Teaches by school — pick **Fire, Water, Wind, Lightning, Earth, Ninjutsu, Taijutsu, Genjutsu & Medical** or **Summoning & Forbidden**, then a scroll (each page shows how many you've unlocked at your level and has a « Back button). **Services**: a replacement Shinobi Record (100 Ryō), Chakra Nature Training, emerald exchange. **Sage Training** (Lv 60) is under Summoning & Forbidden |
+| **Weaponsmith** | Kunai, shuriken, headbands, seven legendary swords (Lv 15–35 — Samehada is quest-only), Leaf / Anbu / Samurai armour, repairs the item in your hand |
 | **Ramen Shop** | Ichiraku Ramen (heal + 60 chakra + regen), Miso Ramen (+30 chakra + speed), Soldier Pills |
+| **Travelling Merchant** | **Random wares that change every 20 minutes** (set per spawner): cheap ramen every time, plus 4–5 random finds — Bloodline Reroll Scrolls, bargain jutsu scrolls, swords and armour, Akatsuki gear, pills, kunai… Limited stock shared by everyone. Buys back old Blank Scrolls. See *The Travelling Merchant* below |
 | **Hokage (Mission Desk)** | D/C/B/A/S missions (kill mobs, ninja, a Tailed Beast, an Akatsuki member) for XP, Ryō and items |
 | **Exam Proctor** | Rank exams: **Chūnin** (Lv 20, beat 4 rogue ninja in 90 s), **Jōnin** (Lv 60, 3 Anbu + 3 Sound in 2 min), nothing higher — exams stop at Jōnin. Ranks show on your name tag and give +5/+10 stat points |
 | **Clan Elder** | For their clan: **Clan Mastery** 1–3 (+10% clan max chakra, −10% clan ability cooldowns each); the Uchiha Elder also awakens the **Eternal Mangekyō**. Others: **Bloodline transfer** into that clan (6,400 Ryō, Lv 30) |
@@ -784,34 +777,25 @@ models: `resource_pack/models/entity/`.
 - **Kunai** — throwable, 6 damage. Drops back as an item when it hits a block.
 - **Shuriken** — fast throwable, 4 damage, stacks to 64.
 
-## Recipes (crafting table)
+## Where things come from (no crafting)
 
-| Item | Recipe |
+Since v1.46 **nothing from the add-on can be crafted** — every recipe is gone. Everything is bought with Ryō, won from
+enemies or given out by quests (and everything is still in the creative inventory):
+
+| Item | Where to get it |
 |---|---|
-| Kunai ×4 | 2 iron ingots diagonally + stick in the bottom-left |
-| Shuriken ×8 | iron ingot in the middle, 4 iron nuggets around it (plus shape) |
-| Hidden Leaf Headband | blue wool, iron ingot, blue wool (one row) |
-| Soldier Pill ×2 | sweet berries + glowstone dust + sugar (shapeless) |
-| Blank Scroll | `P S P` / `P P P` (P = paper, S = stick) |
-| Jutsu scrolls | Blank Scroll + lapis lazuli + catalyst (shapeless) |
-
-New scrolls (Blank Scroll + lapis + catalyst): Phoenix = fire charge · Water Dragon = kelp · Earth Wall = stone ·
-Chidori Current = copper ingot · Mystical Palm = glistering melon · Rasenshuriken = diamond block + feather.
-Vacuum Bullets = wind charge · Earth Spikes = pointed dripstone · Water Prison = water bucket ·
-Chidori Sharp Spear = trident · Great Fire Annihilation = blaze powder + diamond · Eight Gates = golden apple + diamond ·
-Kirin = lightning rod + diamond.
-v1.40 scrolls: Dragon Flame = blaze rod · Ash Pile Burning = gunpowder + charcoal · Water Shark = prismarine shard ·
-Hiding in Mist = glass bottle · Water Shockwave = nautilus shell + diamond · Sickle Weasel = feather ·
-Pressure Damage = breeze rod + diamond · Lightning Hound = bone + copper ingot · Lightning Armour = copper block + diamond ·
-Earth Dragon = clay ball · Headhunter = iron shovel · Swamp = mud + slime ball · Big Ball Rasengan = ender pearl + diamond ·
-Leaf Hurricane = oak leaves · Dynamic Entry = leather boots · Front Lotus = string + pink tulip · Chakra Scalpel = shears ·
-Hell Viewing = fermented spider eye · Explosive Tags = TNT.
-All are also sold by the Jutsu Sensei.
-
-Catalysts: Fireball = blaze powder · Rasengan = ender pearl · Substitution = oak log ·
-Shadow Clone = armor stand · Body Flicker = sugar · Wind Style: Great Breakthrough = feather · Chidori = lightning rod.
-
-All items are also in the creative inventory.
+| Jutsu scrolls | **Jutsu Sensei** (by school, level-gated) · Travelling Merchant bargains (40% off) · Legend drops |
+| Kekkei genkai release scrolls | the **Clan Elder** of that clan |
+| Kunai, shuriken, Hidden Leaf Headband | **Weaponsmith** · Travelling Merchant · enemy ninja drop kunai and shuriken |
+| Soldier Pills | **Ramen Shop** · Travelling Merchant · enemy ninja · C-rank missions |
+| Ichiraku / Miso Ramen | **Ramen Shop** (300 / 200 Ryō) · **Travelling Merchant** (50 / 30 Ryō, while stocks last) |
+| Legendary swords | **Weaponsmith** · Travelling Merchant bargains · Legend / Akatsuki drops · Samehada: its quest chain only |
+| Armour (Leaf, Anbu, Samurai) | **Weaponsmith** · Travelling Merchant bargains |
+| Akatsuki Cloak & Straw Hat | **Travelling Merchant** · Akatsuki drops |
+| Bloodline Reroll Scroll | **Travelling Merchant** (rare) · Tailed Beast and Akatsuki drops (chance) · quest rewards |
+| Tailed Beast Summoning Scroll | S-rank missions · Akatsuki drops (chance) · Travelling Merchant (very rare) |
+| Shinobi Record | given on first join · a replacement from the Jutsu Sensei (*Services*, 100 Ryō) |
+| Blank Scroll | no longer used — the Travelling Merchant buys old ones back for 25 Ryō each |
 
 ## M1 combos (basic attacks)
 
@@ -948,6 +932,28 @@ python3 tools/gen_particles.py --preview fire_burst ice_burst heal -o sheet.png
 
 The timers start when the server starts. Intervals are the two constants at the top of `behavior_pack/scripts/lagclear.js`.
 
+## The Travelling Merchant (v1.46)
+
+Every crafting recipe is gone (see *Where things come from*). In their place: the **Travelling Merchant**, a new NPC
+for the NPC Spawner (*Travelling Merchant (random stock)*). He's a jolly old peddler with a grey beard under a wide
+woven straw kasa, an ochre haori with a coin crest on the back, an abacus tucked into his obi — and a tall wooden
+cabinet of drawers on his back with a green furoshiki bundle tied on top, a rolled straw mat underneath and a red paper
+lantern swinging from its side (`tools/gen_npc_gear.py`, skin 32).
+
+- **What he sells:** two bowls of ramen are always on his cart, dirt cheap (Ichiraku 50 Ryō, Miso 30 Ryō — the Ramen
+  Shop charges 300 / 200), plus **4–5 random wares** from: Soldier Pills (half price), 16 kunai, 32 shuriken, a Hidden
+  Leaf Headband, the **Bloodline Reroll Scroll** (3,000 Ryō, in about 2 of every 5 restocks), the **Tailed Beast
+  Summoning Scroll** (4,500 Ryō, Lv 50, about one restock in eight), the Akatsuki Cloak / Straw Hat, and bargains — a
+  random jutsu scroll 40% off, a legendary sword or an armour piece 30% off (their usual level requirement still applies).
+  Rare finds are starred (★); every button shows the price, the discount and how many are left.
+- **Limited stock, shared:** each ware has 1–8 in stock for everyone who shops there — when it's gone, it's gone until
+  the next restock. Two players can't buy the last one twice.
+- **Restocks** every **20 minutes** of real time (5–120 per spawner; *Restock now* in the spawner menu re-rolls at once).
+  The wares are stored with the spawner, so killing or respawning the merchant doesn't re-roll them.
+- He also exchanges emeralds for Ryō and **buys back Blank Scrolls** (25 Ryō each) — they were only ever used for
+  crafting. Enemy ninja no longer drop them.
+- The Jutsu Sensei's *Services* sell a replacement **Shinobi Record** (100 Ryō, kept on death) instead of blank scrolls.
+
 ## Nindō removed (v1.44)
 
 The Nindō system (a random "ninja way" rolled on join, with perks and drawbacks) has been taken out: nobody rolls one
@@ -959,7 +965,8 @@ in the Shinobi Record and `/scriptevent aegis:nindo` are gone too.
 The Rogue Ninja and the Leaf Shinobi have new hand-painted skins (using the skin's outer layer too) and a layer of 3D
 gear that follows their walk, look and attack animations; the scarf tails, headband ties and ponytail sway, and stream
 out further when they run. Generated by `tools/gen_npc_gear.py` (preview: `python3 tools/gen_npc_gear.py --preview
-npcs.png`); the gear is drawn only for those two skins (`controller.render.aegis.npc_gear_*`).
+npcs.png`); the gear is drawn only for the skins that have it (`controller.render.aegis.npc_gear_*` — since v1.46 the
+Travelling Merchant's too).
 
 ## Fixes (v1.41.1)
 
@@ -986,7 +993,7 @@ npcs.png`); the gear is drawn only for those two skins (`controller.render.aegis
 ## Project layout
 
 ```
-behavior_pack/   items, entities, recipes, scripts/main.js (jutsu) + scripts/clans.js (clans)
+behavior_pack/   items, entities, loot tables, scripts/main.js (jutsu) + scripts/clans.js (clans) — no recipes
 resource_pack/   textures, client entities, headband attachable
 tools/gen_textures.py   regenerates the placeholder pixel art (needs Pillow)
 build.sh         packages dist/WayOfTheShinobi.mcaddon

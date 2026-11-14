@@ -36,7 +36,8 @@
             "Texture.s28",
             "Texture.s29",
             "Texture.s30",
-            "Texture.s31"
+            "Texture.s31",
+            "Texture.s32"
           ]
         }
       },
@@ -70,6 +71,17 @@
       ],
       "textures": [
         "Texture.gear_chunin"
+      ]
+    },
+    "controller.render.aegis.npc_gear_merchant": {
+      "geometry": "Geometry.gear_merchant",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_merchant"
       ]
     }
   }

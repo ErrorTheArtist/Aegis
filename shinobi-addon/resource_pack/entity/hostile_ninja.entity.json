@@ -39,13 +39,16 @@
         "s29": "textures/entity/aegis/npc/madara",
         "s30": "textures/entity/aegis/npc/hashirama",
         "s31": "textures/entity/aegis/npc/tobirama",
+        "s32": "textures/entity/aegis/npc/merchant",
         "gear_rogue": "textures/entity/aegis/npc/gear_rogue",
-        "gear_chunin": "textures/entity/aegis/npc/gear_chunin"
+        "gear_chunin": "textures/entity/aegis/npc/gear_chunin",
+        "gear_merchant": "textures/entity/aegis/npc/gear_merchant"
       },
       "geometry": {
         "default": "geometry.humanoid.custom",
         "gear_rogue": "geometry.aegis.gear_rogue",
-        "gear_chunin": "geometry.aegis.gear_chunin"
+        "gear_chunin": "geometry.aegis.gear_chunin",
+        "gear_merchant": "geometry.aegis.gear_merchant"
       },
       "animations": {
         "humanoid_base_pose": "animation.humanoid.base_pose",
@@ -75,6 +78,9 @@
         },
         {
           "controller.render.aegis.npc_gear_chunin": "q.property('aegis:skin') == 15"
+        },
+        {
+          "controller.render.aegis.npc_gear_merchant": "q.property('aegis:skin') == 32"
         }
       ],
       "enable_attachables": true,

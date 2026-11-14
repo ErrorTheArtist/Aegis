@@ -1121,7 +1121,8 @@ world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
   player.sendMessage(
     [
       "§6=== Way of The Shinobi ===",
-      "§7Craft §fBlank Scrolls§7 (paper + stick) and add a catalyst + lapis to learn jutsu.",
+      "§7Nothing here is crafted: buy jutsu scrolls from a §bJutsu Sensei§7 and gear from the §fWeaponsmith§7 with §6Ryō§7,",
+      "§7and look out for the §6Travelling Merchant§7 — cheap ramen, rare finds, even §dBloodline Reroll Scrolls§7.",
       "§7Right-click a jutsu scroll to cast it. Each jutsu costs §bchakra§7.",
       "§7Sneak and stand still to §3focus§7 and regenerate chakra faster.",
       "§7Wear a §fHidden Leaf Headband§7 for faster regen. Eat §aSoldier Pills§7 for a boost.",

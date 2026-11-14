@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Third wave of jutsu (none clan-bound): scroll icons, items, recipes, the 3D jutsu models (Water Shark, Lightning
+"""Third wave of jutsu (none clan-bound): scroll icons, items, the 3D jutsu models (Water Shark, Lightning
 Hound, Fire Dragon, Earth Dragon) and the mist fog. Behaviour lives in behavior_pack/scripts/jutsu3.js.
 Run from the shinobi-addon folder:  python3 tools/gen_jutsu3.py
 """
@@ -263,7 +263,7 @@ def e_tags(img):
     G.glow(img, l, (255, 170, 60), 3, 1.0)
 
 
-# id: (display name, rod, emblem, recipe ingredient, extra ingredient or None)
+# id: (display name, rod, emblem, old recipe ingredient, extra ingredient or None — recipes are gone since v1.46)
 SCROLLS = {
     "dragon_flame_scroll": ("Fire Style: Dragon Flame Bullet", "red", e_dragon_flame, "minecraft:blaze_rod", None),
     "ash_burning_scroll": ("Fire Style: Ash Pile Burning", "red", e_ash, "minecraft:gunpowder", "minecraft:charcoal"),
@@ -294,10 +294,8 @@ for sid, (name, rod, emblem, ing, extra) in SCROLLS.items():
         "description": {"identifier": f"aegis:{sid}", "menu_category": {"category": "equipment"}},
         "components": {"minecraft:icon": {"textures": {"default": f"aegis_{sid}"}}, "minecraft:display_name": {"value": f"Jutsu Scroll: {name}"},
                        "minecraft:max_stack_size": 1, "minecraft:glint": True}}})
-    ingredients = [{"item": "aegis:blank_scroll"}, {"item": ing}, {"item": "minecraft:lapis_lazuli"}] + ([{"item": extra}] if extra else [])
-    w(BP / "recipes" / f"{sid}.json", {"format_version": "1.21.60", "minecraft:recipe_shapeless": {
-        "description": {"identifier": f"aegis:{sid}"}, "tags": ["crafting_table"], "ingredients": ingredients,
-        "result": {"item": f"aegis:{sid}", "count": 1}, "unlock": {"context": "AlwaysUnlocked"}}})
+    # No crafting since v1.46: scrolls are bought from the Jutsu Sensei or the Travelling Merchant.
+    (BP / "recipes" / f"{sid}.json").unlink(missing_ok=True)
     atlas["texture_data"][f"aegis_{sid}"] = {"textures": f"textures/items/aegis/{sid}"}
 w(atlas_p, atlas)
 

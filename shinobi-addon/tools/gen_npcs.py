@@ -270,6 +270,9 @@ SKINS = [
     ("tobirama", dict(sleeve_len=11, skin=(200, 192, 182), edo=True, sclera=(25, 22, 24), eyes=(190, 30, 40), hair=(225, 228, 232), hair_side=4, bangs=3,
                       top=(30, 30, 45), pants=(30, 30, 45), armor=((45, 75, 150), (25, 40, 90)), fur=(240, 240, 240), marks=True,
                       band=((40, 60, 140), STEEL))),
+    # v1.46: the Travelling Merchant (hand-painted by tools/gen_npc_gear.py; this is only the fallback). Append new skins
+    # at the end — the index is stored on every NPC (aegis:skin).
+    ("merchant", dict(hair=(120, 112, 106), top=(176, 120, 52), sleeve_len=6, pants=(86, 72, 62), belt=(46, 58, 98), shoes=(198, 170, 106))),
 ]
 (RP / "textures" / "entity" / "aegis" / "npc").mkdir(parents=True, exist_ok=True)
 for name, o in SKINS:
@@ -277,8 +280,8 @@ for name, o in SKINS:
     (Image.open(custom).convert("RGBA") if custom.exists() else humanoid(o)).save(RP / "textures" / "entity" / "aegis" / "npc" / f"{name}.png")
 
 skin_tex = {f"s{i}": f"textures/entity/aegis/npc/{n}" for i, (n, _) in enumerate(SKINS)}
-# 3D gear worn over some skins (tools/gen_npc_gear.py): the Rogue Ninja and the Leaf Shinobi
-GEAR = {n: i for i, (n, _) in enumerate(SKINS) if n in ("rogue", "chunin")}
+# 3D gear worn over some skins (tools/gen_npc_gear.py): the Rogue Ninja, the Leaf Shinobi and the Travelling Merchant
+GEAR = {n: i for i, (n, _) in enumerate(SKINS) if n in ("rogue", "chunin", "merchant")}
 w(RP / "render_controllers" / "npc.render_controllers.json", {"format_version": "1.8.0", "render_controllers": {
     "controller.render.aegis.npc": {
         "arrays": {"textures": {"Array.skins": [f"Texture.s{i}" for i in range(len(SKINS))]}},
@@ -614,8 +617,9 @@ def cnt(lo, hi):
 w(BP / "loot_tables" / "entities" / "aegis_ninja.json", {"pools": [
     {"rolls": 1, "entries": [{"type": "item", "name": "aegis:ryo", "weight": 1, "functions": cnt(1, 3)}]},
     {"rolls": 1, "entries": [{"type": "item", "name": "aegis:kunai", "weight": 1, "functions": cnt(1, 4)}, {"type": "empty", "weight": 1}]},
-    {"rolls": 1, "entries": [{"type": "item", "name": "aegis:chakra_pill", "weight": 3}, {"type": "item", "name": "aegis:blank_scroll", "weight": 2},
-                             {"type": "item", "name": "aegis:shuriken", "weight": 2, "functions": cnt(2, 6)}, {"type": "empty", "weight": 6}]}]})
+    # (blank scrolls dropped here until v1.46 — with crafting gone they had no use; their share went to "nothing")
+    {"rolls": 1, "entries": [{"type": "item", "name": "aegis:chakra_pill", "weight": 3},
+                             {"type": "item", "name": "aegis:shuriken", "weight": 2, "functions": cnt(2, 6)}, {"type": "empty", "weight": 8}]}]})
 w(BP / "loot_tables" / "entities" / "aegis_legend.json", {"pools": [
     {"rolls": 1, "entries": [{"type": "item", "name": "aegis:ryo", "weight": 1, "functions": cnt(16, 32)}]},
     {"rolls": 1, "entries": [{"type": "item", "name": "minecraft:diamond", "weight": 1, "functions": cnt(3, 8)}]},

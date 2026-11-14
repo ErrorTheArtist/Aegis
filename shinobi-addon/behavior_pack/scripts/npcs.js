@@ -10,7 +10,7 @@ import { world, system, ItemStack } from "@minecraft/server";
 import { ActionFormData, ModalFormData, MessageFormData } from "@minecraft/server-ui";
 import { showTitle } from "./hud.js";
 import { CLANS, getClanId, setClanPublic, applyNameTag } from "./clans.js";
-import { getLevel, gainXp, getRank, setRank, addPoints, RANKS } from "./levels.js";
+import { getLevel, gainXp, getRank, setRank, addPoints, RANKS, giveRecordCopy } from "./levels.js";
 import { hasSageTraining, grantSage } from "./sage.js";
 import { hasEternalMangekyo, awakenEternal } from "./clans.js";
 import { natureTraining } from "./natures.js";
@@ -23,7 +23,8 @@ const INDEX_PROP = "aegis:spawners";
 const SKIN_NAMES = ["Sensei", "Elder", "Weaponsmith", "Ramen chef", "Hokage", "Proctor", "Genin (orange)", "Genin (blue)",
   "Genin (pink)", "Rogue ninja", "Sound ninja", "Anbu", "Itachi", "Kisame", "Deidara", "Leaf chūnin",
   "Naruto", "Sasuke", "Tsunade", "Hiruzen Sarutobi", "Minato",
-  "Pain", "Konan", "Hidan", "Hidan (Jashin form)", "Kakuzu", "Sasori", "Zetsu", "Tobi"];
+  "Pain", "Konan", "Hidan", "Hidan (Jashin form)", "Kakuzu", "Sasori", "Zetsu", "Tobi",
+  "Madara (Edo)", "Hashirama (Edo)", "Tobirama (Edo)", "Travelling merchant"]; // index = skin number (tools/gen_npcs.py SKINS)
 
 export const NPC_TYPES = {
   sensei: { label: "Jutsu Sensei (jutsu shop)", entity: "aegis:npc", skin: 0, name: "§bJutsu Sensei", friendly: true,
@@ -34,6 +35,8 @@ export const NPC_TYPES = {
     greeting: "Finest steel in the Land of Fire." },
   ramen: { label: "Ramen Shop", entity: "aegis:npc", skin: 3, name: "§eRamen Shop", friendly: true,
     greeting: "Welcome! One bowl or two?" },
+  merchant: { label: "§6Travelling Merchant (random stock)", entity: "aegis:npc", skin: 32, name: "§6Travelling Merchant", friendly: true,
+    greeting: "Fresh stock from all five great nations! Cheap ramen, rare scrolls… and if luck's with you, a Bloodline Reroll Scroll." },
   mission_desk: { label: "Hokage (Mission Desk)", entity: "aegis:npc", skin: 4, name: "§cHokage", friendly: true,
     greeting: "The village has work for you." },
   proctor: { label: "Chūnin Exam Proctor (rank exams)", entity: "aegis:npc", skin: 5, name: "§8Exam Proctor", friendly: true,
@@ -187,7 +190,7 @@ export function defaultsFor(type) {
   return {
     type, name: "", skin: -1, clan: "random", member: "random",
     count: 1, respawn: true, delay: t.legend ? 300 : hostile ? 60 : 10, stay: !hostile && type !== "villager" && type !== "genin",
-    radius: hostile ? 12 : 6, invuln: !hostile, price: 100, greeting: "", height: 0,
+    radius: hostile ? 12 : 6, invuln: !hostile, price: 100, greeting: "", height: 0, restock: 20,
   };
 }
 
@@ -359,9 +362,15 @@ async function spawnerMenu(player, cfg) {
     .button("§6Remove NPCs (they come back if respawn is on)")
     .button("§cDelete spawner");
   if (cfg.type === "quest_giver") form.button("§eQuest settings\n§r§7enemies, rewards, story");
+  if (cfg.type === "merchant") form.button(`§6Restock now\n§r§7new random wares (they change every ${cfg.restock ?? 20} min anyway)`);
   const r = await form.show(player);
   if (r.canceled) return;
   if (r.selection === 0) return configure(player, cfg);
+  if (r.selection === 4 && cfg.type === "merchant") {
+    cfg.stock = undefined;
+    save(cfg);
+    return player.sendMessage("§6The merchant unpacks new wares.");
+  }
   if (r.selection === 4) return cfg.type === "quest_giver" ? questEditor(player, cfg, save) : undefined;
   if (r.selection === 1) {
     removeNpcs(cfg);
@@ -401,7 +410,8 @@ async function configure(player, cfg) {
     .toggle("Invulnerable", cfg.invuln)
     .slider("Shop prices / mission rewards (%)", 50, 300, 10, cfg.price)
     .textField("Greeting line (empty = default)", "default", cfg.greeting)
-    .slider("Spawn height above block (0 = first free space)", 0, 10, 1, cfg.height);
+    .slider("Spawn height above block (0 = first free space)", 0, 10, 1, cfg.height)
+    .slider("Restock every … minutes (Travelling Merchant only)", 5, 120, 5, cfg.restock ?? 20);
   const r = await f.show(player);
   if (r.canceled || !r.formValues) return;
   const v = r.formValues;
@@ -426,6 +436,8 @@ async function configure(player, cfg) {
   cfg.price = Number(v[11]);
   cfg.greeting = String(v[12] ?? "").trim();
   cfg.height = Number(v[13]);
+  cfg.restock = Number(v[14]) || cfg.restock || 20;
+  cfg.stock = undefined; // a merchant re-rolls its wares with the new settings
   removeNpcs(cfg);
   cfg.spawned = false;
   cfg.missingSince = undefined;
@@ -516,7 +528,7 @@ const SENSEI = [
     ["aegis:edo_tensei_scroll", 1, "§8Forbidden: Reanimation Jutsu", 90, 60],
   ]],
   ["§fServices", [
-    ["aegis:blank_scroll", 4, "Blank Scroll ×4", 2, 1],
+    ["__record", 1, "Shinobi Record (replacement copy)", 1, 1],
     ["__nature", 0, "Chakra Nature Training (learn another release)", 0, 1],
     ["__exchange", 0, "Exchange emeralds for Ryō", 0, 1],
   ]],
@@ -571,6 +583,10 @@ async function shop(player, npc, cfg, list, title, back) {
   else if (id === "__exchange") {
     const n = exchangeEmeralds(player);
     player.sendMessage(n ? `§aExchanged ${n} emeralds for §6${fmtRyo(n * EMERALD_RATE)}§a.` : "§7You have no emeralds to exchange.");
+  } else if (id === "__record") {
+    if (!spendRyo(player, price)) player.sendMessage(`§cYou need ${fmtRyo(price)}.`);
+    else if (giveRecordCopy(player)) player.sendMessage("§aHere's a fresh Shinobi Record. Try not to lose this one.");
+    else addRyo(player, price, true);
   } else if (id === "__nature") {
     return natureTraining(player, (n) => priceOf(n, cfg), getLevel);
   } else if (id === "__sage") {
@@ -599,6 +615,154 @@ async function shop(player, npc, cfg, list, title, back) {
 }
 
 // The Jutsu Sensei's front page: one button per school.
+// ---------------------------------------------------------------------------
+// Travelling Merchant — random wares that change every `cfg.restock` minutes (real time). Cheap ramen is always on the
+// cart; 4–5 more wares are drawn at random (weighted) from WARES. Quantities are limited and shared by everyone who
+// shops there. The stock is kept in the spawner's settings, so killing or respawning the merchant never re-rolls it
+// (an NPC without a spawner keeps it on itself).
+// ---------------------------------------------------------------------------
+// price / was: ×100 Ryō (was = the usual shop price, shown as a discount). lvl: level needed. stock: [min, max] on the cart.
+const STAPLES = [
+  { id: "aegis:ramen", n: 1, label: "Ichiraku Ramen", price: 0.5, was: 3, stock: [4, 8] },
+  { id: "aegis:miso_ramen", n: 1, label: "Miso Ramen", price: 0.3, was: 2, stock: [4, 8] },
+];
+const WARES = [
+  { id: "aegis:chakra_pill", n: 3, label: "Soldier Pills ×3", price: 2, was: 4, weight: 14, stock: [2, 4] },
+  { id: "aegis:kunai", n: 16, label: "Kunai ×16", price: 4, was: 6, weight: 9, stock: [1, 3] },
+  { id: "aegis:shuriken", n: 32, label: "Shuriken ×32", price: 4, was: 6, weight: 9, stock: [1, 3] },
+  { id: "aegis:headband", n: 1, label: "Hidden Leaf Headband", price: 4, was: 6, weight: 5, stock: [1, 2] },
+  { id: "aegis:reroll_scroll", n: 1, label: "Bloodline Reroll Scroll (new clan)", price: 30, weight: 8, stock: [1, 1], rare: true },
+  { id: "aegis:bijuu_scroll", n: 1, label: "Tailed Beast Summoning Scroll", price: 45, lvl: 50, weight: 2, stock: [1, 1], rare: true },
+  { id: "aegis:akatsuki_cloak", n: 1, label: "Akatsuki Cloak", price: 16, lvl: 20, weight: 4, stock: [1, 1] },
+  { id: "aegis:akatsuki_hat", n: 1, label: "Akatsuki Straw Hat", price: 6, lvl: 10, weight: 5, stock: [1, 1] },
+  // bargains: something the Jutsu Sensei or the Weaponsmith sells, at a cut price (level requirements still apply)
+  { deal: "scroll", weight: 14 },
+  { deal: "scroll", weight: 10 },
+  { deal: "weapon", weight: 7 },
+  { deal: "armor", weight: 6 },
+];
+const MERCHANT_SWORDS = ["aegis:chakra_blades", "aegis:nuibari", "aegis:kusanagi", "aegis:shibuki", "aegis:kiba", "aegis:hiramekarei", "aegis:kubikiribocho"];
+const MERCHANT_ARMOR = ["aegis:flak_jacket", "aegis:shinobi_pants", "aegis:ninja_sandals", "aegis:anbu_mask", "aegis:anbu_armor",
+  "aegis:samurai_helmet", "aegis:samurai_armor", "aegis:samurai_leggings", "aegis:samurai_boots"];
+const DEALS = {
+  scroll: { cut: 0.6, list: () => SENSEI.flatMap(([, l]) => l).filter(([id]) => !id.startsWith("__")) },
+  weapon: { cut: 0.7, list: () => SHOPS.weaponsmith.filter(([id]) => MERCHANT_SWORDS.includes(id)) },
+  armor: { cut: 0.7, list: () => SHOPS.weaponsmith.filter(([id]) => MERCHANT_ARMOR.includes(id)) },
+};
+const MERCHANT_PICKS = [4, 5];
+const BLANK_SCROLL = "aegis:blank_scroll";
+const BLANK_BUYBACK = 25; // Ryō each — blank scrolls were only ever used for crafting
+const STOCK_PROP = "aegis:stock";
+const rnd = (lo, hi) => lo + Math.floor(Math.random() * (hi - lo + 1));
+
+function offerOf(w, taken) {
+  if (w.deal) {
+    const options = DEALS[w.deal].list().filter(([id]) => !taken.has(id));
+    if (!options.length) return undefined;
+    const [id, n, label, base, lvl] = options[Math.floor(Math.random() * options.length)];
+    return { id, n, label, price: Math.round(base * DEALS[w.deal].cut * 10) / 10, was: base, lvl, left: 1 };
+  }
+  const o = { id: w.id, n: w.n, label: w.label, price: w.price, lvl: w.lvl ?? 1, left: rnd(w.stock[0], w.stock[1]) };
+  if (w.was) o.was = w.was;
+  if (w.rare) o.rare = true;
+  return o;
+}
+
+export function rollStock(minutes = 20) {
+  const taken = new Set();
+  const offers = [];
+  const add = (o) => {
+    if (!o || taken.has(o.id)) return;
+    taken.add(o.id);
+    offers.push(o);
+  };
+  for (const w of STAPLES) add(offerOf(w, taken));
+  const pool = WARES.slice();
+  const picks = rnd(MERCHANT_PICKS[0], MERCHANT_PICKS[1]);
+  for (let k = 0; k < picks && pool.length; k++) {
+    let roll = Math.random() * pool.reduce((a, w) => a + w.weight, 0);
+    let i = 0;
+    while (i < pool.length - 1 && (roll -= pool[i].weight) >= 0) i++;
+    add(offerOf(pool.splice(i, 1)[0], taken));
+  }
+  return { until: Date.now() + minutes * 60000, offers };
+}
+
+function saveStock(npc, cfg, stock) {
+  if (cfg) {
+    cfg.stock = stock;
+    save(cfg);
+  } else {
+    try {
+      npc.setDynamicProperty(STOCK_PROP, JSON.stringify(stock));
+    } catch {
+      /* ignore */
+    }
+  }
+}
+
+function loadStock(npc, cfg) {
+  let stock;
+  try {
+    stock = cfg ? cfg.stock : JSON.parse(npc.getDynamicProperty(STOCK_PROP) ?? "null");
+  } catch {
+    stock = undefined;
+  }
+  if (stock && Array.isArray(stock.offers) && Date.now() < stock.until) return stock;
+  stock = rollStock(cfg?.restock ?? 20);
+  saveStock(npc, cfg, stock);
+  return stock;
+}
+
+async function merchantMenu(player, npc, cfg) {
+  const stock = loadStock(npc, cfg);
+  const ryo = getRyo(player);
+  const lvl = getLevel(player);
+  const blanks = countItem(player, BLANK_SCROLL);
+  const mins = Math.max(1, Math.ceil((stock.until - Date.now()) / 60000));
+  const f = new ActionFormData().title("§lTravelling Merchant").body(
+    `§7${cfg?.greeting || NPC_TYPES.merchant.greeting}\n\n§6Your Ryō: §f${fmtRyo(ryo)}\n§7New wares in §f${mins} min§7 — what's on the cart is shared by every customer.`);
+  for (const o of stock.offers) {
+    const p = priceOf(o.price, cfg);
+    const off = o.was ? Math.round((1 - o.price / o.was) * 100) : 0;
+    if (o.left <= 0) f.button(`§8${o.label}\n§8sold out`);
+    else f.button(`${lvl < o.lvl ? "§8" : ryo < p ? "§c" : o.rare ? "§5" : "§2"}${o.rare ? "★ " : ""}${o.label}\n§r§7${fmtRyo(p)}${off > 0 ? ` §a(-${off}%)` : ""}§7 · ${o.left} left${lvl < o.lvl ? ` · Lv ${o.lvl}` : ""}`);
+  }
+  f.button(`§eExchange emeralds for Ryō\n§r§7${EMERALD_RATE} Ryō per emerald`);
+  if (blanks) f.button(`§6Sell your Blank Scrolls\n§r§7${fmtRyo(BLANK_BUYBACK)} each · you have ${blanks}`);
+  const r = await f.show(player);
+  if (r.canceled || r.selection === undefined) return;
+  const i = r.selection;
+  if (i < stock.offers.length) {
+    const shown = stock.offers[i];
+    const now = loadStock(npc, cfg); // someone else may have bought it, or new wares arrived while the menu was open
+    const o = now.until === stock.until ? now.offers[i] : undefined;
+    const price = priceOf(shown.price, cfg);
+    if (!o || o.id !== shown.id) player.sendMessage("§7The merchant has unpacked new wares — have another look.");
+    else if (o.left <= 0) player.sendMessage("§cSold out — someone beat you to it.");
+    else if (lvl < o.lvl) player.sendMessage(`§cYou need to be level ${o.lvl} for that.`);
+    else if (!spendRyo(player, price)) player.sendMessage(`§cYou need ${fmtRyo(price)}.`);
+    else {
+      o.left--;
+      saveStock(npc, cfg, now);
+      giveItem(player, o.id, o.n);
+      api.sound(player.dimension, "random.orb", player.location, 1, o.rare ? 0.8 : 1.2);
+      player.sendMessage(`§aBought ${o.rare ? "§d★ " : ""}${o.label}§a for §6${fmtRyo(price)}§a.`);
+    }
+  } else if (i === stock.offers.length) {
+    const n = exchangeEmeralds(player);
+    player.sendMessage(n ? `§aExchanged ${n} emeralds for §6${fmtRyo(n * EMERALD_RATE)}§a.` : "§7You have no emeralds to exchange.");
+  } else if (blanks) {
+    const n = countItem(player, BLANK_SCROLL);
+    if (n && takeItem(player, BLANK_SCROLL, n)) {
+      addRyo(player, n * BLANK_BUYBACK, true);
+      api.sound(player.dimension, "random.orb", player.location, 1, 1.2);
+      player.sendMessage(`§aSold ${n} Blank Scroll${n === 1 ? "" : "s"} for §6${fmtRyo(n * BLANK_BUYBACK)}§a.`);
+    }
+  }
+  return merchantMenu(player, npc, cfg);
+}
+
 async function senseiMenu(player, npc, cfg) {
   const lvl = getLevel(player);
   const f = new ActionFormData()
@@ -854,6 +1018,7 @@ const CHATTER = [
   "The Hokage always has missions for those who ask.",
   "Akatsuki hunt Jinchūriki. Watch your back.",
   "The ramen here is the best in the village!",
+  "There's a travelling merchant who sells ramen for next to nothing. Bloodline Reroll Scrolls too, if you're lucky!",
   "The proctor's exams are no joke. Bring Soldier Pills.",
   "A sword's only as good as the chakra you put into it.",
 ];
@@ -869,6 +1034,8 @@ async function talk(player, npc) {
       return shop(player, npc, cfg, SHOPS.weaponsmith, "§lWeaponsmith");
     case "ramen":
       return shop(player, npc, cfg, SHOPS.ramen, "§lRamen Shop");
+    case "merchant":
+      return merchantMenu(player, npc, cfg);
     case "mission_desk":
       return missionDesk(player, npc, cfg);
     case "proctor":

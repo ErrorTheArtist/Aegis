@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Generates the legendary swords: 3D held models (attachables), detailed 32x32 icons
-(rendered from the same voxel design), items and recipes.
+(rendered from the same voxel design), items (no recipes: swords are bought or won).
 
 Held-model placement copies Mojang's vanilla trident: the item is modelled as a pole along +y
 around x=0/z=0 with the bone pivot at [0, 24, 0] and bound to the hand slot; the trident grips
@@ -366,14 +366,8 @@ for sid, sd in SWORDS.items():
             "minecraft:use_modifiers": {"use_duration": 0.25, "movement_modifier": 1.0},
             "minecraft:use_animation": "none"}}})
 
-    if sd["recipe"]:
-        pattern, key = sd["recipe"]
-        w(BP / "recipes" / f"{sid}.json", {"format_version": "1.21.60", "minecraft:recipe_shaped": {
-            "description": {"identifier": f"aegis:{sid}"}, "tags": ["crafting_table"],
-            "pattern": pattern, "key": {k: {"item": v} for k, v in key.items()},
-            "result": {"item": f"aegis:{sid}", "count": 1}, "unlock": {"context": "AlwaysUnlocked"}}})
-    else:
-        (BP / "recipes" / f"{sid}.json").unlink(missing_ok=True)
+    # No crafting since v1.46: swords come from the Weaponsmith, the Travelling Merchant and legendary drops.
+    (BP / "recipes" / f"{sid}.json").unlink(missing_ok=True)
     atlas["texture_data"][f"aegis_{sid}"] = {"textures": f"textures/items/aegis/{sid}"}
 
 w(atlas_path, atlas)

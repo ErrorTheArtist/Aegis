@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Rogue Ninja and Leaf Shinobi (chatter) v2: hand-painted skins on both layers, plus a 3D gear layer.
+"""Rogue Ninja, Leaf Shinobi (chatter) and Travelling Merchant: hand-painted skins on both layers, plus a 3D gear layer.
 
   Rogue Ninja (skin 9 — aegis:hostile_ninja): a scratched-out headband with its ties, a cloth face wrap, messy spiked
     hair and a scar over one eye; a red, tattered scarf whose two tails stream out behind; a cleaver strapped across the
@@ -7,14 +7,20 @@
   Leaf Shinobi (skin 15 — aegis:npc "Leaf Shinobi (chatter)", also the Quest Giver): the chūnin flak jacket in 3D
     (thick collar, four scroll pouches, the red swirl on the back), a Leaf headband with its ties, a ponytail, a scar
     across the nose, a taped thigh holster, taped shins and a hip pouch.
+  Travelling Merchant (skin 32 — aegis:npc "Travelling Merchant"): a jolly old peddler with a grey beard and an indigo
+    head-cloth, an ochre haori with a coin crest on the back, an indigo obi with a red coin purse, arm guards and white leg
+    wraps; in 3D a wide woven straw kasa with a chin cord, a tall wooden pack-cabinet of drawers with brass handles on
+    his back (rope straps across the chest), a green furoshiki bundle tied on top, a rolled straw mat underneath, a red
+    paper lantern swinging from its side and a soroban (abacus) tucked into the obi.
 
 The skins go to tools/skins/ (gen_npcs.py prefers hand-made skins from there) and straight into the pack. The gear is a
-second geometry that the NPC client entities draw only for those two skins (gen_npcs.py: client_humanoid). Its bones are
+second geometry that the NPC client entities draw only for those skins (gen_npcs.py: client_humanoid). Its bones are
 named like the body's, so the walk, look and attack animations move it too; animation.aegis.npc_gear.flutter makes the
-ties, scarf tails and ponytail sway (more when running).
+ties, scarf tails, ponytail and the merchant's lantern sway (more when running).
 
   python3 tools/gen_npc_gear.py                        # skins + gear (then gen_npcs.py writes the client entities)
-  python3 tools/gen_npc_gear.py --preview out.png      # both NPCs, old and new, front and back
+  python3 tools/gen_npc_gear.py --preview out.png      # all three NPCs, front and back
+  python3 tools/gen_npc_gear.py --preview out.png --only merchant
 """
 import argparse
 import json
@@ -292,6 +298,131 @@ def leaf_skin():
     return s.img
 
 
+# ---------------------------------------------------------------------------
+# Travelling Merchant
+# ---------------------------------------------------------------------------
+MC = dict(skin=(214, 168, 128), skin_d=(182, 136, 100), cheek=(222, 146, 118), beard=(168, 160, 152), beard_d=(130, 122, 116),
+          hair=(120, 112, 106), brow=(150, 142, 136), eye=(46, 34, 30), mouth=(120, 58, 52), teeth=(236, 228, 214),
+          cloth=(52, 74, 128), cloth_d=(36, 52, 94), fleck=(214, 222, 236),
+          coat=(176, 120, 52), coat_d=(132, 86, 34), coat_h=(204, 150, 74), crest=(236, 220, 172),
+          kimono=(228, 216, 192), kimono_d=(194, 182, 158), obi=(46, 58, 98), obi_d=(32, 42, 74), purse=(160, 44, 38),
+          cord=(226, 186, 72), guard=(52, 66, 104), guard_d=(36, 46, 76), pants=(86, 72, 62), pants_d=(64, 52, 44),
+          legwrap=(226, 218, 200), legwrap_d=(190, 182, 166), straw=(214, 186, 118), straw_d=(170, 140, 80),
+          straw_h=(232, 208, 148), sandal=(198, 170, 106), strap=(90, 56, 38), wood=(126, 86, 52), wood_d=(84, 56, 32),
+          wood_h=(152, 108, 68), brass=(222, 182, 76), brass_d=(150, 112, 40), green=(58, 124, 74), green_d=(40, 92, 54),
+          lantern=(198, 42, 36), lantern_d=(150, 26, 24), black=(34, 30, 28), rope=(186, 160, 112), rope_d=(146, 122, 82))
+
+
+def merchant_skin():
+    c = MC
+    s = Skin(32)
+    W, w_, H, b, K, S, s_, C, G, g, M, Q, T = (c["cloth"], c["fleck"], c["hair"], c["brow"], c["eye"], c["skin"], c["skin_d"],
+                                               c["cheek"], c["beard"], c["beard_d"], c["beard"], c["mouth"], c["teeth"])
+    pal = {"W": W, "w": w_, "H": H, "b": b, "K": K, "S": S, "s": s_, "C": C, "G": G, "g": g, "M": M, "Q": Q, "T": T,
+           "D": c["cloth_d"], "E": (240, 236, 228)}
+    # --- head: indigo head-cloth under the hat, grey hair and beard, a big grin and happy squinting eyes
+    s.paint("head", ("top",), lambda f, u, v, wd, ht: W if (u * 3 + v * 5) % 7 else w_)
+    s.paint("head", ("bottom",), lambda f, u, v, wd, ht: g)
+    s.paint("head", SIDES, lambda f, u, v, wd, ht: s.cloth(S, f, u, v, wd, ht, 0.02))
+    s.rows("head", "front", ["WWwWWWwW",
+                             "HSSSSSSH",
+                             "bbbSSbbb",
+                             "SEKSSKES",
+                             "CSSssSSC",
+                             "GMMssMMG",
+                             "GgQTTQgG",
+                             "gGGGGGGg"], pal)
+    for side in ("right", "left"):
+        art = ["WWWWWWWW",
+               "HHHHHSSS",
+               "HHHHSSSS",
+               "HHHsSSSS",
+               "HHHssSSS",
+               "HHGGSSSG",
+               "HGGGGGGG",
+               "GGGGGGGG"]
+        s.rows("head", side, art if side == "right" else [r[::-1] for r in art], pal)
+    s.rows("head", "back", ["WWWDDWWW",
+                            "HHHDDHHH",
+                            "HHHHHHHH",
+                            "HhHHHHhH".replace("h", "b"),
+                            "HHHHHHHH",
+                            "HHbHHbHH",
+                            "HHHHHHHH",
+                            "gHHHHHHg"], pal)
+    # hat layer: the head-cloth's knot and its two tails at the back, beard volume
+    s.rows("head", "back", ["...DD...", "..W..W..", "..W..W..", "..w..W.."], pal, layer=1)
+    s.rows("head", "front", ["........", "........", "........", "........", "........", "........", "G......G", ".GGGGGG."], pal, layer=1)
+
+    # --- body: an ochre haori open over a cream kimono, an indigo obi with a coin purse, a coin crest on the back
+    body = {"C": c["coat"], "L": c["coat_d"], "K": c["kimono"], "k": c["kimono_d"], "O": c["obi"], "o": c["obi_d"],
+            "Y": c["cord"], "P": c["purse"], "Z": c["crest"], "h": c["coat_h"]}
+    s.paint("body", SIDES, lambda f, u, v, wd, ht: s.cloth(c["coat"], f, u, v, wd, ht, 0.04))
+    s.paint("body", ("top",), lambda f, u, v, wd, ht: c["coat"])
+    s.paint("body", ("bottom",), lambda f, u, v, wd, ht: c["coat_d"])
+    s.rows("body", "front", ["hLKKKKLh",
+                             "CLKkkKLC",
+                             "CCLKKLCC",
+                             "CCLKKLCC",
+                             "CCLKKLCC",
+                             "CCLKkLCC",
+                             "CCLKKLCC",
+                             "CCLKKLCC",
+                             "OOOOOOOO",
+                             "OYOOOoOO",
+                             "CPPLKKLC",
+                             "CPPLKkLC"], body)
+    s.rows("body", "back", ["hhhhhhhh",
+                            "CCCCCCCC",
+                            "CCZZZZCC",
+                            "CZZCCZZC",
+                            "CZCCCCZC",
+                            "CZCCCCZC",
+                            "CZZCCZZC",
+                            "CCZZZZCC",
+                            "OOOOOOOO",
+                            "OOOoOOOO",
+                            "CCCCCCCC",
+                            "LCCCCCCL"], body)
+    for side in ("right", "left"):
+        s.rows("body", side, ["hhhh"] + ["CCCC"] * 7 + ["OOOO", "OoOO", "CCCC", "LCCL"], body)
+    # jacket layer: the haori stands out from the kimono and the obi (lapels, shoulders, hem)
+    s.rows("body", "front", ["hL....Lh",
+                             "CL....LC",
+                             "CCL..LCC",
+                             "CCL..LCC",
+                             "CCL..LCC",
+                             "CCL..LCC",
+                             "CCL..LCC",
+                             "CCL..LCC",
+                             "........",
+                             "........",
+                             "C..L..LC",
+                             "L..L..LL"], body, layer=1)
+    s.paint("body", ("back", "right", "left"), lambda f, u, v, wd, ht: None if v in (8, 9) else
+            (c["crest"] if f == "back" and (u, v) in {(2, 2), (3, 2), (4, 2), (5, 2), (2, 7), (3, 7), (4, 7), (5, 7), (1, 3), (1, 4), (1, 5),
+                                                       (1, 6), (6, 3), (6, 4), (6, 5), (6, 6), (2, 3), (5, 3), (2, 6), (5, 6)}
+             else s.cloth(c["coat"], f, u, v, wd, ht, 0.03, 1.1, 0.92)), layer=1)
+
+    # --- arms: wide haori sleeves to the elbow, indigo arm guards, hands
+    for arm in ("rarm", "larm"):
+        s.paint(arm, SIDES, lambda f, u, v, wd, ht: s.cloth(c["coat"], f, u, v, wd, ht) if v < 6 else
+                ((c["guard"] if v % 3 else c["guard_d"]) if v < 11 else c["skin"]))
+        s.paint(arm, ("top",), lambda f, u, v, wd, ht: c["coat"])
+        s.paint(arm, ("bottom",), lambda f, u, v, wd, ht: c["skin_d"])
+        s.paint(arm, SIDES, lambda f, u, v, wd, ht: (c["coat_d"] if v == 6 else s.cloth(c["coat"], f, u, v, wd, ht, 0.03)) if v <= 6 else None,
+                layer=1)
+    # --- legs: dark hakama trousers, white leg wraps tied with indigo, straw sandals
+    for leg in ("rleg", "lleg"):
+        s.paint(leg, SIDES, lambda f, u, v, wd, ht: s.cloth(c["pants"], f, u, v, wd, ht) if v < 6 else
+                ((c["cloth"] if v == 6 else (c["legwrap"] if v % 2 else c["legwrap_d"])) if v < 11 else c["sandal"]))
+        s.paint(leg, ("top",), lambda f, u, v, wd, ht: c["pants"])
+        s.paint(leg, ("bottom",), lambda f, u, v, wd, ht: c["sandal"])
+        s.put(leg, "front", 1, 11, c["skin"]); s.put(leg, "front", 2, 11, c["strap"])
+        s.paint(leg, SIDES, lambda f, u, v, wd, ht: s.cloth(c["pants_d"], f, u, v, wd, ht, 0.03) if v < 5 else None, layer=1)
+    return s.img
+
+
 # ===========================================================================
 # Gear (3D): a second geometry with the body's bone names
 # ===========================================================================
@@ -532,6 +663,114 @@ def leaf_gear():
     return g, tex
 
 
+def merchant_gear():
+    c = MC
+    g = Gear("geometry.aegis.gear_merchant")
+    tex = Image.new("RGBA", (GW, GW), (0, 0, 0, 0))
+    KASA_TOP, KASA_UNDER, KASA_EDGE, KASA_RIM = (0, 0, 16, 16), (16, 0, 16, 16), (0, 16, 16, 2), (0, 18, 16, 2)
+    CAB_BACK, CAB_SIDE, CAB_TOP, CAB_DARK = (32, 0, 10, 16), (42, 0, 5, 16), (47, 0, 10, 5), (47, 5, 10, 5)
+    FURO_FRONT, FURO_SIDE, FURO_TOP, KNOT = (32, 16, 8, 4), (40, 16, 4, 4), (44, 16, 8, 4), (52, 16, 4, 4)
+    LANTERN, LANT_CAP = (56, 16, 4, 6), (60, 16, 3, 3)
+    MAT_SIDE, MAT_END, STRAP, ABACUS, CORD, SHIN = (0, 20, 12, 4), (12, 20, 4, 4), (16, 20, 2, 12), (18, 20, 6, 5), (28, 20, 2, 6), (0, 24, 16, 4)
+
+    # --- textures
+    def kasa_top(u, v, wd, ht):
+        r = math.hypot(u - wd / 2 + 0.5, v - ht / 2 + 0.5)
+        ang = math.degrees(math.atan2(v - ht / 2 + 0.5, u - wd / 2 + 0.5)) % 30
+        k = 1.06 if int(r) % 2 == 0 else 0.9
+        if ang < 3:
+            k *= 0.86                                  # the radial ribs of the weave
+        return mul(c["straw"], k)
+    tex_fill(tex, KASA_TOP, kasa_top)
+    tex_fill(tex, KASA_UNDER, lambda u, v, wd, ht: mul(c["straw_d"], 0.82 + 0.1 * ((u + v) % 2)))
+    tex_fill(tex, KASA_EDGE, lambda u, v, wd, ht: mul(c["straw_h"] if v == 0 else c["straw"], 0.88 if u % 3 == 0 else 1.0))
+    tex_fill(tex, KASA_RIM, lambda u, v, wd, ht: mul(c["straw_d"], 0.9 if u % 2 else 1.0))
+
+    def cab_back(u, v, wd, ht):
+        frame = u in (0, wd - 1) or v in (0, ht - 1)
+        if frame:
+            return c["wood_d"]
+        if v in (4, 8, 12) or (v in (9, 10, 11) and u == wd // 2):
+            return mul(c["wood_d"], 1.1)               # drawer seams (the third row is two half drawers)
+        if (v in (2, 6, 14) and u in (wd // 2 - 1, wd // 2)) or (v == 10 and u in (2, wd - 3)):
+            return c["brass"]                          # ring handles
+        if (v in (3, 7, 15 - 1) and u in (wd // 2 - 1, wd // 2) and v != 14) or (v == 11 and u in (2, wd - 3)):
+            return c["brass_d"]
+        return mul(c["wood"], (1.08 if v % 4 == 1 else 1.0) * (0.95 if (u * 7 + v * 3) % 5 == 0 else 1.0))
+    tex_fill(tex, CAB_BACK, cab_back)
+    tex_fill(tex, CAB_SIDE, lambda u, v, wd, ht: c["brass"] if (v in (0, ht - 1) and u in (0, wd - 1)) else
+             (c["wood_d"] if (u in (0, wd - 1) or v in (0, ht - 1)) else mul(c["wood"], 0.92 if u % 2 else 1.02)))
+    tex_fill(tex, CAB_TOP, lambda u, v, wd, ht: c["wood_d"] if (u in (0, wd - 1) or v in (0, ht - 1)) else mul(c["wood_h"], 0.95 if v % 2 else 1.0))
+    tex_fill(tex, CAB_DARK, lambda u, v, wd, ht: mul(c["wood_d"], 0.9 if (u + v) % 2 else 1.0))
+
+    def furoshiki(u, v, wd, ht):
+        if (u * 2 + v * 3) % 7 == 0 or (u * 3 + v) % 11 == 5:
+            return mix(c["green"], (226, 236, 226), 0.8)   # the white karakusa swirls
+        return mul(c["green"], 1.06 - 0.12 * v / ht)
+    for r in (FURO_FRONT, FURO_SIDE, FURO_TOP):
+        tex_fill(tex, r, furoshiki)
+    tex_fill(tex, KNOT, lambda u, v, wd, ht: mul(c["green_d"], 1.1 if (u + v) % 3 == 0 else 1.0))
+    tex_fill(tex, LANTERN, lambda u, v, wd, ht: c["black"] if v in (0, ht - 1) else
+             ((246, 214, 120) if (v in (2, 3) and u in (1, 2)) else (c["lantern"] if v % 2 else mix(c["lantern"], (240, 120, 70), 0.35))))
+    tex_fill(tex, LANT_CAP, lambda u, v, wd, ht: c["black"])
+    tex_fill(tex, MAT_SIDE, lambda u, v, wd, ht: mul(c["straw"], 1.05 if v % 2 else 0.9) if u not in (2, 9) else c["rope_d"])
+    tex_fill(tex, MAT_END, lambda u, v, wd, ht: mul(c["straw_d"], 0.8 + 0.12 * (int(math.hypot(u - 1.5, v - 1.5) * 2) % 2)))
+    tex_fill(tex, STRAP, lambda u, v, wd, ht: c["rope"] if (u + v) % 2 else c["rope_d"])
+    tex_fill(tex, ABACUS, lambda u, v, wd, ht: c["wood_d"] if (u in (0, wd - 1) or v in (0, ht - 1) or v == 2) else
+             ((128, 64, 40) if (u + v) % 2 else (176, 104, 62)))
+    tex_fill(tex, CORD, lambda u, v, wd, ht: c["purse"] if v % 2 else mul(c["purse"], 0.8))
+    tex_fill(tex, SHIN, lambda u, v, wd, ht: c["cloth"] if v == 0 else (c["legwrap"] if (u + v) % 4 else c["legwrap_d"]))
+
+    # --- the kasa: woven rings, each a square plus three turned copies so it reads as round
+    hat = g.bone("g_kasa", "head", (0, 31, 0))
+    y = 31.2
+    for i, wd in enumerate([13.8, 12.8, 11.2, 9.2, 6.8, 4.2, 1.8]):
+        side = KASA_RIM if i in (0, 3) else KASA_EDGE
+        for turn in (0, 22.5, 45, 67.5):
+            k = 0.94 if turn else 0.92
+            g.cube(hat, (-wd * k / 2, y + i * 0.75, -wd * k / 2), (wd * k, 0.8, wd * k),
+                   uv(up=KASA_TOP, down=KASA_UNDER, rest=side), rotation=(0, turn, 0) if turn else None, pivot=(0, y + i * 0.75, 0))
+    g.cube(hat, (-0.6, y + 5.2, -0.6), (1.2, 0.9, 1.2), uv(rest=KASA_RIM))                    # the knot at the tip
+    for x in (-4.75, 4.45):                                                                    # the chin cord
+        g.cube(hat, (x, 25.4, -0.4), (0.3, 5.9, 0.3), uv(rest=CORD))
+    g.cube(hat, (-4.6, 25.1, -0.4), (9.2, 0.3, 0.3), uv(rest=CORD))
+
+    # --- the pack-cabinet on his back, its lid, the furoshiki bundle on top and the rolled mat under it
+    cab = g.bone("g_pack", "body", (0, 24, 2.3))
+    g.cube(cab, (-4.3, 11.6, 2.35), (8.6, 14.2, 5.0), uv(south=CAB_BACK, north=CAB_SIDE, east=CAB_SIDE, west=CAB_SIDE, up=CAB_TOP, down=CAB_DARK))
+    g.cube(cab, (-4.65, 25.8, 2.1), (9.3, 0.7, 5.6), uv(up=CAB_TOP, rest=CAB_DARK))                     # the lid
+    g.cube(cab, (-3.6, 26.5, 2.9), (7.2, 3.0, 4.2), uv(north=FURO_FRONT, south=FURO_FRONT, east=FURO_SIDE, west=FURO_SIDE,
+                                                       up=FURO_TOP, down=FURO_TOP), inflate=0.12)
+    g.cube(cab, (-1.0, 29.4, 4.1), (2.0, 1.1, 1.8), uv(rest=KNOT))                                     # the knot and its ears
+    g.cube(cab, (-2.5, 29.3, 4.4), (1.6, 0.9, 1.2), uv(rest=KNOT), rotation=(0, 0, 28), pivot=(-1.0, 29.6, 5.0))
+    g.cube(cab, (0.9, 29.3, 4.4), (1.6, 0.9, 1.2), uv(rest=KNOT), rotation=(0, 0, -28), pivot=(1.0, 29.6, 5.0))
+    g.cube(cab, (-4.1, 9.2, 3.8), (8.2, 2.4, 2.4), uv(north=MAT_SIDE, south=MAT_SIDE, up=MAT_SIDE, down=MAT_SIDE, east=MAT_END, west=MAT_END))
+    g.cube(cab, (-4.05, 9.2, 3.8), (8.1, 2.4, 2.4), uv(north=MAT_SIDE, south=MAT_SIDE, up=MAT_SIDE, down=MAT_SIDE, east=MAT_END, west=MAT_END),
+           rotation=(45, 0, 0), pivot=(0, 10.4, 5.0))
+    for x in (-2.9, 2.3):                                                                               # rope ties round the mat
+        g.cube(cab, (x, 8.95, 3.55), (0.6, 2.9, 2.9), ring(STRAP))
+    # rope straps over the shoulders and down the chest, and a cross strap
+    st = g.bone("g_straps", "body", (0, 24, 0))
+    for x in (-3.2, 2.0):
+        g.cube(st, (x, 14.2, -2.62), (1.2, 9.8, 0.32), uv(north=STRAP, south=STRAP, rest=(STRAP[0], STRAP[1], 1, 1)))
+    g.cube(st, (-2.0, 19.0, -2.6), (4.0, 0.9, 0.28), uv(north=(STRAP[0], STRAP[1], 2, 4), rest=(STRAP[0], STRAP[1], 1, 1)))
+    # the red paper lantern, swinging from the cabinet's side
+    lt = g.bone("g_lantern", "body", (6.2, 24.6, 5.2))
+    g.cube(lt, (6.05, 22.6, 5.05), (0.3, 2.0, 0.3), uv(rest=CORD))
+    g.cube(lt, (4.85, 22.0, 3.85), (2.7, 0.6, 2.7), uv(rest=LANT_CAP))
+    g.cube(lt, (4.5, 17.9, 3.5), (3.4, 4.1, 3.4), uv(north=LANTERN, south=LANTERN, east=LANTERN, west=LANTERN, up=LANT_CAP, down=LANT_CAP))
+    g.cube(lt, (4.85, 17.3, 3.85), (2.7, 0.6, 2.7), uv(rest=LANT_CAP))
+    g.cube(cab, (4.3, 24.2, 4.95), (2.05, 0.4, 0.5), uv(rest=CAB_DARK))                                  # the hook it hangs from
+    # the soroban tucked into the obi
+    ab = g.bone("g_abacus", "body", (2.5, 13.8, -2.5), (0, 0, -12))
+    g.cube(ab, (0.9, 12.3, -2.78), (3.3, 2.9, 0.42), uv(north=ABACUS, south=ABACUS, rest=(ABACUS[0], ABACUS[1], 1, 1)))
+    # leg wraps (kyahan)
+    for name, leg, x in (("g_shin_r", "rightLeg", -3.9), ("g_shin_l", "leftLeg", -0.1)):
+        b = g.bone(name, leg, BONE_PIVOT[leg])
+        g.cube(b, (x, 1.3, -2), (4, 4.3, 4), ring(SHIN), inflate=0.18)
+    return g, tex
+
+
 FLUTTER = {
     "loop": True,
     "bones": {
@@ -541,6 +780,7 @@ FLUTTER = {
         "g_scarf_t1": {"rotation": ["math.sin(q.life_time * 240 + 40) * 8 + q.modified_move_speed * 42", 0, "math.sin(q.life_time * 200 + 60) * 6"]},
         "g_scarf_t1b": {"rotation": ["math.sin(q.life_time * 240 - 30) * 12 + q.modified_move_speed * 18", 0, 0]},
         "g_tail": {"rotation": ["math.sin(q.life_time * 200) * 4 - q.modified_move_speed * 12", 0, "math.sin(q.life_time * 150) * 4"]},
+        "g_lantern": {"rotation": ["math.sin(q.life_time * 170) * 5 + q.modified_move_speed * 30", 0, "math.sin(q.life_time * 130) * 6"]},
     },
 }
 
@@ -548,21 +788,21 @@ FLUTTER = {
 def build():
     NPC.mkdir(parents=True, exist_ok=True)
     HAND.mkdir(parents=True, exist_ok=True)
-    for name, img in (("rogue", rogue_skin()), ("chunin", leaf_skin())):
+    for name, img in (("rogue", rogue_skin()), ("chunin", leaf_skin()), ("merchant", merchant_skin())):
         img.save(HAND / f"{name}.png")
         img.save(NPC / f"{name}.png")
-    for name, (g, tex) in (("rogue", rogue_gear()), ("chunin", leaf_gear())):
+    for name, (g, tex) in (("rogue", rogue_gear()), ("chunin", leaf_gear()), ("merchant", merchant_gear())):
         tex.paste(Image.new("RGBA", NONE[2:], (0, 0, 0, 0)), NONE[:2])
         tex.save(NPC / f"gear_{name}.png")
         w(RP / "models" / "entity" / f"gear_{name}.geo.json", g.json())
     w(RP / "animations" / "npc_gear.animation.json", {"format_version": "1.8.0", "animations": {"animation.aegis.npc_gear.flutter": FLUTTER}})
-    print("NPC gear: rogue + chunin skins, 2 gear models.")
+    print("NPC gear: rogue, chunin and merchant skins, 3 gear models.")
 
 
 # ===========================================================================
 # Preview
 # ===========================================================================
-def preview(out, compare=None, views=None, size=(260, 300), fov=55):
+def preview(out, compare=None, views=None, size=(260, 300), fov=55, only=None):
     sys.path.insert(0, str(Path(__file__).resolve().parent))
     import cine_preview as CP
 
@@ -594,13 +834,13 @@ def preview(out, compare=None, views=None, size=(260, 300), fov=55):
                       "rightLeg": {"rotation": [16, 0, 0]}, "leftLeg": {"rotation": [-16, 0, 0]}, "head": {"rotation": [-4, 14, 0]}}}
     views = views or [(2.6, 1.6, 1.5, 1.05), (-2.6, -1.6, 1.6, 1.05)]
     cw, chh = size
-    rows = [("rogue", "Rogue Ninja"), ("chunin", "Leaf Shinobi")]
+    rows = [r for r in (("rogue", "Rogue Ninja"), ("chunin", "Leaf Shinobi"), ("merchant", "Travelling Merchant")) if not only or r[0] in only]
     cols = (len(views) if compare else 0) + len(views)
     img = Image.new("RGB", (cw * cols, chh * len(rows)), (24, 22, 28))
     d = ImageDraw.Draw(img)
     for ri, (name, label) in enumerate(rows):
         variants = []
-        if compare:
+        if compare and (Path(compare) / f"{name}.png").exists():
             variants.append(("before", Path(compare) / f"{name}.png", None))
         variants.append(("now", NPC / f"{name}.png", RP / "models" / "entity" / f"gear_{name}.geo.json"))
         col = 0
@@ -632,9 +872,10 @@ if __name__ == "__main__":
     ap.add_argument("--compare", help="folder with the old rogue.png / chunin.png to show side by side")
     ap.add_argument("--view", help='"f,r,h,lookh;…" camera views')
     ap.add_argument("--fov", type=float, default=55)
+    ap.add_argument("--only", help="comma-separated: rogue,chunin,merchant")
     a = ap.parse_args()
     if a.preview:
         vs = [tuple(float(x) for x in v.split(",")) for v in a.view.split(";")] if a.view else None
-        preview(a.preview, a.compare, vs, fov=a.fov)
+        preview(a.preview, a.compare, vs, fov=a.fov, only=a.only.split(",") if a.only else None)
     else:
         build()

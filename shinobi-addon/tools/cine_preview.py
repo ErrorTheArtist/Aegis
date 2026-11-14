@@ -79,6 +79,7 @@ def cube_faces(c):
     """Yields (face, corner(u01, v01) -> model point, (tex u, tex v, tex w, tex h))."""
     (ox, oy, oz), (w, h, d) = c["origin"], c["size"]
     inf = c.get("inflate", 0)
+    w0, h0, d0 = w, h, d   # box UV is laid out from the cube's own size; inflating only stretches it (as in the game)
     ox, oy, oz, w, h, d = ox - inf, oy - inf, oz - inf, w + 2 * inf, h + 2 * inf, d + 2 * inf
     uv = c["uv"]
     geo = {
@@ -103,8 +104,9 @@ def cube_faces(c):
             yield face, geo[face], (u, v, uw, vh)
     else:
         u, v = uv
-        box = {"north": (u + d, v + d, w, h), "south": (u + 2 * d + w, v + d, w, h), "west": (u, v + d, d, h),
-               "east": (u + d + w, v + d, d, h), "up": (u + d, v, w, d), "down": (u + d + w, v, w, d)}
+        bw, bh, bd = w0, h0, d0   # (not w, h, d: the face lambdas above read those when called)
+        box = {"north": (u + bd, v + bd, bw, bh), "south": (u + 2 * bd + bw, v + bd, bw, bh), "west": (u, v + bd, bd, bh),
+               "east": (u + bd + bw, v + bd, bd, bh), "up": (u + bd, v, bw, bd), "down": (u + bd + bw, v, bw, bd)}
         for face, rect in box.items():
             if rect[2] > 0 and rect[3] > 0:
                 yield face, geo[face], rect

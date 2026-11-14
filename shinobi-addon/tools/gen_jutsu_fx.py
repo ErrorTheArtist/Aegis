@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Assets for the newer jutsu: water orb variant, Rasenshuriken model, extra particles,
-and the scroll items + recipes. Run from the shinobi-addon folder:  python3 tools/gen_jutsu_fx.py
+and the scroll items. Run from the shinobi-addon folder:  python3 tools/gen_jutsu_fx.py
 """
 import json
 from pathlib import Path
@@ -130,7 +130,7 @@ part("heal", "spark", "particles_add", {
     shrink("0.2"),
     {"0.0": [0.9, 1, 0.9, 1], "0.5": [0.4, 1, 0.5, 0.9], "1.0": [0.2, 0.9, 0.3, 0]})
 
-# --- scroll items + recipes -----------------------------------------------------------
+# --- scroll items (no recipes) -----------------------------------------------------------
 SCROLLS = {
     "phoenix_scroll": ("Fire Style: Phoenix Sage Fire", "minecraft:fire_charge"),
     "water_dragon_scroll": ("Water Style: Water Dragon Bullet", "minecraft:kelp"),
@@ -152,14 +152,8 @@ for sid, (name, cat) in SCROLLS.items():
         "description": {"identifier": f"aegis:{sid}", "menu_category": {"category": "equipment"}},
         "components": {"minecraft:icon": {"textures": {"default": f"aegis_{sid}"}}, "minecraft:display_name": {"value": f"Jutsu Scroll: {name}"},
                        "minecraft:max_stack_size": 1, "minecraft:glint": True}}})
-    ing = [{"item": "aegis:blank_scroll"}, {"item": cat}, {"item": "minecraft:lapis_lazuli"}]
-    if sid == "rasenshuriken_scroll":
-        ing.append({"item": "minecraft:feather"})
-    if sid in ("kirin_scroll", "eight_gates_scroll", "great_fire_scroll"):
-        ing.append({"item": "minecraft:diamond"})
-    w(BP / "recipes" / f"{sid}.json", {"format_version": "1.21.60", "minecraft:recipe_shapeless": {
-        "description": {"identifier": f"aegis:{sid}"}, "tags": ["crafting_table"], "ingredients": ing,
-        "result": {"item": f"aegis:{sid}", "count": 1}, "unlock": {"context": "AlwaysUnlocked"}}})
+    # No crafting since v1.46: scrolls are bought from the Jutsu Sensei or the Travelling Merchant.
+    (BP / "recipes" / f"{sid}.json").unlink(missing_ok=True)
     atlas["texture_data"][f"aegis_{sid}"] = {"textures": f"textures/items/aegis/{sid}"}
 w(atlas_p, atlas)
 print("Jutsu FX generated.")

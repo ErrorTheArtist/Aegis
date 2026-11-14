@@ -45,6 +45,13 @@
             0,
             "math.sin(q.life_time * 150) * 4"
           ]
+        },
+        "g_lantern": {
+          "rotation": [
+            "math.sin(q.life_time * 170) * 5 + q.modified_move_speed * 30",
+            0,
+            "math.sin(q.life_time * 130) * 6"
+          ]
         }
       }
     }

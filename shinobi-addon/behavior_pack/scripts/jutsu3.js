@@ -1,4 +1,4 @@
-// Third wave of jutsu scrolls — none of them clan-bound. Sold by the Jutsu Sensei, craftable from a blank scroll.
+// Third wave of jutsu scrolls — none of them clan-bound. Sold by the Jutsu Sensei (and now and then the Travelling Merchant).
 //   Fire:      Dragon Flame Bullet · Ash Pile Burning
 //   Water:     Water Shark Bomb · Hiding in Mist · Exploding Water Shockwave
 //   Wind:      Sickle Weasel · Pressure Damage

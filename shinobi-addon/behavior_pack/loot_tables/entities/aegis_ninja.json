@@ -52,11 +52,6 @@
         },
         {
           "type": "item",
-          "name": "aegis:blank_scroll",
-          "weight": 2
-        },
-        {
-          "type": "item",
           "name": "aegis:shuriken",
           "weight": 2,
           "functions": [
@@ -71,7 +66,7 @@
         },
         {
           "type": "empty",
-          "weight": 6
+          "weight": 8
         }
       ]
     }

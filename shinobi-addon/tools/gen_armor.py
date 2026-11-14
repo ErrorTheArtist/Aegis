@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Generates wearable armor/clothing: 3D attachable models (bones follow the player), palette
-textures, 32x32 icons rendered from the models, items and recipes.
+textures, 32x32 icons rendered from the models and items (no recipes: armour is bought, not crafted).
 Run from the shinobi-addon folder:  python3 tools/gen_armor.py
 """
 import json
@@ -417,12 +417,9 @@ for aid, a in ARMOR.items():
             "minecraft:durability": {"max_durability": a["dur"]},
             "minecraft:enchantable": {"slot": ench, "value": 12},
             "minecraft:repairable": {"repair_items": [{"items": ["minecraft:iron_ingot", "minecraft:leather"], "repair_amount": 80}]}}}})
-    if a["recipe"]:
-        pattern, key = a["recipe"]
-        w(BP / "recipes" / f"{aid}.json", {"format_version": "1.21.60", "minecraft:recipe_shaped": {
-            "description": {"identifier": f"aegis:{aid}"}, "tags": ["crafting_table"], "pattern": pattern,
-            "key": {k: {"item": v} for k, v in key.items()}, "result": {"item": f"aegis:{aid}", "count": 1},
-            "unlock": {"context": "AlwaysUnlocked"}}})
+    # No crafting since v1.46: armour comes from the Weaponsmith and the Travelling Merchant (a["recipe"] is kept only
+    # as a note of the old pattern). Remove any recipe an older build left behind.
+    (BP / "recipes" / f"{aid}.json").unlink(missing_ok=True)
     atlas["texture_data"][f"aegis_{aid}"] = {"textures": f"textures/items/aegis/{aid}"}
 w(atlas_p, atlas)
 print("Generated", len(ARMOR), "armor pieces.")

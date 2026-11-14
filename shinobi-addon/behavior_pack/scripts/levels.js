@@ -254,6 +254,20 @@ function giveRecord(player) {
   }
 }
 
+// A replacement Shinobi Record (sold by the Jutsu Sensei — there is no crafting recipe any more). Kept on death like the
+// first one; dropped at the player's feet if the inventory is full.
+export function giveRecordCopy(player) {
+  try {
+    const stack = new ItemStack(RECORD_ITEM, 1);
+    stack.keepOnDeath = true;
+    const left = player.getComponent("minecraft:inventory")?.container?.addItem(stack);
+    if (left) player.dimension.spawnItem(left, player.location);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function handleRecordUse(player, itemStack) {
   if (itemStack.typeId !== RECORD_ITEM) return false;
   system.run(() => openStats(player).catch(() => {}));

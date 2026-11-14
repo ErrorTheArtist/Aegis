@@ -47,6 +47,30 @@
         "s37": "textures/entity/aegis/npc/puppeteer",
         "s38": "textures/entity/aegis/npc/sand_genin_a",
         "s39": "textures/entity/aegis/npc/sand_genin_b",
+        "s40": "textures/entity/aegis/npc/mizukage",
+        "s41": "textures/entity/aegis/npc/raikage",
+        "s42": "textures/entity/aegis/npc/tsuchikage",
+        "s43": "textures/entity/aegis/npc/rain_leader",
+        "s44": "textures/entity/aegis/npc/mist_shinobi",
+        "s45": "textures/entity/aegis/npc/cloud_shinobi",
+        "s46": "textures/entity/aegis/npc/stone_shinobi",
+        "s47": "textures/entity/aegis/npc/rain_shinobi",
+        "s48": "textures/entity/aegis/npc/mist_jonin",
+        "s49": "textures/entity/aegis/npc/cloud_jonin",
+        "s50": "textures/entity/aegis/npc/stone_jonin",
+        "s51": "textures/entity/aegis/npc/rain_jonin",
+        "s52": "textures/entity/aegis/npc/mist_swordsman",
+        "s53": "textures/entity/aegis/npc/cloud_blademaster",
+        "s54": "textures/entity/aegis/npc/stone_smith",
+        "s55": "textures/entity/aegis/npc/rain_umbrella",
+        "s56": "textures/entity/aegis/npc/mist_genin_a",
+        "s57": "textures/entity/aegis/npc/mist_genin_b",
+        "s58": "textures/entity/aegis/npc/cloud_genin_a",
+        "s59": "textures/entity/aegis/npc/cloud_genin_b",
+        "s60": "textures/entity/aegis/npc/stone_genin_a",
+        "s61": "textures/entity/aegis/npc/stone_genin_b",
+        "s62": "textures/entity/aegis/npc/rain_genin_a",
+        "s63": "textures/entity/aegis/npc/rain_genin_b",
         "gear_rogue": "textures/entity/aegis/npc/gear_rogue",
         "gear_sound": "textures/entity/aegis/npc/gear_sound",
         "gear_chunin": "textures/entity/aegis/npc/gear_chunin",
@@ -57,7 +81,31 @@
         "gear_sand_jonin": "textures/entity/aegis/npc/gear_sand_jonin",
         "gear_puppeteer": "textures/entity/aegis/npc/gear_puppeteer",
         "gear_sand_genin_a": "textures/entity/aegis/npc/gear_sand_genin_a",
-        "gear_sand_genin_b": "textures/entity/aegis/npc/gear_sand_genin_b"
+        "gear_sand_genin_b": "textures/entity/aegis/npc/gear_sand_genin_b",
+        "gear_mizukage": "textures/entity/aegis/npc/gear_mizukage",
+        "gear_raikage": "textures/entity/aegis/npc/gear_raikage",
+        "gear_tsuchikage": "textures/entity/aegis/npc/gear_tsuchikage",
+        "gear_rain_leader": "textures/entity/aegis/npc/gear_rain_leader",
+        "gear_mist_shinobi": "textures/entity/aegis/npc/gear_mist_shinobi",
+        "gear_cloud_shinobi": "textures/entity/aegis/npc/gear_cloud_shinobi",
+        "gear_stone_shinobi": "textures/entity/aegis/npc/gear_stone_shinobi",
+        "gear_rain_shinobi": "textures/entity/aegis/npc/gear_rain_shinobi",
+        "gear_mist_jonin": "textures/entity/aegis/npc/gear_mist_jonin",
+        "gear_cloud_jonin": "textures/entity/aegis/npc/gear_cloud_jonin",
+        "gear_stone_jonin": "textures/entity/aegis/npc/gear_stone_jonin",
+        "gear_rain_jonin": "textures/entity/aegis/npc/gear_rain_jonin",
+        "gear_mist_swordsman": "textures/entity/aegis/npc/gear_mist_swordsman",
+        "gear_cloud_blademaster": "textures/entity/aegis/npc/gear_cloud_blademaster",
+        "gear_stone_smith": "textures/entity/aegis/npc/gear_stone_smith",
+        "gear_rain_umbrella": "textures/entity/aegis/npc/gear_rain_umbrella",
+        "gear_mist_genin_a": "textures/entity/aegis/npc/gear_mist_genin_a",
+        "gear_mist_genin_b": "textures/entity/aegis/npc/gear_mist_genin_b",
+        "gear_cloud_genin_a": "textures/entity/aegis/npc/gear_cloud_genin_a",
+        "gear_cloud_genin_b": "textures/entity/aegis/npc/gear_cloud_genin_b",
+        "gear_stone_genin_a": "textures/entity/aegis/npc/gear_stone_genin_a",
+        "gear_stone_genin_b": "textures/entity/aegis/npc/gear_stone_genin_b",
+        "gear_rain_genin_a": "textures/entity/aegis/npc/gear_rain_genin_a",
+        "gear_rain_genin_b": "textures/entity/aegis/npc/gear_rain_genin_b"
       },
       "geometry": {
         "default": "geometry.humanoid.custom",
@@ -71,7 +119,31 @@
         "gear_sand_jonin": "geometry.aegis.gear_sand_jonin",
         "gear_puppeteer": "geometry.aegis.gear_puppeteer",
         "gear_sand_genin_a": "geometry.aegis.gear_sand_genin_a",
-        "gear_sand_genin_b": "geometry.aegis.gear_sand_genin_b"
+        "gear_sand_genin_b": "geometry.aegis.gear_sand_genin_b",
+        "gear_mizukage": "geometry.aegis.gear_mizukage",
+        "gear_raikage": "geometry.aegis.gear_raikage",
+        "gear_tsuchikage": "geometry.aegis.gear_tsuchikage",
+        "gear_rain_leader": "geometry.aegis.gear_rain_leader",
+        "gear_mist_shinobi": "geometry.aegis.gear_mist_shinobi",
+        "gear_cloud_shinobi": "geometry.aegis.gear_cloud_shinobi",
+        "gear_stone_shinobi": "geometry.aegis.gear_stone_shinobi",
+        "gear_rain_shinobi": "geometry.aegis.gear_rain_shinobi",
+        "gear_mist_jonin": "geometry.aegis.gear_mist_jonin",
+        "gear_cloud_jonin": "geometry.aegis.gear_cloud_jonin",
+        "gear_stone_jonin": "geometry.aegis.gear_stone_jonin",
+        "gear_rain_jonin": "geometry.aegis.gear_rain_jonin",
+        "gear_mist_swordsman": "geometry.aegis.gear_mist_swordsman",
+        "gear_cloud_blademaster": "geometry.aegis.gear_cloud_blademaster",
+        "gear_stone_smith": "geometry.aegis.gear_stone_smith",
+        "gear_rain_umbrella": "geometry.aegis.gear_rain_umbrella",
+        "gear_mist_genin_a": "geometry.aegis.gear_mist_genin_a",
+        "gear_mist_genin_b": "geometry.aegis.gear_mist_genin_b",
+        "gear_cloud_genin_a": "geometry.aegis.gear_cloud_genin_a",
+        "gear_cloud_genin_b": "geometry.aegis.gear_cloud_genin_b",
+        "gear_stone_genin_a": "geometry.aegis.gear_stone_genin_a",
+        "gear_stone_genin_b": "geometry.aegis.gear_stone_genin_b",
+        "gear_rain_genin_a": "geometry.aegis.gear_rain_genin_a",
+        "gear_rain_genin_b": "geometry.aegis.gear_rain_genin_b"
       },
       "animations": {
         "humanoid_base_pose": "animation.humanoid.base_pose",
@@ -128,6 +200,78 @@
         },
         {
           "controller.render.aegis.npc_gear_sand_genin_b": "q.property('aegis:skin') == 39"
+        },
+        {
+          "controller.render.aegis.npc_gear_mizukage": "q.property('aegis:skin') == 40"
+        },
+        {
+          "controller.render.aegis.npc_gear_raikage": "q.property('aegis:skin') == 41"
+        },
+        {
+          "controller.render.aegis.npc_gear_tsuchikage": "q.property('aegis:skin') == 42"
+        },
+        {
+          "controller.render.aegis.npc_gear_rain_leader": "q.property('aegis:skin') == 43"
+        },
+        {
+          "controller.render.aegis.npc_gear_mist_shinobi": "q.property('aegis:skin') == 44"
+        },
+        {
+          "controller.render.aegis.npc_gear_cloud_shinobi": "q.property('aegis:skin') == 45"
+        },
+        {
+          "controller.render.aegis.npc_gear_stone_shinobi": "q.property('aegis:skin') == 46"
+        },
+        {
+          "controller.render.aegis.npc_gear_rain_shinobi": "q.property('aegis:skin') == 47"
+        },
+        {
+          "controller.render.aegis.npc_gear_mist_jonin": "q.property('aegis:skin') == 48"
+        },
+        {
+          "controller.render.aegis.npc_gear_cloud_jonin": "q.property('aegis:skin') == 49"
+        },
+        {
+          "controller.render.aegis.npc_gear_stone_jonin": "q.property('aegis:skin') == 50"
+        },
+        {
+          "controller.render.aegis.npc_gear_rain_jonin": "q.property('aegis:skin') == 51"
+        },
+        {
+          "controller.render.aegis.npc_gear_mist_swordsman": "q.property('aegis:skin') == 52"
+        },
+        {
+          "controller.render.aegis.npc_gear_cloud_blademaster": "q.property('aegis:skin') == 53"
+        },
+        {
+          "controller.render.aegis.npc_gear_stone_smith": "q.property('aegis:skin') == 54"
+        },
+        {
+          "controller.render.aegis.npc_gear_rain_umbrella": "q.property('aegis:skin') == 55"
+        },
+        {
+          "controller.render.aegis.npc_gear_mist_genin_a": "q.property('aegis:skin') == 56"
+        },
+        {
+          "controller.render.aegis.npc_gear_mist_genin_b": "q.property('aegis:skin') == 57"
+        },
+        {
+          "controller.render.aegis.npc_gear_cloud_genin_a": "q.property('aegis:skin') == 58"
+        },
+        {
+          "controller.render.aegis.npc_gear_cloud_genin_b": "q.property('aegis:skin') == 59"
+        },
+        {
+          "controller.render.aegis.npc_gear_stone_genin_a": "q.property('aegis:skin') == 60"
+        },
+        {
+          "controller.render.aegis.npc_gear_stone_genin_b": "q.property('aegis:skin') == 61"
+        },
+        {
+          "controller.render.aegis.npc_gear_rain_genin_a": "q.property('aegis:skin') == 62"
+        },
+        {
+          "controller.render.aegis.npc_gear_rain_genin_b": "q.property('aegis:skin') == 63"
         }
       ],
       "enable_attachables": true,

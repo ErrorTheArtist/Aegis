@@ -281,6 +281,31 @@ SKINS = [
     ("puppeteer", dict(hair=(38, 36, 46), top=(38, 36, 46), sleeve_len=11, pants=(38, 36, 46), belt=(92, 70, 52))),
     ("sand_genin_a", dict(hair=(92, 64, 44), top=(226, 206, 166), pants=(126, 104, 78), belt=(58, 112, 138), band=((84, 64, 48), STEEL))),
     ("sand_genin_b", dict(hair=(42, 36, 42), top=(178, 194, 204), pants=(84, 92, 104), band=((84, 64, 48), STEEL))),
+    # v1.50: the Mist, Cloud, Stone and Rain villages (gen_npc_models.py) — leaders, shinobi, jōnin, weaponsmiths, genin
+    ("mizukage", dict(hair=(150, 64, 40), top=(240, 240, 240), sleeve_len=11, pants=(55, 45, 110), hat=((240, 240, 240), (40, 100, 210)), belt=(40, 100, 210), long_hair=True)),
+    ("raikage", dict(skin=(128, 84, 58), hair=(242, 242, 238), top=(240, 240, 240), sleeve_len=2, pants=(35, 35, 40), hat=((240, 240, 240), (240, 200, 40)), belt=(240, 200, 40))),
+    ("tsuchikage", dict(hair=(236, 236, 232), top=(240, 240, 240), sleeve_len=11, pants=(80, 100, 55), hat=((240, 240, 240), (125, 90, 50)), belt=(125, 90, 50))),
+    ("rain_leader", dict(hair=(30, 28, 34), top=(64, 58, 78), sleeve_len=11, pants=(40, 38, 50), band=((62, 66, 78), STEEL), long_hair=True)),
+    ("mist_shinobi", dict(hair=(40, 46, 62), top=(44, 54, 72), sleeve_len=7, pants=(62, 70, 84), vest=(112, 130, 142), band=((42, 50, 66), STEEL))),
+    ("cloud_shinobi", dict(skin=(146, 98, 70), hair=(196, 56, 48), top=(54, 54, 62), pants=(54, 54, 62), vest=(234, 228, 210), band=((44, 44, 52), STEEL))),
+    ("stone_shinobi", dict(hair=(36, 32, 36), top=(146, 48, 44), pants=(92, 70, 56), vest=(130, 94, 64), band=((118, 42, 38), STEEL))),
+    ("rain_shinobi", dict(hair=(50, 48, 60), top=(90, 98, 114), sleeve_len=11, pants=(54, 58, 68), band=((62, 66, 78), STEEL))),
+    ("mist_jonin", dict(hair=(64, 92, 132), top=(44, 54, 72), sleeve_len=11, pants=(62, 70, 84), vest=(96, 112, 124), mask="lower")),
+    ("cloud_jonin", dict(skin=(146, 98, 70), hair=(232, 232, 236), top=(54, 54, 62), pants=(54, 54, 62), vest=(234, 228, 210), band=((44, 44, 52), STEEL))),
+    ("stone_jonin", dict(hair=(70, 52, 40), top=(146, 48, 44), pants=(92, 70, 56), vest=(130, 94, 64), band=((118, 42, 38), STEEL))),
+    ("rain_jonin", dict(hair=(74, 70, 92), top=(74, 70, 92), sleeve_len=11, pants=(54, 58, 68), mask="lower")),
+    ("mist_swordsman", dict(hair=(34, 34, 40), top=(120, 126, 122), sleeve_len=2, pants=(98, 110, 104), mask="lower", band=((42, 50, 66), STEEL))),
+    ("cloud_blademaster", dict(skin=(146, 98, 70), hair=(244, 236, 214), top=(54, 54, 62), pants=(54, 54, 62), vest=(234, 228, 210))),
+    ("stone_smith", dict(skin=(206, 160, 122), hair=(206, 160, 122), top=(146, 48, 44), pants=(92, 70, 56), apron=(110, 74, 46))),
+    ("rain_umbrella", dict(hair=(64, 54, 78), top=(90, 98, 114), sleeve_len=11, pants=(54, 58, 68), mask="lower", band=((62, 66, 78), STEEL))),
+    ("mist_genin_a", dict(hair=(40, 46, 62), top=(120, 140, 160), pants=(62, 70, 84), band=((42, 50, 66), STEEL))),
+    ("mist_genin_b", dict(hair=(70, 46, 60), top=(172, 202, 222), pants=(70, 80, 96), band=((42, 50, 66), STEEL))),
+    ("cloud_genin_a", dict(skin=(146, 98, 70), hair=(236, 236, 240), top=(222, 216, 198), pants=(54, 54, 62), band=((44, 44, 52), STEEL))),
+    ("cloud_genin_b", dict(hair=(240, 212, 120), top=(204, 204, 214), pants=(60, 60, 70), band=((44, 44, 52), STEEL))),
+    ("stone_genin_a", dict(hair=(92, 66, 46), top=(146, 48, 44), pants=(92, 70, 56), band=((118, 42, 38), STEEL))),
+    ("stone_genin_b", dict(hair=(36, 32, 36), top=(130, 94, 64), pants=(80, 62, 50), band=((118, 42, 38), STEEL))),
+    ("rain_genin_a", dict(hair=(50, 48, 60), top=(110, 118, 134), pants=(54, 58, 68), band=((62, 66, 78), STEEL))),
+    ("rain_genin_b", dict(hair=(92, 62, 112), top=(150, 132, 172), pants=(64, 62, 78), band=((62, 66, 78), STEEL))),
 ]
 (RP / "textures" / "entity" / "aegis" / "npc").mkdir(parents=True, exist_ok=True)
 for name, o in SKINS:
@@ -289,8 +314,8 @@ for name, o in SKINS:
 
 skin_tex = {f"s{i}": f"textures/entity/aegis/npc/{n}" for i, (n, _) in enumerate(SKINS)}
 # 3D gear worn over some skins (tools/gen_npc_gear.py + tools/gen_npc_models.py)
-GEARED = ("rogue", "chunin", "merchant", "sound", "chunin_f", "kazekage", "sand_shinobi", "sand_jonin", "puppeteer", "sand_genin_a", "sand_genin_b")
-GEAR = {n: i for i, (n, _) in enumerate(SKINS) if n in GEARED}
+# (every skin that has a gear model of its own: resource_pack/models/entity/gear_<name>.geo.json)
+GEAR = {n: i for i, (n, _) in enumerate(SKINS) if (RP / "models" / "entity" / f"gear_{n}.geo.json").exists()}
 w(RP / "render_controllers" / "npc.render_controllers.json", {"format_version": "1.8.0", "render_controllers": {
     "controller.render.aegis.npc": {
         "arrays": {"textures": {"Array.skins": [f"Texture.s{i}" for i in range(len(SKINS))]}},

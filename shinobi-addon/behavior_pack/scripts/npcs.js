@@ -25,7 +25,11 @@ const SKIN_NAMES = ["Sensei", "Elder", "Weaponsmith", "Ramen chef", "Hokage", "P
   "Naruto", "Sasuke", "Tsunade", "Hiruzen Sarutobi", "Minato",
   "Pain", "Konan", "Hidan", "Hidan (Jashin form)", "Kakuzu", "Sasori", "Zetsu", "Tobi",
   "Madara (Edo)", "Hashirama (Edo)", "Tobirama (Edo)", "Travelling merchant", "Leaf kunoichi",
-  "Kazekage", "Sand shinobi", "Sand jōnin", "Puppet master", "Sand genin (boy)", "Sand genin (girl)"]; // index = skin number (tools/gen_npcs.py SKINS)
+  "Kazekage", "Sand shinobi", "Sand jōnin", "Puppet master", "Sand genin (boy)", "Sand genin (girl)",
+  "Mizukage", "Raikage", "Tsuchikage", "Rain commander", "Mist shinobi", "Cloud kunoichi", "Stone kunoichi", "Rain shinobi",
+  "Mist jōnin", "Cloud jōnin", "Stone jōnin", "Rain jōnin", "Mist swordsman", "Cloud blademaster", "Stone smith", "Umbrella master",
+  "Mist genin (boy)", "Mist genin (girl)", "Cloud genin (boy)", "Cloud genin (girl)", "Stone genin (boy)", "Stone genin (girl)",
+  "Rain genin (boy)", "Rain genin (girl)"]; // index = skin number (tools/gen_npcs.py SKINS)
 
 export const NPC_TYPES = {
   sensei: { label: "Jutsu Sensei (jutsu shop)", entity: "aegis:npc", skin: 0, name: "§bJutsu Sensei", friendly: true,
@@ -38,31 +42,16 @@ export const NPC_TYPES = {
     greeting: "Welcome! One bowl or two?" },
   merchant: { label: "§6Travelling Merchant (random stock)", entity: "aegis:npc", skin: 32, name: "§6Travelling Merchant", friendly: true,
     greeting: "Fresh stock from all five great nations! Cheap ramen, rare scrolls… and if luck's with you, a Bloodline Reroll Scroll." },
-  mission_desk: { label: "Hokage (Mission Desk)", entity: "aegis:npc", skin: 4, name: "§cHokage", friendly: true,
+  mission_desk: { label: "Kage / village leader (Mission Desk)", entity: "aegis:npc", skin: 4, name: "§cHokage", friendly: true,
     greeting: "The village has work for you." },
   proctor: { label: "Chūnin Exam Proctor (rank exams)", entity: "aegis:npc", skin: 5, name: "§8Exam Proctor", friendly: true,
     greeting: "Think you're ready to rank up?" },
-  villager: { label: "Leaf Shinobi (chatter)", entity: "aegis:npc", skin: 15, skins: [15, 33], name: "§aLeaf Shinobi", friendly: true,
+  villager: { label: "Village Shinobi (chatter)", entity: "aegis:npc", skin: 15, skins: [15, 33], name: "§aLeaf Shinobi", friendly: true,
     greeting: "Nice weather for training, huh?" },
   quest_giver: { label: "§eQuest Giver (design your own quest)", entity: "aegis:npc", skin: 15, name: "§eQuest Giver", friendly: true,
     greeting: "I have a job for a capable shinobi." },
   genin: { label: "Genin (recruitable companion)", entity: "aegis:genin", skin: -1, name: "§fGenin", friendly: true,
     greeting: "Hire me and I'll fight by your side!" },
-  // The Hidden Sand: the same jobs (role), dressed for the desert.
-  sand_mission_desk: { label: "§6Sand: Kazekage (Mission Desk)", role: "mission_desk", entity: "aegis:npc", skin: 34, name: "§3Kazekage", friendly: true,
-    greeting: "The sand remembers every promise. The village has work for you." },
-  sand_sensei: { label: "§6Sand: Jutsu Sensei", role: "sensei", entity: "aegis:npc", skin: 36, name: "§6Sand Jutsu Sensei", friendly: true,
-    greeting: "Wind and sand bend to those who train. What will you learn?" },
-  sand_weaponsmith: { label: "§6Sand: Puppet Workshop (weaponsmith)", role: "weaponsmith", entity: "aegis:npc", skin: 37, name: "§5Puppet Master",
-    friendly: true, title: "§lPuppet Workshop", greeting: "Every blade I sell was tested on a puppet first." },
-  sand_proctor: { label: "§6Sand: Exam Proctor (rank exams)", role: "proctor", entity: "aegis:npc", skin: 36, name: "§6Sand Exam Proctor", friendly: true,
-    greeting: "The desert tests everyone. Are you ready for yours?" },
-  sand_villager: { label: "§6Sand: Sand Shinobi (chatter)", role: "villager", entity: "aegis:npc", skin: 35, name: "§6Sand Shinobi", friendly: true,
-    chatter: "sand", greeting: "Hot one today, huh?" },
-  sand_quest_giver: { label: "§6Sand: Quest Giver (design your own quest)", role: "quest_giver", entity: "aegis:npc", skin: 35, name: "§eSand Quest Giver",
-    friendly: true, greeting: "The desert is full of trouble. Can you handle a job?" },
-  sand_genin: { label: "§6Sand: Genin (recruitable companion)", role: "genin", entity: "aegis:genin", skin: -1, skins: [38, 39], name: "§fSand Genin",
-    friendly: true, greeting: "Hire me! I know every dune around here." },
   rogue: { label: "Rogue Ninja (hostile)", entity: "aegis:hostile_ninja", skin: 9, name: "§cRogue Ninja", tier: "rogue" },
   sound: { label: "Sound Ninja (hostile)", entity: "aegis:hostile_ninja", skin: 10, name: "§5Sound Ninja", tier: "sound" },
   anbu: { label: "Anbu (hostile)", entity: "aegis:hostile_ninja", skin: 11, name: "§7Rogue Anbu", tier: "anbu" },
@@ -76,8 +65,131 @@ export const NPC_TYPES = {
   madara_boss: { label: "§4Legend: Edo Madara Uchiha (raid boss)", entity: "aegis:legend", skin: 29, name: "§4Madara Uchiha §8[Edo Tensei]", boss: true, legend: "madara" },
 };
 const TYPE_IDS = Object.keys(NPC_TYPES);
-// What an NPC type does: the Sand types reuse the Leaf ones' jobs (a Kazekage is a Mission Desk, and so on).
-export const roleOf = (type) => NPC_TYPES[type]?.role ?? type;
+
+// ---------------------------------------------------------------------------
+// Villages. A friendly village NPC's job comes from its type; its village (the spawner's Village setting) picks the
+// outfit, name, greeting, shop title and small talk. The Leaf looks are the types' own defaults; the Ramen Shop, the
+// Clan Elder and the Travelling Merchant look the same everywhere.
+// ---------------------------------------------------------------------------
+export const VILLAGE_IDS = ["leaf", "sand", "mist", "cloud", "stone", "rain"];
+const VILLAGE_LABELS = ["§aHidden Leaf", "§6Hidden Sand", "§bHidden Mist", "§eHidden Cloud", "§7Hidden Stone", "§9Hidden Rain"];
+export const VILLAGE_LOOKS = {
+  leaf: {},
+  sand: {
+    mission_desk: { skin: 34, name: "§3Kazekage", greeting: "The sand remembers every promise. The village has work for you." },
+    sensei: { skin: 36, name: "§6Sand Jutsu Sensei", greeting: "Wind and sand bend to those who train. What will you learn?" },
+    weaponsmith: { skin: 37, name: "§5Puppet Master", title: "§lPuppet Workshop", greeting: "Every blade I sell was tested on a puppet first." },
+    proctor: { skin: 36, name: "§6Sand Exam Proctor", greeting: "The desert tests everyone. Are you ready for yours?" },
+    villager: { skin: 35, skins: [35], name: "§6Sand Shinobi", greeting: "Hot one today, huh?", chatter: [
+      "The desert sun is merciless. Never cross the dunes without water.",
+      "Lord Kazekage watches over every one of us.",
+      "A sandstorm's coming in from the west. Better stay inside the walls tonight.",
+      "Puppet masters are the pride of the Hidden Sand.",
+      "The Sand and the Leaf are allies now. Strange times.",
+      "Wind Style is in our blood out here.",
+      "Watch your step on the dunes. Quicksand doesn't care how strong you are.",
+      "The Kazekage always has missions for those who ask.",
+      "A travelling merchant made it across the desert with ramen. Ramen! Out here!",
+      "The puppet workshop sells the sharpest blades in the village.",
+    ] },
+    quest_giver: { skin: 35, name: "§eSand Quest Giver", greeting: "The desert is full of trouble. Can you handle a job?" },
+    genin: { skins: [38, 39], name: "§fSand Genin", greeting: "Hire me! I know every dune around here." },
+  },
+  mist: {
+    mission_desk: { skin: 40, name: "§9Mizukage", greeting: "The mist hides many things, but not from me. The village needs you." },
+    sensei: { skin: 48, name: "§bMist Jutsu Sensei", greeting: "Water takes any shape. So must a shinobi. What will you learn?" },
+    weaponsmith: { skin: 52, name: "§bMist Swordsman", title: "§lSwordsmith of the Mist", greeting: "Every blade here was forged for one of the Seven. Choose carefully." },
+    proctor: { skin: 48, name: "§bMist Exam Proctor", greeting: "The Bloody Mist exams are gone. Ours are still no picnic." },
+    villager: { skin: 44, skins: [44], name: "§bMist Shinobi", greeting: "Thick fog today.", chatter: [
+      "The fog's so thick this morning I walked into the Mizukage. Twice.",
+      "The Seven Swordsmen were legends here. Their blades are still out there somewhere.",
+      "The Mizukage put an end to the Bloody Mist. The academy's a kinder place now.",
+      "Water Style is our specialty — we're never far from the sea.",
+      "Watch the waterline. The tide comes in faster than you'd think.",
+      "Ever seen Kubikiribōchō? It gives me chills just thinking about it.",
+      "Hiding in Mist is the first jutsu every Mist genin learns.",
+      "The swordsmith sells blades fit for the Seven.",
+    ] },
+    quest_giver: { skin: 44, name: "§eMist Quest Giver", greeting: "Something's moving out in the fog. Care to find out what?" },
+    genin: { skins: [56, 57], name: "§fMist Genin", greeting: "Hire me! I can swim faster than anyone in the academy." },
+  },
+  cloud: {
+    mission_desk: { skin: 41, name: "§eRaikage", greeting: "Make it quick! The Cloud doesn't wait. Here's your mission!" },
+    sensei: { skin: 49, name: "§eCloud Jutsu Sensei", greeting: "Lightning strikes first. So should you. Pick a technique." },
+    weaponsmith: { skin: 53, name: "§eCloud Blademaster", title: "§lCloud Blade Forge", greeting: "Yo! Steel's sharp, rhymes are sharper. Grab a blade, partner!" },
+    proctor: { skin: 49, name: "§eCloud Exam Proctor", greeting: "Speed and power. That's the Cloud's exam." },
+    villager: { skin: 45, skins: [45], name: "§eCloud Kunoichi", greeting: "The air's thin up here, huh?", chatter: [
+      "Lord Raikage punched through another wall this morning.",
+      "Lightning Style runs in our veins.",
+      "The mountains keep us strong. And short of breath.",
+      "Heard the blademaster's latest rap? No? Lucky you.",
+      "The Cloud's sword style is the fastest there is.",
+      "Storms up here can be brutal. Stay off the peaks when the sky turns black.",
+      "Mind the cliffs — the village sits right on the edge of the clouds.",
+      "Training on the waterfall builds character. And bruises.",
+    ] },
+    quest_giver: { skin: 45, name: "§eCloud Quest Giver", greeting: "A storm's rolling in over the peaks. I need someone fast." },
+    genin: { skins: [58, 59], name: "§fCloud Genin", greeting: "Hire me! I'm the fastest genin in the Cloud!" },
+  },
+  stone: {
+    mission_desk: { skin: 42, name: "§6Tsuchikage", greeting: "Oof, my back… never mind that. The Stone has work for a solid shinobi." },
+    sensei: { skin: 50, name: "§7Stone Jutsu Sensei", greeting: "Earth is patient and unbreakable. Learn to be the same." },
+    weaponsmith: { skin: 54, name: "§7Stone Smith", title: "§lStone Forge", greeting: "Hammered on the mountain's anvil. Nothing breaks these." },
+    proctor: { skin: 50, name: "§7Stone Exam Proctor", greeting: "Stand firm or fall. That's the Stone's exam." },
+    villager: { skin: 46, skins: [46], name: "§7Stone Kunoichi", greeting: "Mind the loose rocks.", chatter: [
+      "The Tsuchikage's back is acting up again. Don't mention it.",
+      "Earth Style: as solid as our resolve.",
+      "The Explosion Corps was testing again. My ears are still ringing.",
+      "Stone doesn't break. Neither do we.",
+      "Dust Release… only the Tsuchikage's line can use it.",
+      "The rocks here are older than any village.",
+      "Careful in the canyons — rockslides come without warning.",
+      "The Stone Smith's hammers could flatten a mountain. Probably.",
+    ] },
+    quest_giver: { skin: 46, name: "§eStone Quest Giver", greeting: "Rockslides, bandits, worse… the canyons need clearing." },
+    genin: { skins: [60, 61], name: "§fStone Genin", greeting: "I'm tougher than I look! Take me with you!" },
+  },
+  rain: {
+    mission_desk: { skin: 43, name: "§9Rain Commander", greeting: "Rain washes away the weak. Prove you aren't one of them. Take a mission." },
+    sensei: { skin: 51, name: "§9Rain Jutsu Sensei", greeting: "In the rain, every drop can be a needle. Learn what we know." },
+    weaponsmith: { skin: 55, name: "§5Umbrella Master", title: "§lUmbrella Armory", greeting: "Never underestimate an umbrella. Ours open into a storm of senbon." },
+    proctor: { skin: 51, name: "§9Rain Exam Proctor", greeting: "The Rain's exams are held in the storm. Ready?" },
+    villager: { skin: 47, skins: [47], name: "§9Rain Shinobi", greeting: "Still raining.", chatter: [
+      "It's always raining here. You stop noticing after a while.",
+      "The great nations fought their wars on our land. Never again.",
+      "The commander watches over the village from the tower.",
+      "Keep your umbrella close. Here, it's a weapon.",
+      "Paper flowers bloom in the rain… strange, isn't it?",
+      "Breathe through the mask when the fog rolls in off the lake.",
+      "Old-timers still tell stories about a giant salamander.",
+      "Rain Style ninja can hear you coming in the downpour.",
+    ] },
+    quest_giver: { skin: 47, name: "§eRain Quest Giver", greeting: "Something moves in the downpour. I need someone to look into it." },
+    genin: { skins: [62, 63], name: "§fRain Genin", greeting: "I know every alley in the rain. Hire me!" },
+  },
+};
+// v1.49 had a separate Sand type for each job; their spawners become the job + Village: Hidden Sand.
+const LEGACY = { sand_mission_desk: "mission_desk", sand_sensei: "sensei", sand_weaponsmith: "weaponsmith", sand_proctor: "proctor",
+  sand_villager: "villager", sand_quest_giver: "quest_giver", sand_genin: "genin" };
+export const roleOf = (type) => LEGACY[type] ?? NPC_TYPES[type]?.role ?? type;
+// What a friendly NPC of this type looks like (and says) in this village.
+export function lookOf(type, village) {
+  const role = roleOf(type);
+  const own = VILLAGE_LOOKS[village]?.[role];
+  return own ? { ...NPC_TYPES[role], ...own } : NPC_TYPES[role] ?? {};
+}
+// The type and village of an NPC that's standing in the world (its spawner's settings, or what it was spawned with).
+function npcIdentity(npc, cfg) {
+  let raw;
+  let village;
+  try {
+    raw = npc.getDynamicProperty("aegis:role");
+    village = npc.getDynamicProperty("aegis:village");
+  } catch {
+    /* ignore */
+  }
+  return { type: roleOf(cfg?.type ?? raw), village: cfg?.village ?? village ?? (LEGACY[raw] ? "sand" : "leaf") };
+}
 export const AKATSUKI = {
   itachi: { name: "§cItachi Uchiha", skin: 12 },
   kisame: { name: "§9Kisame Hoshigaki", skin: 13 },
@@ -159,13 +271,8 @@ const priceOf = (base, cfg) => Math.max(1, Math.round(base * 100 * ((cfg?.price 
 
 // The default greeting of this NPC's own type (a Sand sensei greets differently from a Leaf one).
 function greetingOf(npc, fallback) {
-  let type;
-  try {
-    type = npc.getDynamicProperty("aegis:role");
-  } catch {
-    type = undefined;
-  }
-  return NPC_TYPES[type]?.greeting ?? NPC_TYPES[fallback]?.greeting ?? "";
+  const { type, village } = npcIdentity(npc, cfgForEntity(npc));
+  return lookOf(type, village).greeting ?? NPC_TYPES[fallback]?.greeting ?? "";
 }
 
 function say(player, npc, text) {
@@ -189,12 +296,21 @@ function loadAll() {
   for (const k of keys) {
     try {
       const c = JSON.parse(world.getDynamicProperty(`aegis:sp:${k}`) ?? "null");
-      if (c) configs.set(k, c);
+      if (!c) continue;
+      if (LEGACY[c.type]) {   // a v1.49 Sand spawner: the job + Village: Hidden Sand (its NPCs respawn with the new settings)
+        c.type = LEGACY[c.type];
+        c.village = "sand";
+        c.spawned = false;
+        world.setDynamicProperty(`aegis:sp:${k}`, JSON.stringify(c));
+      }
+      configs.set(k, c);
     } catch {
       /* skip corrupt entry */
     }
   }
 }
+
+export const reloadSpawners = () => loadAll(); // (tests / admin tools)
 
 function save(cfg) {
   configs.set(cfg.key, cfg);
@@ -214,13 +330,14 @@ export function listQuests() {
 }
 
 export function defaultsFor(type) {
+  type = roleOf(type); // (a v1.49 Sand type name is its job now)
   const t = NPC_TYPES[type];
   const hostile = !t.friendly;
   const role = roleOf(type);
   return {
     type, name: "", skin: -1, clan: "random", member: "random",
     count: 1, respawn: true, delay: t.legend ? 300 : hostile ? 60 : 10, stay: !hostile && role !== "villager" && role !== "genin",
-    radius: hostile ? 12 : 6, invuln: !hostile, price: 100, greeting: "", height: 0, restock: 20,
+    radius: hostile ? 12 : 6, invuln: !hostile, price: 100, greeting: "", height: 0, restock: 20, village: "leaf",
   };
 }
 
@@ -232,8 +349,9 @@ export function createSpawner(dim, loc, overrides = {}) {
   } catch {
     /* ignore */
   }
-  const type = overrides.type ?? "sensei";
-  const cfg = { ...defaultsFor(type), ...overrides, key: keyOf(dim, pos), dim: dim.id, ...pos, spawned: false };
+  const type = roleOf(overrides.type ?? "sensei");
+  const village = LEGACY[overrides.type] ? "sand" : overrides.village;
+  const cfg = { ...defaultsFor(type), ...overrides, type, ...(village ? { village } : {}), key: keyOf(dim, pos), dim: dim.id, ...pos, spawned: false };
   save(cfg);
   return cfg;
 }
@@ -272,8 +390,10 @@ function spawnPoint(dim, cfg) {
 
 function resolveSkin(cfg) {
   if (cfg.skin >= 0) return cfg.skin;
-  const skins = NPC_TYPES[cfg.type]?.skins;
+  const look = lookOf(cfg.type, cfg.village);
+  const skins = look.skins;
   if (skins?.length) return skins[Math.floor(Math.random() * skins.length)]; // a random look each time one spawns
+  if (VILLAGE_LOOKS[cfg.village]?.[roleOf(cfg.type)]?.skin !== undefined) return look.skin;
   if (cfg.type === "genin") return 6 + Math.floor(Math.random() * 3);
   if (cfg.type === "akatsuki") return AKATSUKI[cfg.memberResolved]?.skin ?? 12;
   return NPC_TYPES[cfg.type].skin;
@@ -281,12 +401,14 @@ function resolveSkin(cfg) {
 
 export function setupNpc(e, cfg, extra = {}) {
   const t = NPC_TYPES[cfg.type];
+  const look = lookOf(cfg.type, cfg.village);
   const member = cfg.type === "akatsuki" ? (cfg.member === "random" ? Object.keys(AKATSUKI)[Math.floor(Math.random() * Object.keys(AKATSUKI).length)] : cfg.member) : undefined;
   cfg.memberResolved = member;
   try {
     if (cfg.key) e.addTag(tagOf(cfg.key));
     for (const tag of extra.tags ?? []) e.addTag(tag);
     e.setDynamicProperty("aegis:role", cfg.type);
+    if (t.friendly) e.setDynamicProperty("aegis:village", cfg.village ?? "leaf");
     if (cfg.key) e.setDynamicProperty("aegis:spawner", cfg.key);
     if (member) e.setDynamicProperty("aegis:member", member);
     if (member === "kisame") e.triggerEvent("aegis:equip_kisame"); // Samehada in hand
@@ -302,7 +424,7 @@ export function setupNpc(e, cfg, extra = {}) {
     e.setProperty("aegis:skin", resolveSkin(cfg));
     if (cfg.name) e.nameTag = cfg.name;
     else if (member) e.nameTag = AKATSUKI[member].name;
-    else if (roleOf(cfg.type) !== "clan_elder") e.nameTag = t.name;
+    else if (roleOf(cfg.type) !== "clan_elder") e.nameTag = look.name ?? t.name;
     if (!extra.natural) e.triggerEvent("aegis:persist");
     if (t.tier) e.triggerEvent(`aegis:tier_${t.tier}`);
     if (t.friendly) {
@@ -388,7 +510,7 @@ async function spawnerMenu(player, cfg) {
   const t = NPC_TYPES[cfg.type];
   const form = new ActionFormData()
     .title("§lNPC Spawner")
-    .body(`§7Type: §f${t.label}\n§7Name: §f${cfg.name || t.name}\n§7Count: §f${cfg.count}§7 · Respawn: §f${cfg.respawn ? cfg.delay + "s" : "off"}\n§7Position: §f${cfg.x} ${cfg.y} ${cfg.z}`)
+    .body(`§7Type: §f${t.label}${t.friendly ? `\n§7Village: ${VILLAGE_LABELS[Math.max(0, VILLAGE_IDS.indexOf(cfg.village ?? "leaf"))]}` : ""}\n§7Name: §f${cfg.name || lookOf(cfg.type, cfg.village).name || t.name}\n§7Count: §f${cfg.count}§7 · Respawn: §f${cfg.respawn ? cfg.delay + "s" : "off"}\n§7Position: §f${cfg.x} ${cfg.y} ${cfg.z}`)
     .button("§2Configure")
     .button("§9Respawn now")
     .button("§6Remove NPCs (they come back if respawn is on)")
@@ -430,6 +552,7 @@ async function configure(player, cfg) {
   const f = new ModalFormData()
     .title("§lConfigure NPC Spawner")
     .dropdown("NPC type", TYPE_IDS.map((id) => NPC_TYPES[id].label), Math.max(0, TYPE_IDS.indexOf(cfg.type)))
+    .dropdown("Village (how village NPCs look and talk)", VILLAGE_LABELS, Math.max(0, VILLAGE_IDS.indexOf(cfg.village ?? "leaf")))
     .textField("Name (empty = default; § colour codes work)", "default", cfg.name)
     .dropdown("Outfit", ["Default for this NPC", ...SKIN_NAMES], cfg.skin + 1)
     .dropdown("Clan (Clan Elder only)", clanIds.map((c) => (c === "random" ? "Random" : CLANS[c].name)), Math.max(0, clanIds.indexOf(cfg.clan)))
@@ -453,28 +576,29 @@ async function configure(player, cfg) {
     // sensible defaults for the new type, then apply the rest of the form
     Object.assign(cfg, { ...defaultsFor(cfg.type), type: cfg.type });
   }
-  cfg.name = String(v[1] ?? "").trim();
-  cfg.skin = Number(v[2]) - 1;
-  cfg.clan = clanIds[Number(v[3])] ?? "random";
-  cfg.member = MEMBER_IDS[Number(v[4])] ?? "random";
-  cfg.count = Number(v[5]);
-  cfg.respawn = !!v[6];
-  cfg.delay = Number(v[7]);
+  cfg.village = VILLAGE_IDS[Number(v[1])] ?? "leaf";
+  cfg.name = String(v[2] ?? "").trim();
+  cfg.skin = Number(v[3]) - 1;
+  cfg.clan = clanIds[Number(v[4])] ?? "random";
+  cfg.member = MEMBER_IDS[Number(v[5])] ?? "random";
+  cfg.count = Number(v[6]);
+  cfg.respawn = !!v[7];
+  cfg.delay = Number(v[8]);
   if (cfg.type === oldType) {
-    cfg.stay = !!v[8];
-    cfg.invuln = !!v[10];
+    cfg.stay = !!v[9];
+    cfg.invuln = !!v[11];
   }
-  cfg.radius = Number(v[9]);
-  cfg.price = Number(v[11]);
-  cfg.greeting = String(v[12] ?? "").trim();
-  cfg.height = Number(v[13]);
-  cfg.restock = Number(v[14]) || cfg.restock || 20;
+  cfg.radius = Number(v[10]);
+  cfg.price = Number(v[12]);
+  cfg.greeting = String(v[13] ?? "").trim();
+  cfg.height = Number(v[14]);
+  cfg.restock = Number(v[15]) || cfg.restock || 20;
   cfg.stock = undefined; // a merchant re-rolls its wares with the new settings
   removeNpcs(cfg);
   cfg.spawned = false;
   cfg.missingSince = undefined;
   save(cfg);
-  player.sendMessage(`§aSpawner saved: §f${NPC_TYPES[cfg.type].label}§7. Cover the block if you like — the NPC spawns in the first free space above it.`);
+  player.sendMessage(`§aSpawner saved: §f${NPC_TYPES[cfg.type].label}${NPC_TYPES[cfg.type].friendly ? ` §7(${VILLAGE_LABELS[VILLAGE_IDS.indexOf(cfg.village)]}§7)` : ""}§7. Cover the block if you like — the NPC spawns in the first free space above it.`);
   if (roleOf(cfg.type) === "quest_giver") {
     if (!cfg.quest) {
       cfg.quest = defaultQuest();
@@ -599,7 +723,7 @@ const SHOPS = {
 async function shop(player, npc, cfg, list, title, back) {
   const ems = getRyo(player);
   const lvl = getLevel(player);
-  const f = new ActionFormData().title(title).body(`§7${cfg?.greeting || NPC_TYPES[cfg?.type ?? npc.getDynamicProperty("aegis:role")]?.greeting || ""}\n\n§6Your Ryō: §f${fmtRyo(ems)}`);
+  const f = new ActionFormData().title(title).body(`§7${cfg?.greeting || greetingOf(npc, cfg?.type)}\n\n§6Your Ryō: §f${fmtRyo(ems)}`);
   if (back) f.button("§l« Back");
   for (const [id, , label, base, req] of list) {
     const p = priceOf(base, cfg);
@@ -1050,29 +1174,17 @@ const CHATTER = [
   "A sword's only as good as the chakra you put into it.",
 ];
 
-const SAND_CHATTER = [
-  "The desert sun is merciless. Never cross the dunes without water.",
-  "Lord Kazekage watches over every one of us.",
-  "A sandstorm's coming in from the west. Better stay inside the walls tonight.",
-  "Puppet masters are the pride of the Hidden Sand.",
-  "The Sand and the Leaf are allies now. Strange times.",
-  "Wind Style is in our blood out here.",
-  "Watch your step on the dunes. Quicksand doesn't care how strong you are.",
-  "The Kazekage always has missions for those who ask.",
-  "A travelling merchant made it across the desert with ramen. Ramen! Out here!",
-  "The puppet workshop sells the sharpest blades in the village.",
-];
-
 async function talk(player, npc) {
-  const type = npc.getDynamicProperty("aegis:role");
-  const role = roleOf(type);
   const cfg = cfgForEntity(npc);
+  const { type, village } = npcIdentity(npc, cfg);
+  const role = roleOf(type);
+  const look = lookOf(type, village);
   if (player.isSneaking && isCreative(player) && cfg) return spawnerMenu(player, cfg);
   switch (role) {
     case "sensei":
       return senseiMenu(player, npc, cfg);
     case "weaponsmith":
-      return shop(player, npc, cfg, SHOPS.weaponsmith, NPC_TYPES[type]?.title ?? "§lWeaponsmith");
+      return shop(player, npc, cfg, SHOPS.weaponsmith, look.title ?? "§lWeaponsmith");
     case "ramen":
       return shop(player, npc, cfg, SHOPS.ramen, "§lRamen Shop");
     case "merchant":
@@ -1087,7 +1199,7 @@ async function talk(player, npc) {
       return questGiver(player, npc, cfg);
     case "villager":
     default: {
-      const lines = NPC_TYPES[type]?.chatter === "sand" ? SAND_CHATTER : CHATTER;
+      const lines = look.chatter ?? CHATTER;
       say(player, npc, cfg?.greeting || lines[Math.floor(Math.random() * lines.length)]);
     }
   }

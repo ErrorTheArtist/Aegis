@@ -53,6 +53,13 @@
             "math.sin(q.life_time * 130) * 6"
           ]
         },
+        "g_longhair": {
+          "rotation": [
+            "math.sin(q.life_time * 120) * 2 + q.modified_move_speed * 10",
+            0,
+            0
+          ]
+        },
         "g_neckcloth": {
           "rotation": [
             "math.sin(q.life_time * 160) * 4 + q.modified_move_speed * 30",

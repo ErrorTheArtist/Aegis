@@ -44,7 +44,31 @@
             "Texture.s36",
             "Texture.s37",
             "Texture.s38",
-            "Texture.s39"
+            "Texture.s39",
+            "Texture.s40",
+            "Texture.s41",
+            "Texture.s42",
+            "Texture.s43",
+            "Texture.s44",
+            "Texture.s45",
+            "Texture.s46",
+            "Texture.s47",
+            "Texture.s48",
+            "Texture.s49",
+            "Texture.s50",
+            "Texture.s51",
+            "Texture.s52",
+            "Texture.s53",
+            "Texture.s54",
+            "Texture.s55",
+            "Texture.s56",
+            "Texture.s57",
+            "Texture.s58",
+            "Texture.s59",
+            "Texture.s60",
+            "Texture.s61",
+            "Texture.s62",
+            "Texture.s63"
           ]
         }
       },
@@ -177,6 +201,270 @@
       ],
       "textures": [
         "Texture.gear_sand_genin_b"
+      ]
+    },
+    "controller.render.aegis.npc_gear_mizukage": {
+      "geometry": "Geometry.gear_mizukage",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_mizukage"
+      ]
+    },
+    "controller.render.aegis.npc_gear_raikage": {
+      "geometry": "Geometry.gear_raikage",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_raikage"
+      ]
+    },
+    "controller.render.aegis.npc_gear_tsuchikage": {
+      "geometry": "Geometry.gear_tsuchikage",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_tsuchikage"
+      ]
+    },
+    "controller.render.aegis.npc_gear_rain_leader": {
+      "geometry": "Geometry.gear_rain_leader",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_rain_leader"
+      ]
+    },
+    "controller.render.aegis.npc_gear_mist_shinobi": {
+      "geometry": "Geometry.gear_mist_shinobi",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_mist_shinobi"
+      ]
+    },
+    "controller.render.aegis.npc_gear_cloud_shinobi": {
+      "geometry": "Geometry.gear_cloud_shinobi",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_cloud_shinobi"
+      ]
+    },
+    "controller.render.aegis.npc_gear_stone_shinobi": {
+      "geometry": "Geometry.gear_stone_shinobi",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_stone_shinobi"
+      ]
+    },
+    "controller.render.aegis.npc_gear_rain_shinobi": {
+      "geometry": "Geometry.gear_rain_shinobi",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_rain_shinobi"
+      ]
+    },
+    "controller.render.aegis.npc_gear_mist_jonin": {
+      "geometry": "Geometry.gear_mist_jonin",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_mist_jonin"
+      ]
+    },
+    "controller.render.aegis.npc_gear_cloud_jonin": {
+      "geometry": "Geometry.gear_cloud_jonin",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_cloud_jonin"
+      ]
+    },
+    "controller.render.aegis.npc_gear_stone_jonin": {
+      "geometry": "Geometry.gear_stone_jonin",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_stone_jonin"
+      ]
+    },
+    "controller.render.aegis.npc_gear_rain_jonin": {
+      "geometry": "Geometry.gear_rain_jonin",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_rain_jonin"
+      ]
+    },
+    "controller.render.aegis.npc_gear_mist_swordsman": {
+      "geometry": "Geometry.gear_mist_swordsman",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_mist_swordsman"
+      ]
+    },
+    "controller.render.aegis.npc_gear_cloud_blademaster": {
+      "geometry": "Geometry.gear_cloud_blademaster",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_cloud_blademaster"
+      ]
+    },
+    "controller.render.aegis.npc_gear_stone_smith": {
+      "geometry": "Geometry.gear_stone_smith",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_stone_smith"
+      ]
+    },
+    "controller.render.aegis.npc_gear_rain_umbrella": {
+      "geometry": "Geometry.gear_rain_umbrella",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_rain_umbrella"
+      ]
+    },
+    "controller.render.aegis.npc_gear_mist_genin_a": {
+      "geometry": "Geometry.gear_mist_genin_a",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_mist_genin_a"
+      ]
+    },
+    "controller.render.aegis.npc_gear_mist_genin_b": {
+      "geometry": "Geometry.gear_mist_genin_b",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_mist_genin_b"
+      ]
+    },
+    "controller.render.aegis.npc_gear_cloud_genin_a": {
+      "geometry": "Geometry.gear_cloud_genin_a",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_cloud_genin_a"
+      ]
+    },
+    "controller.render.aegis.npc_gear_cloud_genin_b": {
+      "geometry": "Geometry.gear_cloud_genin_b",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_cloud_genin_b"
+      ]
+    },
+    "controller.render.aegis.npc_gear_stone_genin_a": {
+      "geometry": "Geometry.gear_stone_genin_a",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_stone_genin_a"
+      ]
+    },
+    "controller.render.aegis.npc_gear_stone_genin_b": {
+      "geometry": "Geometry.gear_stone_genin_b",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_stone_genin_b"
+      ]
+    },
+    "controller.render.aegis.npc_gear_rain_genin_a": {
+      "geometry": "Geometry.gear_rain_genin_a",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_rain_genin_a"
+      ]
+    },
+    "controller.render.aegis.npc_gear_rain_genin_b": {
+      "geometry": "Geometry.gear_rain_genin_b",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_rain_genin_b"
       ]
     }
   }

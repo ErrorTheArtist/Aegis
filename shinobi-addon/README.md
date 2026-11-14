@@ -633,7 +633,8 @@ The **NPC Spawner** block is only in the creative inventory (no recipe, drops no
 3. Tap the block again in creative (or **sneak + talk** to one of its NPCs, or `/scriptevent aegis:spawner`
    while looking at it) to: **Configure**, **Respawn now**, **Remove NPCs**, or **Delete spawner**.
 
-Settings: NPC type · name (colour codes work) · outfit (40) · clan (Clan Elder) · Akatsuki member ·
+Settings: NPC type · **village** (how village NPCs look and talk — see *Village NPCs*) · name (colour codes work) · outfit (64) ·
+clan (Clan Elder) · Akatsuki member ·
 how many to keep spawned (1–6) · respawn on/off + delay (5–600 s) · stay in place / wander radius ·
 invulnerable · shop prices / mission rewards % · greeting line · spawn height (0 = first free space) ·
 restock time (Travelling Merchant, 5–120 min). A Travelling Merchant's spawner menu also has **Restock now**.
@@ -677,23 +678,44 @@ Players talk to the Quest Giver to accept, see their progress, claim the reward 
 | **Weaponsmith** | Kunai, shuriken, headbands, seven legendary swords (Lv 15–35 — Samehada is quest-only), Leaf / Anbu / Samurai armour, repairs the item in your hand |
 | **Ramen Shop** | Ichiraku Ramen (heal + 60 chakra + regen), Miso Ramen (+30 chakra + speed), Soldier Pills |
 | **Travelling Merchant** | **Random wares that change every 20 minutes** (set per spawner): cheap ramen every time, plus 4–5 random finds — Bloodline Reroll Scrolls, bargain jutsu scrolls, swords and armour, Akatsuki gear, pills, kunai… Limited stock shared by everyone. Buys back old Blank Scrolls. See *The Travelling Merchant* below |
-| **Hokage (Mission Desk)** | D/C/B/A/S missions (kill mobs, ninja, a Tailed Beast, an Akatsuki member) for XP, Ryō and items |
+| **Kage / village leader (Mission Desk)** | D/C/B/A/S missions (kill mobs, ninja, a Tailed Beast, an Akatsuki member) for XP, Ryō and items |
 | **Exam Proctor** | Rank exams: **Chūnin** (Lv 20, beat 4 rogue ninja in 90 s), **Jōnin** (Lv 60, 3 Anbu + 3 Sound in 2 min), nothing higher — exams stop at Jōnin. Ranks show on your name tag and give +5/+10 stat points |
 | **Clan Elder** | For their clan: **Clan Mastery** 1–3 (+10% clan max chakra, −10% clan ability cooldowns each); the Uchiha Elder also awakens the **Eternal Mangekyō**. Others: **Bloodline transfer** into that clan (6,400 Ryō, Lv 30) |
-| **Leaf Shinobi** | Chatter and tips. Each one is a shinobi or a kunoichi at random: the 3D chūnin flak jacket (a thick rolled collar, four raised scroll pouches, the vest over the shoulders, the red swirl crest on the back) over the navy uniform, the Leaf headband with its ties, a taped thigh holster; spiky black hair and a nose bandage, or auburn bangs and a swinging ponytail (the Quest Giver is the shinobi) |
+| **Village Shinobi** | Chatter and tips. In the Leaf each one is a shinobi or a kunoichi at random: the 3D chūnin flak jacket (a thick rolled collar, four raised scroll pouches, the vest over the shoulders, the red swirl crest on the back) over the navy uniform, the Leaf headband with its ties, a taped thigh holster; spiky black hair and a nose bandage, or auburn bangs and a swinging ponytail (the Quest Giver is the shinobi) |
 | **Genin** | Recruit for 1,500 Ryō — follows you, fights, levels up to 10 (Strength, Resistance, hearts). Talk to toggle follow/stay or dismiss |
 
-**Hidden Sand NPCs** (the *Sand: …* types in the spawner list) do the same jobs, dressed for the desert:
+### Village NPCs
 
-| NPC | Job | Look |
-|---|---|---|
-| **Kazekage** | Mission Desk | White Kage robe with teal trim and sash, robe skirts, the tall Kage hat with its 風 badge and veil; red hair, dark-ringed eyes |
-| **Sand Jutsu Sensei** | Jutsu Sensei | A Sand jōnin: white head-wrap with a veil over half the face, red marks under the eye, the Sand flak jacket over a dark suit |
-| **Puppet Master** | Weaponsmith (*Puppet Workshop*) | Black hooded suit with pointed ears and the Sand plate, purple war paint, a bandaged puppet strapped to his back |
-| **Sand Exam Proctor** | Exam Proctor | The Sand jōnin |
-| **Sand Shinobi** | Chatter about life in the desert | Cream head-wrap with the Sand headband (hourglass mark) and a sun cloth, rust-red scarf, the tan Sand flak jacket (padded ribs, big shoulder guards, cross-strap) |
-| **Sand Quest Giver** | Quest Giver | The Sand Shinobi |
-| **Sand Genin** | Recruitable companion | A boy in a sand tunic with a satchel, or a girl in pale blue with a red scarf — at random |
+Every friendly village NPC has a **Village** setting on its spawner (Hidden Leaf by default). The job stays the same —
+missions, jutsu, the shop, exams, chatter, quests, companions — and the village picks the outfit, the name, the
+greeting, the shop's name and the small talk (each village's shinobi talk about their own home). Every look is also in
+the spawner's *Outfit* list.
+
+| Job | Leaf | Sand | Mist | Cloud | Stone | Rain |
+|---|---|---|---|---|---|---|
+| **Kage / leader** (Mission Desk) | Hokage | Kazekage | Mizukage | Raikage | Tsuchikage | Rain Commander |
+| **Jutsu Sensei** · **Exam Proctor** | Sensei · Proctor | Sand jōnin | Mist jōnin | Cloud jōnin | Stone jōnin | Rain jōnin |
+| **Weaponsmith** | Weaponsmith | Puppet Master (*Puppet Workshop*) | Mist Swordsman (*Swordsmith of the Mist*) | Cloud Blademaster (*Cloud Blade Forge*) | Stone Smith (*Stone Forge*) | Umbrella Master (*Umbrella Armory*) |
+| **Village Shinobi** (chatter) · **Quest Giver** | Leaf shinobi / kunoichi | Sand shinobi | Mist shinobi | Cloud kunoichi | Stone kunoichi | Rain shinobi |
+| **Genin** (companion) | three Leaf genin | Sand genin boy / girl | Mist genin boy / girl | Cloud genin boy / girl | Stone genin boy / girl | Rain genin boy / girl |
+
+The looks:
+- **Kage**: the white Kage robe and tall Kage hat in each village's colour, with its kanji on the hat's badge (風 teal,
+  水 blue, 雷 gold, 土 brown). The **Kazekage** has red hair and dark-ringed eyes; the **Mizukage** long auburn hair down
+  to her waist with a lock over one eye; the **Raikage** is dark-skinned and white-haired with a white moustache, his
+  robe sleeveless over bare arms with gold bracelets; the **Tsuchikage** is an old man with a white beard, bushy brows
+  and a big red nose. The **Rain Commander** wears no Kage hat: a dark armoured cloak, shoulder plates, a rope belt, a
+  respirator mask and long black hair.
+- **Flak jackets**: the Sand's tan jacket with padded ribs, big shoulder guards and a cross-strap; the Mist's blue-grey
+  jacket quilted in vertical ribs with a dark sash; the Cloud's white one-shouldered jacket with a strap and a single
+  shoulder guard; the Stone's brown jacket with a flared collar, a right shoulder guard, a red sash and one red sleeve;
+  the Rain's long slate cloak with caped shoulders. Each wears its village's headband (hourglass, slanting strokes,
+  cloud, mountain, falling rain).
+- **Jōnin**: the Sand's head-wrap and face veil; the Mist's bandana, face mask and short sword; the Cloud's white hair over
+  one eye and a long sword; the Stone's beard; the Rain's hood and respirator.
+- **Weaponsmiths**: a puppet master with a bandaged puppet on his back; a swordsman with a bandage-wrapped face and a huge
+  cleaver; a blademaster in sunglasses and a white scarf with four swords fanned on his back; a bald, bearded smith in
+  goggles and a leather apron with a stone hammer; an umbrella master with a respirator and a folded umbrella.
 
 The Ramen Shop, Clan Elder and Travelling Merchant serve every village as they are.
 
@@ -951,11 +973,23 @@ python3 tools/gen_particles.py --preview fire_burst ice_burst heal -o sheet.png
 
 The timers start when the server starts. Intervals are the two constants at the top of `behavior_pack/scripts/lagclear.js`.
 
+## NPCs for every village (v1.50)
+
+- The **Mist, Cloud, Stone and Rain** villages get their own NPCs, like the Sand did in v1.49: a leader (Mizukage,
+  Raikage, Tsuchikage, Rain Commander), a jōnin (Jutsu Sensei and Exam Proctor), a village shinobi (chatter and Quest
+  Giver), a weaponsmith with a twist (swordsman, blademaster, stone smith, umbrella master) and two genin — 24 new models.
+  See *Village NPCs*.
+- The NPC Spawner has a **Village** setting instead of a separate type for every job in every village: choose the job,
+  then the village. *Hokage (Mission Desk)* is now *Kage / village leader (Mission Desk)* and *Leaf Shinobi (chatter)* is
+  *Village Shinobi (chatter)* — with the Leaf village they're exactly what they were.
+- Spawners made with v1.49's *Sand: …* types turn into the same job with Village: Hidden Sand by themselves.
+- Models: `tools/gen_npc_models.py` (shared builders for the Kage, the village shinobi and their five flak jackets, and the
+  genin). Preview any of them: `python3 tools/gen_npc_gear.py --preview npcs.png --only raikage,mist_swordsman`.
+
 ## The Hidden Sand, and new Sound and Leaf models (v1.49)
 
-- **Sand Village NPCs**: seven new NPC Spawner types (*Sand: Kazekage (Mission Desk)*, *Sand: Jutsu Sensei*,
-  *Sand: Puppet Workshop (weaponsmith)*, *Sand: Exam Proctor*, *Sand: Sand Shinobi (chatter)*, *Sand: Quest Giver*,
-  *Sand: Genin*) with five new models — see *Hidden Sand NPCs* in the NPC table. They do exactly what their Leaf
+- **Sand Village NPCs**: the Kazekage, a Sand jōnin, the Puppet Master, a Sand shinobi and two Sand genin (since v1.50
+  they're the Hidden Sand option of the spawner's Village setting — see *Village NPCs*). They do exactly what their Leaf
   counterparts do (missions, jutsu, shop, exams, quests, companions) with their own names and greetings, and the Sand
   Shinobi talk about the desert.
 - **Sound Ninja**, remodelled: a hand-painted skin and 3D gear (rope belt and bow, music-note headband, spiky hair,

@@ -37,7 +37,14 @@
             "Texture.s29",
             "Texture.s30",
             "Texture.s31",
-            "Texture.s32"
+            "Texture.s32",
+            "Texture.s33",
+            "Texture.s34",
+            "Texture.s35",
+            "Texture.s36",
+            "Texture.s37",
+            "Texture.s38",
+            "Texture.s39"
           ]
         }
       },
@@ -62,6 +69,17 @@
         "Texture.gear_rogue"
       ]
     },
+    "controller.render.aegis.npc_gear_sound": {
+      "geometry": "Geometry.gear_sound",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_sound"
+      ]
+    },
     "controller.render.aegis.npc_gear_chunin": {
       "geometry": "Geometry.gear_chunin",
       "materials": [
@@ -82,6 +100,83 @@
       ],
       "textures": [
         "Texture.gear_merchant"
+      ]
+    },
+    "controller.render.aegis.npc_gear_chunin_f": {
+      "geometry": "Geometry.gear_chunin_f",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_chunin_f"
+      ]
+    },
+    "controller.render.aegis.npc_gear_kazekage": {
+      "geometry": "Geometry.gear_kazekage",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_kazekage"
+      ]
+    },
+    "controller.render.aegis.npc_gear_sand_shinobi": {
+      "geometry": "Geometry.gear_sand_shinobi",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_sand_shinobi"
+      ]
+    },
+    "controller.render.aegis.npc_gear_sand_jonin": {
+      "geometry": "Geometry.gear_sand_jonin",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_sand_jonin"
+      ]
+    },
+    "controller.render.aegis.npc_gear_puppeteer": {
+      "geometry": "Geometry.gear_puppeteer",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_puppeteer"
+      ]
+    },
+    "controller.render.aegis.npc_gear_sand_genin_a": {
+      "geometry": "Geometry.gear_sand_genin_a",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_sand_genin_a"
+      ]
+    },
+    "controller.render.aegis.npc_gear_sand_genin_b": {
+      "geometry": "Geometry.gear_sand_genin_b",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_sand_genin_b"
       ]
     }
   }

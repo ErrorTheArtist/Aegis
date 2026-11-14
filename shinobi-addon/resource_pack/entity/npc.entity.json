@@ -40,15 +40,38 @@
         "s30": "textures/entity/aegis/npc/hashirama",
         "s31": "textures/entity/aegis/npc/tobirama",
         "s32": "textures/entity/aegis/npc/merchant",
+        "s33": "textures/entity/aegis/npc/chunin_f",
+        "s34": "textures/entity/aegis/npc/kazekage",
+        "s35": "textures/entity/aegis/npc/sand_shinobi",
+        "s36": "textures/entity/aegis/npc/sand_jonin",
+        "s37": "textures/entity/aegis/npc/puppeteer",
+        "s38": "textures/entity/aegis/npc/sand_genin_a",
+        "s39": "textures/entity/aegis/npc/sand_genin_b",
         "gear_rogue": "textures/entity/aegis/npc/gear_rogue",
+        "gear_sound": "textures/entity/aegis/npc/gear_sound",
         "gear_chunin": "textures/entity/aegis/npc/gear_chunin",
-        "gear_merchant": "textures/entity/aegis/npc/gear_merchant"
+        "gear_merchant": "textures/entity/aegis/npc/gear_merchant",
+        "gear_chunin_f": "textures/entity/aegis/npc/gear_chunin_f",
+        "gear_kazekage": "textures/entity/aegis/npc/gear_kazekage",
+        "gear_sand_shinobi": "textures/entity/aegis/npc/gear_sand_shinobi",
+        "gear_sand_jonin": "textures/entity/aegis/npc/gear_sand_jonin",
+        "gear_puppeteer": "textures/entity/aegis/npc/gear_puppeteer",
+        "gear_sand_genin_a": "textures/entity/aegis/npc/gear_sand_genin_a",
+        "gear_sand_genin_b": "textures/entity/aegis/npc/gear_sand_genin_b"
       },
       "geometry": {
         "default": "geometry.humanoid.custom",
         "gear_rogue": "geometry.aegis.gear_rogue",
+        "gear_sound": "geometry.aegis.gear_sound",
         "gear_chunin": "geometry.aegis.gear_chunin",
-        "gear_merchant": "geometry.aegis.gear_merchant"
+        "gear_merchant": "geometry.aegis.gear_merchant",
+        "gear_chunin_f": "geometry.aegis.gear_chunin_f",
+        "gear_kazekage": "geometry.aegis.gear_kazekage",
+        "gear_sand_shinobi": "geometry.aegis.gear_sand_shinobi",
+        "gear_sand_jonin": "geometry.aegis.gear_sand_jonin",
+        "gear_puppeteer": "geometry.aegis.gear_puppeteer",
+        "gear_sand_genin_a": "geometry.aegis.gear_sand_genin_a",
+        "gear_sand_genin_b": "geometry.aegis.gear_sand_genin_b"
       },
       "animations": {
         "humanoid_base_pose": "animation.humanoid.base_pose",
@@ -77,10 +100,34 @@
           "controller.render.aegis.npc_gear_rogue": "q.property('aegis:skin') == 9"
         },
         {
+          "controller.render.aegis.npc_gear_sound": "q.property('aegis:skin') == 10"
+        },
+        {
           "controller.render.aegis.npc_gear_chunin": "q.property('aegis:skin') == 15"
         },
         {
           "controller.render.aegis.npc_gear_merchant": "q.property('aegis:skin') == 32"
+        },
+        {
+          "controller.render.aegis.npc_gear_chunin_f": "q.property('aegis:skin') == 33"
+        },
+        {
+          "controller.render.aegis.npc_gear_kazekage": "q.property('aegis:skin') == 34"
+        },
+        {
+          "controller.render.aegis.npc_gear_sand_shinobi": "q.property('aegis:skin') == 35"
+        },
+        {
+          "controller.render.aegis.npc_gear_sand_jonin": "q.property('aegis:skin') == 36"
+        },
+        {
+          "controller.render.aegis.npc_gear_puppeteer": "q.property('aegis:skin') == 37"
+        },
+        {
+          "controller.render.aegis.npc_gear_sand_genin_a": "q.property('aegis:skin') == 38"
+        },
+        {
+          "controller.render.aegis.npc_gear_sand_genin_b": "q.property('aegis:skin') == 39"
         }
       ],
       "enable_attachables": true,

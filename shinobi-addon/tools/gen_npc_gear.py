@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
-"""Rogue Ninja, Leaf Shinobi (chatter) and Travelling Merchant: hand-painted skins on both layers, plus a 3D gear layer.
+"""NPC skins and 3D gear: the Rogue Ninja and the Travelling Merchant here, plus everything in tools/gen_npc_models.py
+(the Sound Ninja, the Leaf Shinobi and Kunoichi, and the Hidden Sand NPCs), using the shared helpers below.
 
   Rogue Ninja (skin 9 — aegis:hostile_ninja): a scratched-out headband with its ties, a cloth face wrap, messy spiked
     hair and a scar over one eye; a red, tattered scarf whose two tails stream out behind; a cleaver strapped across the
     back on a leather strap; bandaged forearms, a thigh holster, wrapped shins and a hip pouch.
-  Leaf Shinobi (skin 15 — aegis:npc "Leaf Shinobi (chatter)", also the Quest Giver): the chūnin flak jacket in 3D
-    (thick collar, four scroll pouches, the red swirl on the back), a Leaf headband with its ties, a ponytail, a scar
-    across the nose, a taped thigh holster, taped shins and a hip pouch.
   Travelling Merchant (skin 32 — aegis:npc "Travelling Merchant"): a jolly old peddler with a grey beard and an indigo
     head-cloth, an ochre haori with a coin crest on the back, an indigo obi with a red coin purse, arm guards and white leg
     wraps; in 3D a wide woven straw kasa with a chin cord, a tall wooden pack-cabinet of drawers with brass handles on
@@ -19,7 +17,7 @@ named like the body's, so the walk, look and attack animations move it too; anim
 ties, scarf tails, ponytail and the merchant's lantern sway (more when running).
 
   python3 tools/gen_npc_gear.py                        # skins + gear (then gen_npcs.py writes the client entities)
-  python3 tools/gen_npc_gear.py --preview out.png      # all three NPCs, front and back
+  python3 tools/gen_npc_gear.py --preview out.png      # every NPC with gear, front and back
   python3 tools/gen_npc_gear.py --preview out.png --only merchant
 """
 import argparse
@@ -208,93 +206,6 @@ def rogue_skin():
         s.paint(leg, ("top",), lambda f, u, v, wd, ht: c["pants"])
         s.paint(leg, ("bottom",), lambda f, u, v, wd, ht: c["sandal"])
         s.put(leg, "front", 1, 11, c["skin"]); s.put(leg, "front", 2, 11, c["skin_d"])   # toes
-    return s.img
-
-
-# ---------------------------------------------------------------------------
-# Leaf Shinobi (chūnin)
-# ---------------------------------------------------------------------------
-LF = dict(skin=(226, 182, 142), skin_d=(194, 150, 114), hair=(86, 57, 36), hair_h=(116, 80, 52), navy=(40, 50, 92), navy_d=(28, 36, 70),
-          vest=(86, 112, 62), vest_d=(64, 86, 46), vest_h=(110, 138, 80), pouch=(100, 128, 72), red=(190, 42, 42), band=(38, 56, 128),
-          plate=(178, 182, 192), plate_d=(126, 130, 142), leaf=(92, 96, 108), eye=(246, 242, 236), iris=(70, 46, 32), scar=(178, 116, 104),
-          lip=(170, 112, 98), tape=(212, 206, 192), tape_d=(178, 172, 160), sandal=(40, 48, 92))
-
-
-def leaf_skin():
-    c = LF
-    s = Skin(15)
-    H, h, B, P, p, L, S, s_, E, I, X, Q, N = (c["hair"], c["hair_h"], c["band"], c["plate"], c["plate_d"], c["leaf"], c["skin"], c["skin_d"],
-                                              c["eye"], c["iris"], c["scar"], c["lip"], c["navy"])
-    pal = {"H": H, "h": h, "B": B, "P": P, "p": p, "L": L, "S": S, "s": s_, "E": E, "I": I, "X": X, "Q": Q, "N": N}
-    s.paint("head", ("top",), lambda f, u, v, wd, ht: mul(H, 1 + s.rng.uniform(-0.1, 0.15)))
-    s.paint("head", ("bottom",), lambda f, u, v, wd, ht: s_)
-    s.paint("head", SIDES, lambda f, u, v, wd, ht: s.cloth(S, f, u, v, wd, ht, 0.02))
-    s.rows("head", "front", ["HHhHHhHH",
-                             "HSHHHHSH",
-                             "BpPLLPpB",
-                             "SHSSSSHS",
-                             "SEISSIES",
-                             "sSSXXSSs",
-                             "SSSQQSSS",
-                             "sSSSSSSs"], pal)
-    for side in ("right", "left"):
-        s.rows("head", side, ["HHHHHHhH",
-                              "HHHHHHHH",
-                              "BBBBBBBB",
-                              "HHSSSSSS" if side == "right" else "SSSSSSHH",
-                              "HHSSsSSS" if side == "right" else "SSSsSSHH",
-                              "HSSSSSSS" if side == "right" else "SSSSSSSH",
-                              "SSSSSSSS",
-                              "SSSSSSSS"], pal)
-    s.rows("head", "back", ["HHhHHhHH",
-                            "HHHHHHHH",
-                            "BBBBBBBB",
-                            "HHHhHHHH",
-                            "HHHNNHHH",
-                            "HhHHHHhH",
-                            "HHHHHHHH",
-                            "sHHHHHHs"], pal)
-    # hat layer: fringe strands and hair volume at the sides
-    s.rows("head", "front", ["H..h...H", "h......H"], pal, layer=1)
-    for side in ("right", "left"):
-        s.rows("head", side, ["HHhHHhHH", "H.H..H.h"], pal, layer=1)
-    s.paint("head", ("top",), lambda f, u, v, wd, ht: mul(H, 1.2) if (u * 5 + v * 3) % 6 == 0 else None, layer=1)
-
-    # --- body: navy shirt under the green flak jacket (the 3D gear vest goes over it)
-    def vest(f, u, v, wd, ht):
-        if v >= 10:
-            return s.cloth(c["navy"], f, u, v, wd, ht)
-        base = c["vest_h"] if v == 0 else c["vest"]
-        if f == "front" and u in (3, 4) and v >= 1:
-            base = c["vest_d"]           # the zip
-        return s.cloth(base, f, u, v, wd, ht, 0.04)
-    s.paint("body", SIDES, vest)
-    s.paint("body", ("top",), lambda f, u, v, wd, ht: c["vest"])
-    s.paint("body", ("bottom",), lambda f, u, v, wd, ht: c["navy_d"])
-    for (u0, v0) in ((0, 2), (5, 2), (0, 5), (5, 5)):    # painted pouches (the gear adds them in 3D)
-        for du in range(3):
-            for dv in range(2):
-                s.put("body", "front", u0 + du, v0 + dv, c["pouch"] if dv else c["vest_h"])
-    R = c["red"]
-    for u, v in ((3, 3), (4, 3), (2, 4), (5, 4), (2, 5), (4, 5), (5, 5), (3, 6), (4, 6), (3, 5)):   # the red swirl on the back
-        s.put("body", "back", u, v, R)
-    # --- arms: navy sleeves, red swirl on each shoulder, hands
-    for arm in ("rarm", "larm"):
-        s.paint(arm, SIDES, lambda f, u, v, wd, ht: s.cloth(c["navy"], f, u, v, wd, ht) if v < 11 else c["skin"])
-        s.paint(arm, ("top",), lambda f, u, v, wd, ht: c["navy"])
-        s.paint(arm, ("bottom",), lambda f, u, v, wd, ht: c["skin_d"])
-        outer = "right" if arm == "rarm" else "left"
-        for u, v in ((1, 1), (2, 1), (1, 2), (2, 2)):
-            s.put(arm, outer, u, v, R if (u + v) % 2 else mul(R, 0.8))
-        s.paint(arm, SIDES, lambda f, u, v, wd, ht: c["navy_d"] if v == 10 else None)    # cuff
-    # --- legs: navy trousers, white tape on the right thigh and both shins, sandals
-    for leg in ("rleg", "lleg"):
-        s.paint(leg, SIDES, lambda f, u, v, wd, ht: s.cloth(c["navy"], f, u, v, wd, ht) if v < 8 else
-                ((c["tape"] if v % 2 == 0 else c["tape_d"]) if v < 11 else c["sandal"]))
-        s.paint(leg, ("top",), lambda f, u, v, wd, ht: c["navy"])
-        s.paint(leg, ("bottom",), lambda f, u, v, wd, ht: c["sandal"])
-        s.put(leg, "front", 1, 11, c["skin"]); s.put(leg, "front", 2, 11, c["skin_d"])
-    s.paint("rleg", SIDES, lambda f, u, v, wd, ht: c["tape"] if v in (3, 4) else None)
     return s.img
 
 
@@ -603,66 +514,6 @@ def rogue_gear():
     return g, tex
 
 
-def leaf_gear():
-    c = LF
-    g = Gear("geometry.aegis.gear_chunin")
-    tex = Image.new("RGBA", (GW, GW), (0, 0, 0, 0))
-
-    def leaf_mark(d, r):
-        x, y, wd, ht = r
-        cx, cy = x + wd / 2, y + ht / 2
-        d.arc([cx - 2.6, cy - 2.2, cx + 1.6, cy + 2.2], 30, 330, fill=c["leaf"] + (255,), width=1)   # the swirl
-        d.line([(cx + 1.4, cy - 2.2), (cx + 2.8, cy - 3.2)], fill=c["leaf"] + (255,), width=1)       # and its point
-        d.point([(cx - 0.6, cy)], fill=c["leaf"] + (255,))
-    headband(g, tex, (0, 0, 32, 2), (0, 2, 12, 7), c["band"], c["plate"], c["plate_d"], leaf_mark)
-    ties(g, tex, (12, 2, 4, 6), c["band"], 2.6)
-    # the ponytail, sticking up and back
-    tex_fill(tex, (16, 2, 8, 8), lambda u, v, wd, ht: mul(c["hair"], 1.2 - 0.35 * v / ht))
-    tex_fill(tex, (24, 2, 4, 4), lambda u, v, wd, ht: c["band"])
-    pt = g.bone("g_tail", "head", (0, 29.6, 4.2), (-38, 0, 0))
-    g.cube(pt, (-0.9, 29.0, 4.0), (1.8, 1.2, 1.0), uv(rest=(24, 2, 4, 4)))
-    g.cube(pt, (-1.2, 29.2, 4.9), (2.4, 2.4, 3.2), uv(rest=(16, 2, 8, 8)))
-    g.cube(pt, (-0.8, 29.6, 8.0), (1.6, 1.6, 1.6), uv(rest=(16, 2, 8, 8)))
-    # the flak jacket
-    vf, vb, vs, col_r, po_r = (0, 12, 16, 22), (16, 12, 16, 22), (32, 12, 8, 22), (40, 12, 16, 4), (40, 16, 6, 6)
-
-    def vest_front(u, v, wd, ht):
-        k = 1.08 - 0.16 * v / ht
-        if u in (7, 8):
-            return mul(c["vest_d"], k)                 # the zip
-        if v == ht - 1:
-            return mul(c["vest_d"], 0.9)
-        return mul(c["vest"], k * (0.96 if (u * 3 + v) % 7 == 0 else 1))
-
-    def vest_back(u, v, wd, ht):
-        k = 1.06 - 0.14 * v / ht
-        dx, dy = u - wd / 2 + 0.5, v - ht * 0.42
-        rr = math.hypot(dx, dy)
-        ang = (math.degrees(math.atan2(dy, dx)) + 360) % 360
-        if 2.2 <= rr <= 5.2 and (ang + rr * 55) % 360 < 230:
-            return c["red"]                            # the Uzumaki swirl
-        if rr < 1.4:
-            return c["red"]
-        return mul(c["vest"], k * (0.96 if (u + v * 3) % 7 == 0 else 1))
-    tex_fill(tex, vf, vest_front)
-    tex_fill(tex, vb, vest_back)
-    tex_fill(tex, vs, lambda u, v, wd, ht: mul(c["vest"], 0.98 - 0.16 * v / ht))
-    tex_fill(tex, col_r, lambda u, v, wd, ht: mul(c["vest_h"], 1.0 - 0.12 * v))
-    tex_fill(tex, po_r, lambda u, v, wd, ht: mul(c["pouch"], 1.12) if v < 2 else (mul(c["pouch"], 0.78) if v == 2 else c["pouch"]))
-    vest = g.bone("g_vest", "body", (0, 24, 0))
-    g.cube(vest, (-4, 13.2, -2), (8, 10.8, 4), uv(north=vf, south=vb, east=vs, west=vs, up=(32, 12, 8, 4)), inflate=0.52)
-    g.cube(vest, (-3.7, 23.5, -2.25), (7.4, 1.8, 4.5), ring(col_r), inflate=0.45)          # the thick collar
-    for x in (-3.85, 1.45):
-        for y in (16.6, 19.5):
-            g.cube(vest, (x, y, -3.3), (2.4, 2.5, 0.8), uv(north=po_r, rest=(po_r[0], po_r[1] + 3, 6, 3)))
-    # holster with tape, taped shins, hip pouch
-    holster(g, tex, (0, 34, 16, 2), (16, 34, 6, 6), c["tape"], (34, 36, 48))
-    wraps(g, tex, "g_shin_r", "rightLeg", (-3.9, 1.4, -2), (4, 2.6, 4), (0, 40, 16, 4), c["tape"], c["tape_d"], 0.14)
-    wraps(g, tex, "g_shin_l", "leftLeg", (-0.1, 1.4, -2), (4, 2.6, 4), (0, 40, 16, 4), c["tape"], c["tape_d"], 0.14)
-    pouch(g, tex, "g_pouch", "body", (-1.5, 11.8, 2.2), (3.0, 2.0, 1.3), (22, 34, 6, 4), (188, 168, 128))
-    return g, tex
-
-
 def merchant_gear():
     c = MC
     g = Gear("geometry.aegis.gear_merchant")
@@ -785,18 +636,28 @@ FLUTTER = {
 }
 
 
+def all_models():
+    """name -> (skin painter, gear builder). The v3 models (tools/gen_npc_models.py) replace any older one of the same name."""
+    import gen_npc_models as M
+    return {"rogue": (rogue_skin, rogue_gear), "merchant": (merchant_skin, merchant_gear), **M.MODELS}
+
+
 def build():
+    import gen_npc_models as M
     NPC.mkdir(parents=True, exist_ok=True)
     HAND.mkdir(parents=True, exist_ok=True)
-    for name, img in (("rogue", rogue_skin()), ("chunin", leaf_skin()), ("merchant", merchant_skin())):
+    models = all_models()
+    for name, (skin_fn, gear_fn) in models.items():
+        img = skin_fn()
         img.save(HAND / f"{name}.png")
         img.save(NPC / f"{name}.png")
-    for name, (g, tex) in (("rogue", rogue_gear()), ("chunin", leaf_gear()), ("merchant", merchant_gear())):
+        g, tex = gear_fn()
         tex.paste(Image.new("RGBA", NONE[2:], (0, 0, 0, 0)), NONE[:2])
         tex.save(NPC / f"gear_{name}.png")
         w(RP / "models" / "entity" / f"gear_{name}.geo.json", g.json())
-    w(RP / "animations" / "npc_gear.animation.json", {"format_version": "1.8.0", "animations": {"animation.aegis.npc_gear.flutter": FLUTTER}})
-    print("NPC gear: rogue, chunin and merchant skins, 3 gear models.")
+    flutter = {**FLUTTER, "bones": {**FLUTTER["bones"], **M.FLUTTER}}
+    w(RP / "animations" / "npc_gear.animation.json", {"format_version": "1.8.0", "animations": {"animation.aegis.npc_gear.flutter": flutter}})
+    print(f"NPC gear: {len(models)} skins and gear models ({', '.join(models)}).")
 
 
 # ===========================================================================
@@ -834,7 +695,7 @@ def preview(out, compare=None, views=None, size=(260, 300), fov=55, only=None):
                       "rightLeg": {"rotation": [16, 0, 0]}, "leftLeg": {"rotation": [-16, 0, 0]}, "head": {"rotation": [-4, 14, 0]}}}
     views = views or [(2.6, 1.6, 1.5, 1.05), (-2.6, -1.6, 1.6, 1.05)]
     cw, chh = size
-    rows = [r for r in (("rogue", "Rogue Ninja"), ("chunin", "Leaf Shinobi"), ("merchant", "Travelling Merchant")) if not only or r[0] in only]
+    rows = [(n, n) for n in all_models() if not only or n in only]
     cols = (len(views) if compare else 0) + len(views)
     img = Image.new("RGB", (cw * cols, chh * len(rows)), (24, 22, 28))
     d = ImageDraw.Draw(img)
@@ -852,7 +713,8 @@ def preview(out, compare=None, views=None, size=(260, 300), fov=55, only=None):
                     gm = CP.load_geo(gear_geo, NPC / f"gear_{name}.png")
                     gm.scale = 0.9375
                     an = {"bones": dict(pose["bones"])}
-                    for bn, ch in FLUTTER["bones"].items():
+                    import gen_npc_models as M
+                    for bn, ch in {**FLUTTER["bones"], **M.FLUTTER}.items():
                         an["bones"][bn] = {"rotation": [molang(x, 0.7, 0.4) for x in ch["rotation"]]}
                     quads += CP.model_quads(gm, an, 0, place)
                 cam = CP.Camera(CP.scene_pt(f, r, h), CP.scene_pt(0, 0, lh), cw, chh, fov=fov)

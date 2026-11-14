@@ -633,7 +633,7 @@ The **NPC Spawner** block is only in the creative inventory (no recipe, drops no
 3. Tap the block again in creative (or **sneak + talk** to one of its NPCs, or `/scriptevent aegis:spawner`
    while looking at it) to: **Configure**, **Respawn now**, **Remove NPCs**, or **Delete spawner**.
 
-Settings: NPC type · name (colour codes work) · outfit (33) · clan (Clan Elder) · Akatsuki member ·
+Settings: NPC type · name (colour codes work) · outfit (40) · clan (Clan Elder) · Akatsuki member ·
 how many to keep spawned (1–6) · respawn on/off + delay (5–600 s) · stay in place / wander radius ·
 invulnerable · shop prices / mission rewards % · greeting line · spawn height (0 = first free space) ·
 restock time (Travelling Merchant, 5–120 min). A Travelling Merchant's spawner menu also has **Restock now**.
@@ -680,8 +680,22 @@ Players talk to the Quest Giver to accept, see their progress, claim the reward 
 | **Hokage (Mission Desk)** | D/C/B/A/S missions (kill mobs, ninja, a Tailed Beast, an Akatsuki member) for XP, Ryō and items |
 | **Exam Proctor** | Rank exams: **Chūnin** (Lv 20, beat 4 rogue ninja in 90 s), **Jōnin** (Lv 60, 3 Anbu + 3 Sound in 2 min), nothing higher — exams stop at Jōnin. Ranks show on your name tag and give +5/+10 stat points |
 | **Clan Elder** | For their clan: **Clan Mastery** 1–3 (+10% clan max chakra, −10% clan ability cooldowns each); the Uchiha Elder also awakens the **Eternal Mangekyō**. Others: **Bloodline transfer** into that clan (6,400 Ryō, Lv 30) |
-| **Leaf Shinobi** | Chatter and tips. Wears a 3D chūnin flak jacket (thick collar, four scroll pouches, the red swirl on the back), a Leaf headband with its ties, a ponytail and a taped thigh holster (the Quest Giver dresses the same) |
+| **Leaf Shinobi** | Chatter and tips. Each one is a shinobi or a kunoichi at random: the 3D chūnin flak jacket (a thick rolled collar, four raised scroll pouches, the vest over the shoulders, the red swirl crest on the back) over the navy uniform, the Leaf headband with its ties, a taped thigh holster; spiky black hair and a nose bandage, or auburn bangs and a swinging ponytail (the Quest Giver is the shinobi) |
 | **Genin** | Recruit for 1,500 Ryō — follows you, fights, levels up to 10 (Strength, Resistance, hearts). Talk to toggle follow/stay or dismiss |
+
+**Hidden Sand NPCs** (the *Sand: …* types in the spawner list) do the same jobs, dressed for the desert:
+
+| NPC | Job | Look |
+|---|---|---|
+| **Kazekage** | Mission Desk | White Kage robe with teal trim and sash, robe skirts, the tall Kage hat with its 風 badge and veil; red hair, dark-ringed eyes |
+| **Sand Jutsu Sensei** | Jutsu Sensei | A Sand jōnin: white head-wrap with a veil over half the face, red marks under the eye, the Sand flak jacket over a dark suit |
+| **Puppet Master** | Weaponsmith (*Puppet Workshop*) | Black hooded suit with pointed ears and the Sand plate, purple war paint, a bandaged puppet strapped to his back |
+| **Sand Exam Proctor** | Exam Proctor | The Sand jōnin |
+| **Sand Shinobi** | Chatter about life in the desert | Cream head-wrap with the Sand headband (hourglass mark) and a sun cloth, rust-red scarf, the tan Sand flak jacket (padded ribs, big shoulder guards, cross-strap) |
+| **Sand Quest Giver** | Quest Giver | The Sand Shinobi |
+| **Sand Genin** | Recruitable companion | A boy in a sand tunic with a satchel, or a girl in pale blue with a red scarf — at random |
+
+The Ramen Shop, Clan Elder and Travelling Merchant serve every village as they are.
 
 Shops use **Ryō** — see *Ryō currency* below.
 
@@ -689,7 +703,9 @@ Shops use **Ryō** — see *Ryō currency* below.
 
 - **Rogue ninja** (kunai, Fireball, Substitution) — a missing-nin with a scratched-out headband, a face wrap, spiked
   hair and a scar over one eye, a tattered red scarf whose tails stream behind them, a cleaver strapped across the back,
-  bandaged forearms, a thigh holster and wrapped shins — **Sound ninja** (sound-wave blast, nausea), **Rogue Anbu** (blink
+  bandaged forearms, a thigh holster and wrapped shins — **Sound ninja** (sound-wave blast, nausea) — a bone-white crossover
+  tunic trimmed in purple, the thick purple rope belt tied in a big bow at the back, the Sound headband with its music
+  note, spiky violet-grey hair, purple eye shadow and amber eyes, a sound-amplifier gauntlet on the right arm — **Rogue Anbu** (blink
   behind you and strike) **wander the overworld day and night** in groups of 1–3 (more in the dark/underground).
   Killing them gives XP (and levels), Ryō, kunai and pills.
 - **Akatsuki bosses** with boss bars: **Itachi** (Amaterasu, Tsukuyomi, Fireball, crow Substitution),
@@ -935,6 +951,21 @@ python3 tools/gen_particles.py --preview fire_burst ice_burst heal -o sheet.png
 
 The timers start when the server starts. Intervals are the two constants at the top of `behavior_pack/scripts/lagclear.js`.
 
+## The Hidden Sand, and new Sound and Leaf models (v1.49)
+
+- **Sand Village NPCs**: seven new NPC Spawner types (*Sand: Kazekage (Mission Desk)*, *Sand: Jutsu Sensei*,
+  *Sand: Puppet Workshop (weaponsmith)*, *Sand: Exam Proctor*, *Sand: Sand Shinobi (chatter)*, *Sand: Quest Giver*,
+  *Sand: Genin*) with five new models — see *Hidden Sand NPCs* in the NPC table. They do exactly what their Leaf
+  counterparts do (missions, jutsu, shop, exams, quests, companions) with their own names and greetings, and the Sand
+  Shinobi talk about the desert.
+- **Sound Ninja**, remodelled: a hand-painted skin and 3D gear (rope belt and bow, music-note headband, spiky hair,
+  sound-amplifier gauntlet) — see *Enemies*.
+- **Leaf Shinobi**, remodelled: a fuller 3D flak jacket and a new face and hair, and now a **kunoichi** too — each Leaf
+  Shinobi that spawns is one or the other.
+- Every new look is also in the spawner's *Outfit* list (Leaf kunoichi, Kazekage, Sand shinobi, Sand jōnin, Puppet
+  master, Sand genin boy and girl). Models: `tools/gen_npc_models.py` (preview: `python3 tools/gen_npc_gear.py --preview
+  npcs.png --only kazekage,sand_shinobi`).
+
 ## The Kusanagi draws before it strikes (v1.48)
 
 The Kusanagi no longer fights in its scabbard. Before, the scabbard was meant to vanish during each swing, but the held
@@ -992,7 +1023,7 @@ The Nindō system (a random "ninja way" rolled on join, with perks and drawbacks
 any more and the bonuses and penalties are gone, so every shinobi plays by the same rules again. The old Nindō button
 in the Shinobi Record and `/scriptevent aegis:nindo` are gone too.
 
-## NPC models (v1.42)
+## NPC models (v1.42 — the Leaf Shinobi was redone in v1.49)
 
 The Rogue Ninja and the Leaf Shinobi have new hand-painted skins (using the skin's outer layer too) and a layer of 3D
 gear that follows their walk, look and attack animations; the scarf tails, headband ties and ponytail sway, and stream

@@ -273,6 +273,14 @@ SKINS = [
     # v1.46: the Travelling Merchant (hand-painted by tools/gen_npc_gear.py; this is only the fallback). Append new skins
     # at the end — the index is stored on every NPC (aegis:skin).
     ("merchant", dict(hair=(120, 112, 106), top=(176, 120, 52), sleeve_len=6, pants=(86, 72, 62), belt=(46, 58, 98), shoes=(198, 170, 106))),
+    # v1.49 (hand-painted by tools/gen_npc_models.py; these are only fallbacks): the Leaf kunoichi, and the Hidden Sand
+    ("chunin_f", dict(hair=(132, 56, 40), top=(40, 50, 92), pants=(40, 50, 92), vest=(80, 110, 60), band=((40, 60, 140), STEEL), long_hair=True)),
+    ("kazekage", dict(hair=(178, 54, 44), top=(240, 240, 240), sleeve_len=11, pants=(190, 160, 110), hat=((240, 240, 240), (40, 150, 120)), belt=(40, 150, 120))),
+    ("sand_shinobi", dict(hair=(228, 214, 180), top=(192, 158, 102), pants=(112, 94, 74), band=((84, 64, 48), STEEL))),
+    ("sand_jonin", dict(hair=(240, 236, 224), top=(178, 150, 102), pants=(52, 58, 72), band=((52, 58, 72), STEEL))),
+    ("puppeteer", dict(hair=(38, 36, 46), top=(38, 36, 46), sleeve_len=11, pants=(38, 36, 46), belt=(92, 70, 52))),
+    ("sand_genin_a", dict(hair=(92, 64, 44), top=(226, 206, 166), pants=(126, 104, 78), belt=(58, 112, 138), band=((84, 64, 48), STEEL))),
+    ("sand_genin_b", dict(hair=(42, 36, 42), top=(178, 194, 204), pants=(84, 92, 104), band=((84, 64, 48), STEEL))),
 ]
 (RP / "textures" / "entity" / "aegis" / "npc").mkdir(parents=True, exist_ok=True)
 for name, o in SKINS:
@@ -280,8 +288,9 @@ for name, o in SKINS:
     (Image.open(custom).convert("RGBA") if custom.exists() else humanoid(o)).save(RP / "textures" / "entity" / "aegis" / "npc" / f"{name}.png")
 
 skin_tex = {f"s{i}": f"textures/entity/aegis/npc/{n}" for i, (n, _) in enumerate(SKINS)}
-# 3D gear worn over some skins (tools/gen_npc_gear.py): the Rogue Ninja, the Leaf Shinobi and the Travelling Merchant
-GEAR = {n: i for i, (n, _) in enumerate(SKINS) if n in ("rogue", "chunin", "merchant")}
+# 3D gear worn over some skins (tools/gen_npc_gear.py + tools/gen_npc_models.py)
+GEARED = ("rogue", "chunin", "merchant", "sound", "chunin_f", "kazekage", "sand_shinobi", "sand_jonin", "puppeteer", "sand_genin_a", "sand_genin_b")
+GEAR = {n: i for i, (n, _) in enumerate(SKINS) if n in GEARED}
 w(RP / "render_controllers" / "npc.render_controllers.json", {"format_version": "1.8.0", "render_controllers": {
     "controller.render.aegis.npc": {
         "arrays": {"textures": {"Array.skins": [f"Texture.s{i}" for i in range(len(SKINS))]}},

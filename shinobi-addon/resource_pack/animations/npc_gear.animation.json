@@ -52,6 +52,48 @@
             0,
             "math.sin(q.life_time * 130) * 6"
           ]
+        },
+        "g_neckcloth": {
+          "rotation": [
+            "math.sin(q.life_time * 160) * 4 + q.modified_move_speed * 30",
+            0,
+            0
+          ]
+        },
+        "g_veil": {
+          "rotation": [
+            "math.sin(q.life_time * 150) * 3 - q.modified_move_speed * 6",
+            0,
+            "math.sin(q.life_time * 110) * 2"
+          ]
+        },
+        "g_hatcloth": {
+          "rotation": [
+            "math.sin(q.life_time * 140) * 3 + q.modified_move_speed * 22",
+            0,
+            0
+          ]
+        },
+        "g_ponytail": {
+          "rotation": [
+            "math.sin(q.life_time * 190) * 5 + q.modified_move_speed * 26",
+            0,
+            "math.sin(q.life_time * 140) * 5"
+          ]
+        },
+        "g_bow_t0": {
+          "rotation": [
+            "math.sin(q.life_time * 230) * 6 + q.modified_move_speed * 34",
+            0,
+            "math.sin(q.life_time * 170) * 5"
+          ]
+        },
+        "g_bow_t1": {
+          "rotation": [
+            "math.sin(q.life_time * 210 + 50) * 6 + q.modified_move_speed * 30",
+            0,
+            "math.sin(q.life_time * 190 + 30) * 5"
+          ]
         }
       }
     }

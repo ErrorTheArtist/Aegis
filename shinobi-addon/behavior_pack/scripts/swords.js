@@ -4,6 +4,7 @@
 import { world, system } from "@minecraft/server";
 import { sameVillage } from "./villages.js";
 import { impactFx, sfx } from "./cinematic.js";
+import { RECORD_SLOT } from "./levels.js";
 
 let api;
 
@@ -441,8 +442,9 @@ function wear(p) {
   const off = eq.getEquipment("Offhand");
   const home = p.getDynamicProperty(HOME);
 
-  // draw: back on the slot it came from, with nothing in hand
-  if (off && SWORDS[off.typeId] && home === sel && !held) {
+  // draw: back on the slot it came from, with nothing in hand. A sword put away from the last hotbar slot before v1.47
+  // can't go back there (the Shinobi Record owns it now): it's drawn into whichever empty slot you select instead.
+  if (off && SWORDS[off.typeId] && !held && (home === sel || (home === RECORD_SLOT && sel !== RECORD_SLOT))) {
     inv.setItem(sel, off);
     if (inv.getItem(sel)?.typeId === off.typeId) {
       eq.setEquipment("Offhand", undefined);

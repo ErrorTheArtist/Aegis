@@ -97,8 +97,8 @@ You start at **Level 1**; the max is **Level 200**. Each level gives **3 stat po
 XP needed per level grows: 52 XP for level 2, ~1,800 around level 60, ~12,400 for the last levels
 (about 908,000 XP total from 1 to 200).
 
-**Stats** (max 100 each) — spend points with the **Shinobi Record** (you get one on first join; a lost one is replaced
-by the **Jutsu Sensei** → *Services* for 100 Ryō), or `/scriptevent aegis:stats`:
+**Stats** (max 100 each) — spend points with the **Shinobi Record** (it lives in the last slot of your hotbar, locked
+there: it can't be moved, dropped or lost), or `/scriptevent aegis:stats`:
 
 | Stat | Effect |
 |---|---|
@@ -670,7 +670,7 @@ Players talk to the Quest Giver to accept, see their progress, claim the reward 
 
 | NPC | What they do |
 |---|---|
-| **Jutsu Sensei** | Teaches by school — pick **Fire, Water, Wind, Lightning, Earth, Ninjutsu, Taijutsu, Genjutsu & Medical** or **Summoning & Forbidden**, then a scroll (each page shows how many you've unlocked at your level and has a « Back button). **Services**: a replacement Shinobi Record (100 Ryō), Chakra Nature Training, emerald exchange. **Sage Training** (Lv 60) is under Summoning & Forbidden |
+| **Jutsu Sensei** | Teaches by school — pick **Fire, Water, Wind, Lightning, Earth, Ninjutsu, Taijutsu, Genjutsu & Medical** or **Summoning & Forbidden**, then a scroll (each page shows how many you've unlocked at your level and has a « Back button). **Services**: Chakra Nature Training, emerald exchange. **Sage Training** (Lv 60) is under Summoning & Forbidden |
 | **Weaponsmith** | Kunai, shuriken, headbands, seven legendary swords (Lv 15–35 — Samehada is quest-only), Leaf / Anbu / Samurai armour, repairs the item in your hand |
 | **Ramen Shop** | Ichiraku Ramen (heal + 60 chakra + regen), Miso Ramen (+30 chakra + speed), Soldier Pills |
 | **Travelling Merchant** | **Random wares that change every 20 minutes** (set per spawner): cheap ramen every time, plus 4–5 random finds — Bloodline Reroll Scrolls, bargain jutsu scrolls, swords and armour, Akatsuki gear, pills, kunai… Limited stock shared by everyone. Buys back old Blank Scrolls. See *The Travelling Merchant* below |
@@ -794,7 +794,7 @@ enemies or given out by quests (and everything is still in the creative inventor
 | Akatsuki Cloak & Straw Hat | **Travelling Merchant** · Akatsuki drops |
 | Bloodline Reroll Scroll | **Travelling Merchant** (rare) · Tailed Beast and Akatsuki drops (chance) · quest rewards |
 | Tailed Beast Summoning Scroll | S-rank missions · Akatsuki drops (chance) · Travelling Merchant (very rare) |
-| Shinobi Record | given on first join · a replacement from the Jutsu Sensei (*Services*, 100 Ryō) |
+| Shinobi Record | everyone has one, locked in the last hotbar slot — it can't be lost |
 | Blank Scroll | no longer used — the Travelling Merchant buys old ones back for 25 Ryō each |
 
 ## M1 combos (basic attacks)
@@ -932,6 +932,19 @@ python3 tools/gen_particles.py --preview fire_burst ice_burst heal -o sheet.png
 
 The timers start when the server starts. Intervals are the two constants at the top of `behavior_pack/scripts/lagclear.js`.
 
+## The Shinobi Record's own slot (v1.47)
+
+The **last slot of your hotbar belongs to the Shinobi Record**. Minecraft doesn't let an add-on add a new slot to the
+inventory, so one is reserved instead: the Record is **locked** in it — it can't be moved, dropped, put in a chest or
+thrown away — and it stays with you when you die. Select the slot and right-click to open it, as before.
+
+- If it ever goes missing (`/clear`, a creative inventory wipe…), it's back within 2 seconds. Extra copies (an old one
+  in a chest) disappear when you pick them up.
+- On the first join after the update, whatever was in that slot moves into your inventory (or drops at your feet if
+  the inventory is full — you're told either way), and an old Record anywhere else is replaced by the locked one.
+- A sword you'd put away on your back from that slot before the update is drawn into whichever empty slot you select.
+- The replacement Records the Jutsu Sensei sold in v1.46 are gone — you can't lose yours any more.
+
 ## The Travelling Merchant (v1.46)
 
 Every crafting recipe is gone (see *Where things come from*). In their place: the **Travelling Merchant**, a new NPC
@@ -952,7 +965,7 @@ lantern swinging from its side (`tools/gen_npc_gear.py`, skin 32).
   The wares are stored with the spawner, so killing or respawning the merchant doesn't re-roll them.
 - He also exchanges emeralds for Ryō and **buys back Blank Scrolls** (25 Ryō each) — they were only ever used for
   crafting. Enemy ninja no longer drop them.
-- The Jutsu Sensei's *Services* sell a replacement **Shinobi Record** (100 Ryō, kept on death) instead of blank scrolls.
+- The Jutsu Sensei no longer sells blank scrolls.
 
 ## Nindō removed (v1.44)
 

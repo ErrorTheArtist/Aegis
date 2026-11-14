@@ -10,7 +10,7 @@
 //   /scriptevent aegis:level set 50       — set your level (points are recalculated)
 //   /scriptevent aegis:level xp 5000      — add XP
 
-import { world, system, ItemStack } from "@minecraft/server";
+import { world, system, ItemStack, ItemLockMode } from "@minecraft/server";
 import { showTitle } from "./hud.js";
 import { ActionFormData, ModalFormData, MessageFormData } from "@minecraft/server-ui";
 import { applyNameTag, refreshClanEffects } from "./clans.js";
@@ -22,8 +22,12 @@ export const MAX_LEVEL = 200;
 const POINTS_PER_LEVEL = 3;
 const STAT_CAP = 100;
 const RECORD_ITEM = "aegis:shinobi_record";
+// The last hotbar slot belongs to the Shinobi Record (Bedrock add-ons can't add a slot to the inventory, so one is
+// reserved): the Record is locked in it — it can't be moved, dropped, stored or thrown away — and kept on death. If it
+// ever goes missing (/clear, a creative inventory wipe…) it's put back within 2 seconds.
+export const RECORD_SLOT = 8;
 
-const P = { level: "aegis:level", xp: "aegis:xp", points: "aegis:points", given: "aegis:record_given" };
+const P = { level: "aegis:level", xp: "aegis:xp", points: "aegis:points", slot: "aegis:record_slot" };
 
 export const STATS = {
   vitality: { name: "Vitality", color: "§c", desc: "+2 hearts every 10 points (up to +20 hearts)" },
@@ -242,29 +246,39 @@ function applyStatEffects(player) {
   api.setChakra(player, api.getChakra(player));
 }
 
-function giveRecord(player) {
-  if (player.getDynamicProperty(P.given)) return;
-  try {
-    const stack = new ItemStack(RECORD_ITEM, 1);
-    stack.keepOnDeath = true;
-    player.getComponent("minecraft:inventory").container.addItem(stack);
-    player.setDynamicProperty(P.given, true);
-  } catch {
-    /* inventory full — try next spawn */
-  }
+function lockedRecord() {
+  const stack = new ItemStack(RECORD_ITEM, 1);
+  stack.keepOnDeath = true;
+  stack.lockMode = ItemLockMode.slot;
+  return stack;
 }
 
-// A replacement Shinobi Record (sold by the Jutsu Sensei — there is no crafting recipe any more). Kept on death like the
-// first one; dropped at the player's feet if the inventory is full.
-export function giveRecordCopy(player) {
+// Keeps exactly one locked Shinobi Record in RECORD_SLOT. Stray copies (old unlocked ones, one picked up from a chest)
+// are removed; whatever the player had in that slot moves into the inventory, or drops at their feet if it's full.
+export function ensureRecord(player) {
   try {
-    const stack = new ItemStack(RECORD_ITEM, 1);
-    stack.keepOnDeath = true;
-    const left = player.getComponent("minecraft:inventory")?.container?.addItem(stack);
-    if (left) player.dimension.spawnItem(left, player.location);
-    return true;
+    if (!(player.getComponent("minecraft:health")?.currentValue > 0)) return; // not while dead
+    const inv = player.getComponent("minecraft:inventory")?.container;
+    if (!inv || inv.size <= RECORD_SLOT) return;
+    for (let i = 0; i < inv.size; i++) {
+      if (i !== RECORD_SLOT && inv.getItem(i)?.typeId === RECORD_ITEM) inv.setItem(i, undefined);
+    }
+    const cur = inv.getItem(RECORD_SLOT);
+    if (cur?.typeId === RECORD_ITEM && cur.lockMode === ItemLockMode.slot) return;
+    inv.setItem(RECORD_SLOT, lockedRecord());
+    const first = !player.getDynamicProperty(P.slot);
+    if (first) player.setDynamicProperty(P.slot, true);
+    if (cur && cur.typeId !== RECORD_ITEM) {
+      const left = inv.addItem(cur);
+      if (left) player.dimension.spawnItem(left, player.location);
+      player.sendMessage(left
+        ? "§eThe last hotbar slot belongs to your Shinobi Record — your inventory was full, so what was there dropped at your feet."
+        : "§7The last hotbar slot belongs to your §eShinobi Record§7 — what was there moved into your inventory.");
+    } else if (first) {
+      player.sendMessage("§7Your §eShinobi Record§7 lives in the last hotbar slot: it can't be moved, dropped or lost.");
+    }
   } catch {
-    return false;
+    /* try again on the next check */
   }
 }
 
@@ -328,9 +342,13 @@ export function initLevels(helpers) {
       set(player, P.xp, 0);
       set(player, P.points, 0);
     }
-    giveRecord(player);
+    ensureRecord(player);
     applyStatEffects(player);
   });
+
+  system.runInterval(() => {
+    for (const p of world.getAllPlayers()) ensureRecord(p);
+  }, 40);
 
   system.afterEvents.scriptEventReceive.subscribe(({ id, message, sourceEntity }) => {
     if (sourceEntity?.typeId !== "minecraft:player") return;

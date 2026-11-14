@@ -10,7 +10,7 @@ import { world, system, ItemStack } from "@minecraft/server";
 import { ActionFormData, ModalFormData, MessageFormData } from "@minecraft/server-ui";
 import { showTitle } from "./hud.js";
 import { CLANS, getClanId, setClanPublic, applyNameTag } from "./clans.js";
-import { getLevel, gainXp, getRank, setRank, addPoints, RANKS, giveRecordCopy } from "./levels.js";
+import { getLevel, gainXp, getRank, setRank, addPoints, RANKS } from "./levels.js";
 import { hasSageTraining, grantSage } from "./sage.js";
 import { hasEternalMangekyo, awakenEternal } from "./clans.js";
 import { natureTraining } from "./natures.js";
@@ -528,7 +528,6 @@ const SENSEI = [
     ["aegis:edo_tensei_scroll", 1, "§8Forbidden: Reanimation Jutsu", 90, 60],
   ]],
   ["§fServices", [
-    ["__record", 1, "Shinobi Record (replacement copy)", 1, 1],
     ["__nature", 0, "Chakra Nature Training (learn another release)", 0, 1],
     ["__exchange", 0, "Exchange emeralds for Ryō", 0, 1],
   ]],
@@ -583,10 +582,6 @@ async function shop(player, npc, cfg, list, title, back) {
   else if (id === "__exchange") {
     const n = exchangeEmeralds(player);
     player.sendMessage(n ? `§aExchanged ${n} emeralds for §6${fmtRyo(n * EMERALD_RATE)}§a.` : "§7You have no emeralds to exchange.");
-  } else if (id === "__record") {
-    if (!spendRyo(player, price)) player.sendMessage(`§cYou need ${fmtRyo(price)}.`);
-    else if (giveRecordCopy(player)) player.sendMessage("§aHere's a fresh Shinobi Record. Try not to lose this one.");
-    else addRyo(player, price, true);
   } else if (id === "__nature") {
     return natureTraining(player, (n) => priceOf(n, cfg), getLevel);
   } else if (id === "__sage") {

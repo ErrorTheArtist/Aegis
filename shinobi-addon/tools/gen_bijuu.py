@@ -54,6 +54,10 @@ BEASTS = {
     "kurama": dict(name="Kurama, the Nine-Tailed Fox", tails=9, main=(235, 110, 20), accent=(255, 230, 190),
                    dark=(60, 20, 10), eye=(220, 30, 20), W=28, H=26, L=44, legH=26, legW=10,
                    head=(22, 18, 18), snout=(10, 8, 10), ears=(7, 14), tail=(9, 52), egg=("#eb6e14", "#ffe6be")),
+    # v1.54: the Ten-Tails — spawn egg only (creative), never summoned, sealed or called by a quest (juubi.js runs it)
+    "juubi": dict(name="The Ten-Tails", tails=10, main=(122, 110, 124), accent=(210, 30, 40),
+                  dark=(44, 36, 48), eye=(215, 30, 35), W=36, H=30, L=40, legH=24, legW=12,
+                  head=(24, 20, 20), snout=(8, 6, 6), tail=(10, 56), egg=("#6e6478", "#c81e28")),
 }
 
 
@@ -130,6 +134,18 @@ def paint_eye(img, at, iris, sclera=(245, 245, 235), pupil=(15, 10, 10), shape="
                     col = pupil
                 elif shape == "star" and (abs(dx) * abs(dy) < 0.035 and r < 0.75):
                     col = iris
+                elif shape == "rinne":                   # the Rinne-Sharingan: red, two dark rings, tomoe on each, a dark pupil
+                    q = math.hypot(dx, dy)
+                    col = iris
+                    if abs(q - 0.42) < 0.09 or abs(q - 0.8) < 0.08:
+                        col = tuple(int(c * 0.35) for c in iris[:3])
+                    for ring, off in ((0.42, 0.5), (0.8, 0.0)):
+                        for k in range(3):
+                            a = off + k * 2.094
+                            if math.hypot(dx - math.cos(a) * ring, dy - math.sin(a) * ring) < 0.14:
+                                col = pupil
+                    if q < 0.16:
+                        col = pupil
                 if y == 0 or (y == 1 and abs(dx) > 0.5):
                     col = (20, 15, 15)                              # the heavy upper lid
             if len(col) == 3:
@@ -533,8 +549,33 @@ def m_kurama(K, b):
     K.fan("body", [0, by + 16, 21], 9, 150, 58, segs=8, w0=9, w1=4.5, seg_len=8, sw="main", tip="under", curl=-9)
 
 
+def m_juubi(K, b):
+    """The Ten-Tails: a hulking grey beast with long clawed arms, a crown of horns round one huge Rinne-Sharingan eye,
+    a wide fanged maw, spikes down the spine and ten great tails."""
+    by = 30
+    body = K.bone("body", None, [0, by + 14, 0])
+    body.append(K.box([-15, by + 2, -20], [30, 26, 40], "main", under="belly"))            # the great torso
+    body.append(K.box([-18, by + 8, -27], [36, 24, 18], "main", under="belly"))            # hunched shoulders
+    body.append(K.box([-13, by + 4, 12], [26, 20, 14], "main", under="belly"))             # hips
+    for z in range(-24, 14, 6):                                                             # spikes down the spine
+        body.append(K.box([-2.5, by + 30 + (2 if z < -10 else 0), z], [5, 6, 4], "dark", under="dark"))
+    head = K.bone("head", "body", [0, by + 26, -28])
+    head.append(K.box([-12, by + 18, -46], [24, 20, 20], "main", under="belly"))
+    head.append(K.box([-10, by + 14, -50], [20, 8, 8], "main", under="belly"))
+    for x, length, lean in ((-10, 14, (-0.8, 0.3)), (-5, 18, (-0.3, 0.6)), (0, 21, (0, 0.8)), (5, 18, (0.3, 0.6)), (10, 14, (0.8, 0.3))):
+        K.horn(head, x, by + 37, -38, 4.5, length, steps=4, lean=lean, sw="ivory")       # the crown of horns
+    K.eye(head, -7.5, by + 24.5, -46.4, True, 15, 11.25)                                    # one huge eye
+    upper_teeth(K, head, by + 18, -50, 18)
+    jaw(K, -40, by + 14, -50, 18, 22)
+    for sx in (-1, 1):                                                                      # long clawed arms
+        K.leg("body", sx * 16, -16, by + 10, (12, 18), (9, 22), paw=(12, 12), claws=4, sw="main")
+    for sx in (-1, 1):
+        K.leg("body", sx * 12, 16, by + 8, (12, 14), (9, 24), paw=(11, 10), claws=3, sw="main", knee=12)
+    K.fan("body", [0, by + 18, 24], 10, 170, 50, segs=8, w0=10, w1=5, seg_len=8, sw="main", tip="dark", curl=-8)
+
+
 MODELS = {"shukaku": m_shukaku, "matatabi": m_matatabi, "isobu": m_isobu, "son_goku": m_son_goku, "kokuo": m_kokuo,
-          "saiken": m_saiken, "chomei": m_chomei, "gyuki": m_gyuki, "kurama": m_kurama}
+          "saiken": m_saiken, "chomei": m_chomei, "gyuki": m_gyuki, "kurama": m_kurama, "juubi": m_juubi}
 # per-beast swatches: (tile kind, colour[, second colour]); anything not listed falls back to the palette
 LOOKS = {
     "shukaku": dict(pattern=("stripes", "main", (48, 62, 132)), belly=("fur", (214, 184, 128)), eye=dict(iris=(235, 205, 60), sclera=(20, 18, 16), shape="star")),
@@ -547,6 +588,7 @@ LOOKS = {
                    eye=dict(iris=(250, 150, 40), sclera=(250, 150, 40), shape="round")),
     "gyuki": dict(pattern=("suckers", (120, 60, 120), (216, 190, 200)), belly=("skin", (188, 150, 170)), eye=dict(iris=(250, 240, 200), sclera=(250, 240, 200), shape="round")),
     "kurama": dict(belly=("fur", (244, 150, 60)), eye=dict(iris=(215, 30, 20), sclera=(230, 60, 40))),
+    "juubi": dict(main=("skin", (122, 110, 124)), belly=("skin", (150, 138, 150)), eye=dict(iris=(215, 30, 35), sclera=(215, 30, 35), shape="rinne")),
 }
 
 
@@ -635,11 +677,12 @@ for bid, b in BEASTS.items():
         "spawn_egg": {"base_color": b["egg"][0], "overlay_color": b["egg"][1]}}}})
 
     tails = b["tails"] if bid != "chomei" else 7
-    hp = 500 + tails * 250
+    juubi = bid == "juubi"
+    hp = 5000 if juubi else 500 + tails * 250
     width = round(max(b["W"], 24) / 16 + 0.6, 2)
     height = round((b["legH"] + b["H"]) / 16 + 0.6, 2)
     comps = {
-        "minecraft:type_family": {"family": ["tailed_beast", "monster", "mob"]},
+        "minecraft:type_family": {"family": ["tailed_beast", *(["juubi"] if juubi else []), "monster", "mob"]},
         "minecraft:health": {"value": hp, "max": hp},
         "minecraft:boss": {"hud_range": 60, "name": b["name"], "should_darken_sky": True},
         "minecraft:collision_box": {"width": width, "height": height},
@@ -651,7 +694,7 @@ for bid, b in BEASTS.items():
         "minecraft:physics": {},
         "minecraft:pushable": {"is_pushable": False, "is_pushable_by_piston": False},
         "minecraft:knockback_resistance": {"value": 1.0},
-        "minecraft:attack": {"damage": int(10 + tails * 2)},
+        "minecraft:attack": {"damage": 26 if juubi else int(10 + tails * 2)},
         "minecraft:follow_range": {"value": 64, "max": 64},
         "minecraft:persistent": {},
         "minecraft:nameable": {},
@@ -661,7 +704,7 @@ for bid, b in BEASTS.items():
                                                  {"cause": "drowning", "deals_damage": "no"}]},
         "minecraft:breathable": {"total_supply": 15, "suffocate_time": 0, "breathes_water": True},
         "minecraft:experience_reward": {"on_death": "q.last_hit_by_player ? 200 + 50 * " + str(tails) + " : 0"},
-        "minecraft:loot": {"table": "loot_tables/entities/aegis_bijuu.json"},
+        "minecraft:loot": {"table": f"loot_tables/entities/aegis_{'juubi' if juubi else 'bijuu'}.json"},
         "minecraft:behavior.float": {"priority": 0},
         "minecraft:behavior.melee_attack": {"priority": 2, "speed_multiplier": 1.35, "track_target": True, "reach_multiplier": 1.4},
         "minecraft:behavior.hurt_by_target": {"priority": 1},
@@ -694,6 +737,14 @@ w(BP / "loot_tables" / "entities" / "aegis_bijuu.json", {"pools": [
                               "functions": [{"function": "set_count", "count": {"min": 4, "max": 10}}]}]},
     {"rolls": 1, "entries": [{"type": "item", "name": "aegis:reroll_scroll", "weight": 1},
                              {"type": "empty", "weight": 3}]},
+]})
+
+w(BP / "loot_tables" / "entities" / "aegis_juubi.json", {"pools": [
+    {"rolls": 1, "entries": [{"type": "item", "name": "aegis:ryo", "weight": 1, "functions": [{"function": "set_count", "count": {"min": 48, "max": 64}}]}]},
+    {"rolls": 1, "entries": [{"type": "item", "name": "aegis:ryo", "weight": 1, "functions": [{"function": "set_count", "count": {"min": 48, "max": 64}}]}]},
+    {"rolls": 1, "entries": [{"type": "item", "name": "minecraft:diamond", "weight": 1, "functions": [{"function": "set_count", "count": {"min": 10, "max": 20}}]}]},
+    {"rolls": 1, "entries": [{"type": "item", "name": "minecraft:enchanted_golden_apple", "weight": 1, "functions": [{"function": "set_count", "count": {"min": 1, "max": 2}}]}]},
+    {"rolls": 2, "entries": [{"type": "item", "name": "aegis:reroll_scroll", "weight": 1}, {"type": "empty", "weight": 1}]},
 ]})
 
 lang_path = RP / "texts" / "en_US.lang"

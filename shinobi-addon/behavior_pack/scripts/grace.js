@@ -9,17 +9,22 @@
 //   /scriptevent aegis:grace off          — end every grace period now
 //   /scriptevent aegis:grace off Steve    — end one player's
 //   /scriptevent aegis:grace              — how long is left
+// Every shinobi joining the server for the first time gets 1 hour of grace automatically (v1.54) — counted in play
+// time, so it doesn't run out while they're offline.
 
 import { world, system } from "@minecraft/server";
 import { showTitle } from "./hud.js";
 
 const WORLD_PROP = "aegis:grace_until"; // world: everyone's grace ends at this time (ms)
 const PLAYER_PROP = "aegis:grace_until"; // player: their own grace ends at this time (ms)
+const LEFT_PROP = "aegis:grace_left"; // player: seconds of play-time grace left (a new player's first hour)
+const JOINED_PROP = "aegis:joined";
+export const NEW_PLAYER_GRACE = 3600; // seconds
 export const GRACE_TAG = "aegis_grace"; // the add-on's mobs won't target a player with this tag
 const MAX_MINUTES = 24 * 60;
 // what a player with grace may not hurt (besides other players)
 const ENEMIES = new Set(["aegis:hostile_ninja", "aegis:akatsuki", "aegis:legend",
-  ...["shukaku", "matatabi", "isobu", "son_goku", "kokuo", "saiken", "chomei", "gyuki", "kurama"].map((b) => `aegis:${b}`)]);
+  ...["shukaku", "matatabi", "isobu", "son_goku", "kokuo", "saiken", "chomei", "gyuki", "kurama", "juubi"].map((b) => `aegis:${b}`)]);
 
 const num = (v) => (typeof v === "number" && Number.isFinite(v) ? v : 0);
 const worldUntil = () => num(world.getDynamicProperty(WORLD_PROP));
@@ -30,10 +35,18 @@ function playerUntil(p) {
     return 0;
   }
 }
+function playLeft(p) {
+  try {
+    return num(p.getDynamicProperty(LEFT_PROP));
+  } catch {
+    return 0;
+  }
+}
 // When this player's grace ends (ms), or 0.
 export function graceUntil(p) {
   if (p?.typeId !== "minecraft:player") return 0;
-  const t = Math.max(worldUntil(), playerUntil(p));
+  const left = playLeft(p);
+  const t = Math.max(worldUntil(), playerUntil(p), left > 0 ? Date.now() + left * 1000 : 0);
   return t > Date.now() ? t : 0;
 }
 export const isGraced = (e) => graceUntil(e) > 0;
@@ -99,6 +112,8 @@ function unprotect(p, announce) {
 
 function tick() {
   for (const p of world.getAllPlayers()) {
+    const left = playLeft(p); // a new player's play-time grace only runs while they're online
+    if (left > 0) p.setDynamicProperty(LEFT_PROP, left - 1 > 0 ? left - 1 : undefined);
     const until = graceUntil(p);
     if (until) {
       protect(p, until);
@@ -135,11 +150,15 @@ function start(minutes, target, by) {
 function stop(target, by) {
   if (target) {
     target.setDynamicProperty(PLAYER_PROP, undefined);
+    target.setDynamicProperty(LEFT_PROP, undefined);
     if (!worldUntil() || worldUntil() <= Date.now()) by?.sendMessage(`§7${target.name}'s grace period ended.`);
     else by?.sendMessage(`§7${target.name}'s own grace ended, but everyone's grace is still on (${left(worldUntil())}).`);
   } else {
     world.setDynamicProperty(WORLD_PROP, undefined);
-    for (const p of world.getAllPlayers()) p.setDynamicProperty(PLAYER_PROP, undefined);
+    for (const p of world.getAllPlayers()) {
+      p.setDynamicProperty(PLAYER_PROP, undefined);
+      p.setDynamicProperty(LEFT_PROP, undefined);
+    }
     world.sendMessage("§cThe grace period has been ended.");
   }
   tick();
@@ -149,15 +168,33 @@ function status(by) {
   const w = worldUntil() > Date.now() ? worldUntil() : 0;
   const lines = [w ? `§aEveryone has grace: §f${left(w)} left` : "§7No grace period for everyone."];
   for (const p of world.getAllPlayers()) {
-    const own = playerUntil(p);
-    if (own > Date.now() && own > w) lines.push(`§a${p.name}§7: §f${left(own)} left`);
+    const own = Math.max(playerUntil(p), playLeft(p) > 0 ? Date.now() + playLeft(p) * 1000 : 0);
+    if (own > Date.now() && own > w) lines.push(`§a${p.name}§7: §f${left(own)} left${playLeft(p) > 0 ? " §8(new-player grace, play time)" : ""}`);
   }
   by.sendMessage(lines.join("\n"));
+}
+
+// A brand-new shinobi (never been on this server): 1 hour of play-time grace.
+function welcome(p) {
+  if (p.getDynamicProperty(JOINED_PROP)) return;
+  p.setDynamicProperty(JOINED_PROP, true);
+  // (the levels module sets a newcomer's level and XP on this same spawn, so look for real progress, not for the keys)
+  const veteran = ["aegis:village", "aegis:rogue_of", "aegis:starter_kit"].some((k) => p.getDynamicProperty(k) !== undefined) ||
+    num(p.getDynamicProperty("aegis:level")) > 1 || num(p.getDynamicProperty("aegis:xp")) > 0;
+  if (veteran) return; // (players from before this update)
+  p.setDynamicProperty(LEFT_PROP, NEW_PLAYER_GRACE);
+  system.runTimeout(() => {
+    if (!api.isValid(p)) return;
+    p.sendMessage("§aWelcome, shinobi! You have a §l1-hour grace period§r§a (counted while you play): nothing can hurt you — not players, not ninja, not bosses — and you can't fight either. Explore, train and get ready!");
+  }, 100);
 }
 
 export function initGrace(helpers) {
   api = helpers;
   system.runInterval(tick, 20);
+  world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
+    if (initialSpawn) welcome(player);
+  });
 
   // what Resistance can't catch: a player with grace landing a blow on another player or on a ninja / boss
   world.afterEvents.entityHurt.subscribe(({ hurtEntity, damage, damageSource }) => {

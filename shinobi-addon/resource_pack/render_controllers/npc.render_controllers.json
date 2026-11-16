@@ -88,6 +88,17 @@
         "Array.skins[q.property('aegis:skin')]"
       ]
     },
+    "controller.render.aegis.npc_gear_hokage": {
+      "geometry": "Geometry.gear_hokage",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_hokage"
+      ]
+    },
     "controller.render.aegis.npc_gear_rogue": {
       "geometry": "Geometry.gear_rogue",
       "materials": [

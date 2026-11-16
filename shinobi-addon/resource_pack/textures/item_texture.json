@@ -481,6 +481,81 @@
     },
     "aegis_xp_shard": {
       "textures": "textures/items/aegis/xp_shard"
+    },
+    "aegis_headband_scratched": {
+      "textures": "textures/items/aegis/headband_scratched"
+    },
+    "aegis_sand_headband_scratched": {
+      "textures": "textures/items/aegis/sand_headband_scratched"
+    },
+    "aegis_mist_headband_scratched": {
+      "textures": "textures/items/aegis/mist_headband_scratched"
+    },
+    "aegis_cloud_headband_scratched": {
+      "textures": "textures/items/aegis/cloud_headband_scratched"
+    },
+    "aegis_stone_headband_scratched": {
+      "textures": "textures/items/aegis/stone_headband_scratched"
+    },
+    "aegis_rain_headband_scratched": {
+      "textures": "textures/items/aegis/rain_headband_scratched"
+    },
+    "aegis_totsuka_blade": {
+      "textures": "textures/items/aegis/totsuka_blade"
+    },
+    "aegis_kusanagi_v2": {
+      "textures": "textures/items/aegis/kusanagi_v2"
+    },
+    "aegis_chakra_rod": {
+      "textures": "textures/items/aegis/chakra_rod"
+    },
+    "aegis_gunbai": {
+      "textures": "textures/items/aegis/gunbai"
+    },
+    "aegis_tobi_mask": {
+      "textures": "textures/items/aegis/tobi_mask"
+    },
+    "aegis_orange_sage_coat": {
+      "textures": "textures/items/aegis/orange_sage_coat"
+    },
+    "aegis_adv_shinra_tensei_scroll": {
+      "textures": "textures/items/aegis/adv_shinra_tensei_scroll"
+    },
+    "aegis_adv_chibaku_tensei_scroll": {
+      "textures": "textures/items/aegis/adv_chibaku_tensei_scroll"
+    },
+    "aegis_tsukuyomi_scroll": {
+      "textures": "textures/items/aegis/tsukuyomi_scroll"
+    },
+    "aegis_amaterasu_scroll": {
+      "textures": "textures/items/aegis/amaterasu_scroll"
+    },
+    "aegis_susanoo_scroll": {
+      "textures": "textures/items/aegis/susanoo_scroll"
+    },
+    "aegis_kamui_shuriken_scroll": {
+      "textures": "textures/items/aegis/kamui_shuriken_scroll"
+    },
+    "aegis_indra_arrow_scroll": {
+      "textures": "textures/items/aegis/indra_arrow_scroll"
+    },
+    "aegis_chidori_nagashi_scroll": {
+      "textures": "textures/items/aegis/chidori_nagashi_scroll"
+    },
+    "aegis_perfect_susanoo_scroll": {
+      "textures": "textures/items/aegis/perfect_susanoo_scroll"
+    },
+    "aegis_rasenshuriken_v2_scroll": {
+      "textures": "textures/items/aegis/rasenshuriken_v2_scroll"
+    },
+    "aegis_tailed_beast_bomb_scroll": {
+      "textures": "textures/items/aegis/tailed_beast_bomb_scroll"
+    },
+    "aegis_six_paths_sage_scroll": {
+      "textures": "textures/items/aegis/six_paths_sage_scroll"
+    },
+    "aegis_advanced_rinnegan": {
+      "textures": "textures/items/aegis/advanced_rinnegan"
     }
   }
 }

@@ -1,0 +1,32 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "aegis:juubi",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/aegis/juubi"
+      },
+      "geometry": {
+        "default": "geometry.aegis.juubi"
+      },
+      "animations": {
+        "idle": "animation.aegis.juubi.idle"
+      },
+      "scripts": {
+        "animate": [
+          "idle"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ],
+      "spawn_egg": {
+        "base_color": "#6e6478",
+        "overlay_color": "#c81e28"
+      }
+    }
+  }
+}

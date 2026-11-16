@@ -1,0 +1,51 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:item": {
+    "description": {
+      "identifier": "aegis:kusanagi_v2",
+      "menu_category": {
+        "category": "equipment",
+        "group": "minecraft:itemGroup.name.sword"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "aegis_kusanagi_v2"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "\u00a7bKusanagi Sword V2\u00a7r\n\u00a77Sasuke's chokut\u014d, reforged \u2014 lightning in the steel"
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:hand_equipped": true,
+      "minecraft:allow_off_hand": {
+        "value": true
+      },
+      "minecraft:damage": 13,
+      "minecraft:durability": {
+        "max_durability": 3000
+      },
+      "minecraft:enchantable": {
+        "slot": "sword",
+        "value": 15
+      },
+      "minecraft:repairable": {
+        "repair_items": [
+          {
+            "items": [
+              "minecraft:diamond"
+            ],
+            "repair_amount": 400
+          }
+        ]
+      },
+      "minecraft:can_destroy_in_creative": false,
+      "minecraft:use_modifiers": {
+        "use_duration": 0.25,
+        "movement_modifier": 1.0
+      },
+      "minecraft:use_animation": "none"
+    }
+  }
+}

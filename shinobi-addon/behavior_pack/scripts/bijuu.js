@@ -20,6 +20,7 @@
 
 import { world, system, ItemStack, ItemLockMode } from "@minecraft/server";
 import { isGraced } from "./grace.js";
+import { rampageHolder, rampageText } from "./rampage.js";
 import { ActionFormData, MessageFormData } from "@minecraft/server-ui";
 import { showTitle } from "./hud.js";
 import { transformCinematic, beastAwakenFx, impactFx, aura, sfx, inCinematic } from "./cinematic.js";
@@ -567,18 +568,11 @@ function summonBeast(player, id) {
 }
 
 function useSummonScroll(player) {
-  try {
-    for (const name of DIMENSIONS) {
-      const dim = world.getDimension(name);
-      if (dim.id !== player.dimension.id) continue;
-      const near = dim.getEntities({ location: player.location, maxDistance: 64, families: ["tailed_beast"] });
-      if (near.length) {
-        player.onScreenDisplay.setActionBar("§cA Tailed Beast is already rampaging nearby!");
-        return;
-      }
-    }
-  } catch {
-    /* ignore */
+  const loose = rampageHolder(); // only one Tailed Beast in the world at a time
+  if (loose) {
+    player.sendMessage(rampageText(loose));
+    player.onScreenDisplay.setActionBar("§cAnother Tailed Beast is already loose.");
+    return;
   }
   const inv = player.getComponent("minecraft:inventory")?.container;
   const slot = player.selectedSlotIndex;
@@ -807,7 +801,7 @@ function updateBombCharge(player, b) {
     api.sound(player.dimension, "aegis.charge", player.location, 0.8, 0.8 + stage[2] * 0.3);
   }
   api.particle(player.dimension, "aegis:bijuudama_charge", front());
-  if (ch.ticks % 10 === 0) aura(player, mastered ? [1, 0.8, 0.25] : b.color, true);
+  if (ch.ticks % 10 === 0) api.particle(player.dimension, "aegis:cine_swirl", player.location, mastered ? [1, 0.8, 0.25] : b.color);
   player.onScreenDisplay.setActionBar(`§5Charging Tailed Beast Bomb ${"§d■".repeat(ch.ticks / 5)}${"§8■".repeat(Math.max(0, (BOMB_CHARGE - ch.ticks) / 5))}`);
   if (ch.ticks < BOMB_CHARGE) return;
 
@@ -894,11 +888,32 @@ function updateCloak(player) {
   eff(player, "regeneration", 30, mastered ? 1 : 0, false);
   if (mastered) eff(player, "fire_resistance", 30, 0, false);
   for (const [effect, amp] of CLOAK_PERKS[id] ?? []) eff(player, effect, 30, amp, false);
-  api.particle(player.dimension, "aegis:beast_aura", player.location, b.color);
-  if (system.currentTick % 10 < 5) api.particle(player.dimension, "aegis:jin_bubble", player.location, mastered ? [1, 0.85, 0.3] : b.color);
-  if (mastered) api.particle(player.dimension, "aegis:beast_aura", player.location, [1, 0.85, 0.3]);
-  if (system.currentTick % 10 < 5) aura(player, mastered ? [1, 0.8, 0.25] : b.color);
+  // the aura (v1.54): standing still, it rises from a ring round your feet so your own first-person view stays clear
+  // (it used to well up inside your head); on the move it streams out behind you as before
+  const col = mastered ? [1, 0.85, 0.3] : b.color;
+  api.particle(player.dimension, "aegis:beast_aura", auraSpot(player), b.color);
+  if (system.currentTick % 10 < 5) api.particle(player.dimension, "aegis:jin_bubble", auraSpot(player), col);
+  if (mastered) api.particle(player.dimension, "aegis:beast_aura", auraSpot(player), [1, 0.85, 0.3]);
+  if (system.currentTick % 10 < 5) {
+    api.particle(player.dimension, "aegis:cine_swirl", player.location, mastered ? [1, 0.8, 0.25] : b.color);
+    if (Math.random() < 0.5) api.particle(player.dimension, "aegis:cine_bolt", api.add(auraSpot(player), { x: 0, y: 0.9, z: 0 }), mastered ? [1, 0.8, 0.25] : b.color);
+  }
   updateBombCharge(player, b);
+}
+
+// Where a Jinchūriki's aura particles start: on the move, where they stand; standing still, a point on a ring round
+// their feet (lowered, so the rising chakra stays below and around the eyes instead of filling the camera).
+function auraSpot(player) {
+  let v = { x: 0, z: 0 };
+  try {
+    v = player.getVelocity();
+  } catch {
+    /* ignore */
+  }
+  const l = player.location;
+  if (Math.hypot(v.x, v.z) > 0.06) return l;
+  const a = Math.random() * Math.PI * 2;
+  return { x: l.x + Math.cos(a) * 1.05, y: l.y - 0.85, z: l.z + Math.sin(a) * 1.05 };
 }
 
 export function handleBijuuItemUse(player, itemStack) {
@@ -1088,6 +1103,61 @@ export function initBijuu(helpers) {
 // ---------------------------------------------------------------------------
 const SEAL_COST = 150;
 const SEAL_TICKS = 60;
+const SEAL_STAT = 50; // Chakra and Vitality needed to seal a Tailed Beast (v1.54: was 100 each)
+const SEAL_AWAY_HP = 0.2; // an enemy this weak (ninja, Akatsuki, a legend) can be sealed away outright
+const SEAL_AWAY_COST = 60;
+
+// An enemy (not a Tailed Beast) the Uzumaki is looking at that's down to its last 20% of health.
+function beatenFoeInSight(player) {
+  let hits = [];
+  try {
+    hits = player.getEntitiesFromViewDirection({ maxDistance: 16 }).map((h) => h.entity);
+  } catch {
+    return undefined;
+  }
+  return hits.find((e) => {
+    if (!["aegis:hostile_ninja", "aegis:akatsuki", "aegis:legend"].includes(e.typeId) || !api.canBeHit(e, player)) return false;
+    try {
+      const h = e.getComponent("minecraft:health");
+      return h.currentValue > 0 && h.currentValue / h.effectiveMax <= SEAL_AWAY_HP;
+    } catch {
+      return false;
+    }
+  });
+}
+
+// Sealing Jutsu: golden chains drag a beaten enemy into the seal — defeated on the spot (loot, XP and all).
+function sealAway(player, foe) {
+  const left = api.cooldownLeft(player, "uzumaki_seal_away");
+  if (left > 0) return player.sendMessage(`§7The sealing jutsu is ready in ${(left / 20).toFixed(0)}s.`);
+  if (api.getChakra(player) < SEAL_AWAY_COST) return player.sendMessage(`§cNot enough chakra (${SEAL_AWAY_COST} needed).`);
+  api.setChakra(player, api.getChakra(player) - SEAL_AWAY_COST);
+  api.startCooldown(player, "uzumaki_seal_away", 600);
+  api.anim(player, "animation.aegis.hand_signs");
+  const dim = foe.dimension;
+  showTitle(player, "§6Sealing Jutsu", { subtitle: `§7${(foe.nameTag || "the enemy").replace(/§./g, "")} is sealed away`, fadeInDuration: 2, stayDuration: 30, fadeOutDuration: 8 });
+  sfx(dim, "aegis.seal", foe.location, 2, 0.9);
+  for (let t = 0; t <= 20; t += 4) {
+    system.runTimeout(() => {
+      if (!api.isValid(foe) || !api.isValid(player)) return;
+      const a = api.add(player.location, { x: 0, y: 1, z: 0 });
+      const d = api.sub(api.add(foe.location, { x: 0, y: 1, z: 0 }), a);
+      for (let i = 0; i <= 10; i++) api.particle(dim, "aegis:slash", api.add(a, api.scale(d, i / 10)), GOLD);
+      api.particle(dim, "aegis:cine_ring", foe.location, GOLD);
+    }, t);
+  }
+  system.runTimeout(() => {
+    if (!api.isValid(foe)) return;
+    eff(foe, "slowness", 40, 255);
+    try {
+      const h = foe.getComponent("minecraft:health");
+      api.hurt(foe, h.currentValue + 100, player, "magic");
+    } catch {
+      /* ignore */
+    }
+    api.particle(dim, "aegis:jin_seal", foe.location);
+  }, 22);
+}
 const beingSealed = new Set(); // beast entity ids
 const GOLD = [1, 0.85, 0.3];
 
@@ -1113,12 +1183,15 @@ function beastInSight(player) {
 export async function uzumakiSealMenu(player) {
   if (!isUzumaki(player)) return player.sendMessage("§cOnly the Uzumaki know this sealing jutsu.");
   const beast = beastInSight(player);
-  if (!beast) return openSealMenu(player);
+  if (!beast) {
+    const foe = beatenFoeInSight(player);
+    return foe ? sealAway(player, foe) : openSealMenu(player);
+  }
 
   const chakraStat = getStat(player, "chakra");
   const vitStat = getStat(player, "vitality");
-  if (chakraStat < 100 || vitStat < 100) {
-    return player.sendMessage(`§cThe Four Symbols Seal needs §f100 Chakra§c and §f100 Vitality§c stats §7(you: ${chakraStat} / ${vitStat})`);
+  if (chakraStat < SEAL_STAT || vitStat < SEAL_STAT) {
+    return player.sendMessage(`§cThe Four Symbols Seal needs §f${SEAL_STAT} Chakra§c and §f${SEAL_STAT} Vitality§c stats §7(you: ${chakraStat} / ${vitStat})`);
   }
   if (beingSealed.has(beast.id)) return;
   if (unsealable(beast)) return player.sendMessage("§cThis beast's chakra is unstable — it can't be sealed.");

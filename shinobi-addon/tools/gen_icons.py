@@ -467,6 +467,15 @@ def headband():
     return img
 
 
+def scratched_headband(band, band_d, mark):
+    """A rogue ninja's headband: the village's, with a slash cut right through the mark."""
+    img = village_headband(band, band_d, mark)
+    d = ImageDraw.Draw(img)
+    d.line([30, 76, 98, 50], fill=(30, 30, 36, 255), width=6)
+    d.line([30, 73, 98, 47], fill=(150, 154, 166, 255), width=2)
+    return img
+
+
 def village_headband(band, band_d, mark):
     """Every village's headband, drawn like the Leaf's: the cloth band, its tail and the plate with the village's mark."""
     img = new()
@@ -495,6 +504,10 @@ def village_headband(band, band_d, mark):
         d.line([(46, 78), (64, 48), (82, 78)], fill=ink, width=5)
         d.line([(56, 78), (64, 64), (72, 78)], fill=ink, width=4)
         d.line([44, 79, 84, 79], fill=ink, width=3)
+    elif mark == "leaf":    # the leaf swirl
+        d.arc([48, 48, 80, 80], 200, 520, fill=ink, width=4)
+        d.line([64, 64, 82, 50], fill=ink, width=4)
+        d.polygon([(76, 44), (86, 48), (80, 56)], fill=ink)
     elif mark == "rain":    # falling rain
         for x in (49, 58, 67, 76):
             d.line([x, 50, x, 78], fill=ink, width=4)
@@ -730,6 +743,9 @@ if __name__ == "__main__":
     finish(headband(), "headband")
     for v, band in (("sand", (150, 116, 80)), ("mist", (70, 84, 112)), ("cloud", (78, 78, 92)), ("stone", (170, 60, 52)), ("rain", (100, 106, 124))):
         finish(village_headband(band, tuple(int(c * 0.55) for c in band), v), f"{v}_headband")
+    for v, band in (("leaf", (60, 100, 200)), ("sand", (150, 116, 80)), ("mist", (70, 84, 112)), ("cloud", (78, 78, 92)), ("stone", (170, 60, 52)),
+                    ("rain", (100, 106, 124))):
+        finish(scratched_headband(band, tuple(int(c * 0.55) for c in band), v), "headband_scratched" if v == "leaf" else f"{v}_headband_scratched")
     finish(pill(), "chakra_pill")
     finish(ramen(), "ramen")
     finish(ramen((200, 150, 80), (120, 170, 80)), "miso_ramen")

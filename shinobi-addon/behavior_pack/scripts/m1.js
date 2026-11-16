@@ -7,7 +7,7 @@
 //   /scriptevent aegis:m1 off | on   — turn your own combo animations off / on (damage bonus stays)
 
 import { world, system } from "@minecraft/server";
-import { getStat } from "./levels.js";
+import { getStat, levelDamageFactor } from "./levels.js";
 import { boostHit, isEcho, healBack, scriptedHit } from "./dmgutil.js";
 import { bijuuMeleeBonus } from "./bijuu.js";
 
@@ -23,7 +23,7 @@ const BLADE = [
   { anim: "m1_slash2", bonus: 0 },
   { anim: "m1_slash3", bonus: 2, finisher: true },
 ];
-const BLADES = /sword|kunai|kusanagi|samehada|kubikiribocho|hiramekarei|kiba|nuibari|shibuki|chakra_blades|_axe$|trident|mace/;
+const BLADES = /sword|kunai|kusanagi|samehada|kubikiribocho|hiramekarei|kiba|nuibari|shibuki|chakra_blades|totsuka|gunbai|chakra_rod|_axe$|trident|mace/;
 
 let api;
 const combo = new Map(); // player id -> { step, tick, target }
@@ -55,7 +55,7 @@ function onHit(player, target, damage) {
   // A bigger hit is applied as (this hit + bonus) so it lands inside the hurt cooldown; a weaker one is healed back.
   const bonus = Math.round(move.bonus * (blade ? 1 : 1 + getStat(player, "taijutsu") / 100));
   // …and in Tailed Beast Mode every hit carries the beast's chakra
-  const total = damage + bonus + bijuuMeleeBonus(player, target);
+  const total = (damage + bonus + bijuuMeleeBonus(player, target)) * levelDamageFactor(player);
   if (total > damage) boostHit(target, damage, total, player);
   else healBack(target, damage - total);
 

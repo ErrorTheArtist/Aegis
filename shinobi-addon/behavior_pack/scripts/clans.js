@@ -15,7 +15,8 @@ import { getKage, KAGE_VILLAGES, isSannin } from "./armor.js";
 import { registerCast } from "./clash.js";
 
 import { noteCast } from "./starter.js";
-import { getVillage, villageTag, villageEffectLevels } from "./villages.js";
+import { getVillage, villageTag, villageEffectLevels, isRogue, rogueTag } from "./villages.js";
+import { titlePrefix } from "./titles.js";
 import { transformCinematic, impactFx, sfx, chargeFx } from "./cinematic.js";
 import { statEffectLevels, getLevel, getRank, RANKS } from "./levels.js";
 import { jinchurikiEffectLevels } from "./bijuu.js";
@@ -162,7 +163,7 @@ export function getClanId(player) {
 
 const getClan = (player) => CLANS[getClanId(player)];
 
-// Clan Mastery (trained at a Clan Elder): +10% clan max chakra and -10% clan ability cooldowns per level.
+// Clan Mastery (trained at a Jutsu Sensei's Clan Training): +10% clan max chakra and -10% clan ability cooldowns per level.
 const mastery = (player) => {
   try {
     return Number(player.getDynamicProperty("aegis:clan_mastery") ?? 0);
@@ -203,8 +204,9 @@ export function applyNameTag(player) {
     // titles chosen by the server owner take priority: Kage > Sannin > exam rank
     const title = kage ? `${KAGE_VILLAGES[kage].title} ` : isSannin(player) ? "§aSannin " : rank ? `§7${RANKS[rank]} ` : "";
     const lv = `${title}§eLv.${getLevel(player)}§r`;
-    const vt = villageTag(getVillage(player));
-    player.nameTag = clan ? `${vt}${clan.color}[${clan.name}]§r ${lv} ${player.name}` : `${vt}${lv} ${player.name}`;
+    const vt = isRogue(player) ? rogueTag : villageTag(getVillage(player));
+    const tt = titlePrefix(player); // a title of legend (v1.54)
+    player.nameTag = clan ? `${vt}${tt}${clan.color}[${clan.name}]§r ${lv} ${player.name}` : `${vt}${tt}${lv} ${player.name}`;
   } catch {
     /* ignore */
   }
@@ -332,6 +334,7 @@ function refreshEffects(player, force = false) {
     else if (lv > 0) merged.set(id, (merged.has(id) ? merged.get(id) + 1 : 0) + lv - 1);
   }
   for (const [id, amp] of Object.entries(villageEffectLevels(player))) put(id, amp); // the village's spirit (the Mist: water breathing)
+  if (merged.has("health_boost")) merged.set("health_boost", Math.min(255, merged.get("health_boost"))); // Bedrock's limit (1,044 HP)
   for (const [id, amp] of merged) {
     try {
       const cur = player.getEffect(id);
@@ -559,9 +562,10 @@ const ABILITIES = {
         api.anim(p, "animation.aegis.chains_cast");
         for (const e of targets) {
           line(p, api.add(p.location, { x: 0, y: 1, z: 0 }), api.add(e.location, { x: 0, y: 1, z: 0 }), "minecraft:electric_spark_particle");
-          eff(e, "slowness", 100, 255);
-          eff(e, "weakness", 100, 2);
-          api.hurt(e, 4, p);
+          eff(e, "slowness", 120, 255);
+          eff(e, "weakness", 120, 2);
+          api.hurt(e, 8, p);
+          sealChakra(e, 120); // a bound shinobi can't mould chakra: no jutsu or clan abilities for 6 s
         }
         api.sound(p.dimension, "random.anvil_land", p.location, 0.6, 1.5);
         sfx(p.dimension, "aegis.seal", p.location, 1.2, 1);
@@ -795,6 +799,15 @@ export function beginClanRoll(player) {
   if (!getClanId(player)) rollClan(player);
 }
 
+// Sealing Chains (v1.54): a bound player's chakra is sealed — no jutsu or clan abilities until it wears off.
+const sealedUntil = new Map(); // player id -> tick
+export function sealChakra(e, ticks) {
+  if (e?.typeId !== "minecraft:player") return;
+  sealedUntil.set(e.id, system.currentTick + ticks);
+  e.onScreenDisplay?.setActionBar("§6Your chakra is sealed! §7(no jutsu for a few seconds)");
+}
+export const chakraSealed = (p) => (sealedUntil.get(p?.id) ?? 0) > system.currentTick;
+
 export function handleClanItemUse(player, itemStack) {
   if (itemStack.typeId === REROLL_ITEM) {
     useRerollScroll(player);
@@ -802,6 +815,10 @@ export function handleClanItemUse(player, itemStack) {
   }
   const ability = ABILITIES[itemStack.typeId];
   if (!ability) return false;
+  if (chakraSealed(player)) {
+    player.onScreenDisplay.setActionBar("§6Your chakra is sealed — you can't use that right now.");
+    return true;
+  }
 
   const clanId = getClanId(player);
   if (clanId !== ability.clan) {
@@ -982,7 +999,7 @@ function awakenMangekyo(player) {
   world.sendMessage(`§e${player.name} has awakened the §4Mangekyō Sharingan§e!`);
 }
 
-// Eternal Mangekyō: the next stage after the Mangekyō (trained at the Uchiha Clan Elder).
+// Eternal Mangekyō: the next stage after the Mangekyō (Jutsu Sensei → Clan Training, for the Uchiha).
 export function awakenEternal(player) {
   if (!hasMangekyo(player) || hasEternalMangekyo(player)) return false;
   player.setDynamicProperty(EMS_PROP, true);

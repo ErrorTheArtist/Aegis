@@ -132,6 +132,169 @@
           "value": 900,
           "max": 900
         }
+      },
+      "aegis:fighting": {
+        "minecraft:boss": {
+          "hud_range": 48,
+          "should_darken_sky": false
+        },
+        "minecraft:behavior.hurt_by_target": {
+          "priority": 1
+        },
+        "minecraft:behavior.nearest_attackable_target": {
+          "priority": 3,
+          "must_see": false,
+          "reselect_targets": true,
+          "within_radius": 32,
+          "entity_types": [
+            {
+              "filters": {
+                "any_of": [
+                  {
+                    "all_of": [
+                      {
+                        "test": "is_family",
+                        "subject": "other",
+                        "value": "player"
+                      },
+                      {
+                        "test": "has_tag",
+                        "subject": "other",
+                        "operator": "!=",
+                        "value": "aegis_grace"
+                      }
+                    ]
+                  },
+                  {
+                    "test": "is_family",
+                    "subject": "other",
+                    "value": "ninja_companion"
+                  }
+                ]
+              },
+              "max_dist": 32
+            }
+          ]
+        }
+      },
+      "aegis:calm": {
+        "minecraft:damage_sensor": {
+          "triggers": [
+            {
+              "cause": "fall",
+              "deals_damage": "no"
+            },
+            {
+              "on_damage": {
+                "filters": {
+                  "test": "is_family",
+                  "subject": "other",
+                  "value": "player"
+                }
+              },
+              "deals_damage": "no"
+            }
+          ]
+        },
+        "minecraft:interact": {
+          "interactions": [
+            {
+              "on_interact": {
+                "filters": {
+                  "test": "is_family",
+                  "subject": "other",
+                  "value": "player"
+                },
+                "event": "aegis:talked",
+                "target": "self"
+              },
+              "interact_text": "Challenge",
+              "swing": true
+            }
+          ]
+        },
+        "minecraft:behavior.hurt_by_target": {
+          "priority": 1,
+          "entity_types": [
+            {
+              "filters": {
+                "test": "is_family",
+                "subject": "other",
+                "operator": "!=",
+                "value": "player"
+              }
+            }
+          ]
+        },
+        "minecraft:behavior.nearest_attackable_target": {
+          "priority": 3,
+          "must_see": true,
+          "reselect_targets": true,
+          "within_radius": 20,
+          "entity_types": [
+            {
+              "filters": {
+                "all_of": [
+                  {
+                    "test": "is_family",
+                    "subject": "other",
+                    "value": "ninja"
+                  },
+                  {
+                    "test": "is_family",
+                    "subject": "other",
+                    "operator": "!=",
+                    "value": "legend"
+                  },
+                  {
+                    "test": "is_family",
+                    "subject": "other",
+                    "operator": "!=",
+                    "value": "player"
+                  }
+                ]
+              },
+              "max_dist": 20
+            }
+          ]
+        }
+      },
+      "aegis:calm_madara": {
+        "minecraft:damage_sensor": {
+          "triggers": [
+            {
+              "cause": "fall",
+              "deals_damage": "no"
+            },
+            {
+              "on_damage": {
+                "filters": {
+                  "test": "is_family",
+                  "subject": "other",
+                  "value": "player"
+                }
+              },
+              "deals_damage": "no"
+            }
+          ]
+        },
+        "minecraft:interact": {
+          "interactions": [
+            {
+              "on_interact": {
+                "filters": {
+                  "test": "is_family",
+                  "subject": "other",
+                  "value": "player"
+                },
+                "event": "aegis:talked",
+                "target": "self"
+              },
+              "interact_text": "Challenge",
+              "swing": true
+            }
+          ]
+        }
       }
     },
     "components": {
@@ -173,10 +336,6 @@
       "minecraft:movement": {
         "value": 0.28
       },
-      "minecraft:boss": {
-        "hud_range": 48,
-        "should_darken_sky": false
-      },
       "minecraft:knockback_resistance": {
         "value": 0.8
       },
@@ -210,44 +369,6 @@
         "priority": 2,
         "speed_multiplier": 1.05,
         "track_target": true
-      },
-      "minecraft:behavior.hurt_by_target": {
-        "priority": 1
-      },
-      "minecraft:behavior.nearest_attackable_target": {
-        "priority": 3,
-        "must_see": false,
-        "reselect_targets": true,
-        "within_radius": 32,
-        "entity_types": [
-          {
-            "filters": {
-              "any_of": [
-                {
-                  "all_of": [
-                    {
-                      "test": "is_family",
-                      "subject": "other",
-                      "value": "player"
-                    },
-                    {
-                      "test": "has_tag",
-                      "subject": "other",
-                      "operator": "!=",
-                      "value": "aegis_grace"
-                    }
-                  ]
-                },
-                {
-                  "test": "is_family",
-                  "subject": "other",
-                  "value": "ninja_companion"
-                }
-              ]
-            },
-            "max_dist": 32
-          }
-        ]
       },
       "minecraft:behavior.random_stroll": {
         "priority": 7,
@@ -379,6 +500,45 @@
         "add": {
           "component_groups": [
             "aegis:legend_hanzo"
+          ]
+        }
+      },
+      "aegis:calm": {
+        "remove": {
+          "component_groups": [
+            "aegis:fighting",
+            "aegis:calm_madara"
+          ]
+        },
+        "add": {
+          "component_groups": [
+            "aegis:calm"
+          ]
+        }
+      },
+      "aegis:calm_madara": {
+        "remove": {
+          "component_groups": [
+            "aegis:fighting",
+            "aegis:calm"
+          ]
+        },
+        "add": {
+          "component_groups": [
+            "aegis:calm_madara"
+          ]
+        }
+      },
+      "aegis:challenge": {
+        "remove": {
+          "component_groups": [
+            "aegis:calm",
+            "aegis:calm_madara"
+          ]
+        },
+        "add": {
+          "component_groups": [
+            "aegis:fighting"
           ]
         }
       }

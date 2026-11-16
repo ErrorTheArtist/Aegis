@@ -11,6 +11,7 @@ import { showTitle } from "./hud.js";
 import { NPC_TYPES, setupNpc, defaultsFor, giveItem, listQuests } from "./npcs.js";
 import { getLevel, gainXp } from "./levels.js";
 import { addRyo, fmtRyo } from "./currency.js";
+import { rampageHolder, rampageText } from "./rampage.js";
 
 let api;
 const QUEST_PROP = "aegis:quest";
@@ -95,7 +96,7 @@ const REWARD_ITEMS = [
   "aegis:big_rasengan_scroll", "aegis:dragon_flame_scroll", "aegis:water_shark_scroll", "aegis:lightning_hound_scroll", "aegis:front_lotus_scroll",
   "aegis:kunai", "aegis:shuriken", "aegis:kusanagi", "aegis:samehada", "aegis:kubikiribocho", "aegis:hiramekarei",
   "aegis:anbu_mask", "aegis:anbu_armor", "aegis:akatsuki_cloak",
-  "minecraft:diamond", "minecraft:golden_apple", "minecraft:enchanted_golden_apple", "minecraft:netherite_ingot", "minecraft:totem_of_undying",
+  "minecraft:diamond", "minecraft:golden_apple", "minecraft:enchanted_golden_apple", "minecraft:netherite_ingot",
 ];
 const itemLabel = (id) => cap(id.split(":")[1].replace(/_scroll$/, " scroll"));
 
@@ -224,7 +225,7 @@ export async function questEditor(player, cfg, save) {
     .textField("XP reward", "1500", String(q.xp))
     .dropdown(`Item reward${q.item && itemIdx === 1 ? ` (now: ${q.item} ×${q.itemCount})` : ""}`, itemOpts, itemIdx)
     .slider("Item amount", 1, 64, 1, Math.max(1, q.itemCount))
-    .slider("Minimum level", 1, 200, 1, q.minLevel)
+    .slider("Minimum level", 1, 300, 1, q.minLevel)
     .toggle("Repeatable", q.repeatable)
     .slider("Time limit in minutes (0 = no limit)", 0, 30, 1, q.timeLimit)
     .dropdown("Requires finishing this quest first", ["Nothing", ...others.map((o) => o.title)], Math.max(0, others.findIndex((o) => o.id === q.requires) + 1));
@@ -374,6 +375,11 @@ function timeLeft(cur) {
 }
 
 function startQuest(player, giver, q) {
+  // only one Tailed Beast may be loose at a time: a quest can't call another while one is out
+  if (q.spawn && (q.target === "bijuu" || BEASTS.includes(q.target))) {
+    const loose = rampageHolder();
+    if (loose) return void player.sendMessage(`${rampageText(loose)} §7Defeat it, then come back for this quest.`);
+  }
   const tag = `aegis_q_${player.id}`;
   const cur = { giver, id: q.id, title: q.title, target: q.target, count: q.count, progress: 0, spawn: q.spawn, tag,
     deadline: q.timeLimit ? Date.now() + q.timeLimit * 60000 : 0 };

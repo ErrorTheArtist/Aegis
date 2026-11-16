@@ -1,0 +1,23 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:item": {
+    "description": {
+      "identifier": "aegis:adv_chibaku_tensei_scroll",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "aegis_adv_chibaku_tensei_scroll"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "§5Title Scroll: Advanced Chibaku Tensei§r\n§7Pain title"
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:glint": true
+    }
+  }
+}

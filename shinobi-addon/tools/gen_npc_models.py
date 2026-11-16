@@ -1503,6 +1503,39 @@ def tsuchikage_gear():
     return kage_gear(TK, EARTH, "geometry.aegis.gear_tsuchikage", lambda g, tex: big_nose(g, tex, TK, (48, 0, 4, 4)))
 
 
+# --- Hokage (v1.54) — the Seventh: spiky blond hair poking out under the hat, blue eyes, whisker marks; the white robe
+#     with red trim, red flames licking up the hem, and 火 on the hat
+FIRE = ["...#...",        # 火
+        ".#.#.#.",
+        ".#.#.#.",
+        "...#...",
+        "..#.#..",
+        ".#...#.",
+        "#.....#"]
+HK = dict(skin=(240, 206, 172), skin_d=(210, 172, 140), hair=(244, 204, 68), hair_h=(255, 230, 120), eye=(246, 242, 236),
+          iris=(48, 116, 224), mark=(150, 104, 84), brow=(212, 168, 46), mouth=(168, 98, 88), robe=(242, 240, 234),
+          robe_d=(208, 206, 200), trim=(204, 34, 28), trim_d=(150, 22, 18), under=(40, 40, 46), under_d=(26, 26, 30),
+          sandal=(38, 42, 58), ink=(242, 240, 234))
+HOKAGE_FACE = dict(front=["HhHHhHHh", "HHhHHHhH", "HSHSSHSH", "SKKSSKKS", "SEISSIES", "MSSssSSM", "MSSQQSSM", "sSSSSSSs"],
+                   side=["HHHHHHHH", "HHHHHHHh", "HHHHHSSS", "HHHHSSSS", "HHHsSSSS", "HHHsSSSM", "HHSSSSSM", "HSSSSSSS"],
+                   back=["HHhHHhHH", "HHHHHHHH", "HhHHHHhH", "HHHHHHHH", "HHhHHhHH", "HHHHHHHH", "HHHHHHHH", "sHHHHHHs"],
+                   front1=["H.hH.h.H", ".H..H..h"], side1=["HhHHhHHh", "H.H.HH.."], back1=None)
+
+
+def hokage_gear():
+    def extra(g, tex):
+        spikes(g, tex, (48, 0, 8, 8), HK["hair"], "head", [                                      # under the hat brim
+            ((-5.0, 27.6, -1.6), (1.9, 2.6, 1.9), (0, 0, 42)), ((-5.0, 26.6, 0.8), (1.9, 2.4, 1.9), (0, 0, 54)),
+            ((3.1, 27.6, -1.6), (1.9, 2.6, 1.9), (0, 0, -42)), ((3.1, 26.6, 0.8), (1.9, 2.4, 1.9), (0, 0, -54))])
+        for x0, y0, wd, ht in ((0, 28, 10, 14), (10, 28, 5, 14)):                               # flames on the hem
+            for u in range(wd):
+                fh = 3 + round(2.6 * (1 + math.sin((x0 + u) * 1.9)))
+                for v in range(ht - fh, ht):
+                    tip = v - (ht - fh) < 2
+                    tex.putpixel((x0 + u, y0 + v), (*(mul(HK["trim"], 1.25) if tip else HK["trim"]), 255))
+    return kage_gear(HK, FIRE, "geometry.aegis.gear_hokage", extra)
+
+
 RL = dict(RA, hair=(30, 28, 34), vest=(64, 58, 78), vest_d=(48, 44, 60), vest_h=(86, 80, 102), vest_dd=(36, 32, 46), torso=(64, 58, 78),
           shirt=(40, 38, 50), sleeve=(40, 38, 50), pants=(40, 38, 50), armor=(92, 88, 104), rope=(150, 138, 120))
 
@@ -1923,6 +1956,8 @@ MODELS = {
     "hanzo": (lambda: ninja_skin(HZ, HANZO, 68), hanzo_gear),
     # v1.52: the Travel Master (skin 69) — Fast Travel
     "travel_master": (travel_master_skin, travel_master_gear),
+    # v1.54: the Hokage (skin 4) in the robe of office, like the other four Kage
+    "hokage": (lambda: kage_skin(HK, HOKAGE_FACE, 4), hokage_gear),
 }
 
 FLUTTER = {

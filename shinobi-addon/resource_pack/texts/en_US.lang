@@ -36,3 +36,5 @@ entity.aegis:gyuki.name=Gyuki, the Eight-Tailed Ox
 item.spawn_egg.entity.aegis:gyuki.name=Spawn Gyuki
 entity.aegis:kurama.name=Kurama, the Nine-Tailed Fox
 item.spawn_egg.entity.aegis:kurama.name=Spawn Kurama
+entity.aegis:juubi.name=The Ten-Tails
+item.spawn_egg.entity.aegis:juubi.name=Spawn The Ten-Tails

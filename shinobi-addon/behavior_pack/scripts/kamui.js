@@ -7,6 +7,7 @@
 //   /scriptevent aegis:kamui info | free (admin: take Kamui back from its holder's record)
 
 import { world, system, ItemStack, ItemLockMode } from "@minecraft/server";
+import { titleKamuiCdMultiplier } from "./titles.js";
 import { showTitle } from "./hud.js";
 import { impactFx, sfx } from "./cinematic.js";
 
@@ -182,7 +183,7 @@ export function handleKamuiUse(player, itemStack) {
   api.anim(player, "animation.aegis.eye_activate");
   if ((sneaking ? warpSelf(player) : warp(player)) === false) return true;
   api.setChakra(player, api.getChakra(player) - move.cost);
-  api.startCooldown(player, key, move.cd);
+  api.startCooldown(player, key, Math.round(move.cd * titleKamuiCdMultiplier(player))); // Tobi's title: −30%
   return true;
 }
 

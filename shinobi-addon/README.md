@@ -112,12 +112,30 @@ While a player has grace:
 
 Everyone sees a title when it starts and when it ends, with a warning a minute and ten seconds before the end.
 Minecraft's own PvP setting only stops players hurting players — it doesn't stop mobs or bosses; grace does.
+
+**Every new player gets an hour of grace** (v1.54): the first time someone joins the server they have a **1-hour grace
+period**, counted only while they're online — time to choose a village, explore and train before anyone (player, ninja
+or boss) can touch them. Players who joined before v1.54 don't get it. `/scriptevent aegis:grace off <name>` ends it early.
 - **Village menu** — Shinobi Record → *Village*:
   - **Village chat** — a message only your village sees.
   - **Village leaderboard** — the villages ranked by **Village Honor**, with member counts, the current Kage and the top 3 shinobi.
   - **Return Home** — teleport to your village (10 min cooldown, not while in a fight).
+  - **Leave the village** — become a rogue ninja (see *Leaving your village* below).
 - **Village Honor** — every kill earns honor for you and your village: mob 1, enemy ninja 3, Akatsuki 25,
-  legend 40, Tailed Beast 60 (companions' and summons' kills count for their owner). `/scriptevent aegis:village honor` prints the board.
+  legend 40, Tailed Beast 60, the Ten-Tails 150 (companions' and summons' kills count for their owner). `/scriptevent aegis:village honor` prints the board.
+
+### Leaving your village (rogue ninja)
+
+Shinobi Record → *Village* → **Leave the village** (it asks you to confirm). You become a **rogue ninja**:
+
+- a **scratched headband** of your old village lands in your inventory (it still counts as a headband for chakra regen);
+- your name tag shows **[Rogue]**, and the Shinobi Record shows which village you left;
+- you lose the village perk, Return Home, the village quests and the no-friendly-fire protection — no village-mate is
+  safe from you, nor you from them;
+- the whole server is told.
+
+Only an admin can put a rogue back in a village: `/execute as <player> run scriptevent aegis:village choose` (choosing a
+village clears the rogue status). Several *Titles* need you to have left your village.
 
 ## Chakra
 
@@ -127,8 +145,18 @@ Minecraft's own PvP setting only stops players hurting players — it doesn't st
 
 ## Levels & Stats
 
-You start at **Level 1**; the max is **Level 200**. Each level gives **3 stat points**
-(+3 bonus at level 200, so 600 total — enough to max every stat).
+You start at **Level 1**; the max is **Level 300** (v1.54). Each level gives **3 stat points**
+(+3 bonus at level 300, so 900 total — enough to max every stat at 150).
+
+**Health and damage grow with you** (v1.54):
+- **HP**: every level adds health, and so does Vitality — from **20 HP** at level 1 to **1,044 HP** at level 300 with
+  150 Vitality. That's Bedrock's limit: Health Boost can't go higher, so the ~1,100 HP that was asked for would need
+  replacing Minecraft's own player file (which breaks with game updates) — 1,044 is the most an add-on can give.
+- **Your damage**: **+3% per level** for jutsu, clan abilities and punches/blades (×9.97 at level 300), so your hits
+  keep up with the big health pools.
+- **Bosses** (Akatsuki, legends, Tailed Beasts, the Ten-Tails) hit **+2% harder per level of the player they hit**
+  (×6.98 at level 300), so they stay dangerous.
+- **Out of a fight** (not hit for 8 seconds) you heal **1% of your max HP every second**.
 
 **XP sources**
 - Kills: 3 XP per point of the victim's max health (zombie ≈ 60, Kurama ≈ 8,250)
@@ -141,24 +169,24 @@ You start at **Level 1**; the max is **Level 200**. Each level gives **3 stat po
 Crystals of a fallen boss's chakra. **Right-click** one to absorb it — about **a third of the XP your next level
 needs**, whatever your level (at least 100 XP) — or **sneak + right-click** to absorb the whole stack at once.
 Almost every boss drops them when you (or your companion, clone or summon) bring it down: **Legendary shinobi** 4–5
-(Edo Madara 8), **Akatsuki members** 3, **Tailed Beasts** 5 (Kurama 7). B/A/S-rank missions pay 1 / 2 / 4, and the
-bigger premade quests pay 1–10. At level 200 they're not used up — give them to a friend.
+(Edo Madara 8), **Akatsuki members** 3, **Tailed Beasts** 5 (Kurama 7), **the Ten-Tails** 12. B/A/S-rank missions pay
+1 / 2 / 4, and the bigger premade quests pay 1–10. At level 300 they're not used up — give them to a friend.
 `/scriptevent aegis:xpshard 16` gives you 16 (testing).
 
-XP needed per level grows: 52 XP for level 2, ~1,800 around level 60, ~12,400 for the last levels
-(about 908,000 XP total from 1 to 200).
+XP needed per level grows (v1.54: about 20% steeper than before): 65 XP for level 2, ~2,000 around level 60, ~4,550
+at level 100, ~31,000 for the last levels (about 3.37 million XP from 1 to 300).
 
-**Stats** (max 100 each) — spend points with the **Shinobi Record** (it lives in the last slot of your hotbar, locked
+**Stats** (max 150 each) — spend points with the **Shinobi Record** (it lives in the last slot of your hotbar, locked
 there: it can't be moved, dropped or lost), or `/scriptevent aegis:stats`:
 
 | Stat | Effect |
 |---|---|
-| Vitality | +2 hearts every 10 points (up to +20 hearts) |
-| Chakra | +2 max chakra and +0.5% chakra regen per point (+200 chakra, +50% regen at 100) |
-| Taijutsu | Strength I/II/III/IV at 25/50/75/100 (stacks with clan Strength), and +1% damage for punch combos and taijutsu scrolls per point |
-| Ninjutsu | +1% damage for jutsu, clan abilities and sword specials per point (+100% at 100) |
-| Agility | Speed I–IV at 25/50/75/100 and −0.25% jutsu cooldowns per point (−25% at 100) |
-| Endurance | Shrug off 0.3% of all damage taken per point (30% at 100) |
+| Vitality | +4 max HP every 3 points (+200 HP at 150), on top of the HP your level gives |
+| Chakra | +2 max chakra and +0.5% chakra regen per point (+300 chakra, +75% regen at 150) |
+| Taijutsu | a level of Strength every 25 points (stacks with clan Strength), and +1% damage for punch combos and taijutsu scrolls per point |
+| Ninjutsu | +1% damage for jutsu, clan abilities and sword specials per point (+150% at 150) |
+| Agility | Speed I–IV at 25/50/75/100 and −0.25% jutsu cooldowns per point (−37.5% at 150) |
+| Endurance | Shrug off 0.2% of all damage taken per point (30% at 150) |
 
 The menu shows your XP bar, unspent points and every stat; tap a stat and use the slider to add points.
 **Reset stats** refunds everything. Your level shows above your head and on the chakra bar.
@@ -168,6 +196,32 @@ The menu shows your XP bar, unspent points and every stat; tap a stat and use th
 /scriptevent aegis:level set 50
 /scriptevent aegis:level xp 5000
 ```
+
+## Titles (v1.54)
+
+Five legendary titles a server admin grants by hand once a player has earned them:
+
+```
+/tag <player> add pain          (or itachi, tobi, sasuke, naruto)
+/tag <player> remove pain       takes the title and its perks away
+```
+
+The moment the tag is added the player gets the title **over their name**, its **perks**, and its **reward gear** —
+once per title, kept on death. The gear is **creative-only**: no shop, quest, mission or drop gives it, and only the
+title's holder can use it (anyone else gets *"Only the holder of the … title can use this"*). Losing and regaining a
+title doesn't hand the gear out twice. **Shinobi Record → Titles** lists every title with its requirements, ticked
+where the add-on can check them (level, clan, village, Mangekyō, Kamui, kills, missions, honor); duels and bounties
+are for the admin to judge.
+
+| Title | Requirements | Rewards | Perks |
+|---|---|---|---|
+| **Pain** | Leave your village · Level 300 · defeat the player holding *The Toad Sage* · a bounty of 5 million Ryō · the Ōtsutsuki clan | Advanced Rinnegan Eyes · Advanced Shinra Tensei · Advanced Chibaku Tensei · Chakra Receiver Rods | +15% damage vs groups |
+| **Itachi of the Sharingan** | Level 300 · Mangekyō Sharingan · every village quest chain without dying · left the Hidden Leaf · defeat a Kage-rank player · a 2 million bounty | Tsukuyomi · Amaterasu · Susanoo scrolls · Totsuka Blade | +15% genjutsu strength · shrug off one debuff every 45 s |
+| **Tobi** | Level 300 · the world's Kamui holder · Mangekyō Sharingan · leave your village · defeat a feared and respected Jōnin-rank player · a 2 million bounty | Tobi's Spiral Mask · Uchiha War Fan (Gunbai) · Kamui Shuriken | Kamui cooldown −30% · +10% jutsu damage |
+| **Sasuke** | Level 300 · Mangekyō Sharingan · leave your village · defeat 3,000 hostile ninja · defeat a Kage-rank player · a 2 million bounty | Kusanagi Sword V2 · Indra's Arrow · Chidori Nagashi V2 · Perfect Susanoo | +15% lightning jutsu damage · +10% movement speed |
+| **Naruto** | Level 300 · Sage Mode · Kurama sealed inside you · never leave your village · 500 missions · 3,000 hostile ninja · 3 million honor | Orange Sage Coat · Rasenshuriken V2 · Tailed Beast Bomb V2 · Six Paths Sage Mode (half) | +15% chakra regen · +10% max HP |
+
+Mission turn-ins and hostile ninja kills are counted from v1.54 on.
 
 ## Clans
 
@@ -214,7 +268,7 @@ Learn more releases at the **Jutsu Sensei** (*Chakra Nature Training*): 2nd rele
 ### Kekkei genkai releases (clan-bound)
 
 These scrolls can **only be cast by their clan** (anyone else gets *"Only the Senju Clan can use Wood Release"*).
-Only a **Clan Elder** of that clan sells them, and only to its members.
+The **Jutsu Sensei** teaches them under **Clan Training**, and only to that clan's members.
 
 | Clan | Release scroll | Chakra / cd | Effect |
 |---|---|---|---|
@@ -241,7 +295,7 @@ Check your progress with `/scriptevent aegis:clan info`.
 
 ### Eternal Mangekyō Sharingan (Uchiha)
 
-Uchiha with the Mangekyō can awaken the **Eternal Mangekyō** at an **Uchiha Clan Elder** (Lv 100, 7,680 Ryō).
+Uchiha with the Mangekyō can awaken the **Eternal Mangekyō** at the **Jutsu Sensei → Clan Training** (Lv 100, 7,680 Ryō).
 It replaces your Mangekyō item:
 
 - half the chakra drain (1.5/sec), **50% dodge**, Strength II + Speed while active
@@ -427,10 +481,30 @@ Bring good armor, Soldier Pills and friends.
 
 **Summon:** use a **Tailed Beast Summoning Scroll** (the S-rank mission reward, a rare Akatsuki drop, or — very rarely —
 the Travelling Merchant's, Lv 50, 5,400 Ryō). A random beast is released 8 blocks in front of you after a short ritual
-(fewer tails = more common). Only one beast can be summoned within 64 blocks at a time. Spawn eggs are in the
-creative inventory too.
+(fewer tails = more common). Spawn eggs are in the creative inventory too.
+
+**One rampage at a time** (v1.54): only **one Tailed Beast can be loose in the whole world** (the Ten-Tails included).
+While one is out, summoning scrolls refuse, quests won't call another, and any other beast that appears (a broken seal,
+a spawn egg) is turned away with a message saying which beast is loose and where. The slot frees when the beast is
+defeated, sealed or sent home by the lag clear (after 20 minutes alive and out of a fight). A Jinchūriki's trial inside
+the seal doesn't count.
 
 **Drops:** diamonds, golden apples, Soldier Pills, a chance at a Bloodline Reroll Scroll, and lots of XP.
+
+### The Ten-Tails (v1.54)
+
+The strongest beast of all: a hulking grey beast on long clawed arms, a crown of horns around **one huge
+Rinne-Sharingan eye**, a fanged maw, spikes down its spine and ten great tails. **5,000 HP**, boss bar, its own moves:
+
+- **Giant Tailed Beast Bomb** — a long charge at its mouth, then a bomb with a 9-block blast
+- **Tail Slam** — it rears up and slams; a shockwave through everything within 9 blocks (get away when it rears!)
+- **Wood Spikes** — the ground cracks under each target, then roots burst up a moment later (keep moving!)
+- **Roar** — hurts, slows and weakens everyone within 14 blocks · **Leap** at anyone who runs
+- **Phase 2 at half health** — *"The Ten-Tails awakens!"*: tougher, faster, and a **three-bomb barrage** at up to three targets
+
+It's **creative-only**: it comes **only from its spawn egg** — no scroll, quest, mission or natural spawn — and survival
+players can't keep or use the egg (it's taken away). It can't be sealed. Drops 12 XP Shards, lots of Ryō, diamonds,
+enchanted golden apples and reroll scrolls; 150 village honor. Its moves scale with your level like every boss.
 
 ### Jinchūriki & Tailed Beast Mode
 
@@ -492,7 +566,12 @@ free again. Beasts from quests can never be sealed.
 
 Only the **Uzumaki** can do this (sneak + use the **Sealing Chains**):
 
-- **Seal a Tailed Beast alive** — needs **100 Chakra and 100 Vitality** stats, 150 chakra, and the beast weakened
+- **Seal an enemy away** (v1.54) — look at an enemy ninja, an Akatsuki member or a legend that's down to its **last 20%
+  of health** and sneak + use the chains: it's sealed away for good (60 chakra, 30 s cooldown) — it counts as defeated.
+- **The chains themselves** (right-click) bind everything within 9 blocks for 6 seconds, deal 8 damage and **seal the
+  chakra of any player they catch** — no jutsu or clan abilities until it wears off.
+
+- **Seal a Tailed Beast alive** — needs **50 Chakra and 50 Vitality** stats (v1.54: was 100 each), 150 chakra, and the beast weakened
   **below half health**. Look at it, choose who becomes the Jinchūriki (**yourself or any player within 16 blocks**),
   and golden chains bind it for a 3-second ritual. The beast isn't killed — it's sealed straight into that player.
   You get the XP. 60 s cooldown. Stay within 40 blocks or the seal breaks.
@@ -698,7 +777,7 @@ The **NPC Spawner** block is only in the creative inventory (no recipe, drops no
    while looking at it) to: **Configure**, **Respawn now**, **Remove NPCs**, or **Delete spawner**.
 
 Settings: NPC type · **village** (how village NPCs look and talk — see *Village NPCs*) · name (colour codes work) · outfit (64) ·
-clan (Clan Elder) · Akatsuki member ·
+Akatsuki member ·
 how many to keep spawned (1–6) · respawn on/off + delay (5–600 s) · stay in place / wander radius ·
 invulnerable · shop prices / mission rewards % · greeting line · spawn height (0 = first free space) ·
 restock time (Travelling Merchant, 5–120 min) · place name (Fast Travel stops). A Travelling Merchant's spawner menu also has
@@ -711,7 +790,7 @@ Friendly NPCs are leashed to their spawner; breaking the spawner removes its NPC
 
 - **Earn it:** enemy ninja, Akatsuki, Legends and Tailed Beasts drop **Ryō notes** (100 Ryō each) — picking them up puts
   them straight into your wallet. Missions and quests pay Ryō too.
-- **Spend it:** every shop, the Clan Elder, Sage Training, nature training and recruiting Genin.
+- **Spend it:** every shop, Clan Training, Sage Training, nature training and recruiting Genin.
 - **Pay a player / exchange emeralds:** open your **Shinobi Record → Ryō Wallet**. Old emeralds exchange for **100 Ryō
   each** (also at the Jutsu Sensei, the Weaponsmith and the Travelling Merchant).
 - Admin: `/scriptevent aegis:ryo give 5000` · `take 5000` · `set 0` (the player who runs it).
@@ -767,13 +846,12 @@ Players talk to the Quest Giver to accept, see their progress, claim the reward 
 
 | NPC | What they do |
 |---|---|
-| **Jutsu Sensei** | Teaches by school — pick **Fire, Water, Wind, Lightning, Earth, Ninjutsu, Taijutsu, Genjutsu & Medical** or **Summoning & Forbidden**, then a scroll (each page shows how many you've unlocked at your level and has a « Back button). **Services**: Chakra Nature Training, emerald exchange. **Sage Training** (Lv 60) is under Summoning & Forbidden |
+| **Jutsu Sensei** | Teaches by school — pick **Fire, Water, Wind, Lightning, Earth, Ninjutsu, Taijutsu, Genjutsu & Medical** or **Summoning & Forbidden**, then a scroll (each page shows how many you've unlocked at your level and has a « Back button). **Services**: Chakra Nature Training, **Clan Training** (your clan's **Clan Mastery** 1–3: +10% clan max chakra and −10% clan ability cooldowns each; your clan's kekkei genkai release scrolls; the Uchiha's **Eternal Mangekyō**), emerald exchange. **Sage Training** (Lv 60) is under Summoning & Forbidden |
 | **Weaponsmith** | Kunai, shuriken, its village's headband and flak jacket (and the customer's own village's), seven legendary swords (Lv 15–35 — Samehada is quest-only), Anbu / Samurai armour, repairs the item in your hand |
 | **Ramen Shop** | Ichiraku Ramen (heal + 60 chakra + regen), Miso Ramen (+30 chakra + speed), Soldier Pills |
 | **Travelling Merchant** | **Random wares that change every 20 minutes** (set per spawner): cheap ramen every time, plus 4–5 random finds — Bloodline Reroll Scrolls, bargain jutsu scrolls, swords and armour, Akatsuki gear, pills, kunai… Limited stock shared by everyone. Buys back old Blank Scrolls. See *The Travelling Merchant* below |
 | **Kage / village leader (Mission Desk)** | D/C/B/A/S missions (kill mobs, ninja, a Tailed Beast, an Akatsuki member) for XP, Ryō and items |
 | **Exam Proctor** | Rank exams: **Chūnin** (Lv 20, beat 4 rogue ninja in 90 s), **Jōnin** (Lv 60, 3 Anbu + 3 Sound in 2 min), nothing higher — exams stop at Jōnin. Ranks show on your name tag and give +5/+10 stat points |
-| **Clan Elder** | For their clan: **Clan Mastery** 1–3 (+10% clan max chakra, −10% clan ability cooldowns each); the Uchiha Elder also awakens the **Eternal Mangekyō**. Others: **Bloodline transfer** into that clan (7,680 Ryō, Lv 30) |
 | **Village Shinobi** | Chatter and tips. In the Leaf each one is a shinobi or a kunoichi at random: the 3D chūnin flak jacket (a thick rolled collar, four raised scroll pouches, the vest over the shoulders, the red swirl crest on the back) over the navy uniform, the Leaf headband with its ties, a taped thigh holster; spiky black hair and a nose bandage, or auburn bangs and a swinging ponytail (the Quest Giver is the shinobi) |
 | **Quest Giver** | A **Quest Board** of every premade quest (the default), one premade quest, or a quest you design — see *Quest Givers* |
 | **Travel Master** (Fast Travel) | Flies you to any of the six villages or any other Travel Master for a fee — see *Fast Travel* |
@@ -795,8 +873,9 @@ the spawner's *Outfit* list.
 | **Genin** (companion) | three Leaf genin | Sand genin boy / girl | Mist genin boy / girl | Cloud genin boy / girl | Stone genin boy / girl | Rain genin boy / girl |
 
 The looks:
-- **Kage**: the white Kage robe and tall Kage hat in each village's colour, with its kanji on the hat's badge (風 teal,
-  水 blue, 雷 gold, 土 brown). The **Kazekage** has red hair and dark-ringed eyes; the **Mizukage** long auburn hair down
+- **Kage**: the white Kage robe and tall Kage hat in each village's colour, with its kanji on the hat's badge (火 red,
+  風 teal, 水 blue, 雷 gold, 土 brown). The **Hokage** (remodelled in v1.54) has spiky blond hair poking out under the hat,
+  blue eyes and whisker marks, and red flames licking up the hem of the robe; the **Kazekage** has red hair and dark-ringed eyes; the **Mizukage** long auburn hair down
   to her waist with a lock over one eye; the **Raikage** is dark-skinned and white-haired with a white moustache, his
   robe sleeveless over bare arms with gold bracelets; the **Tsuchikage** is an old man with a white beard, bushy brows
   and a big red nose. The **Rain Commander** wears no Kage hat: a dark armoured cloak, shoulder plates, a rope belt, a
@@ -812,7 +891,8 @@ The looks:
   cleaver; a blademaster in sunglasses and a white scarf with four swords fanned on his back; a bald, bearded smith in
   goggles and a leather apron with a stone hammer; an umbrella master with a respirator and a folded umbrella.
 
-The Ramen Shop, Clan Elder, Travelling Merchant and Travel Master serve every village as they are.
+The Ramen Shop, Travelling Merchant and Travel Master serve every village as they are. (The Clan Elder was removed in
+v1.54 — its training moved to the Jutsu Sensei; old Clan Elder spawners retire on their own.)
 
 ### Fast Travel
 
@@ -840,8 +920,10 @@ Shops use **Ryō** — see *Ryō currency* below.
   bandaged forearms, a thigh holster and wrapped shins — **Sound ninja** (sound-wave blast, nausea) — a bone-white crossover
   tunic trimmed in purple, the thick purple rope belt tied in a big bow at the back, the Sound headband with its music
   note, spiky violet-grey hair, purple eye shadow and amber eyes, a sound-amplifier gauntlet on the right arm — **Rogue Anbu** (blink
-  behind you and strike) **wander the overworld day and night** in groups of 1–3 (more in the dark/underground).
-  Killing them gives XP (and levels), Ryō, kunai and pills.
+  behind you and strike) **wander the overworld**. v1.54 made them **much rarer and gentler**: they spawn alone, never
+  within 200 blocks of a village or 20 blocks of a player, at most two around at once, and not underground; a rogue has
+  20 HP and hits for 3, a Sound ninja 24 HP / 3, an Anbu 40 HP / 5, with weaker jutsu — a level-1 shinobi with the
+  starter kit can win. Killing them gives XP (and levels), Ryō, kunai and pills.
 - **Akatsuki bosses** with boss bars: **Itachi** (Amaterasu, Tsukuyomi, Fireball, crow Substitution),
   **Kisame** (Water Shark Bomb, Water Prison, Samehada chakra drain), **Deidara** (C1 clay birds, telegraphed C3
   blast, keeps his distance), **Pain** (Shinra Tensei blasts everyone away, Banshō Ten'in yanks you in for a strike,
@@ -860,7 +942,7 @@ Shops use **Ryō** — see *Ryō currency* below.
   (twist space around the enemy you look at: 14 damage and thrown 10 blocks away, 20 to bosses — stays phased),
   *sneak + right-click* = warp yourself to the spot you look at. The holder's hits also drag any other Tobi out of his phase.
   `/scriptevent aegis:kamui` shows the holder; `… free` lets the next Tobi-slayer claim it. They **rarely roam the world** (Normal/Hard difficulty — you get a "sighted nearby"
-  warning), **hunt Jinchūriki** (every 5 min, 35% chance) and appear for S-rank missions. ~1,500 XP each.
+  warning), **hunt Jinchūriki** (every 15 min, 20% chance, never inside a village) and appear for S-rank missions. ~1,500 XP each.
 
 Enemy ninja, the Akatsuki, the legends and companions walk at about a player's pace. Their jutsu push players less
 than half as far as before, and nobody can be thrown again within 1.5 s of the last throw.
@@ -868,9 +950,16 @@ than half as far as before, and nobody can be thrown again within 1.5 s of the l
 ### Legendary bosses (NPC Spawner only)
 
 These **never spawn on their own** — place an **NPC Spawner**, choose *Legend: …* as the NPC type, and they
-appear (default respawn: 5 minutes). Each has a boss bar, its own moveset, and a **second phase at half health**
+appear (default respawn: 10 minutes). Each has a boss bar, its own moveset, and a **second phase at half health**
 (+Strength, Speed, Resistance and a chakra aura). Defeating one announces it to the server, counts toward
 S-rank missions and gives big XP.
+
+**They wait for a challenge** (v1.54). A placed legend doesn't roam or attack — it stands by its spawner. **Talk to it**
+and it asks, in character, *"Do you want to fight me? Defeat me and I'll reward you"*, showing the rewards and a
+recommended level. Choose **Fight!** and the battle starts (anyone nearby can join in). If everyone walks away for 30
+seconds it heals and waits again. While waiting, a legend **guards the area**: it attacks any rogue / Sound ninja or
+Akatsuki that comes near — **except Madara**, who sides with the rogues as in canon: enemy ninja near him grow
+stronger. Players in a grace period can't start a challenge. Legends called by a quest still come out fighting.
 
 | Boss | HP | Moves | Phase 2 | Signature drops |
 |---|---|---|---|---|
@@ -943,7 +1032,7 @@ enemies or given out by quests (and everything is still in the creative inventor
 | Item | Where to get it |
 |---|---|
 | Jutsu scrolls | **Jutsu Sensei** (by school, level-gated) · Travelling Merchant bargains (40% off) · Legend drops |
-| Kekkei genkai release scrolls | the **Clan Elder** of that clan |
+| Kekkei genkai release scrolls | the **Jutsu Sensei → Clan Training**, for that clan's members |
 | Kunai, shuriken, village headbands | **Weaponsmith** (its village's headband, and yours) · Travelling Merchant · starter kit · legend drops · enemy ninja drop kunai and shuriken |
 | Soldier Pills | **Ramen Shop** · Travelling Merchant · enemy ninja · C-rank missions |
 | Ichiraku / Miso Ramen | **Ramen Shop** (360 / 240 Ryō) · **Travelling Merchant** (60 / 36 Ryō, while stocks last) |
@@ -1066,30 +1155,84 @@ lens flares, a sealing circle, a scorch mark) and 108 effects.
 frost mist), **earth** (rocks, pebbles, dust and a ground ring), **wood** (splinters and leaves) and **lava**
 (fire, molten globs that fall and bounce, embers, smoke).
 
-A server-wide budget (160 extra layers per tick) keeps a crowded fight from flooding clients: past it, only the base
-effects are spawned. Preview any effect with all its layers, without opening Minecraft:
+**Lighter VFX** (v1.54) — nothing was removed, but the work is cut where nobody can see it: effects more than 64 blocks
+from every player aren't spawned at all, the same effect on the same spot twice in one tick is spawned once, a
+per-tick budget (48 extra layers, 140 particles in all) keeps a crowded fight from flooding clients, and the busiest
+emitters spawn a quarter fewer particles. Preview any effect with all its layers, without opening Minecraft:
 
 ```
 python3 tools/gen_particles.py --preview fire_burst ice_burst heal -o sheet.png
 ```
 
-## Lag clear
+## Vanilla items (v1.54)
 
-- **Every 10 minutes** all dropped items lying on the ground are removed. Chat warns 60 seconds and 10 seconds before,
-  then reports how many were removed.
-- **Every 30 minutes** hostile mobs are cleared (a chat line says how many); they simply spawn again.
-- Never touched: players, animals and villagers, pets and anything tamed or name-tagged, shop NPCs, companions,
-  summons, reanimated shinobi, bosses (Akatsuki, legends, Tailed Beasts), and anything made by a quest, an exam or an
-  NPC Spawner.
+This is a shinobi server, so vanilla weapons and armour, redstone, bundles and a few game-breakers are switched off —
+the add-on's gear is what counts. Every vanilla item that's useful for living stays: blocks, pickaxes, axes, shovels,
+hoes, food, farming, building, crafting.
+
+- **Banned**: every vanilla sword, bow, crossbow, trident, mace, arrow and wind charge; every vanilla armour piece,
+  shield, elytra, turtle helmet and wolf armour; the totem of undying; **redstone** (dust, torches, repeaters,
+  comparators, pistons, observers, dispensers, droppers, hoppers, levers, buttons, pressure plates, tripwire hooks,
+  daylight detectors, targets, lamps, copper bulbs, the crafter, sculk sensors, TNT and special rails); **bundles /
+  satchels**; end crystals and respawn anchors.
+- Banned items are **taken out of inventories and armour slots** within a couple of seconds; using one is cancelled;
+  redstone already placed in the world can't be operated.
+- Creative and spectator players are left alone.
+- The **Ten-Tails' spawn egg** is taken from survival players even when the bans are off.
 
 ```
-/scriptevent aegis:lag            (when the next clears are due)
+/scriptevent aegis:vanilla           (show whether the bans are on)
+/scriptevent aegis:vanilla off       (allow vanilla gear again — "on" bans it again)
+```
+
+## Lag clear
+
+(v1.54)
+- **Every 5 minutes** all dropped items lying on the ground are removed. Chat warns 30 seconds and 10 seconds before,
+  then reports how many were removed.
+- **After 20 minutes alive**, every hostile mob is removed — rogue / Sound / Anbu ninja, Akatsuki, legends, **all Tailed
+  Beasts and the Ten-Tails**, vanilla monsters (checked once a minute). Spawners send theirs again after their delay, and
+  a Tailed Beast that's sent home frees the world for the next one.
+- Never touched: players, animals and villagers, pets and anything tamed or name-tagged, shop NPCs, companions,
+  summons and clones, reanimated shinobi, a legend waiting for a challenger, a Jinchūriki's trial — and **anything
+  that was hit in the last 2 minutes** (a fight in progress is never cut short).
+
+```
+/scriptevent aegis:lag            (when the next item clear is due)
 /scriptevent aegis:lag items      (clear dropped items now)
-/scriptevent aegis:lag mobs       (clear hostile mobs now)
+/scriptevent aegis:lag mobs       (clear every hostile mob now, any age)
 /scriptevent aegis:lag off        (stop the automatic clears; "on" resumes them)
 ```
 
-The timers start when the server starts. Intervals are the two constants at the top of `behavior_pack/scripts/lagclear.js`.
+The timers start when the server starts. The times are the constants at the top of `behavior_pack/scripts/lagclear.js`.
+
+## Balance, legends that wait for a challenge, the Ten-Tails, titles (v1.54)
+
+- **Enemy ninja nerfed and far rarer**: rogue 20 HP / 3 damage, Sound 24 / 3, Anbu 40 / 5, weaker jutsu. They spawn
+  alone, never within 200 blocks of a village or 20 blocks of a player, at most two around at once. The Akatsuki hunt
+  less often and never inside a village.
+- **Legends wait for a challenge**: a placed legend stands calmly and asks *"Do you want to fight me?"* when you talk to
+  it — say yes and the fight starts. While waiting it attacks rogue / Sound ninja and Akatsuki that come near; **Madara**
+  sides with them instead. See *Legendary bosses*.
+- **Lag**: dropped items are cleared every 5 minutes, every hostile mob (bosses and Tailed Beasts too) after 20 minutes
+  alive; **only one Tailed Beast can rampage in the world at a time**; effects are no longer spawned where nobody can
+  see them, with a tighter per-tick budget (nothing removed).
+- **The Tailed Beast cloak no longer covers your screen** in first person: its aura parts are hidden from your own
+  view (everyone else still sees them), and the aura particles sit around you instead of in your face.
+- **The Ten-Tails**: a new 5,000 HP boss with its own moves and a phase 2, from its spawn egg only (creative). See
+  *The Ten-Tails*.
+- **Levels to 300**, **HP up to 1,044**, damage that grows with your level, bosses that hit harder as you level,
+  out-of-combat healing, slightly harder levelling, stats up to 150. See *Levels & Stats*.
+- **The Uzumaki's sealing works**: the Four Symbols Seal needs 50 Chakra / 50 Vitality (was 100), the chains seal a
+  player's chakra, and a weakened enemy can be sealed away outright.
+- **Titles**: Pain, Itachi of the Sharingan, Tobi, Sasuke and Naruto — `/tag <player> add pain` etc. hands over their
+  creative-only gear and perks. See *Titles*.
+- **Leave your village** from the Shinobi Record and become a rogue ninja with a scratched headband.
+- **Vanilla weapons, armour, redstone and bundles are banned** (`/scriptevent aegis:vanilla off` to allow them).
+- **The Clan Elder is gone** — Clan Mastery, kekkei genkai scrolls and the Eternal Mangekyō moved to the Jutsu
+  Sensei's *Clan Training*.
+- **Every new player gets a 1-hour grace period** on their first join.
+- **The Hokage is remodelled** in the Kage robe and hat like the other four Kage.
 
 ## Grace period command (v1.53)
 

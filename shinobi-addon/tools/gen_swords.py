@@ -175,6 +175,46 @@ SWORDS["chakra_blades"]["cubes"] = [
     box((-0.6, -1.8, -14), (1.2, 0.5, 12), "accent"), box((-0.6, 1.9, -13), (1.2, 0.4, 10), "accent2")]
 
 
+# ---- Title gear (v1.54): creative-only weapons of the Pain, Itachi, Tobi and Sasuke titles (titles.js) ----
+SWORDS["totsuka_blade"] = dict(
+    name="Totsuka Blade", damage=12, durability=3000, owner="Itachi's sealing sword — a blade of sake from a gourd",
+    colors=dict(steel=(236, 96, 52), edge=(255, 214, 140), dark=(70, 44, 26), wrap=(132, 86, 44),
+                accent=(180, 40, 30), accent2=(255, 150, 60), light=(255, 236, 190), red=(214, 58, 38)),
+    slash=(1.0, 0.45, 0.2), recipe=None,
+    cubes=[box((-1.7, -1.7, -1.5), (3.4, 3.4, 4), "wrap"), box((-1.1, -1.1, 2.5), (2.2, 2.2, 1.5), "dark"),       # the gourd
+           box((-1.2, -1.2, -3.5), (2.4, 2.4, 2), "wrap"), box((-0.8, -0.8, -4.5), (1.6, 1.6, 1), "dark"),
+           box((-0.7, -1.3, -26), (1.4, 2.6, 21.5), "red"), box((-0.45, -0.7, -27), (0.9, 1.4, 22.5), "steel"),     # the spirit blade
+           box((-0.25, -0.35, -28), (0.5, 0.7, 22), "light"), box((-0.95, -0.9, -20), (1.9, 1.8, 3), "accent2"),
+           box((-0.95, -0.9, -12), (1.9, 1.8, 2), "accent2")])
+SWORDS["kusanagi_v2"] = dict(
+    name="Kusanagi Sword V2", damage=13, durability=3000, owner="Sasuke's chokutō, reforged — lightning in the steel",
+    colors=dict(steel=(176, 186, 230), edge=(214, 232, 255), dark=(26, 20, 40), wrap=(44, 22, 64),
+                accent=(124, 64, 210), accent2=(150, 205, 255), light=(255, 255, 255), red=(110, 40, 170)),
+    slash=(0.55, 0.45, 1.0), recipe=None,
+    cubes=[box((-1, -1, -3), (2, 2, 7), "wrap"), box((-1.25, -1.25, 4), (2.5, 2.5, 1), "dark"),
+           box((-1.6, -1.6, -4), (3.2, 3.2, 1), "accent"),
+           box((-0.5, -1, -24), (1, 2.5, 20), "steel"), box((-0.35, -1.35, -23.5), (0.7, 0.5, 19.5), "edge"),
+           box((-0.5, -0.8, -25.5), (1, 1.8, 1.5), "steel"), box((-0.4, -0.5, -26.5), (0.8, 0.9, 1), "edge"),
+           box((-0.6, 1.35, -22), (1.2, 0.3, 16), "accent2"), box((-1.05, -0.8, -1.5), (2.1, 0.4, 3), "accent")])
+SWORDS["chakra_rod"] = dict(
+    name="Chakra Receiver Rods", damage=9, durability=3000, owner="Pain's black rods — they steal chakra and pin their prey",
+    colors=dict(steel=(84, 78, 96), edge=(160, 150, 184), dark=(34, 30, 40), wrap=(24, 22, 30),
+                accent=(124, 82, 200), accent2=(170, 120, 240), light=(220, 210, 240), red=(120, 40, 40)),
+    slash=(0.6, 0.35, 0.95), recipe=None,
+    cubes=[box((-0.5, -0.5, -27), (1, 1, 31), "dark"), box((-0.3, -0.3, -29), (0.6, 0.6, 2), "edge"),
+           *[box((-0.8, -0.8, z), (1.6, 1.6, 0.7), "steel") for z in (-24, -20, -16, -12, -8, -4)],
+           box((-0.9, -0.9, 2), (1.8, 1.8, 1.5), "accent")])
+SWORDS["gunbai"] = dict(
+    name="Uchiha War Fan (Gunbai)", damage=10, durability=3000, owner="Madara's war fan — Tobi's to wield",
+    colors=dict(steel=(232, 218, 176), edge=(250, 240, 210), dark=(62, 40, 30), wrap=(112, 72, 40),
+                accent=(170, 32, 32), accent2=(40, 36, 44), light=(255, 250, 235), red=(170, 32, 32)),
+    slash=(0.9, 0.85, 0.75), recipe=None,
+    cubes=[box((-0.6, -0.6, -9), (1.2, 1.2, 13), "wrap"), box((-0.8, -0.8, 3.5), (1.6, 1.6, 1), "dark"),
+           *[box((-0.5, -h / 2, -17 - l / 2), (1.0, h, l), "steel") for h, l in ((12.4, 8.2), (10.8, 10.8), (8.2, 12.4))],  # the fan
+           box((-0.55, -0.7, -22.5), (1.1, 1.4, 11), "accent"), box((-0.55, -5.5, -17.7), (1.1, 11, 1.4), "accent"),
+           box((-0.6, -1.4, -18.4), (1.2, 2.8, 2.8), "accent2")])
+
+
 def palette(colors):
     img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
     random.seed(sum(sum(v) for k, v in colors.items() if k != "sheath"))

@@ -1,5 +1,5 @@
 // NPCs: the creative-only NPC Spawner block, friendly NPC menus (shops, Mission Desk, Chūnin Exam
-// Proctor, Clan Elder, chatter), missions, rank exams and ramen.
+// Proctor, chatter), missions, rank exams and ramen.
 //
 // NPC Spawner: place it (creative) → a settings form opens. Cover it with anything; the NPC appears
 // in the first free space above and respawns according to its settings. Interact with the block
@@ -36,8 +36,6 @@ const SKIN_NAMES = ["Sensei", "Elder", "Weaponsmith", "Ramen chef", "Hokage", "P
 export const NPC_TYPES = {
   sensei: { label: "Jutsu Sensei (jutsu shop)", entity: "aegis:npc", skin: 0, name: "§bJutsu Sensei", friendly: true,
     greeting: "A ninja never stops training. What would you like to learn?" },
-  clan_elder: { label: "Clan Elder", entity: "aegis:npc", skin: 1, name: "§6Clan Elder", friendly: true,
-    greeting: "Our bloodline is our strength." },
   weaponsmith: { label: "Weaponsmith (tools & swords)", entity: "aegis:npc", skin: 2, name: "§7Weaponsmith", friendly: true,
     greeting: "Finest steel in the Land of Fire." },
   ramen: { label: "Ramen Shop", entity: "aegis:npc", skin: 3, name: "§eRamen Shop", friendly: true,
@@ -79,7 +77,7 @@ const TYPE_IDS = Object.keys(NPC_TYPES);
 // ---------------------------------------------------------------------------
 // Villages. A friendly village NPC's job comes from its type; its village (the spawner's Village setting) picks the
 // outfit, name, greeting, shop title and small talk. The Leaf looks are the types' own defaults; the Ramen Shop, the
-// Clan Elder and the Travelling Merchant look the same everywhere.
+// Travelling Merchant and Travel Master look the same everywhere.
 // ---------------------------------------------------------------------------
 export const VILLAGE_IDS = ["leaf", "sand", "mist", "cloud", "stone", "rain"];
 const VILLAGE_LABELS = ["§aHidden Leaf", "§6Hidden Sand", "§bHidden Mist", "§eHidden Cloud", "§7Hidden Stone", "§9Hidden Rain"];
@@ -309,6 +307,10 @@ function loadAll() {
     try {
       const c = JSON.parse(world.getDynamicProperty(`aegis:sp:${k}`) ?? "null");
       if (!c) continue;
+      if (c.type === "clan_elder") {   // v1.54: the Clan Elder is gone (clan training is at the Jutsu Sensei now)
+        system.run(() => retire(c));
+        continue;
+      }
       if (LEGACY[c.type]) {   // a v1.49 Sand spawner: the job + Village: Hidden Sand (its NPCs respawn with the new settings)
         c.type = LEGACY[c.type];
         c.village = "sand";
@@ -323,6 +325,19 @@ function loadAll() {
 }
 
 export const reloadSpawners = () => loadAll(); // (tests / admin tools)
+
+// A spawner whose NPC type no longer exists: its NPCs, its block and its record go.
+function retire(c) {
+  try {
+    const dim = world.getDimension(c.dim);
+    for (const e of dim.getEntities({ tags: [tagOf(c.key)] })) e.remove();
+    const b = dim.getBlock({ x: c.x, y: c.y, z: c.z });
+    if (b?.typeId === SPAWNER) b.setType("minecraft:air");
+  } catch {
+    /* unloaded: the record still goes */
+  }
+  forget(c.key);
+}
 
 function save(cfg) {
   configs.set(cfg.key, cfg);
@@ -348,7 +363,7 @@ export function defaultsFor(type) {
   const role = roleOf(type);
   return {
     type, name: "", skin: -1, clan: "random", member: "random",
-    count: 1, respawn: true, delay: t.legend ? 300 : hostile ? 60 : 10, stay: !hostile && role !== "villager" && role !== "genin",
+    count: 1, respawn: true, delay: t.legend ? 600 : hostile ? 180 : 10, stay: !hostile && role !== "villager" && role !== "genin",
     radius: hostile ? 12 : 6, invuln: !hostile, price: 100, greeting: "", height: 0, restock: 20, village: "leaf",
   };
 }
@@ -427,16 +442,20 @@ export function setupNpc(e, cfg, extra = {}) {
     if (t.legend) {
       e.setDynamicProperty("aegis:member", t.legend);
       e.triggerEvent(`aegis:legend_${t.legend}`);
-    }
-    if (roleOf(cfg.type) === "clan_elder") {
-      const clan = cfg.clan === "random" || !CLANS[cfg.clan] ? Object.keys(CLANS)[Math.floor(Math.random() * Object.keys(CLANS).length)] : cfg.clan;
-      e.setDynamicProperty("aegis:elder_clan", clan);
-      if (!cfg.name) e.nameTag = `${CLANS[clan].color}${CLANS[clan].name} Clan Elder`;
+      // v1.54: a legend waits calmly for a challenger (legends.js) — unless a quest called it to fight
+      if ((extra.tags ?? []).some((g) => g.startsWith("aegis_q_"))) {
+        e.setDynamicProperty("aegis:state", "fighting");
+        e.triggerEvent("aegis:challenge");
+      } else {
+        e.addTag("aegis_calm");
+        e.setDynamicProperty("aegis:state", "calm");
+        e.triggerEvent(t.legend === "madara" ? "aegis:calm_madara" : "aegis:calm");
+      }
     }
     e.setProperty("aegis:skin", resolveSkin(cfg));
     if (cfg.name) e.nameTag = cfg.name;
     else if (member) e.nameTag = AKATSUKI[member].name;
-    else if (roleOf(cfg.type) !== "clan_elder") e.nameTag = look.name ?? t.name;
+    else e.nameTag = look.name ?? t.name;
     if (!extra.natural) e.triggerEvent("aegis:persist");
     if (t.tier) e.triggerEvent(`aegis:tier_${t.tier}`);
     if (t.friendly) {
@@ -567,7 +586,7 @@ async function configure(player, cfg) {
     .dropdown("Village (how village NPCs look and talk)", VILLAGE_LABELS, Math.max(0, VILLAGE_IDS.indexOf(cfg.village ?? "leaf")))
     .textField("Name (empty = default; § colour codes work)", "default", cfg.name)
     .dropdown("Outfit", ["Default for this NPC", ...SKIN_NAMES], cfg.skin + 1)
-    .dropdown("Clan (Clan Elder only)", clanIds.map((c) => (c === "random" ? "Random" : CLANS[c].name)), Math.max(0, clanIds.indexOf(cfg.clan)))
+    .dropdown("Clan (no longer used)", clanIds.map((c) => (c === "random" ? "Random" : CLANS[c].name)), Math.max(0, clanIds.indexOf(cfg.clan)))
     .dropdown("Akatsuki member (Akatsuki only)", ["Random", ...Object.values(AKATSUKI).map((m) => m.name.replace(/§./g, ""))], Math.max(0, MEMBER_IDS.indexOf(cfg.member)))
     .slider("How many to keep spawned", 1, 6, 1, cfg.count)
     .toggle("Respawn when killed / removed", cfg.respawn)
@@ -946,6 +965,7 @@ async function merchantMenu(player, npc, cfg) {
 
 async function senseiMenu(player, npc, cfg) {
   const lvl = getLevel(player);
+  const clan = CLANS[getClanId(player)];
   const f = new ActionFormData()
     .title("§lJutsu Sensei")
     .body(`§7${cfg?.greeting || greetingOf(npc, "sensei")}\n\n§6Your Ryō: §f${fmtRyo(getRyo(player))}`);
@@ -953,8 +973,10 @@ async function senseiMenu(player, npc, cfg) {
     const open = list.filter((e) => lvl >= e[4]).length;
     f.button(`${label}\n§r§7${open < list.length ? `${open}/${list.length} unlocked at your level` : `${list.length} on offer`}`);
   }
+  f.button(`§6Clan Training\n§r§7${clan ? `${clan.name} — mastery, release scrolls` : "for your clan"}`);
   const r = await f.show(player);
   if (r.canceled || r.selection === undefined) return;
+  if (r.selection === SENSEI.length) return clanTraining(player, npc, cfg, () => senseiMenu(player, npc, cfg));
   const [label, list] = SENSEI[r.selection];
   return shop(player, npc, cfg, list, `§lJutsu Sensei §r§8· ${label}`, () => senseiMenu(player, npc, cfg));
 }
@@ -1014,6 +1036,7 @@ async function missionDesk(player, npc, cfg) {
     gainXp(player, Math.round(def.xp * mult));
     addRyo(player, rewardOf(def.ems, cfg), true);
     for (const [id, n] of def.items) giveItem(player, id, n);
+    player.setDynamicProperty("aegis:missions_done", Number(player.getDynamicProperty("aegis:missions_done") ?? 0) + 1); // (Naruto's title)
     showTitle(player, `§a${m.rank}-rank complete!`, { subtitle: `§7+${Math.round(def.xp * mult)} XP, ${fmtRyo(rewardOf(def.ems, cfg))}`, stayDuration: 50 });
     api.sound(player.dimension, "random.levelup", player.location, 1, 1.2);
   } else if (choice) {
@@ -1124,21 +1147,25 @@ function tickExams() {
 }
 
 // ---------------------------------------------------------------------------
-// Clan Elder
+// Clan Training
 // ---------------------------------------------------------------------------
 const MASTERY = [null, { lvl: 15, ems: 20 }, { lvl: 40, ems: 40 }, { lvl: 80, ems: 64 }];
 
-async function clanElder(player, npc, cfg) {
-  const clanId = npc.getDynamicProperty("aegis:elder_clan");
+// Clan Training (the Jutsu Sensei, v1.54 — it used to be the Clan Elder's): Clan Mastery, your clan's kekkei genkai
+// release scrolls and, for the Uchiha, the Eternal Mangekyō.
+async function clanTraining(player, npc, cfg, back) {
+  const clanId = getClanId(player);
   const clan = CLANS[clanId];
-  if (!clan) return;
-  const mine = getClanId(player) === clanId;
+  if (!clan) return player.sendMessage("§7You don't have a clan yet.");
+  const mine = true;
   const mastery = Number(player.getDynamicProperty("aegis:clan_mastery") ?? 0);
-  const f = new ActionFormData().title(`§l${clan.name} Clan Elder`);
+  const f = new ActionFormData().title(`§l${clan.color}${clan.name}§r§l Clan Training`);
   const opts = [];
+  f.button("§l« Back");
+  opts.push("back");
   if (mine) {
     const next = MASTERY[mastery + 1];
-    f.body(`§7${cfg?.greeting || `Welcome home, child of the ${clan.name}.`}\n\n§7Clan Mastery: §e${mastery}/3§7 (each level: +10% clan max chakra, −10% clan ability cooldowns)\n§7Perks: §f${clan.perks}`);
+    f.body(`§7Your bloodline: ${clan.color}${clan.name}\n\n§7Clan Mastery: §e${mastery}/3§7 (each level: +10% clan max chakra, −10% clan ability cooldowns)\n§7Perks: §f${clan.perks}`);
     if (next) {
       f.button(`§2Train Clan Mastery ${mastery + 1}\n§r§7${fmtRyo(priceOf(next.ems, cfg))} · Lv ${next.lvl}`);
       opts.push("train");
@@ -1151,23 +1178,18 @@ async function clanElder(player, npc, cfg) {
       f.button(`§5Awaken the Eternal Mangekyō\n§r§7${fmtRyo(priceOf(64, cfg))} · Lv 100`);
       opts.push("eternal");
     }
-  } else {
-    f.body(`§7You are not of the ${clan.color}${clan.name}§7. But blood can be… arranged.\n§7Perks of our clan: §f${clan.perks}`);
-    f.button(`§5Bloodline transfer: join the ${clan.name}\n§r§7${fmtRyo(priceOf(64, cfg))} · Lv 30 · replaces your clan`);
-    opts.push("join");
   }
-  f.button("Leave");
-  opts.push("leave");
   const r = await f.show(player);
   if (r.canceled || r.selection === undefined) return;
   const c = opts[r.selection];
+  if (c === "back") return back?.();
   if (Array.isArray(c) && c[0] === "release") {
     const [, item, label, ems, lvl] = c;
     if (getLevel(player) < lvl) return player.sendMessage(`§cReach level ${lvl} first.`);
     if (!spendRyo(player, priceOf(ems, cfg))) return player.sendMessage(`§cYou need ${fmtRyo(priceOf(ems, cfg))}.`);
     giveItem(player, item, 1);
     api.sound(player.dimension, "random.orb", player.location, 1, 1.2);
-    return player.sendMessage(`§aThe elder entrusts you with ${clan.color}${label}§a.`);
+    return player.sendMessage(`§aThe sensei entrusts you with ${clan.color}${label}§a.`);
   }
   if (c === "train") {
     const next = MASTERY[mastery + 1];
@@ -1180,13 +1202,6 @@ async function clanElder(player, npc, cfg) {
     if (getLevel(player) < 100) return player.sendMessage("§cReach level 100 first.");
     if (!spendRyo(player, priceOf(64, cfg))) return player.sendMessage(`§cYou need ${fmtRyo(priceOf(64, cfg))}.`);
     awakenEternal(player);
-  } else if (c === "join") {
-    if (getLevel(player) < 30) return player.sendMessage("§cReach level 30 first.");
-    const ok = await new MessageFormData().title("Bloodline transfer").body(`Replace your clan with the ${clan.name}? Clan Mastery and Mangekyō progress are lost.`).button1("§5Transfer").button2("Cancel").show(player);
-    if (ok.selection !== 0) return;
-    if (!spendRyo(player, priceOf(64, cfg))) return player.sendMessage(`§cYou need ${fmtRyo(priceOf(64, cfg))}.`);
-    setClanPublic(player, clanId);
-    showTitle(player, `${clan.color}${clan.name} Clan`, { subtitle: "§7Your bloodline has changed", stayDuration: 60 });
   }
 }
 
@@ -1225,8 +1240,9 @@ async function talk(player, npc) {
       return missionDesk(player, npc, cfg);
     case "proctor":
       return proctor(player, npc, cfg);
-    case "clan_elder":
-      return clanElder(player, npc, cfg);
+    case "clan_elder": // (removed in v1.54 — its training moved to the Jutsu Sensei)
+      say(player, npc, "The elders have retired. Ask a Jutsu Sensei about clan training.");
+      return void system.runTimeout(() => api.isValid(npc) && npc.remove(), 40);
     case "quest_giver":
       return questGiver(player, npc, cfg);
     case "villager":
@@ -1257,7 +1273,7 @@ function killKind(dead) {
   const t = dead.typeId;
   if (t === "aegis:akatsuki" || t === "aegis:legend") return "akatsuki";
   if (t === "aegis:hostile_ninja") return "ninja";
-  if (["shukaku", "matatabi", "isobu", "son_goku", "kokuo", "saiken", "chomei", "gyuki", "kurama"].some((b) => t === `aegis:${b}`)) return "bijuu";
+  if (["shukaku", "matatabi", "isobu", "son_goku", "kokuo", "saiken", "chomei", "gyuki", "kurama", "juubi"].some((b) => t === `aegis:${b}`)) return "bijuu";
   try {
     if (dead.matches?.({ families: ["monster"] })) return "monster";
   } catch {

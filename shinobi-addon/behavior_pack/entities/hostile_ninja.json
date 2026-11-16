@@ -51,32 +51,32 @@
       },
       "aegis:tier_rogue": {
         "minecraft:health": {
+          "value": 20,
+          "max": 20
+        },
+        "minecraft:attack": {
+          "damage": 3
+        }
+      },
+      "aegis:tier_sound": {
+        "minecraft:health": {
+          "value": 24,
+          "max": 24
+        },
+        "minecraft:attack": {
+          "damage": 3
+        }
+      },
+      "aegis:tier_anbu": {
+        "minecraft:health": {
           "value": 40,
           "max": 40
         },
         "minecraft:attack": {
           "damage": 5
-        }
-      },
-      "aegis:tier_sound": {
-        "minecraft:health": {
-          "value": 50,
-          "max": 50
-        },
-        "minecraft:attack": {
-          "damage": 6
-        }
-      },
-      "aegis:tier_anbu": {
-        "minecraft:health": {
-          "value": 80,
-          "max": 80
-        },
-        "minecraft:attack": {
-          "damage": 8
         },
         "minecraft:movement": {
-          "value": 0.29
+          "value": 0.28
         }
       }
     },
@@ -109,14 +109,14 @@
         ]
       },
       "minecraft:health": {
-        "value": 40,
-        "max": 40
+        "value": 20,
+        "max": 20
       },
       "minecraft:attack": {
-        "damage": 5
+        "damage": 3
       },
       "minecraft:movement": {
-        "value": 0.26
+        "value": 0.25
       },
       "minecraft:pushable": {
         "is_pushable": true,

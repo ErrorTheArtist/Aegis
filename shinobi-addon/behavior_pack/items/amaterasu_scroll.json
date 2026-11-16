@@ -1,0 +1,23 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:item": {
+    "description": {
+      "identifier": "aegis:amaterasu_scroll",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "aegis_amaterasu_scroll"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "§cTitle Scroll: Amaterasu§r\n§7Itachi of the Sharingan title"
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:glint": true
+    }
+  }
+}

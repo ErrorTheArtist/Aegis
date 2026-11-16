@@ -36,6 +36,10 @@ TW = 128  # cloak texture size
 GW = 64   # glow texture size
 
 
+FP_HIDE = ["sh_body*", "sh_head*", "sh_lleg*", "sh_rleg*", "w_hd*", "w_bk*", "w_sh*", "w_he*", "ear*", "crest", "cr_*", "flap*", "shell",
+           *[f"t{i}_*" for i in range(9)], "tail*", "wing*"]   # cloak bones hidden from your own first-person camera
+
+
 def w(path, obj):
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(obj, indent=2, ensure_ascii=False) + "\n")
@@ -807,7 +811,7 @@ def main():
                              "glow": f"textures/models/armor/jin_glow_{'gold' if gold else bid}"},
                 "geometry": {"default": f"geometry.aegis.jin_{bid}{sfx}", "glow": f"geometry.aegis.jin_{bid}_glow"},
                 "animations": {"form": f"animation.aegis.jin_{bid}{sfx}.form", "sway": f"animation.aegis.jin_{bid}{sfx}.sway"},
-                "scripts": {"animate": ["form", "sway"]},
+                "scripts": {"pre_animation": ["v.fp = c.is_first_person;"], "animate": ["form", "sway"]},
                 "render_controllers": ["controller.render.aegis.jin_cloak", "controller.render.aegis.jin_glow"]}}})
             label = f"Tailed Beast Cloak ({beast['name']})" if not gold else f"Tailed Beast Chakra Mode ({beast['name']})"
             w(BP / "items" / f"cloak_{bid}{sfx}.json", {"format_version": "1.21.60", "minecraft:item": {
@@ -822,13 +826,16 @@ def main():
             atlas["texture_data"][f"aegis_cloak_{bid}{sfx}"] = {"textures": f"textures/items/aegis/cloak_{bid}{sfx}"}
     w(atlas_p, atlas)
     w(RP / "animations" / "jinchuriki.animation.json", {"format_version": "1.8.0", "animations": anims})
+    # in first person only the shroud's arms show (v1.54): the head, body, tails and wings sat around the camera and
+    # covered the whole view
+    fp_hidden = [{b: "!v.fp"} for b in FP_HIDE]
     w(RP / "render_controllers" / "jinchuriki.render_controllers.json", {"format_version": "1.8.0", "render_controllers": {
         "controller.render.aegis.jin_cloak": {
             "geometry": "Geometry.default", "materials": [{"*": "Material.default"}], "textures": ["Texture.default"],
-            "ignore_lighting": True},
+            "ignore_lighting": True, "part_visibility": fp_hidden},
         "controller.render.aegis.jin_glow": {
             "geometry": "Geometry.glow", "materials": [{"*": "Material.glow"}], "textures": ["Texture.glow"],
-            "ignore_lighting": True,
+            "ignore_lighting": True, "part_visibility": fp_hidden,
             "uv_anim": {"offset": [0.0, "math.mod(q.life_time * 0.35, 1.0)"], "scale": [1.0, 1.0]}}}})
 
     # the old v1 cloak assets are replaced

@@ -5,6 +5,7 @@
 // second phase at half health. Called from enemies.js for entities of type aegis:legend.
 
 import { world, system, ItemStack } from "@minecraft/server";
+import { MessageFormData } from "@minecraft/server-ui";
 import { isGraced } from "./grace.js";
 import { showTitle } from "./hud.js";
 import { impactFx, sfx, shake, aura, chargeFx } from "./cinematic.js";
@@ -1211,6 +1212,192 @@ function edoReform(boss) {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Challenges (v1.54). A legend from an NPC Spawner (or a spawn egg) doesn't charge in: it waits by its spawner, calm.
+// Talk to it and it asks whether you want to fight — beat it and you get its rewards. While it waits it can't be hurt
+// by players and it fights off any enemy ninja or Akatsuki that come near — except Madara, who backs them (their
+// strength grows near him). If nobody's left to fight for 30 seconds, a spawner's legend heals up and waits again.
+// Legends a quest calls up fight straight away.
+// ---------------------------------------------------------------------------
+const CHALLENGE_LINES = {
+  naruto: "Hey! You look pretty strong — wanna fight me? Beat me and I'll give you something awesome, believe it!",
+  sasuke: "…You want to test yourself against me? Fine. Win, and you can keep what you find.",
+  tsunade: "A challenge, huh? I don't hold back. Knock me down and I'll make it worth your while.",
+  sarutobi: "I can see the Will of Fire burning in you. Show me — defeat this old man and earn your reward.",
+  minato: "Think you can keep up with me? Let's find out. Beat me and the reward is yours.",
+  madara: "You dare stand before me? …Very well. Dance for me. Survive, and take what you can.",
+  gaara: "My sand wants to test you. Break through my defence and I'll reward you.",
+  zabuza: "Heh. Another one looking for a fight? Beat the Demon of the Hidden Mist and keep the spoils.",
+  killer_bee: "Yo! You wanna battle? Beat B and the prize is free — that's a guarantee!",
+  onoki: "Hmph, young people these days… You want to fight an old man? Beat me and I'll reward you. Oof, my back…",
+  hanzo: "You seek to challenge Hanzō of the Salamander? Defeat me and be rewarded. Fail, and the poison takes you.",
+};
+const fights = new Map(); // boss id -> { lastFoe: tick }
+const GUARD_FOES = new Set(["aegis:hostile_ninja", "aegis:akatsuki"]);
+
+export const isCalm = (e) => {
+  try {
+    return e.hasTag("aegis_calm");
+  } catch {
+    return false;
+  }
+};
+const memberOf = (e) => {
+  try {
+    return e.getDynamicProperty("aegis:member");
+  } catch {
+    return undefined;
+  }
+};
+const fromSpawner = (e) => {
+  try {
+    return !!e.getDynamicProperty("aegis:spawner");
+  } catch {
+    return false;
+  }
+};
+
+const itemName = (id) => id.replace("aegis:", "").replace(/_scroll$/, " scroll").split("_").map((w) => w[0].toUpperCase() + w.slice(1)).join(" ");
+function rewardText(id) {
+  const L = LEGENDS[id];
+  const sure = L.drops.filter(([, , c]) => c >= 1).map(([it, n]) => (it === "aegis:ryo" ? `${(n * 100).toLocaleString("en-US")} Ryō` : itemName(it)));
+  const maybe = L.drops.filter(([, , c]) => c < 1).map(([it]) => itemName(it));
+  return `§f${[...sure, `${id === "madara" ? 8 : "4–5"} XP Shards`, "Ryō"].join("§7, §f")}${maybe.length ? `§7 — and maybe: §f${maybe.join("§7, §f")}` : ""}`;
+}
+
+// Back to waiting: healed, calm, phase two undone.
+export function makeCalm(boss, line) {
+  const id = memberOf(boss);
+  phase2.delete(boss.id);
+  reformed.delete(boss.id);
+  fights.delete(boss.id);
+  const model = susanoo.get(boss.id);
+  if (model) api.removeFx(model);
+  susanoo.delete(boss.id);
+  try {
+    for (const c of boss.dimension.getEntities({ tags: [`aegis_lclone_${boss.id}`] })) c.remove();
+  } catch {
+    /* ignore */
+  }
+  for (const ef of ["strength", "speed", "resistance", "invisibility", "slowness", "weakness", "levitation", "slow_falling", "regeneration"]) {
+    try {
+      boss.removeEffect(ef);
+    } catch {
+      /* ignore */
+    }
+  }
+  heal(boss, 1e6);
+  try {
+    boss.addTag("aegis_calm");
+    boss.setDynamicProperty("aegis:state", "calm");
+    boss.triggerEvent(id === "madara" ? "aegis:calm_madara" : "aegis:calm");
+  } catch {
+    /* ignore */
+  }
+  if (line) for (const p of playersAround(boss.dimension, boss.location, 48)) p.sendMessage(line);
+}
+
+function startChallenge(boss, player) {
+  if (!api.isValid(boss) || !isCalm(boss)) return;
+  const L = LEGENDS[memberOf(boss)];
+  try {
+    boss.removeTag("aegis_calm");
+    boss.setDynamicProperty("aegis:state", "fighting");
+    boss.triggerEvent("aegis:challenge");
+  } catch {
+    return;
+  }
+  fights.set(boss.id, { lastFoe: system.currentTick });
+  impactFx(boss.dimension, boss.location, L.color, 2.5);
+  sfx(boss.dimension, "aegis.transform", boss.location, 2, 1.1);
+  for (const p of playersAround(boss.dimension, boss.location, 48)) {
+    showTitle(p, L.name, { subtitle: `§7accepts ${player.name}'s challenge!`, fadeInDuration: 3, stayDuration: 40, fadeOutDuration: 10 });
+  }
+}
+
+async function challengeMenu(player, boss) {
+  const id = memberOf(boss);
+  const L = LEGENDS[id];
+  if (!L || !isCalm(boss)) return;
+  if (isGraced(player)) return player.sendMessage(`${L.name}§f: You're under a grace period — come back when it's over.`);
+  let hp = 800;
+  try {
+    hp = Math.round(boss.getComponent("minecraft:health").effectiveMax);
+  } catch {
+    /* ignore */
+  }
+  const rec = Math.max(30, Math.round(hp / 12 / 5) * 5);
+  const r = await new MessageFormData()
+    .title(`§l${L.name}`)
+    .body(`§f"${CHALLENGE_LINES[id] ?? "Do you want to fight me?"}"\n\n§7If you win: ${rewardText(id)}\n§7Recommended: §eLv ${rec}+§7 · ${hp.toLocaleString("en-US")} HP\n\n§8Anyone nearby can join in. Walk away and ${L.name.replace(/§./g, "")} waits again.`)
+    .button1("§cFight!")
+    .button2("Not now")
+    .show(player);
+  if (r.selection === 0) startChallenge(boss, player);
+}
+
+const nearestFoe = (boss, r) => {
+  try {
+    let best;
+    let bd = Infinity;
+    for (const e of boss.dimension.getEntities({ location: boss.location, maxDistance: r })) {
+      if (!GUARD_FOES.has(e.typeId) || !api.isValid(e)) continue;
+      const d = flat(e.location, boss.location);
+      if (d < bd) {
+        bd = d;
+        best = e;
+      }
+    }
+    return best ? { foe: best, dist: bd } : undefined;
+  } catch {
+    return undefined;
+  }
+};
+
+// While calm: guard the area. Returns the cooldown (ticks).
+export function calmUpdate(boss) {
+  const id = memberOf(boss);
+  const L = LEGENDS[id];
+  if (!L) return 40;
+  if (id === "madara") {
+    // Madara backs the rogues: enemy ninja near him grow stronger
+    try {
+      for (const e of boss.dimension.getEntities({ location: boss.location, maxDistance: 16 })) {
+        if (!GUARD_FOES.has(e.typeId)) continue;
+        eff(e, "strength", 90, 0);
+        eff(e, "resistance", 90, 0);
+        api.particle(e.dimension, "aegis:cine_ring", e.location, [0.55, 0.2, 0.9]);
+      }
+    } catch {
+      /* ignore */
+    }
+    return 60;
+  }
+  const near = nearestFoe(boss, 20);
+  if (!near) return 40;
+  const { foe, dist } = near;
+  if (dist < 3.5) {
+    // a burst of chakra that only hits the enemy ninja
+    api.anim(boss, "animation.aegis.palm_thrust");
+    impactFx(boss.dimension, boss.location, L.color, 1);
+    try {
+      for (const e of boss.dimension.getEntities({ location: boss.location, maxDistance: 4 })) {
+        if (!GUARD_FOES.has(e.typeId)) continue;
+        api.hurt(e, 12, boss);
+        const d = dirTo(boss, e);
+        api.knockback(e, d.x, d.z, 1.8, 0.4);
+      }
+    } catch {
+      /* ignore */
+    }
+    return 50;
+  }
+  api.anim(boss, "animation.aegis.palm_thrust");
+  shoot(boss, foe, { noOrb: true, speed: 1.6, maxAge: 24, damage: 10, radius: 2, knock: 0.6, fire: 0, trail: "aegis:chakra_aura",
+    burst: "aegis:chakra_burst", color: L.color, hitRadius: 1.2, power: 0.6, ignoreFamily: "player" });
+  return 60;
+}
+
 // Second phase at half health.
 function enterPhase2(boss, id) {
   const L = LEGENDS[id];
@@ -1256,6 +1443,13 @@ export function legendTick(boss) {
   const id = boss.getDynamicProperty("aegis:member");
   const L = LEGENDS[id];
   if (!L) return;
+  if (boss.getDynamicProperty("aegis:state") === undefined) return makeCalm(boss); // legends from before v1.54, spawn eggs
+  if (isCalm(boss)) return heal(boss, 4 + (boss.getComponent("minecraft:health")?.effectiveMax ?? 800) * 0.01); // waiting: always fresh
+  const now = system.currentTick;
+  const f = fights.get(boss.id) ?? { lastFoe: now };
+  if (playersAround(boss.dimension, boss.location, 40).length) f.lastFoe = now;
+  fights.set(boss.id, f);
+  if (now - f.lastFoe > 600 && fromSpawner(boss)) return makeCalm(boss, `${L.name}§7: Come back when you're ready.`);
   let hp = 1;
   try {
     const h = boss.getComponent("minecraft:health");
@@ -1316,7 +1510,7 @@ export function initLegends(helpers) {
     system.runTimeout(() => {
       if (!api.isValid(entity)) return;
       const L = LEGENDS[entity.getDynamicProperty("aegis:member")];
-      if (!L) return;
+      if (!L || entity.getDynamicProperty("aegis:state") !== "fighting") return; // a calm legend arrives quietly
       impactFx(entity.dimension, entity.location, L.color, 2.5);
       sfx(entity.dimension, "aegis.transform", entity.location, 2, 1.1);
       for (const p of playersAround(entity.dimension, entity.location, 48)) {
@@ -1342,6 +1536,12 @@ export function initLegends(helpers) {
     sfx(hurtEntity.dimension, "dig.sand", hurtEntity.location, 1.2, 0.8);
     const by = damageSource?.damagingEntity;
     if (by?.typeId === "minecraft:player") by.onScreenDisplay?.setActionBar("§6The sand blocks your attack!");
+  });
+
+  // Talk to a legend that's waiting → its challenge.
+  world.afterEvents.playerInteractWithEntity.subscribe(({ player, target }) => {
+    if (target?.typeId !== "aegis:legend" || !isCalm(target)) return;
+    system.run(() => challengeMenu(player, target).catch(() => {}));
   });
 
   // Shadow clones vanish in a puff of smoke when hit (no loot, no XP).
@@ -1384,7 +1584,9 @@ export function initLegends(helpers) {
       }
     }
     for (const c of deadEntity.dimension.getEntities({ tags: [`aegis_lclone_${deadEntity.id}`] })) c.remove();
+    fights.delete(deadEntity.id);
     const killer = damageSource?.damagingEntity;
     world.sendMessage(`§e${L.name}§e was defeated${killer?.typeId === "minecraft:player" ? ` by §f${killer.name}` : ""}§e!`);
+    if (killer?.typeId === "minecraft:player") killer.sendMessage(`${L.name}§f: ${id === "madara" ? "…Impressive. This world may yet surprise me." : "Heh… you've earned it. Take your reward."}`);
   });
 }

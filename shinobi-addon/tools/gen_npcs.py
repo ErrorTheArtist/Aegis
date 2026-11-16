@@ -399,16 +399,18 @@ entity("npc", {**BASE_MOVE, **TALK,
 client_humanoid("npc", ("#4a6a3a", "#2a3a6a"))
 
 # Hostile ninja: rogue / sound / anbu tiers
+# (v1.54: balanced for a level-1 shinobi with only the starter kit — a rogue takes ~3 Kusanagi hits, and it takes
+# ~6 of its hits to bring down a fresh 20-HP player)
 TIER = {
-    "rogue": {"minecraft:health": {"value": 40, "max": 40}, "minecraft:attack": {"damage": 5}},
-    "sound": {"minecraft:health": {"value": 50, "max": 50}, "minecraft:attack": {"damage": 6}},
-    "anbu": {"minecraft:health": {"value": 80, "max": 80}, "minecraft:attack": {"damage": 8}, "minecraft:movement": {"value": 0.29}},
+    "rogue": {"minecraft:health": {"value": 20, "max": 20}, "minecraft:attack": {"damage": 3}},
+    "sound": {"minecraft:health": {"value": 24, "max": 24}, "minecraft:attack": {"damage": 3}},
+    "anbu": {"minecraft:health": {"value": 40, "max": 40}, "minecraft:attack": {"damage": 5}, "minecraft:movement": {"value": 0.28}},
 }
 entity("hostile_ninja", {**BASE_MOVE,
     "minecraft:type_family": {"family": ["ninja", "monster", "mob"]},
-    "minecraft:health": {"value": 40, "max": 40},
-    "minecraft:attack": {"damage": 5},
-    "minecraft:movement": {"value": 0.26},
+    "minecraft:health": {"value": 20, "max": 20},
+    "minecraft:attack": {"damage": 3},
+    "minecraft:movement": {"value": 0.25},
     "minecraft:pushable": {"is_pushable": True, "is_pushable_by_piston": True},
     "minecraft:nameable": {},
     "minecraft:loot": {"table": "loot_tables/entities/aegis_ninja.json"},
@@ -467,12 +469,21 @@ client_humanoid("akatsuki", ("#141418", "#c81419"))
 LEGEND_HP = {"naruto": 900, "sasuke": 850, "tsunade": 950, "sarutobi": 800, "minato": 750, "madara": 1800,
              "gaara": 950, "zabuza": 850, "killer_bee": 1000, "onoki": 900, "hanzo": 900}
 LEGEND_EQUIP = {"sasuke": "aegis:kusanagi_drawn", "zabuza": "aegis:kubikiribocho"}   # what they hold (it never drops)
+# v1.54: a legend from a spawner waits calmly ("aegis:calm") until a player talks to it and accepts its challenge
+# ("aegis:challenge" → fighting). While calm it can't be hurt by players and hunts hostile ninja instead — except
+# Madara ("aegis:calm_madara"), who sides with them. legends.js switches the states.
+PLAYER_FOE = {"all_of": [{"test": "is_family", "subject": "other", "value": "player"}, {"test": "has_tag", "subject": "other", "operator": "!=", "value": "aegis_grace"}]}
+NOT_PLAYER = {"test": "is_family", "subject": "other", "operator": "!=", "value": "player"}
+CALM_SENSOR = {"minecraft:damage_sensor": {"triggers": [{"cause": "fall", "deals_damage": "no"},
+                                                        {"on_damage": {"filters": {"test": "is_family", "subject": "other", "value": "player"}}, "deals_damage": "no"}]}}
+CHALLENGE = {"minecraft:interact": {"interactions": [{
+    "on_interact": {"filters": {"test": "is_family", "subject": "other", "value": "player"}, "event": "aegis:talked", "target": "self"},
+    "interact_text": "Challenge", "swing": True}]}}
 entity("legend", {**BASE_MOVE,
     "minecraft:type_family": {"family": ["legend", "ninja", "monster", "mob"]},
     "minecraft:health": {"value": 800, "max": 800},
     "minecraft:attack": {"damage": 14},
     "minecraft:movement": {"value": 0.28},
-    "minecraft:boss": {"hud_range": 48, "should_darken_sky": False},
     "minecraft:knockback_resistance": {"value": 0.8},
     "minecraft:pushable": {"is_pushable": False, "is_pushable_by_piston": False},
     "minecraft:nameable": {"always_show": True},
@@ -483,15 +494,26 @@ entity("legend", {**BASE_MOVE,
     "minecraft:experience_reward": {"on_death": "q.last_hit_by_player ? 500 : 0"},
     "minecraft:follow_range": {"value": 48},
     "minecraft:behavior.melee_attack": {"priority": 2, "speed_multiplier": 1.05, "track_target": True},
-    "minecraft:behavior.hurt_by_target": {"priority": 1},
-    "minecraft:behavior.nearest_attackable_target": {"priority": 3, "must_see": False, "reselect_targets": True, "within_radius": 32,
-        "entity_types": [{"filters": {"any_of": [{"all_of": [{"test": "is_family", "subject": "other", "value": "player"}, {"test": "has_tag", "subject": "other", "operator": "!=", "value": "aegis_grace"}]},
-                                                  {"test": "is_family", "subject": "other", "value": "ninja_companion"}]}, "max_dist": 32}]},
     "minecraft:behavior.random_stroll": {"priority": 7, "speed_multiplier": 0.7},
     "minecraft:behavior.look_at_player": {"priority": 8, "look_distance": 16}},
-    groups={f"aegis:legend_{k}": {"minecraft:health": {"value": hp, "max": hp}, **(equip(k, LEGEND_EQUIP[k]) if k in LEGEND_EQUIP else {})}
-            for k, hp in LEGEND_HP.items()},
-    events={f"aegis:legend_{k}": {"add": {"component_groups": [f"aegis:legend_{k}"]}} for k in LEGEND_HP})
+    groups={**{f"aegis:legend_{k}": {"minecraft:health": {"value": hp, "max": hp}, **(equip(k, LEGEND_EQUIP[k]) if k in LEGEND_EQUIP else {})}
+               for k, hp in LEGEND_HP.items()},
+            "aegis:fighting": {
+                "minecraft:boss": {"hud_range": 48, "should_darken_sky": False},
+                "minecraft:behavior.hurt_by_target": {"priority": 1},
+                "minecraft:behavior.nearest_attackable_target": {"priority": 3, "must_see": False, "reselect_targets": True, "within_radius": 32,
+                    "entity_types": [{"filters": {"any_of": [PLAYER_FOE, {"test": "is_family", "subject": "other", "value": "ninja_companion"}]}, "max_dist": 32}]}},
+            "aegis:calm": {**CALM_SENSOR, **CHALLENGE,
+                "minecraft:behavior.hurt_by_target": {"priority": 1, "entity_types": [{"filters": NOT_PLAYER}]},
+                "minecraft:behavior.nearest_attackable_target": {"priority": 3, "must_see": True, "reselect_targets": True, "within_radius": 20,
+                    "entity_types": [{"filters": {"all_of": [{"test": "is_family", "subject": "other", "value": "ninja"},
+                                                             {"test": "is_family", "subject": "other", "operator": "!=", "value": "legend"}, NOT_PLAYER]},
+                                      "max_dist": 20}]}},
+            "aegis:calm_madara": {**CALM_SENSOR, **CHALLENGE}},
+    events={**{f"aegis:legend_{k}": {"add": {"component_groups": [f"aegis:legend_{k}"]}} for k in LEGEND_HP},
+            "aegis:calm": {"remove": {"component_groups": ["aegis:fighting", "aegis:calm_madara"]}, "add": {"component_groups": ["aegis:calm"]}},
+            "aegis:calm_madara": {"remove": {"component_groups": ["aegis:fighting", "aegis:calm"]}, "add": {"component_groups": ["aegis:calm_madara"]}},
+            "aegis:challenge": {"remove": {"component_groups": ["aegis:calm", "aegis:calm_madara"]}, "add": {"component_groups": ["aegis:fighting"]}}})
 client_humanoid("legend", ("#f0782a", "#1e1e28"))
 
 # Recruitable genin companion
@@ -684,16 +706,9 @@ w(BP / "spawn_rules" / "hostile_ninja.json", {"format_version": "1.8.0", "minecr
                                                                                  "minecraft:podzol", "minecraft:snow", "minecraft:coarse_dirt", "minecraft:stone"],
          "minecraft:brightness_filter": {"min": 0, "max": 15, "adjust_for_weather": False},
          "minecraft:difficulty_filter": {"min": "easy", "max": "hard"},
-         "minecraft:weight": {"default": 30},
-         "minecraft:herd": {"min_size": 1, "max_size": 3},
-         "minecraft:density_limit": {"surface": 6},
-         "minecraft:biome_filter": {"test": "has_biome_tag", "operator": "==", "value": "overworld"}},
-        {"minecraft:spawns_underground": {},
-         "minecraft:brightness_filter": {"min": 0, "max": 7, "adjust_for_weather": True},
-         "minecraft:difficulty_filter": {"min": "easy", "max": "hard"},
-         "minecraft:weight": {"default": 8},
-         "minecraft:herd": {"min_size": 1, "max_size": 2},
-         "minecraft:density_limit": {"underground": 2},
+         "minecraft:weight": {"default": 4},
+         "minecraft:herd": {"min_size": 1, "max_size": 1},
+         "minecraft:density_limit": {"surface": 2},
          "minecraft:biome_filter": {"test": "has_biome_tag", "operator": "==", "value": "overworld"}}]}})
 # Rare Akatsuki (Itachi / Kisame / Deidara, picked by script) roaming the surface.
 w(BP / "spawn_rules" / "akatsuki.json", {"format_version": "1.8.0", "minecraft:spawn_rules": {

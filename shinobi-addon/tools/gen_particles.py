@@ -827,14 +827,24 @@ P["chidori"].update(n=9)
 # ===========================================================================
 # Particle JSON
 # ===========================================================================
+# v1.54: the busiest effects emit a quarter fewer particles (they look the same — bigger, well-textured sprites carry
+# them — but big fights no longer flood weaker devices). Small effects keep every particle.
+DENSITY = 0.75
+
+
+def count(n):
+    return n if n < 10 else max(8, round(n * DENSITY))
+
+
 def build(pid, s):
     fw, fh, frames, mode = LAYOUT[s["tex"]]
     tw, th = TEXTURES[s["tex"]][1]
+    n = count(s["n"])
     if s.get("emit"):   # emitted over a short time instead of all at once (lingering smoke, pouring embers)
-        comps = {"minecraft:emitter_rate_steady": {"spawn_rate": round(s["n"] / s["emit"], 2), "max_particles": s["n"] * 2},
+        comps = {"minecraft:emitter_rate_steady": {"spawn_rate": round(n / s["emit"], 2), "max_particles": n * 2},
                  "minecraft:emitter_lifetime_once": {"active_time": s["emit"]}}
     else:
-        comps = {"minecraft:emitter_rate_instant": {"num_particles": s["n"]}, "minecraft:emitter_lifetime_once": {"active_time": 0.05}}
+        comps = {"minecraft:emitter_rate_instant": {"num_particles": n}, "minecraft:emitter_lifetime_once": {"active_time": 0.05}}
     sh = s["shape"]
     if sh[0] == "point":
         comps["minecraft:emitter_shape_point"] = {"offset": sh[1]}

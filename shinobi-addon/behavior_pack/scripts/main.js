@@ -32,6 +32,12 @@ import { breakTobiPhase } from "./akatsuki2.js";
 import { initNatures, natureCostMultiplier, natureDamageMultiplier, onJutsuCast, natureTag } from "./natures.js";
 import { initXpShards } from "./xpshards.js";
 import { initGrace, graceBlocks } from "./grace.js";
+import { initRampage } from "./rampage.js";
+import { initJuubi } from "./juubi.js";
+import { initBans } from "./bans.js";
+import { initTitles, makeTitleJutsu, titleDamageMultiplier, titleRegenMultiplier, noteTitleCast, hasTitle, TITLES } from "./titles.js";
+import { levelDamageFactor, bossDamageFactor } from "./levels.js";
+import { chakraSealed } from "./clans.js";
 import { initLevels, handleRecordUse, levelChakraBonus, levelRegenMultiplier, ninjutsuMultiplier, taijutsuMultiplier, cooldownMultiplier, gainJutsuXp, getLevel, xpInfo } from "./levels.js";
 
 // ---------------------------------------------------------------------------
@@ -108,12 +114,20 @@ function knockback(entity, dirX, dirZ, horizontal, vertical) {
   }
 }
 
+// Bosses whose hits scale with the target's level (v1.54).
+const BOSS_TYPES = new Set(["aegis:akatsuki", "aegis:legend", "aegis:juubi",
+  ...["shukaku", "matatabi", "isobu", "son_goku", "kokuo", "saiken", "chomei", "gyuki", "kurama"].map((b) => `aegis:${b}`)]);
+
 function hurt(target, amount, attacker, cause = "entityAttack", kind = "tech") {
   if (sameVillage(target, attacker)) return; // no friendly fire between village-mates
   if (graceBlocks(target, attacker)) return; // grace period: no fighting
   // Ninjutsu stat boosts every scripted technique a player lands (taijutsu scrolls use the Taijutsu stat instead).
   if (attacker?.typeId === "minecraft:player") {
     amount *= (kind === "fist" ? taijutsuMultiplier(attacker) : ninjutsuMultiplier(attacker)) * sageMultiplier(attacker) * armorDamageMultiplier(attacker) * natureDamageMultiplier(attacker);
+    amount *= levelDamageFactor(attacker); // v1.54: stronger as you level (×1 → ×10 at 300)
+    amount *= titleDamageMultiplier(attacker, target); // Pain / Itachi / Tobi / Sasuke perks
+  } else if (target?.typeId === "minecraft:player" && BOSS_TYPES.has(attacker?.typeId)) {
+    amount *= bossDamageFactor(target); // bosses stay dangerous for high-level shinobi
   }
   markScripted(target, attacker, cause, kind); // so the M1 combo doesn't mistake this for a punch
   try {
@@ -151,6 +165,9 @@ function canBeHit(e, caster) {
   if (sameVillage(e, caster)) return false;
   // grace period: players with grace can't be hit, and can't hit players or ninja / bosses
   if (graceBlocks(e, caster)) return false;
+  // a legend waiting for a challenger (v1.54) only fights enemy ninja — and players can't touch it until they accept
+  if (caster?.typeId === "aegis:legend" && caster.hasTag?.("aegis_calm")) return e.typeId === "aegis:hostile_ninja" || e.typeId === "aegis:akatsuki";
+  if (e.typeId === "aegis:legend" && e.hasTag?.("aegis_calm") && caster?.typeId !== "aegis:hostile_ninja" && caster?.typeId !== "aegis:akatsuki") return false;
   if (e.typeId.startsWith("aegis:")) {
     try {
       if (e.getDynamicProperty(OWNER_PROP) === caster.id) return false;
@@ -337,6 +354,16 @@ world.afterEvents.itemUse.subscribe(({ source: player, itemStack }) => {
   if (handleGourdUse(player, itemStack)) return;
   const jutsu = JUTSU[itemStack.typeId];
   if (!jutsu) return;
+  if (chakraSealed(player)) {
+    player.onScreenDisplay.setActionBar("§6Your chakra is sealed — you can't cast jutsu right now.");
+    return;
+  }
+  // a title's jutsu answers only to that title's holder (v1.54)
+  if (jutsu.title && !hasTitle(player, jutsu.title)) {
+    player.onScreenDisplay.setActionBar(`§cOnly the holder of the ${TITLES[jutsu.title].name}§c title can use ${jutsu.name}.`);
+    sound(player.dimension, "note.bass", player.location, 0.6, 0.6);
+    return;
+  }
 
   // Kekkei genkai releases belong to one clan.
   if (jutsu.clan && getClanId(player) !== jutsu.clan) {
@@ -360,6 +387,7 @@ world.afterEvents.itemUse.subscribe(({ source: player, itemStack }) => {
 
   // cast() returns false if the jutsu fizzled (e.g. no target) — no cost then.
   onJutsuCast(player, itemStack.typeId); // affinity damage boost starts before the jutsu lands
+  noteTitleCast(player, itemStack.typeId); // (Itachi's genjutsu, Sasuke's lightning)
   const ok = jutsu.cast(player);
   if (ok === false) return;
 
@@ -1088,7 +1116,7 @@ system.runInterval(() => {
     const max = getMaxChakra(player);
 
     // Regeneration
-    let rate = isTransformed(player) && !isBijuuMastered(player) ? 0 : REGEN_PER_SECOND * clanRegenMultiplier(player) * bijuuRegenMultiplier(player) * levelRegenMultiplier(player) * armorRegenMultiplier(player) * villageRegenMultiplier(player);
+    let rate = isTransformed(player) && !isBijuuMastered(player) ? 0 : REGEN_PER_SECOND * clanRegenMultiplier(player) * bijuuRegenMultiplier(player) * levelRegenMultiplier(player) * armorRegenMultiplier(player) * villageRegenMultiplier(player) * titleRegenMultiplier(player);
     if (wearingHeadband(player)) rate *= HEADBAND_REGEN_BONUS;
 
     const prev = lastPos.get(player.id);
@@ -1167,6 +1195,7 @@ const npcApi = {
 };
 Object.assign(JUTSU, makeJutsu2(npcApi));
 Object.assign(JUTSU, makeJutsu3(npcApi));
+Object.assign(JUTSU, makeTitleJutsu(npcApi)); // v1.54: the titles' scrolls
 {
   const rel = makeReleases(npcApi);
   Object.assign(JUTSU, rel.jutsu);
@@ -1180,6 +1209,10 @@ initKamui(npcApi, breakTobiPhase);
 initStarter(npcApi);
 initXpShards(npcApi);
 initGrace(npcApi);
+initRampage(npcApi);
+initJuubi(npcApi); // v1.54: the Ten-Tails (spawn egg only)
+initBans();
+initTitles({ ...npcApi, refreshName: applyNameTag });
 initEdoTensei(npcApi);
 initM1(npcApi);
 initLagClear();

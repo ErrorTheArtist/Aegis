@@ -77,6 +77,7 @@
         "s67": "textures/entity/aegis/npc/onoki",
         "s68": "textures/entity/aegis/npc/hanzo",
         "s69": "textures/entity/aegis/npc/travel_master",
+        "gear_hokage": "textures/entity/aegis/npc/gear_hokage",
         "gear_rogue": "textures/entity/aegis/npc/gear_rogue",
         "gear_sound": "textures/entity/aegis/npc/gear_sound",
         "gear_chunin": "textures/entity/aegis/npc/gear_chunin",
@@ -121,6 +122,7 @@
       },
       "geometry": {
         "default": "geometry.humanoid.custom",
+        "gear_hokage": "geometry.aegis.gear_hokage",
         "gear_rogue": "geometry.aegis.gear_rogue",
         "gear_sound": "geometry.aegis.gear_sound",
         "gear_chunin": "geometry.aegis.gear_chunin",
@@ -186,6 +188,9 @@
       },
       "render_controllers": [
         "controller.render.aegis.npc",
+        {
+          "controller.render.aegis.npc_gear_hokage": "q.property('aegis:skin') == 4"
+        },
         {
           "controller.render.aegis.npc_gear_rogue": "q.property('aegis:skin') == 9"
         },

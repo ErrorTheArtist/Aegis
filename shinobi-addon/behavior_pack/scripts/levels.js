@@ -1,8 +1,11 @@
-// Shinobi levels (1–200) and stat points.
+// Shinobi levels (1–300, v1.54) and stat points.
 //
 // XP: kills (scaled by the victim's max health — Tailed Beasts give a lot), player kills,
 // and casting jutsu / clan abilities / sword specials.
-// Every level gives 3 stat points (+3 bonus at level 200 = 600 total = every stat maxed).
+// Every level gives 3 stat points (+3 bonus at level 300 = 900 total = every stat maxed at 150).
+// v1.54: your level also raises your max HP (about 1,044 at level 300 with full Vitality — Bedrock's limit) and the
+// damage of everything you do (×1 at level 1, ×10 at level 300), so jutsu keep their bite as health grows. Bosses hit
+// higher-level shinobi harder too. Out of a fight you heal 1% of your max HP a second.
 // Spend them in the Shinobi Record (item) or with /scriptevent aegis:stats.
 //
 // Commands (cheats on):
@@ -15,12 +18,13 @@ import { showTitle } from "./hud.js";
 import { ActionFormData, ModalFormData, MessageFormData } from "@minecraft/server-ui";
 import { applyNameTag, refreshClanEffects } from "./clans.js";
 import { getRyo, fmtRyo, walletMenu } from "./currency.js";
-import { getVillage, villageLabel, villageMenu, villageCooldownMultiplier } from "./villages.js";
+import { getVillage, villageLabel, villageMenu, villageCooldownMultiplier, isRogue, rogueOf } from "./villages.js";
 import { starterLine } from "./starter.js";
+import { titleHpLevels, titlesMenu, titlesOf, TITLES } from "./titles.js";
 
-export const MAX_LEVEL = 200;
+export const MAX_LEVEL = 300;
 const POINTS_PER_LEVEL = 3;
-const STAT_CAP = 100;
+export const STAT_CAP = 150;
 const RECORD_ITEM = "aegis:shinobi_record";
 // The last hotbar slot belongs to the Shinobi Record (Bedrock add-ons can't add a slot to the inventory, so one is
 // reserved): the Record is locked in it — it can't be moved, dropped, stored or thrown away — and kept on death. If it
@@ -30,15 +34,16 @@ export const RECORD_SLOT = 8;
 const P = { level: "aegis:level", xp: "aegis:xp", points: "aegis:points", slot: "aegis:record_slot" };
 
 export const STATS = {
-  vitality: { name: "Vitality", color: "§c", desc: "+2 hearts every 10 points (up to +20 hearts)" },
+  vitality: { name: "Vitality", color: "§c", desc: "+4 max HP every 3 points (on top of the HP your level gives)" },
   chakra: { name: "Chakra", color: "§b", desc: "+2 max chakra and +0.5% chakra regen per point" },
   taijutsu: { name: "Taijutsu", color: "§6", desc: "Strength (+3 melee damage) every 25 points, and +1% damage for punch combos and taijutsu scrolls per point" },
   ninjutsu: { name: "Ninjutsu", color: "§d", desc: "+1% damage for jutsu, clan abilities and sword specials per point" },
-  agility: { name: "Agility", color: "§a", desc: "Speed every 25 points, and -0.25% jutsu cooldowns per point" },
-  endurance: { name: "Endurance", color: "§7", desc: "Shrug off 0.3% of all damage taken per point (up to 30%)" },
+  agility: { name: "Agility", color: "§a", desc: "Speed every 25 points (up to Speed IV), and -0.25% jutsu cooldowns per point" },
+  endurance: { name: "Endurance", color: "§7", desc: "Shrug off 0.2% of all damage taken per point (up to 30%)" },
 };
 
 let api;
+const lastHurt = new Map(); // player id -> tick they were last hurt
 
 // ---------------------------------------------------------------------------
 // Data
@@ -70,9 +75,18 @@ const setStat = (player, id, v) => set(player, `aegis:stat_${id}`, v);
 const getPoints = (player) => num(player, P.points, 0);
 
 // XP needed to go from `level` to `level + 1`.
+// v1.54: a little steeper than before (≈20% more per level), and on to level 300.
 export function xpToNext(level) {
-  return Math.round(40 + 12 * level + 0.25 * level * level);
+  return Math.round(50 + 15 * level + 0.3 * level * level);
 }
+
+// Health boost levels (4 HP each) from level and Vitality; Bedrock allows 256 at most (1,044 HP).
+export const HP_LEVEL_CAP = 256;
+export const hpLevels = (player) => Math.floor((getLevel(player) - 1) * 0.69) + Math.floor(getStat(player, "vitality") / 3);
+// Everything a shinobi does hits harder as they level: ×1 at level 1 → ×9.97 at level 300.
+export const levelDamageFactor = (player) => (player?.typeId === "minecraft:player" ? 1 + (getLevel(player) - 1) * 0.03 : 1);
+// …and the bosses hit higher-level shinobi harder (×1 → ×6.98 at level 300), though HP grows faster.
+export const bossDamageFactor = (target) => (target?.typeId === "minecraft:player" ? 1 + (getLevel(target) - 1) * 0.02 : 1);
 
 // For the HUD: XP into the current level, XP needed for the next one, unspent points.
 export function xpInfo(player) {
@@ -100,9 +114,9 @@ export const cooldownMultiplier = (player) => (1 - getStat(player, "agility") * 
 // Extra "levels" of potion-style effects, merged with clan passives in clans.js.
 export function statEffectLevels(player) {
   return {
-    health_boost: Math.floor(getStat(player, "vitality") / 10), // 1 level = +2 hearts
+    health_boost: Math.min(HP_LEVEL_CAP, hpLevels(player) + titleHpLevels(player, hpLevels(player))), // 1 level = +4 HP (Naruto's title: +10%)
     strength: Math.floor(getStat(player, "taijutsu") / 25),
-    speed: Math.floor(getStat(player, "agility") / 25),
+    speed: Math.floor(Math.min(100, getStat(player, "agility")) / 25),
   };
 }
 
@@ -175,7 +189,7 @@ export async function openStats(player) {
         level >= MAX_LEVEL ? "§6MAX LEVEL" : `§7XP ${bar(xp, need)} §f${xp}/${need}`,
         `§7Unspent points: §e${points}`,
         `§7Ryō: §6${fmtRyo(getRyo(player))}`,
-        `§7Village: ${villageLabel(getVillage(player))}`,
+        `§7Village: ${isRogue(player) ? "§cRogue ninja §7(left the " + villageLabel(rogueOf(player)) + "§7)" : villageLabel(getVillage(player))}`,
         starterLine(player),
         "",
         ...ids.map((id) => `${STATS[id].color}${STATS[id].name}§r §f${getStat(player, id)}§7/${STAT_CAP} §8— ${STATS[id].desc}`),
@@ -184,13 +198,15 @@ export async function openStats(player) {
   for (const id of ids) form.button(`${STATS[id].color}${STATS[id].name}  §r§8${getStat(player, id)}/${STAT_CAP}`);
   form.button("§cReset stats");
   form.button("§6Ryō Wallet\n§r§7pay players · exchange emeralds");
-  form.button("§aVillage\n§r§7chat · leaderboard · return home");
+  form.button("§aVillage\n§r§7chat · leaderboard · return home · leave");
+  form.button("§5Titles\n§r§7Pain · Itachi · Tobi · Sasuke · Naruto");
 
   const res = await form.show(player);
   if (res.canceled || res.selection === undefined) return;
   if (res.selection === ids.length) return confirmReset(player);
   if (res.selection === ids.length + 1) return walletMenu(player);
   if (res.selection === ids.length + 2) return villageMenu(player);
+  if (res.selection === ids.length + 3) return titlesMenu(player, () => openStats(player));
   const id = ids[res.selection];
   const room = Math.min(getPoints(player), STAT_CAP - getStat(player, id));
   if (room <= 0) {
@@ -322,15 +338,30 @@ export function initLevels(helpers) {
     gainXp(killer, killXp(deadEntity));
   });
 
+  // Out of a fight (not hit for 8 s) you heal 1% of your max HP every second — big health pools refill in time.
+  system.runInterval(() => {
+    const now = system.currentTick;
+    for (const p of world.getAllPlayers()) {
+      if (now - (lastHurt.get(p.id) ?? -1e9) < 160) continue;
+      try {
+        const h = p.getComponent("minecraft:health");
+        if (h.currentValue > 0 && h.currentValue < h.effectiveMax) h.setCurrentValue(Math.min(h.effectiveMax, h.currentValue + Math.max(0.5, h.effectiveMax * 0.01)));
+      } catch {
+        /* ignore */
+      }
+    }
+  }, 20);
+
   // Endurance: shrug off part of every hit.
   world.afterEvents.entityHurt.subscribe(({ hurtEntity, damage }) => {
     if (hurtEntity.typeId !== "minecraft:player") return;
+    lastHurt.set(hurtEntity.id, system.currentTick);
     const end = getStat(hurtEntity, "endurance");
     if (end <= 0) return;
     try {
       const h = hurtEntity.getComponent("minecraft:health");
       if (h.currentValue <= 0) return;
-      h.setCurrentValue(Math.min(h.effectiveMax, h.currentValue + damage * end * 0.003));
+      h.setCurrentValue(Math.min(h.effectiveMax, h.currentValue + damage * Math.min(0.3, end * 0.002)));
     } catch {
       /* ignore */
     }

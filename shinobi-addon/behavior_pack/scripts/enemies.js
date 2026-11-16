@@ -3,9 +3,12 @@
 
 import { world, system } from "@minecraft/server";
 import { isGraced } from "./grace.js";
+import { VILLAGES } from "./villages.js";
+import { bossDamageFactor } from "./levels.js";
+import { boostHit, isEcho, scriptedHit } from "./dmgutil.js";
 import { showTitle } from "./hud.js";
 import { NPC_TYPES, AKATSUKI, setupNpc } from "./npcs.js";
-import { initLegends, legendTick, updateLegend } from "./legends.js";
+import { initLegends, legendTick, updateLegend, isCalm, calmUpdate } from "./legends.js";
 import { registerCast, inClash } from "./clash.js";
 import { MORE_MEMBER_AI, initAkatsuki2 } from "./akatsuki2.js";
 
@@ -49,6 +52,28 @@ function nearest(e, list) {
 const chest = (e) => api.add(e.location, { x: 0, y: 1.2, z: 0 });
 const aim = (from, to) => api.norm(api.sub(api.add(to.location, { x: 0, y: 1, z: 0 }), from));
 
+const BOSS_MELEE = new Set(["aegis:akatsuki", "aegis:legend", "aegis:juubi",
+  ...["shukaku", "matatabi", "isobu", "son_goku", "kokuo", "saiken", "chomei", "gyuki", "kurama"].map((b) => `aegis:${b}`)]);
+
+// --- natural spawn limits (v1.54) ---
+const VILLAGE_SAFE = 200; // no natural ninja or Akatsuki within this many blocks of a village's centre
+const PLAYER_GAP = 20; // nor right next to a player ("out of nowhere")
+const NEARBY_CAP = { "aegis:hostile_ninja": 2, "aegis:akatsuki": 1 }; // at most this many within 64 blocks
+function nearVillage(loc, r) {
+  return Object.values(VILLAGES).some((v) => Math.hypot(v.pos.x - loc.x, v.pos.z - loc.z) < r);
+}
+function crowded(e) {
+  const loc = e.location;
+  if (e.dimension.id === "minecraft:overworld" && nearVillage(loc, VILLAGE_SAFE)) return true;
+  try {
+    if (e.dimension.getPlayers({ location: loc, maxDistance: PLAYER_GAP }).length) return true;
+    const same = e.dimension.getEntities({ type: e.typeId, location: loc, maxDistance: 64 }).filter((o) => o.id !== e.id);
+    return same.length >= (NEARBY_CAP[e.typeId] ?? 2);
+  } catch {
+    return false;
+  }
+}
+
 function throwAt(e, t, opts) {
   const start = api.add(e.getHeadLocation(), api.scale(aim(e.getHeadLocation(), t), 1.2));
   api.launchProjectile(e, start, aim(start, t), { ignoreFamily: "ninja", ...opts });
@@ -63,7 +88,8 @@ function behind(attacker, dist = 2) {
 // ---------------------------------------------------------------------------
 // Abilities
 // ---------------------------------------------------------------------------
-const KUNAI = { noOrb: true, speed: 1.7, maxAge: 16, damage: 4, radius: 1.2, knock: 0.3, fire: 0, trail: "aegis:slash", burst: "aegis:slash", color: [0.9, 0.9, 0.95], hitRadius: 1.1, sound: "random.bowhit" };
+// (v1.54: rogue / Sound / Anbu jutsu toned down for level-1 players with the starter kit)
+const KUNAI = { noOrb: true, speed: 1.6, maxAge: 16, damage: 2, radius: 1.1, knock: 0.2, fire: 0, trail: "aegis:slash", burst: "aegis:slash", color: [0.9, 0.9, 0.95], hitRadius: 1.0, sound: "random.bowhit" };
 
 const ROLE_AI = {
   rogue(e, t, dist) {
@@ -71,17 +97,17 @@ const ROLE_AI = {
       api.anim(e, "animation.aegis.palm_thrust");
       throwAt(e, t, KUNAI);
       api.sound(e.dimension, "random.bow", e.location, 0.8, 1.4);
-      return 50;
+      return 80;
     }
     api.anim(e, "animation.aegis.hand_signs");
-    throwAt(e, t, { damage: 6, radius: 2.5, knock: 0.6, fire: 3 });
+    throwAt(e, t, { damage: 3, radius: 2, knock: 0.4, fire: 1 });
     api.sound(e.dimension, "mob.ghast.fireball", e.location, 0.8, 1);
-    return 80;
+    return 130;
   },
   sound(e, t, dist) {
     if (dist > 9) {
       throwAt(e, t, KUNAI);
-      return 50;
+      return 80;
     }
     api.anim(e, "animation.aegis.palm_thrust");
     const dir = e.getViewDirection();
@@ -89,12 +115,12 @@ const ROLE_AI = {
     api.sound(e.dimension, "mob.warden.sonic_boom", e.location, 0.5, 1.6);
     for (const p of survivalPlayersNear(e.dimension, e.location, 9)) {
       if (api.dot(api.norm(api.sub(p.location, e.location)), dir) < 0.5) continue;
-      api.hurt(p, 4, e);
+      api.hurt(p, 2, e);
       const h = api.norm({ x: p.location.x - e.location.x, y: 0, z: p.location.z - e.location.z });
-      api.knockback(p, h.x, h.z, 1.5, 0.4);
-      eff(p, "nausea", 120, 0);
+      api.knockback(p, h.x, h.z, 0.9, 0.3);
+      eff(p, "nausea", 50, 0);
     }
-    return 70;
+    return 120;
   },
   anbu(e, t, dist) {
     if (dist > 3 && dist < 18) {
@@ -105,13 +131,13 @@ const ROLE_AI = {
       system.runTimeout(() => {
         if (!api.isValid(e) || !api.isValid(t)) return;
         api.anim(e, "animation.aegis.sword_thrust");
-        api.hurt(t, 6, e);
+        api.hurt(t, 4, e);
         api.particle(e.dimension, "aegis:slash", chest(t), [0.9, 0.9, 1]);
       }, 6);
-      return 90;
+      return 140;
     }
     throwAt(e, t, KUNAI);
-    return 40;
+    return 70;
   },
 };
 
@@ -224,6 +250,17 @@ function update(e, now) {
     }
   }
   if (now < st.next) return;
+  if (isLegend && isCalm(e)) {
+    // waiting for a challenger: guard the area against enemy ninja (Madara backs them instead)
+    let cd = 40;
+    try {
+      cd = calmUpdate(e);
+    } catch {
+      /* ignore */
+    }
+    st.next = now + cd;
+    return;
+  }
   const isBoss = isLegend || e.typeId === "aegis:akatsuki";
   const found = nearest(e, survivalPlayersNear(e.dimension, e.location, isBoss ? 32 : 20));
   if (!found) return;
@@ -299,11 +336,13 @@ export function initEnemies(helpers) {
   }, 10);
   world.afterEvents.entityDie.subscribe(({ deadEntity }) => state.delete(deadEntity.id));
 
-  // Natural spawns: pick a faction; Akatsuki without a member get one.
+  // Natural spawns: pick a faction; Akatsuki without a member get one. (v1.54: far fewer — never near a village, never
+  // close to a player, and only a couple around at once, so players can breathe.)
   world.afterEvents.entitySpawn.subscribe(({ entity }) => {
     if (entity.typeId !== "aegis:hostile_ninja" && entity.typeId !== "aegis:akatsuki") return;
     system.runTimeout(() => {
       if (!api.isValid(entity) || entity.getDynamicProperty("aegis:role")) return;
+      if (crowded(entity)) return entity.remove();
       if (entity.typeId === "aegis:akatsuki") {
         setupNpc(entity, { type: "akatsuki", member: "random", skin: -1, name: "", invuln: false }, { natural: true });
         for (const p of entity.dimension.getPlayers({ location: entity.location, maxDistance: 64 })) {
@@ -311,7 +350,7 @@ export function initEnemies(helpers) {
         }
       } else {
         const r = Math.random();
-        const type = r < 0.7 ? "rogue" : r < 0.9 ? "sound" : "anbu";
+        const type = r < 0.75 ? "rogue" : r < 0.95 ? "sound" : "anbu";
         entity.setDynamicProperty("aegis:role", type);
         entity.setProperty("aegis:skin", NPC_TYPES[type].skin);
         entity.triggerEvent(`aegis:tier_${NPC_TYPES[type].tier}`);
@@ -325,7 +364,7 @@ export function initEnemies(helpers) {
     if (hurtEntity.typeId !== "aegis:hostile_ninja" && hurtEntity.typeId !== "aegis:akatsuki") return;
     const role = hurtEntity.getDynamicProperty("aegis:role");
     const member = hurtEntity.getDynamicProperty("aegis:member");
-    const chance = member === "itachi" ? 0.3 : member === "konan" ? 0.25 : role === "anbu" ? 0.25 : role === "rogue" ? 0.15 : 0;
+    const chance = member === "itachi" ? 0.3 : member === "konan" ? 0.25 : role === "anbu" ? 0.12 : role === "rogue" ? 0.06 : 0;
     const st = state.get(hurtEntity.id) ?? {};
     const attacker = damageSource?.damagingEntity;
     if (!attacker || Math.random() > chance || system.currentTick < (st.subNext ?? 0)) return;
@@ -344,6 +383,15 @@ export function initEnemies(helpers) {
     }
   });
 
+  // v1.54: a boss's own swings hit higher-level shinobi harder too (its jutsu are scaled in main.js hurt()).
+  world.afterEvents.entityHurt.subscribe(({ hurtEntity, damage, damageSource }) => {
+    if (hurtEntity.typeId !== "minecraft:player" || damage <= 0 || damageSource?.cause !== "entityAttack") return;
+    const a = damageSource.damagingEntity;
+    if (!a || !BOSS_MELEE.has(a.typeId) || isEcho(hurtEntity, damage) || scriptedHit(hurtEntity, damageSource)) return;
+    const f = bossDamageFactor(hurtEntity);
+    if (f > 1.01) boostHit(hurtEntity, damage, damage * f, a);
+  });
+
   // Kisame's Samehada drains chakra on hit.
   world.afterEvents.entityHitEntity.subscribe(({ damagingEntity, hitEntity }) => {
     if (damagingEntity?.typeId !== "aegis:akatsuki" || hitEntity?.typeId !== "minecraft:player") return;
@@ -352,13 +400,14 @@ export function initEnemies(helpers) {
     hitEntity.onScreenDisplay.setActionBar("§9Samehada devours your chakra!");
   });
 
-  // Akatsuki hunt Jinchūriki (every 5 minutes, 35% chance per Jinchūriki in the overworld).
+  // Akatsuki hunt Jinchūriki (every 15 minutes, 20% chance per Jinchūriki in the overworld — not inside a village).
   system.runInterval(() => {
     for (const p of world.getAllPlayers()) {
-      if (!p.getDynamicProperty("aegis:bijuu") || p.dimension.id !== "minecraft:overworld" || Math.random() > 0.35) continue;
+      if (!p.getDynamicProperty("aegis:bijuu") || p.dimension.id !== "minecraft:overworld" || Math.random() > 0.2) continue;
+      if (nearVillage(p.location, VILLAGE_SAFE)) continue;
       spawnAkatsukiNear(p, "§7They've come for your Tailed Beast!");
     }
-  }, 6000);
+  }, 18000);
 
   Object.assign(MEMBER_AI, MORE_MEMBER_AI);
   initAkatsuki2(helpers);

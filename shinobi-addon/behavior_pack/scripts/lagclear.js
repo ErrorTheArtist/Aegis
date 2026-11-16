@@ -1,24 +1,31 @@
-// Lag clear — keeps the server light.
-//   every 10 minutes: every dropped item lying on the ground is removed (chat warns 60 s and 10 s before)
-//   every 30 minutes: hostile mobs are cleared; they simply spawn again (naturally, or from their NPC Spawner)
+// Lag clear — keeps the server light (v1.54).
+//   every 5 minutes: every dropped item lying on the ground is removed (chat warns 30 s and 10 s before)
+//   after 20 minutes alive: hostile mobs are removed — rogue / Sound / Anbu ninja, Akatsuki, legends, Tailed Beasts
+//     (the Ten-Tails too) and vanilla monsters. Spawners send theirs back after their delay, and a Tailed Beast that's
+//     sent home frees the world for the next one.
 // Never touched: players, villagers and animals, pets and anything tamed or name-tagged, shop NPCs, companions,
-// summons, reanimated shinobi, bosses (Akatsuki, legends, Tailed Beasts) and anything a quest, exam or spawner made.
-//   /scriptevent aegis:lag            — when the next clears are due
+// summons and clones, reanimated shinobi, a legend waiting for a challenger, a Jinchūriki's trial — and anything that
+// was hit in the last 2 minutes (a fight in progress is never cut short).
+//   /scriptevent aegis:lag            — when the next item clear is due
 //   /scriptevent aegis:lag items      — clear dropped items now
-//   /scriptevent aegis:lag mobs       — clear hostile mobs now
+//   /scriptevent aegis:lag mobs       — clear every hostile mob now (any age)
 //   /scriptevent aegis:lag off | on   — stop / resume the automatic clears
 
 import { world, system } from "@minecraft/server";
+import { TAILED_BEASTS, releaseRampage } from "./rampage.js";
 
-const ITEMS_EVERY = 12000; // 10 min
-const MOBS_EVERY = 36000; // 30 min
-const WARN = [1200, 200]; // ticks before an item clear
+const ITEMS_EVERY = 6000; // 5 min
+const MOB_AGE = 24000; // 20 min
+const SCAN_EVERY = 1200; // look for old mobs once a minute
+const FIGHTING = 2400; // hit in the last 2 min = still fighting
+const WARN = [600, 200]; // ticks before an item clear
 const OFF = "aegis:lag_off";
 const DIMENSIONS = ["overworld", "nether", "the_end"];
-const BOSSES = /^aegis:(akatsuki|legend|shukaku|matatabi|isobu|son_goku|kokuo|saiken|chomei|gyuki|kurama)$/;
+const BOSSES = new Set(["aegis:akatsuki", "aegis:legend", ...TAILED_BEASTS]);
 
 let nextItems = ITEMS_EVERY;
-let nextMobs = MOBS_EVERY;
+const born = new Map(); // entity id -> tick it was first seen
+const lastHit = new Map(); // entity id -> tick it was last hurt
 const say = (text) => world.sendMessage(`§8[§bLag Clear§8] §7${text}`);
 
 function each(query, fn) {
@@ -50,24 +57,61 @@ export function clearItems() {
   return n;
 }
 
-// A hostile mob nobody owns and nothing depends on.
-function disposable(e) {
-  if (e.typeId === "minecraft:player" || BOSSES.test(e.typeId)) return false;
+const prop = (e, k) => {
+  try {
+    return e.getDynamicProperty(k);
+  } catch {
+    return undefined;
+  }
+};
+
+// A hostile mob nobody owns, that isn't busy fighting or waiting for a challenger.
+function disposable(e, now) {
+  if (e.typeId === "minecraft:player") return false;
+  if (now - (lastHit.get(e.id) ?? -1e9) < FIGHTING) return false;
+  if (BOSSES.has(e.typeId)) {
+    if (prop(e, "aegis:trial_of") || prop(e, "aegis:owner")) return false;
+    if (e.typeId === "aegis:legend" && e.hasTag?.("aegis_calm")) return false; // waiting by its spawner for a challenger
+    return true;
+  }
   if (e.typeId.startsWith("aegis:") && e.typeId !== "aegis:hostile_ninja") return false;
   if (e.nameTag && !e.typeId.startsWith("aegis:")) return false; // name-tagged by a player
-  if (e.getTags().length) return false; // quest / exam / spawner / clone bookkeeping
-  if (e.getDynamicProperty("aegis:owner") || e.getDynamicProperty("aegis:spawner")) return false;
+  if (e.getTags().some((t) => t.startsWith("aegis_lclone_") || t.startsWith("aegis_exam"))) return false; // a legend's clones, an exam
+  if (prop(e, "aegis:owner")) return false;
   if (e.getComponent("minecraft:is_tamed") || e.getComponent("minecraft:tameable")?.isTamed) return false;
   return true;
 }
 
-export function clearMobs() {
-  const n = each({ families: ["monster"] }, (e) => {
-    if (!disposable(e)) return false;
-    e.remove();
+function remove(e) {
+  if (TAILED_BEASTS.has(e.typeId)) releaseRampage(e.id);
+  born.delete(e.id);
+  lastHit.delete(e.id);
+  try {
+    if (BOSSES.has(e.typeId)) {
+      e.dimension.spawnParticle("aegis:smoke_puff", e.location);
+      for (const p of e.dimension.getPlayers({ location: e.location, maxDistance: 48 })) {
+        p.sendMessage(`§8[§bLag Clear§8] §7${e.nameTag || e.typeId.replace("aegis:", "")}§7 has moved on.`);
+      }
+    }
+  } catch {
+    /* ignore */
+  }
+  e.remove();
+}
+
+const hostiles = (fn) => each({ families: ["monster"] }, fn) + each({ families: ["tailed_beast"], excludeFamilies: ["monster"] }, fn);
+
+// Removes hostile mobs older than 20 minutes (or every one, with all = true).
+export function clearMobs(all = false) {
+  const now = system.currentTick;
+  const n = hostiles((e) => {
+    if (!born.has(e.id)) born.set(e.id, now);
+    if (!all && now - born.get(e.id) < MOB_AGE) return false;
+    if (!disposable(e, now)) return false;
+    remove(e);
     return true;
   });
-  say(n ? `Cleared §f${n}§7 hostile mob${n === 1 ? "" : "s"} — they'll spawn again.` : "No hostile mobs to clear.");
+  if (all || n) say(n ? `Cleared §f${n}§7 hostile mob${n === 1 ? "" : "s"} — they'll spawn again.` : "No hostile mobs to clear.");
   return n;
 }
 
@@ -78,7 +122,13 @@ const left = (ticks) => {
 
 export function initLagClear() {
   nextItems = system.currentTick + ITEMS_EVERY;
-  nextMobs = system.currentTick + MOBS_EVERY;
+  world.afterEvents.entityHurt.subscribe(({ hurtEntity }) => {
+    if (hurtEntity.typeId !== "minecraft:player") lastHit.set(hurtEntity.id, system.currentTick);
+  });
+  world.afterEvents.entityDie.subscribe(({ deadEntity }) => {
+    born.delete(deadEntity.id);
+    lastHit.delete(deadEntity.id);
+  });
   system.runInterval(() => {
     if (world.getDynamicProperty(OFF)) return;
     const now = system.currentTick;
@@ -89,10 +139,8 @@ export function initLagClear() {
       nextItems = now + ITEMS_EVERY;
       clearItems();
     }
-    if (now >= nextMobs) {
-      nextMobs = now + MOBS_EVERY;
-      clearMobs();
-    }
+    if (now % SCAN_EVERY < 20) clearMobs(false);
+    if (now % 72000 < 20) for (const [id, t] of born) if (now - t > MOB_AGE * 4) born.delete(id); // forget long-gone ones
   }, 20);
 
   system.afterEvents.scriptEventReceive.subscribe(({ id, message, sourceEntity: p }) => {
@@ -100,16 +148,13 @@ export function initLagClear() {
     const cmd = String(message ?? "").trim().toLowerCase();
     const tell = (t) => (p?.typeId === "minecraft:player" ? p.sendMessage(t) : say(t));
     if (cmd === "items") return void clearItems();
-    if (cmd === "mobs") return void clearMobs();
+    if (cmd === "mobs") return void clearMobs(true);
     if (cmd === "off" || cmd === "on") {
       world.setDynamicProperty(OFF, cmd === "off" ? true : undefined);
-      if (cmd === "on") {
-        nextItems = system.currentTick + ITEMS_EVERY;
-        nextMobs = system.currentTick + MOBS_EVERY;
-      }
-      return say(cmd === "off" ? "Automatic clears are §coff§7." : "Automatic clears are §aon§7 (items every 10 min, hostile mobs every 30 min).");
+      if (cmd === "on") nextItems = system.currentTick + ITEMS_EVERY;
+      return say(cmd === "off" ? "Automatic clears are §coff§7." : "Automatic clears are §aon§7 (items every 5 min, hostile mobs after 20 min alive).");
     }
     tell(world.getDynamicProperty(OFF) ? "§7Lag clear is §coff§7. /scriptevent aegis:lag on" :
-      `§7Next item clear in §f${left(nextItems - system.currentTick)}§7, next mob clear in §f${left(nextMobs - system.currentTick)}§7.`);
+      `§7Next item clear in §f${left(nextItems - system.currentTick)}§7. Hostile mobs and bosses are cleared after 20 minutes alive (not mid-fight).`);
   });
 }

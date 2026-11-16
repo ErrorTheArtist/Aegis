@@ -1,7 +1,7 @@
 // XP Shards (v1.52) — crystals of a fallen boss's chakra. Right-click one to absorb it: about a third of the XP your
 // next level needs, whatever your level (at least 100 XP). Sneak + right-click absorbs the whole stack.
 // Almost every boss drops them when a player (or a player's companion, clone or summon) brings it down:
-//   Legendary shinobi 4–5 (Edo Madara 8) · Akatsuki members 3 · Tailed Beasts 5 (Kurama 7).
+//   Legendary shinobi 4–5 (Edo Madara 8) · Akatsuki members 3 · Tailed Beasts 5 (Kurama 7) · the Ten-Tails 12.
 // They're also paid by the bigger Quest Board quests and A/S-rank missions.
 //   /scriptevent aegis:xpshard [n]   — give yourself n shards (testing)
 
@@ -33,6 +33,7 @@ export function shardsFor(e) {
   }
   if (t === "aegis:akatsuki") return 3;
   if (TAILED_BEASTS.has(t)) return t === "aegis:kurama" ? 7 : 5;
+  if (t === "aegis:juubi") return 12;
   return 0;
 }
 

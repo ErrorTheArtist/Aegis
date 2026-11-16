@@ -396,7 +396,59 @@ VILLAGE_GEAR = {
         recipe=None),
 }
 ARMOR.update(VILLAGE_GEAR)
-DRAWN_ICONS = {f"{v}_headband" for v in ("sand", "mist", "cloud", "stone", "rain")}
+# ---- Rogue ninja (v1.54): leaving your village gives you its headband with a slash scratched through the mark ----
+MARKS["leaf"] = [mark_bar(-0.95, 28.65, 1.7, 0.26), mark_bar(-0.95, 27.45, 0.26, 1.46), mark_bar(-0.95, 27.35, 1.5, 0.26),   # the leaf swirl
+                 mark_bar(0.3, 27.6, 0.26, 0.9), mark_bar(-0.4, 28.05, 0.95, 0.26), mark_bar(0.55, 28.75, 0.26, 0.85, -42)]
+
+
+def scratched(v, name, band):
+    d = village_headband(v, name, band)
+    d["bones"]["head"].append(rotz([-2.45, 27.92, Z - 0.07], [4.9, 0.34, D + 0.08], "black", -14, [0, 28.1, Z - 0.03]))   # the slash
+    return d
+
+
+ROGUE_GEAR = {
+    "headband_scratched": scratched("leaf", "Scratched Hidden Leaf Headband", (40, 60, 140)),
+    "sand_headband_scratched": scratched("sand", "Scratched Hidden Sand Headband", (84, 64, 48)),
+    "mist_headband_scratched": scratched("mist", "Scratched Hidden Mist Headband", (42, 50, 66)),
+    "cloud_headband_scratched": scratched("cloud", "Scratched Hidden Cloud Headband", (44, 44, 52)),
+    "stone_headband_scratched": scratched("stone", "Scratched Hidden Stone Headband", (118, 42, 38)),
+    "rain_headband_scratched": scratched("rain", "Scratched Hidden Rain Headband", (62, 66, 78)),
+}
+ARMOR.update(ROGUE_GEAR)
+
+# ---- Title gear (v1.54, creative-only): Tobi's spiral mask, Naruto's orange sage coat ----
+def spiral(cx, cy, z, rings):
+    """A square spiral of thin dark bars round (cx, cy) on a mask's face."""
+    out = []
+    for r in rings:
+        out += [c([cx - r, cy + r - 0.22, z], [2 * r, 0.22, 0.1], "dark"), c([cx - r, cy - r, z], [2 * r + 0.22, 0.22, 0.1], "dark"),
+                c([cx - r, cy - r, z], [0.22, 2 * r - 0.3, 0.1], "dark"), c([cx + r, cy - r + 0.3, z], [0.22, 2 * r - 0.1, 0.1], "dark")]
+    return out
+
+
+TITLE_GEAR = {
+    "tobi_mask": dict(name="Tobi's Spiral Mask", slot="head", prot=3, dur=400,
+        colors=dict(base=(236, 122, 36), dark=(150, 66, 14), black=(18, 14, 16), light=(250, 160, 70)),
+        bones={"head": [c([-3.7, 24.3, -4.8], [7.4, 7.4, 0.6], "base"), c([-3.3, 24.7, -4.95], [6.6, 6.6, 0.2], "light"),
+                        *spiral(-1.4, 28.0, -5.06, (0.9, 1.8, 2.7)),
+                        c([-1.85, 27.55, -5.1], [0.9, 0.9, 0.12], "black"),                                       # the eye hole
+                        c([-4, 27.4, -4], [8, 1.0, 8], "black", 0.5)]},                                           # the strap
+        recipe=None),
+    "orange_sage_coat": dict(name="Orange Sage Coat", slot="chest", prot=8, dur=600,
+        colors=dict(base=(238, 128, 38), dark=(196, 96, 24), light=(252, 170, 80), black=(26, 22, 24), red=(170, 40, 30)),
+        bones={"body": [BODY(0.7, "base"), c([-4.6, 22.0, -2.7], [9.2, 2.6, 5.4], "light", 0.3),                 # the collar
+                        c([-0.4, 12, -2.85], [0.8, 10.5, 0.15], "dark"),
+                        *[c([x, 12.0, -2.95], [1.2, 1.4 + (i % 2) * 0.9, 0.12], "black") for i, x in enumerate((-4.2, -2.6, -1.0, 0.6, 2.2))],
+                        *[c([x, 12.0, 2.85], [1.2, 1.4 + (i % 2) * 0.9, 0.12], "black") for i, x in enumerate((-4.2, -2.6, -1.0, 0.6, 2.2))]],
+               "rightArm": [c([-8.6, 15.5, -2.6], [5.2, 8.7, 5.2], "base"), c([-8.7, 15.2, -2.7], [5.4, 0.9, 5.4], "black")],
+               "leftArm": [c([3.4, 15.5, -2.6], [5.2, 8.7, 5.2], "base"), c([3.3, 15.2, -2.7], [5.4, 0.9, 5.4], "black")],
+               "rightLeg": [c([-4.5, 3.6, -2.6], [5.0, 8.4, 5.2], "base"), *[c([x, 3.6, -2.7], [1.0, 1.6 + (i % 2), 0.12], "black") for i, x in enumerate((-4.4, -3.0, -1.6))]],
+               "leftLeg": [c([-0.5, 3.6, -2.6], [5.0, 8.4, 5.2], "base"), *[c([x, 3.6, -2.7], [1.0, 1.6 + (i % 2), 0.12], "black") for i, x in enumerate((0.0, 1.4, 2.8))]]},
+        recipe=None),
+}
+ARMOR.update(TITLE_GEAR)
+DRAWN_ICONS = {f"{v}_headband" for v in ("sand", "mist", "cloud", "stone", "rain")} | set(ROGUE_GEAR) | {"tobi_mask", "orange_sage_coat"}  # (gen_titles.py)
 
 
 SLOT = {"head": ("slot.armor.head", "armor_head"), "chest": ("slot.armor.chest", "armor_torso"),

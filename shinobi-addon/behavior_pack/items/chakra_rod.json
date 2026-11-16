@@ -1,0 +1,51 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:item": {
+    "description": {
+      "identifier": "aegis:chakra_rod",
+      "menu_category": {
+        "category": "equipment",
+        "group": "minecraft:itemGroup.name.sword"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "aegis_chakra_rod"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "\u00a7bChakra Receiver Rods\u00a7r\n\u00a77Pain's black rods \u2014 they steal chakra and pin their prey"
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:hand_equipped": true,
+      "minecraft:allow_off_hand": {
+        "value": true
+      },
+      "minecraft:damage": 9,
+      "minecraft:durability": {
+        "max_durability": 3000
+      },
+      "minecraft:enchantable": {
+        "slot": "sword",
+        "value": 15
+      },
+      "minecraft:repairable": {
+        "repair_items": [
+          {
+            "items": [
+              "minecraft:diamond"
+            ],
+            "repair_amount": 400
+          }
+        ]
+      },
+      "minecraft:can_destroy_in_creative": false,
+      "minecraft:use_modifiers": {
+        "use_duration": 0.25,
+        "movement_modifier": 1.0
+      },
+      "minecraft:use_animation": "none"
+    }
+  }
+}

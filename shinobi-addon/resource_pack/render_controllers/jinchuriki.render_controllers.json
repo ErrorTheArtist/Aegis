@@ -11,7 +11,81 @@
       "textures": [
         "Texture.default"
       ],
-      "ignore_lighting": true
+      "ignore_lighting": true,
+      "part_visibility": [
+        {
+          "sh_body*": "!v.fp"
+        },
+        {
+          "sh_head*": "!v.fp"
+        },
+        {
+          "sh_lleg*": "!v.fp"
+        },
+        {
+          "sh_rleg*": "!v.fp"
+        },
+        {
+          "w_hd*": "!v.fp"
+        },
+        {
+          "w_bk*": "!v.fp"
+        },
+        {
+          "w_sh*": "!v.fp"
+        },
+        {
+          "w_he*": "!v.fp"
+        },
+        {
+          "ear*": "!v.fp"
+        },
+        {
+          "crest": "!v.fp"
+        },
+        {
+          "cr_*": "!v.fp"
+        },
+        {
+          "flap*": "!v.fp"
+        },
+        {
+          "shell": "!v.fp"
+        },
+        {
+          "t0_*": "!v.fp"
+        },
+        {
+          "t1_*": "!v.fp"
+        },
+        {
+          "t2_*": "!v.fp"
+        },
+        {
+          "t3_*": "!v.fp"
+        },
+        {
+          "t4_*": "!v.fp"
+        },
+        {
+          "t5_*": "!v.fp"
+        },
+        {
+          "t6_*": "!v.fp"
+        },
+        {
+          "t7_*": "!v.fp"
+        },
+        {
+          "t8_*": "!v.fp"
+        },
+        {
+          "tail*": "!v.fp"
+        },
+        {
+          "wing*": "!v.fp"
+        }
+      ]
     },
     "controller.render.aegis.jin_glow": {
       "geometry": "Geometry.glow",
@@ -33,7 +107,81 @@
           1.0,
           1.0
         ]
-      }
+      },
+      "part_visibility": [
+        {
+          "sh_body*": "!v.fp"
+        },
+        {
+          "sh_head*": "!v.fp"
+        },
+        {
+          "sh_lleg*": "!v.fp"
+        },
+        {
+          "sh_rleg*": "!v.fp"
+        },
+        {
+          "w_hd*": "!v.fp"
+        },
+        {
+          "w_bk*": "!v.fp"
+        },
+        {
+          "w_sh*": "!v.fp"
+        },
+        {
+          "w_he*": "!v.fp"
+        },
+        {
+          "ear*": "!v.fp"
+        },
+        {
+          "crest": "!v.fp"
+        },
+        {
+          "cr_*": "!v.fp"
+        },
+        {
+          "flap*": "!v.fp"
+        },
+        {
+          "shell": "!v.fp"
+        },
+        {
+          "t0_*": "!v.fp"
+        },
+        {
+          "t1_*": "!v.fp"
+        },
+        {
+          "t2_*": "!v.fp"
+        },
+        {
+          "t3_*": "!v.fp"
+        },
+        {
+          "t4_*": "!v.fp"
+        },
+        {
+          "t5_*": "!v.fp"
+        },
+        {
+          "t6_*": "!v.fp"
+        },
+        {
+          "t7_*": "!v.fp"
+        },
+        {
+          "t8_*": "!v.fp"
+        },
+        {
+          "tail*": "!v.fp"
+        },
+        {
+          "wing*": "!v.fp"
+        }
+      ]
     }
   }
 }

@@ -12,7 +12,7 @@
 //   /scriptevent aegis:village home       — go back to your village
 
 import { world, system, ItemStack } from "@minecraft/server";
-import { ActionFormData, ModalFormData } from "@minecraft/server-ui";
+import { ActionFormData, ModalFormData, MessageFormData } from "@minecraft/server-ui";
 import { showTitle } from "./hud.js";
 import { impactFx, sfx } from "./cinematic.js";
 
@@ -61,7 +61,8 @@ export function claimBlock(entity) {
   blockTick.set(entity.id, t);
   return true;
 }
-export const HEADBANDS = new Set(Object.values(VILLAGE_GEAR).map((g) => g.headband));
+export const HEADBANDS = new Set([...Object.values(VILLAGE_GEAR).map((g) => g.headband),
+  ...["leaf", "sand", "mist", "cloud", "stone", "rain"].map((v) => (v === "leaf" ? "aegis:headband_scratched" : `aegis:${v}_headband_scratched`))]);
 export const gearOf = (player) => VILLAGE_GEAR[getVillage(player)] ?? VILLAGE_GEAR.leaf;
 const GEAR_PROP = "aegis:vgear"; // got their village's headband (v1.51)
 const KAGE_OF = { hokage: "leaf", kazekage: "sand", mizukage: "mist", raikage: "cloud", tsuchikage: "stone" };
@@ -71,7 +72,7 @@ const HONOR_PROP = "aegis:honor";
 const FF_PROP = "aegis:ff";
 const HOME_CD = 12000; // Return Home: 10 min
 // honor per kill
-const HONOR = { monster: 1, ninja: 3, akatsuki: 25, legend: 40, bijuu: 60 };
+const HONOR = { monster: 1, ninja: 3, akatsuki: 25, legend: 40, bijuu: 60, juubi: 150 };
 const BEASTS = ["shukaku", "matatabi", "isobu", "son_goku", "kokuo", "saiken", "chomei", "gyuki", "kurama"];
 const PROP = "aegis:village";
 const KIT_PROP = "aegis:starter_kit";
@@ -91,6 +92,33 @@ export function getVillage(player) {
 }
 export const villageLabel = (v) => (VILLAGES[v] ? `${VILLAGES[v].color}${VILLAGES[v].name}` : "§8none");
 export const villageTag = (v) => (VILLAGES[v] ? `${VILLAGES[v].color}[${SHORT[v]}]§r ` : "");
+
+// ---------------------------------------------------------------------------
+// Leaving the village (v1.54): from the Shinobi Record → Village. You become a rogue ninja (missing-nin): no village
+// perks, no protection from your old village-mates, no Return Home or village quests — and a scratched headband.
+// Only a server admin can let a rogue join a village again (/scriptevent aegis:village choose, run as that player).
+// ---------------------------------------------------------------------------
+const ROGUE_PROP = "aegis:rogue_of"; // the village a rogue left
+const LEFT_PROP = "aegis:left_village"; // has ever left a village (titles care)
+export const SCRATCHED = { leaf: "aegis:headband_scratched", sand: "aegis:sand_headband_scratched", mist: "aegis:mist_headband_scratched",
+  cloud: "aegis:cloud_headband_scratched", stone: "aegis:stone_headband_scratched", rain: "aegis:rain_headband_scratched" };
+export function rogueOf(player) {
+  try {
+    const v = player.getDynamicProperty(ROGUE_PROP);
+    return VILLAGES[v] ? v : undefined;
+  } catch {
+    return undefined;
+  }
+}
+export const isRogue = (player) => !!rogueOf(player);
+export function everLeft(player) {
+  try {
+    return !!player.getDynamicProperty(LEFT_PROP);
+  } catch {
+    return false;
+  }
+}
+export const rogueTag = "§c[Rogue]§r ";
 
 // ---------------------------------------------------------------------------
 // Friendly fire
@@ -154,6 +182,7 @@ function killHonor(dead) {
   if (t === "aegis:akatsuki") return HONOR.akatsuki;
   if (t === "aegis:hostile_ninja") return HONOR.ninja;
   if (BEASTS.some((b) => t === `aegis:${b}`)) return HONOR.bijuu;
+  if (t === "aegis:juubi") return HONOR.juubi;
   try {
     if (dead.matches?.({ families: ["monster"] })) return HONOR.monster;
   } catch {
@@ -197,6 +226,7 @@ export const inFight = (player) => (lastHurt.get(player.id) ?? -1e9) > system.cu
 
 export async function villageMenu(player) {
   const v = getVillage(player);
+  if (!v && isRogue(player)) return rogueMenu(player);
   if (!v) return askVillage(player);
   const V = VILLAGES[v];
   const mates = world.getAllPlayers().filter((p) => p.id !== player.id && getVillage(p) === v);
@@ -214,15 +244,60 @@ export async function villageMenu(player) {
     .button(`${V.color}Village chat\n§r§8message everyone in your village`)
     .button("§eVillage leaderboard\n§r§8honor of the great villages")
     .button("§bReturn Home\n§r§8teleport to your village (10 min cooldown)")
+    .button("§cLeave the village\n§r§8become a rogue ninja (missing-nin)")
     .button("Close")
     .show(player);
   if (r.canceled) return;
   if (r.selection === 0) return villageChat(player);
   if (r.selection === 1) {
-    await new ActionFormData().title("§lVillage Honor").body(leaderboardText() + "\n\n§8Earn honor by defeating enemies: mobs 1, ninja 3, Akatsuki 25, legends 40, tailed beasts 60.").button("Back").show(player);
+    await new ActionFormData().title("§lVillage Honor").body(leaderboardText() + "\n\n§8Earn honor by defeating enemies: mobs 1, ninja 3, Akatsuki 25, legends 40, tailed beasts 60, the Ten-Tails 150.").button("Back").show(player);
     return villageMenu(player);
   }
   if (r.selection === 2) return returnHome(player);
+  if (r.selection === 3) return confirmLeave(player);
+}
+
+async function confirmLeave(player) {
+  const v = getVillage(player);
+  if (!v) return;
+  const V = VILLAGES[v];
+  const r = await new MessageFormData()
+    .title(`§lLeave the ${V.name}?`)
+    .body(`§7You'll become a §crogue ninja§7 — a missing-nin.\n\n§7You lose: §f${VILLAGE_PERKS[v].name}§7, protection from your village-mates, Return Home and your village quests.\n§7You get: a §fscratched ${V.name} headband§7.\n\n§cOnly a server admin can let you join a village again.`)
+    .button1("§cLeave the village")
+    .button2("Stay")
+    .show(player);
+  if (r.selection === 0) leaveVillage(player);
+}
+
+export function leaveVillage(player) {
+  const v = getVillage(player);
+  if (!v) return false;
+  player.setDynamicProperty(ROGUE_PROP, v);
+  player.setDynamicProperty(LEFT_PROP, true);
+  player.setDynamicProperty(PROP, undefined);
+  syncMember(player);
+  api.refreshName?.(player);
+  const s = new ItemStack(SCRATCHED[v], 1);
+  try {
+    const left = player.getComponent("minecraft:inventory")?.container?.addItem(s);
+    if (left) player.dimension.spawnItem(left, player.location);
+  } catch {
+    player.dimension.spawnItem(s, player.location);
+  }
+  showTitle(player, "§cRogue Ninja", { subtitle: `§7You have abandoned the ${VILLAGES[v].name}`, fadeInDuration: 5, stayDuration: 50, fadeOutDuration: 15 });
+  sfx(player.dimension, "aegis.slash", player.location, 1, 0.7);
+  world.sendMessage(`§c${player.name} has abandoned the ${VILLAGES[v].color}${VILLAGES[v].name}§c and become a rogue ninja!`);
+  return true;
+}
+
+async function rogueMenu(player) {
+  const v = rogueOf(player);
+  await new ActionFormData()
+    .title("§l§cRogue Ninja")
+    .body(`§7You left the ${VILLAGES[v].color}${VILLAGES[v].name}§7 and answer to no village now.\n\n§7No village perks, no Return Home, no village quests — and no village-mate is safe from you, nor you from them.\n§8(Only a server admin can let you join a village again.)`)
+    .button("Close")
+    .show(player);
 }
 
 async function villageChat(player) {
@@ -385,6 +460,7 @@ export async function askVillage(player, force = false) {
     }
     const v = ids[r.selection];
     player.setDynamicProperty(PROP, v);
+    player.setDynamicProperty(ROGUE_PROP, undefined); // (an admin letting a rogue back in)
     asking.delete(player.id);
     goHome(player, v);
     syncMember(player);
@@ -408,7 +484,8 @@ export function initVillages(helpers, onChosen) {
   api = helpers;
   if (onChosen) after = onChosen;
   world.afterEvents.playerSpawn.subscribe(({ player }) => {
-    if (!getVillage(player)) system.runTimeout(() => api.isValid(player) && askVillage(player), 40);
+    if (!getVillage(player) && !isRogue(player)) system.runTimeout(() => api.isValid(player) && askVillage(player), 40);
+    else if (!getVillage(player)) return; // a rogue ninja
     else {
       syncMember(player); // players from before the leaderboard existed
       if (!player.getDynamicProperty(GEAR_PROP)) system.runTimeout(() => api.isValid(player) && giftHeadband(player), 60);

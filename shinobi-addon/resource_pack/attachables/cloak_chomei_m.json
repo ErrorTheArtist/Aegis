@@ -20,6 +20,9 @@
         "sway": "animation.aegis.jin_chomei_m.sway"
       },
       "scripts": {
+        "pre_animation": [
+          "v.fp = c.is_first_person;"
+        ],
         "animate": [
           "form",
           "sway"

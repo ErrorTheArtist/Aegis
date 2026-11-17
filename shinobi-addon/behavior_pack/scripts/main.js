@@ -39,6 +39,7 @@ import { initTools } from "./tools.js";
 import { initBounty } from "./bounty.js";
 import { initAchievements, noteAchCast } from "./achievements.js";
 import { initDailies, noteDailyCast } from "./dailies.js";
+import { initEvents } from "./events.js";
 import { initBans } from "./bans.js";
 import { initTitles, makeTitleJutsu, titleDamageMultiplier, titleRegenMultiplier, noteTitleCast, hasTitle, TITLES } from "./titles.js";
 import { levelDamageFactor, bossDamageFactor } from "./levels.js";
@@ -1223,6 +1224,7 @@ initTools(npcApi); // v1.55: ninja tools & food
 initBounty({ ...npcApi, refreshName: applyNameTag }); // v1.55: the Bingo Book
 initAchievements(npcApi); // v1.55: achievements
 initDailies(npcApi); // v1.55: daily missions & login streak
+initEvents(npcApi); // v1.55: world events
 initBans();
 initTitles({ ...npcApi, refreshName: applyNameTag });
 initEdoTensei(npcApi);

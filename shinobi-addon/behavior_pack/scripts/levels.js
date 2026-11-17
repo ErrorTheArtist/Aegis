@@ -16,6 +16,7 @@
 import { bingoBook } from "./bounty.js";
 import { achievementsMenu } from "./achievements.js";
 import { dailyMenu } from "./dailies.js";
+import { eventXpMultiplier } from "./events.js";
 import { world, system, ItemStack, ItemLockMode } from "@minecraft/server";
 import { showTitle } from "./hud.js";
 import { ActionFormData, ModalFormData, MessageFormData } from "@minecraft/server-ui";
@@ -130,7 +131,7 @@ export function gainXp(player, amount, quiet = false, shared = false) {
   if (!player || player.typeId !== "minecraft:player" || amount <= 0) return;
   let level = getLevel(player);
   if (level >= MAX_LEVEL) return;
-  let xp = num(player, P.xp, 0) + Math.round(amount);
+  let xp = num(player, P.xp, 0) + Math.round(amount * eventXpMultiplier()); // (a Double XP event, v1.55)
   let ups = 0;
   while (level < MAX_LEVEL && xp >= xpToNext(level)) {
     xp -= xpToNext(level);

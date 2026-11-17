@@ -210,8 +210,9 @@ The moment the tag is added the player gets the title **over their name**, its *
 once per title, kept on death. The gear is **creative-only**: no shop, quest, mission or drop gives it, and only the
 title's holder can use it (anyone else gets *"Only the holder of the … title can use this"*). Losing and regaining a
 title doesn't hand the gear out twice. **Shinobi Record → Titles** lists every title with its requirements, ticked
-where the add-on can check them (level, clan, village, Mangekyō, Kamui, kills, missions, honor); duels and bounties
-are for the admin to judge.
+where the add-on can check them — level, clan, village, Mangekyō, Kamui, kills, missions, honor, and since v1.55 the
+**bounties** and the **players you've defeated** (see *Bingo Book*). Only "every village quest chain without dying" is
+left for the admin to judge.
 
 | Title | Requirements | Rewards | Perks |
 |---|---|---|---|
@@ -222,6 +223,70 @@ are for the admin to judge.
 | **Naruto** | Level 300 · Sage Mode · Kurama sealed inside you · never leave your village · 500 missions · 3,000 hostile ninja · 3 million honor | Orange Sage Coat · Rasenshuriken V2 · Tailed Beast Bomb V2 · Six Paths Sage Mode (half) | +15% chakra regen · +10% max HP |
 
 Mission turn-ins and hostile ninja kills are counted from v1.54 on.
+
+## Bingo Book (v1.55)
+
+**Shinobi Record → Bingo Book** — the most wanted shinobi on the server, your own bounty, and your PvP record.
+
+- **Place a bounty**: pick an online player and pay at least **1,000 Ryō** — it's added to the price on their head. The
+  server hears that they're WANTED, but never who paid.
+- **Claim it**: defeat the wanted player (your clone, companion or summon counts) and the **whole bounty is yours**.
+- **Player killers get a bounty of their own**: 1,000 Ryō + 50 per level of the victim — **three times that for a rogue
+  ninja**. Defeating a wanted player is bounty hunting: it never raises yours.
+- A bounty of **100,000 Ryō** or more shows **[Wanted]** over your name.
+- Your **PvP record** counts the players you've defeated and the bounties you've claimed, and remembers if you've ever
+  defeated a **Kage**, the **Toad Sage** (the Sannin title with Jiraiya's legacy) or a **feared and respected Jōnin**
+  (Jōnin rank and 10,000+ honor) — the titles check these.
+
+```
+/scriptevent aegis:bounty                    (the ten most wanted)
+/scriptevent aegis:bounty set <player> <ryo> (set a player's bounty — admins)
+/scriptevent aegis:bounty clear <player>     (clear it)
+```
+
+## Achievements (v1.55)
+
+**50 achievements** in seven groups — Combat, Bosses, Jutsu, Path of the Shinobi, Wealth & Village, Daily & Events and
+Just for Fun — from *First Blood* (defeat a hostile ninja) to *Hall of Legends* (defeat all 19 legends), *Sealing the
+Rabbit Goddess*, *Walking Library* (cast 40 different jutsu), *Millionaire*, *Ichiraku Regular* (50 bowls of ramen) and
+*Peak of the Shinobi World* (level 300). Each pays its reward the moment it's unlocked — Ryō, XP Shards, sometimes a
+Bloodline Reroll Scroll — and the rare ones are announced to the server. **Shinobi Record → Achievements** shows every
+group with your progress. `/scriptevent aegis:achievements` shows your count.
+
+## Daily missions & login streak (v1.55)
+
+- **Three random daily missions** every day (UTC): defeat 15 hostile ninja, defeat 30 monsters, cast 25 jutsu, cast 5
+  different jutsu, eat 3 bowls of ramen, defeat a legend or an Akatsuki member, defeat a Tailed Beast, earn 50 honor,
+  complete a mission or quest, use ninja tools 10 times, gain 2 levels, summon an animal. Each pays 1,000–10,000 Ryō
+  (the hard ones an XP Shard too) the moment it's done; finishing all three pays a bonus (5,000 Ryō and an XP Shard,
+  sometimes a Bloodline Reroll Scroll).
+- **Login streak**: log in on consecutive days — day 1 pays 500 Ryō, day 7 pays **10,000 Ryō and 2 XP Shards**, then the
+  week starts again. Miss a day and it starts over.
+- **Shinobi Record → Daily** shows today's missions, your streak and when the next missions come.
+
+## World events (v1.55)
+
+Started by an admin — or, if you switch it on, a random one every hour while 2+ players are online (off by default).
+One at a time (Double XP can run alongside).
+
+| Event | What happens | Reward |
+|---|---|---|
+| **Village Raid** | Three waves of enemy ninja attack a village — rogues, then Sound and Anbu, then an Akatsuki member leads the last. 10 minutes. | Everyone who defended it: 5,000 Ryō, 2 XP Shards, 200 honor |
+| **Wanted** | A legendary shinobi appears out in the world, already fighting, and its position is announced. 15 minutes. | Whoever brings it down: 20,000 Ryō + 3 XP Shards (everyone who hit it: 5,000) |
+| **Hidden Scrolls** | Eight sealed scrolls are hidden around a village, each marked by a pillar of light. 20 minutes. | Open one (right-click): Ryō, an XP Shard, a jutsu scroll — or, rarely, a Bloodline Reroll Scroll |
+| **Double XP** | All XP counts twice. | — |
+
+Waiting legends guard their village against raiders (the villains don't).
+
+```
+/scriptevent aegis:event                       (what's running)
+/scriptevent aegis:event raid [village]        (leaf | sand | mist | cloud | stone | rain — default: the nearest)
+/scriptevent aegis:event wanted [legend]       (e.g. wanted kakashi — appears near you)
+/scriptevent aegis:event scrolls [village]
+/scriptevent aegis:event doublexp [minutes]    (default 30)
+/scriptevent aegis:event stop
+/scriptevent aegis:event auto on | off
+```
 
 ## Clans
 
@@ -403,6 +468,32 @@ if you aren't looking at one.
 
 **Taijutsu scrolls** are melee techniques: they scale with the **Taijutsu** stat (+1% per point) instead of Ninjutsu.
 The Eight Inner Gates count as taijutsu too.
+
+### The fourth wave (v1.55)
+
+17 more scrolls for everyone, taught by the Jutsu Sensei (a new school, **Sealing & Space-Time**, holds the last two)
+and dropped by the new legends. The elemental ones get your chakra-nature affinity like the rest. Prices include the
+v1.52 +20%.
+
+| Scroll | Chakra | Cooldown | Sensei | Effect |
+|---|---|---|---|---|
+| Fire Style: Toad Oil Flame Bomb | 45 | 11s | Lv 40 · 3,600 | A long cone of burning toad oil: 4 × 6 fire damage, and the oil keeps burning on the ground for 3 s (2 a second). |
+| Water Style: Great Waterfall | 55 | 15s | Lv 45 · 4,080 | A wall of water rises and rolls 14 blocks forward: 12 damage, a huge push and Slowness II — it puts out fires too. |
+| Wind Style: Gale Palm | 25 | 4s | Lv 15 · 1,440 | A palm thrust fires a 10-block beam of compressed wind: 10 damage, knockback and slowness. |
+| Lightning Style: Raikiri | 50 | 11s | Lv 45 · 4,080 | Charge the Lightning Blade, then cross up to 14 blocks in a flash, cutting through everyone in your path: **22** each and a stun. |
+| Lightning Style: Black Panther | 45 | 10s | Lv 55 · 4,560 | A panther of black lightning races along the ground to your target: 18 damage and a 1.5 s stun, then it leaps to one more enemy (8). |
+| Earth Style: Mud River | 35 | 11s | Lv 25 · 2,160 | The ground ahead turns into a 12-block river of mud for 4 s: everyone on it is dragged away, slowed and takes 4 a second. |
+| Planetary Rasengan | 70 | 18s | Lv 75 · 6,000 | A Rasengan with three small ones orbiting it, thrown at your target: **26** damage in 5 blocks, then the three moons hit around it (8 each). |
+| Striking Shadow Snakes | 30 | 5s | Lv 30 · 2,400 | Three snakes lash out of your sleeve: 8 damage each, poison and slowness. |
+| Shadow Clone Explosion | 40 | 12s | Lv 40 · 3,360 | A clone runs at the enemy and blows itself up (or the moment it's hit): 20 damage in 4 blocks. |
+| Flying Thunder God | 30 | 3s | Lv 60 · 5,520 | **Sneak + use** plants a seal where you stand (5 minutes). **Use** flashes you back to it from anywhere in the same dimension — or, if a **Flying Raijin Kunai** marked an enemy, you appear behind them and strike (14). |
+| Sealing: Five Elements Seal | 40 | 15s | Lv 40 · 3,600 | A five-fingered seal struck into the enemy in front of you: 6 damage, and a player can't use jutsu or clan abilities for 10 s (an enemy ninja for 10 s, a boss for 5 s). |
+| Genjutsu: Tree Binding Death | 40 | 13s | Lv 35 · 3,120 | The enemy you look at (16 blocks) is caught by a tree: can't move or see, 4 damage a second for 3 s (1.5 s on bosses). |
+| Genjutsu: Temple of Nirvana | 45 | 20s | Lv 50 · 3,840 | Feathers fall around you: every enemy within 10 blocks grows drowsy for 5 s — Slowness V, Weakness III, blindness (bosses are only slowed). |
+| Genjutsu: Crow Genjutsu | 35 | 13s | Lv 35 · 2,880 | You burst into a flock of crows: the enemies in front are blinded and dizzied (3 damage), and you re-form 6 blocks back, invisible for 3 s. |
+| Medical: Hundred Healings | 60 | 60s | Lv 60 · 4,800 | The seal spreads across your body: 20 s of healing 4% of your max HP a second, and Resistance. |
+| Taijutsu: Morning Peacock | 35 | 10s | Lv 45 · 3,600 | 8 blazing punches into the enemy in front of you, the last one launching them — **16** with the Eight Inner Gates open. |
+| Taijutsu: Daytime Tiger | 60 | 30s | Lv 65 · 5,280 | Only with the Eight Inner Gates open: one punch fires a tiger of air — **30** damage in 4.5 blocks and a huge push. |
 
 ### Forbidden: Reanimation Jutsu (Edo Tensei)
 
@@ -682,7 +773,7 @@ Appoint a Kage (cheats on, or from a command block):
 
 ## Legendary Swords
 
-Eight swords with **3D models held in your hand**, a **passive** on every hit (plus a coloured slash mark),
+Eleven weapons with **3D models held in your hand**, a **passive** on every hit (plus a coloured slash mark),
 and a **right-click special** with its own attack animation and slash-arc effects.
 
 | Sword | Dmg | Passive (on hit) | Special (right-click) | Chakra / CD |
@@ -696,10 +787,18 @@ and a **right-click special** with its own attack animation and slash-arc effect
 | **Shibuki** | 10 | 25%: mini explosion | **Explosive Tag Chain**: three blasts marching forward | 25 / 4s |
 | **Chakra Blades** (Asuma) | 8 | +2 wind, wind aura while held | **Flying Wind Blade**: launch a cutting wind slash | 15 / 1.5s |
 
+**New in v1.55:**
+
+| Weapon | Dmg | Passive (on hit) | Special (right-click) | Chakra / CD |
+|---|---|---|---|---|
+| **Kabutowari** (the last of the Seven Swords) | 12 | 20%: a dazing blow | **Helmet Splitter**: the axe breaks the enemy's guard (removes Resistance, Weakness II), then the hammer follows | 25 / 6s |
+| **Thunder God Sword** (the Second Hokage) | 11 | 25%: +3 lightning | **Thunder God Thrust**: the lightning blade lengthens into a 9-block thrust through a whole line of enemies | 25 / 4.5s |
+| **Adamantine Staff** (Enma) | 10 | extra knockback | **Extending Staff**: it shoots out to 10 blocks (sneak: a whirl all around you) | 20 / 4s |
+
 Attack animations: wide slash, overhead slam, lunge thrust, full spin and sky raise.
 
-Swords aren't crafted: the **Weaponsmith** sells seven of them (Lv 15–35), the **Travelling Merchant** sometimes has
-one 30% off, Sasuke drops the Kusanagi and the Akatsuki the Shibuki — and **Samehada** is only earned through its quest
+Swords aren't crafted: the **Weaponsmith** sells ten of them (Lv 15–50), the **Travelling Merchant** sometimes has
+one 30% off, Tobirama sometimes drops the Thunder God Sword, Sasuke drops the Kusanagi and the Akatsuki the Shibuki — and **Samehada** is only earned through its quest
 chain.
 
 **Use the special:** right-click (hold use on mobile) with the sword, **or sneak + hit an enemy**.
@@ -847,8 +946,8 @@ Players talk to the Quest Giver to accept, see their progress, claim the reward 
 | NPC | What they do |
 |---|---|
 | **Jutsu Sensei** | Teaches by school — pick **Fire, Water, Wind, Lightning, Earth, Ninjutsu, Taijutsu, Genjutsu & Medical** or **Summoning & Forbidden**, then a scroll (each page shows how many you've unlocked at your level and has a « Back button). **Services**: Chakra Nature Training, **Clan Training** (your clan's **Clan Mastery** 1–3: +10% clan max chakra and −10% clan ability cooldowns each; your clan's kekkei genkai release scrolls; the Uchiha's **Eternal Mangekyō**), emerald exchange. **Sage Training** (Lv 60) is under Summoning & Forbidden |
-| **Weaponsmith** | Kunai, shuriken, its village's headband and flak jacket (and the customer's own village's), seven legendary swords (Lv 15–35 — Samehada is quest-only), Anbu / Samurai armour, repairs the item in your hand |
-| **Ramen Shop** | Ichiraku Ramen (heal + 60 chakra + regen), Miso Ramen (+30 chakra + speed), Soldier Pills |
+| **Weaponsmith** | Kunai, shuriken, its village's headband and flak jacket (and the customer's own village's), ten legendary weapons (Lv 15–50 — Samehada is quest-only), the v1.55 ninja tools (smoke and flash bombs, senbon, ninja wire, explosive kunai, the Fūma Shuriken, the Flying Raijin Kunai), Anbu / Samurai armour, repairs the item in your hand |
+| **Ramen Shop** | Ichiraku Ramen (heal + 60 chakra + regen), Miso Ramen (+30 chakra + speed), Soldier Pills, and since v1.55 Dango, Military Ration Pills, Blood Increasing Pills, Akimichi Food Pills and the Curry of Life |
 | **Travelling Merchant** | **Random wares that change every 20 minutes** (set per spawner): cheap ramen every time, plus 4–5 random finds — Bloodline Reroll Scrolls, bargain jutsu scrolls, swords and armour, Akatsuki gear, pills, kunai… Limited stock shared by everyone. Buys back old Blank Scrolls. See *The Travelling Merchant* below |
 | **Kage / village leader (Mission Desk)** | D/C/B/A/S missions (kill mobs, ninja, a Tailed Beast, an Akatsuki member) for XP, Ryō and items |
 | **Exam Proctor** | Rank exams: **Chūnin** (Lv 20, beat 4 rogue ninja in 90 s), **Jōnin** (Lv 60, 3 Anbu + 3 Sound in 2 min), nothing higher — exams stop at Jōnin. Ranks show on your name tag and give +5/+10 stat points |
@@ -975,7 +1074,18 @@ stronger. Players in a grace period can't start a challenge. Legends called by a
 | **Ōnoki, the Third Tsuchikage** (Stone) | 900 | **Added Weight Rock** (you're too heavy to move), **Flight** — floats up and rains rock on you, earth spikes in a line, stone fist. His **back gives out** sometimes after a big jutsu — strike then! | **Dust Release: Detachment of the Primitive World** — a cube of light grows round you for 2 seconds, then erases what's inside (30 dmg) | Earth Dragon scroll, Earth Spikes (50%), Headhunter (40%), Stone headband (50%) |
 | **Hanzō of the Salamander** (Rain) | 900 | **Salamander Poison** mist, kusarigama chain that drags you in, poisoned sickle, venom spat in a fan (Rain shinobi are immune to the poison, not the hits) | **Salamander's Venom** — poison seeps from him onto anyone close; **Venom Rain** all around him | Water Prison scroll, Water Shockwave (40%), 6,400 Ryō, Rain headband (50%) |
 
-All also drop 1,600–3,200 Ryō, diamonds and pills.
+| **Kakashi Hatake** (Leaf, v1.55) | 1000 | **Raikiri**, Lightning Hound, a copied Water Dragon, ninja hounds that burst out of the ground and pin you, kunai | **Mangekyō Sharingan: Kamui** — the space round you twists: get out before it closes (22 dmg and warped away) | Raikiri scroll, Ninja Hounds (50%), Lightning Hound (40%), 16 kunai |
+| **Might Guy** (Leaf, v1.55) | 1100 | Leaf Hurricane, **Dynamic Entry**, Leaf Gale | **The Eight Gates** open as he weakens: Morning Peacock (half health), Daytime Tiger (a quarter), and at 12% **Night Guy** — one kick that bends space (45 dmg). Then he's burnt out. | Morning Peacock scroll, Daytime Tiger (35%), Eight Gates (40%), 2 Curry of Life |
+| **Jiraiya** the Toad Sage (Leaf, v1.55) | 1050 | Rasengan, **Toad Oil Flame Bomb**, Needle Jizō, Toad Mouth Trap, hair-needle senbon | **Sage Mode** — Sage Art: Goemon (a river of burning oil), **Gamarinshō** (the toads' song freezes everyone near) | Toad Oil scroll, Summon Toad (50%), Rasengan (40%), Ninja Wire (50%) |
+| **Orochimaru** (rogue Sannin, v1.55) | 1100 | The Sword of Kusanagi from his mouth, **Striking Shadow Snakes**, a ring of snakes, Great Breakthrough, poison mist | **White Snake** — he sheds his skin (heals a quarter) and the **Eight Branches** strike one after another | Shadow Snakes scroll, Summon Snake (50%), Five Elements Seal (30%), Kusanagi (20%) |
+| **Hashirama Senju** [Edo Tensei] (raid boss, v1.55) | 1700 | Wood Release spikes, **Deep Forest Emergence**, racing roots, wood clones, healing | **Sage Mode** — the **Gate of the Great God** crashes down on your spot (30 dmg — move!) | Wood Forest (60%), Wood Dragon (50%), Hundred Healings (35%), 6,400 Ryō |
+| **Tobirama Senju** [Edo Tensei] (v1.55) | 1300 | The Thunder God Sword, **Flying Thunder God** strikes, Water Dragon, Water Formation Wall, kunai | **Flying Thunder God Split** — two shadow clones and a three-way teleport combo | Water Dragon scroll, Flying Thunder God (40%), Flying Raijin Kunai (35%), Great Waterfall (50%), Thunder God Sword (12%) |
+| **Obito Uchiha**, the Ten-Tails' Jinchūriki (raid boss, v1.55) | 2600 | **Truth-Seeking Balls**, Kamui, the war fan's gale, the Six Paths staff, Great Fire Annihilation | **Six Paths Power** — heals, Tailed Beast Bombs and racing roots | 12,800 Ryō, Bijū Summoning (25%), Tree Binding (40%), Wood Forest (30%), Reroll Scroll (30%) |
+| **Kaguya Ōtsutsuki** (final raid boss, v1.55) | 3000 | **All-Killing Ash Bones** (wither), **Expansive Truth-Seeking Ball** (slow, huge — run), **Dimension Shift** (everyone near is thrown into the sky), Yomotsu Hirasaka portals, Vacuum Palm | **Rabbit Goddess** — her hair binds everyone round her | 19,200 Ryō, Reroll Scroll (60%), Hundred Healings, Nirvana (40% each), Planetary Rasengan (25%) |
+
+All also drop 1,600–3,200 Ryō, diamonds and pills. XP Shards: 4–5 (Madara and Hashirama 8, Tobirama 6, Obito 10,
+Kaguya 15). **Villains** — Madara, Orochimaru, Obito and Kaguya — don't guard the area while they wait for a challenger;
+Madara, Orochimaru and Obito make enemy ninja near them stronger instead.
 
 Their skins live in `tools/skins/<name>.png` (standard 64×64 Minecraft skins). Replace a file there and run
 `python3 tools/gen_npcs.py` to change a skin — any NPC skin with a file in that folder uses it instead of the generated one.
@@ -983,7 +1093,9 @@ Their skins live in `tools/skins/<name>.png` (standard 64×64 Minecraft skins). 
 ### Summoning
 
 Summoning scrolls (Sensei): **Toad** (belly-slam AoE), **Slug** (heals you, restores chakra, acid), **Snake**
-(fast, poison bite). 40 chakra, 60 s cooldown, the summon fights for 45 s.
+(fast, poison bite), and since v1.55 **Ninja Hounds** (a pack of three hounds in headbands — their bites pin the enemy)
+and **Hawk** (it dives at enemies near you, and while it's out you get Slow Falling and Jump Boost II). 40 chakra, 60 s
+cooldown, the summon fights for 45 s; one summon at a time.
 
 ```
 /scriptevent aegis:spawner           settings of the spawner you're looking at
@@ -1023,6 +1135,23 @@ models: `resource_pack/models/entity/`.
 
 - **Kunai** — throwable, 6 damage. Drops back as an item when it hits a block.
 - **Shuriken** — fast throwable, 4 damage, stacks to 64.
+
+**New in v1.55** (right-click to use; the Weaponsmith sells them, one is used up each time except the Fūma Shuriken and
+the Flying Raijin Kunai, and creative players keep theirs):
+
+| Tool | What it does |
+|---|---|
+| **Smoke Bomb** | A cloud of smoke at your feet for 5 s: you turn invisible and faster, enemies inside can't see. |
+| **Flash Bomb** | Thrown — it bursts in a blinding flash: blindness, nausea and slowness to everyone near it (no damage). |
+| **Senbon** | A fan of three needles: 3 damage and slowness each — sneak to throw them poisoned. |
+| **Fūma Shuriken** | A giant windmill shuriken that flies 14 blocks out and comes back to your hand, cutting everything it passes (8). |
+| **Explosive Kunai** | A kunai with a paper bomb: it goes off half a second after it lands (10 damage in 3 blocks). |
+| **Flying Raijin Kunai** | Minato's three-pronged kunai: an enemy it hits is marked, and where it lands becomes a Flying Thunder God seal. |
+| **Ninja Wire** | Snare the enemy you look at (12 blocks): pulled in, held still for 2.5 s, 4 damage. |
+
+**Food** (the Ramen Shop): **Dango** (heals 2 hearts, Speed), **Military Ration Pill** (a whole meal), **Blood Increasing
+Pill** (Regeneration and Absorption), **Akimichi Food Pill** (+80 chakra and Strength — but Hunger), and the **Curry of
+Life** (a full heal, Regeneration and Strength… very spicy).
 
 ## Where things come from (no crafting)
 
@@ -1205,6 +1334,24 @@ hoes, food, farming, building, crafting.
 ```
 
 The timers start when the server starts. The times are the constants at the top of `behavior_pack/scripts/lagclear.js`.
+
+## Much more content (v1.55)
+
+- **8 new legendary bosses**: Kakashi, Might Guy, Jiraiya, Orochimaru, Edo Hashirama, Edo Tobirama, Obito (the Ten-Tails'
+  Jinchūriki) and Kaguya — new models, movesets with a second phase, rewards, NPC Spawner types and quest targets.
+  See *Legendary bosses*.
+- **17 new jutsu** (Raikiri, Black Panther, Toad Oil Flame Bomb, Great Waterfall, Gale Palm, Mud River, Planetary
+  Rasengan, Striking Shadow Snakes, Shadow Clone Explosion, Flying Thunder God, Five Elements Seal, Tree Binding Death,
+  Temple of Nirvana, Crow Genjutsu, Hundred Healings, Morning Peacock, Daytime Tiger) and two new summons (**Ninja
+  Hounds**, **Hawk**). See *The fourth wave*.
+- **7 ninja tools** (smoke and flash bombs, senbon, Fūma Shuriken, explosive kunai, Flying Raijin Kunai, ninja wire),
+  **5 foods** (dango, three pills, the Curry of Life) and **3 weapons** (Kabutowari, Thunder God Sword, Adamantine
+  Staff).
+- **The Bingo Book**: bounties on players, bounty hunting, [Wanted], a PvP record — and the titles' bounty and
+  "defeat a …" requirements now check themselves.
+- **50 achievements**, **daily missions** with a **login streak**, and **world events** (Village Raid, Wanted, Hidden
+  Scrolls, Double XP).
+- New Shinobi Record pages: **Bingo Book**, **Achievements**, **Daily**.
 
 ## Balance, legends that wait for a challenge, the Ten-Tails, titles (v1.54)
 

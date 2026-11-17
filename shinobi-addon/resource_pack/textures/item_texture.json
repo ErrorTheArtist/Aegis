@@ -658,6 +658,9 @@
     },
     "aegis_curry_of_life": {
       "textures": "textures/items/aegis/curry_of_life"
+    },
+    "aegis_hidden_scroll": {
+      "textures": "textures/items/aegis/hidden_scroll"
     }
   }
 }

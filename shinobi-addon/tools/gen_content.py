@@ -418,5 +418,14 @@ if __name__ == "__main__" or True:
         item(fid, name, {"minecraft:food": {"nutrition": nut, "saturation_modifier": sat, "can_always_eat": True},
                          "minecraft:use_animation": "eat", "minecraft:use_modifiers": {"use_duration": dur, "movement_modifier": 0.5}},
              category="items", stack=16)
+    # the Hidden Scroll (events.js): a sealed scroll with a gold seal
+    hs = G.scroll("black")
+    seal = G.new()
+    G.shape(seal, lambda d: d.ellipse([46, 46, 82, 82], fill=255), (250, 210, 90), (190, 130, 30), "radial", center=(58, 56), radius=30)
+    G.glow(hs, seal, (255, 200, 80), 6, 1.6)
+    ImageDraw.Draw(hs).line([(64, 52), (64, 76)], fill=(160, 40, 30, 255), width=4)
+    ImageDraw.Draw(hs).line([(52, 64), (76, 64)], fill=(160, 40, 30, 255), width=4)
+    G.finish(hs, "hidden_scroll")
+    item("hidden_scroll", "§eHidden Scroll§r\n§7Right-click to break the seal", stack=16, glint=True)
     w(atlas_p, atlas)
-    print(f"v1.55 content: {len(SCROLLS)} scrolls, {len(TOOLS)} tools, {len(FOOD)} foods.")
+    print(f"v1.55 content: {len(SCROLLS)} scrolls, {len(TOOLS)} tools, {len(FOOD)} foods, the Hidden Scroll.")

@@ -14,6 +14,7 @@ import { initArmor, armorChakraBonus, armorRegenMultiplier, armorDamageMultiplie
 import { impactFx, castFx, sfx, shake, chargeFx } from "./cinematic.js";
 import { makeJutsu2 } from "./jutsu2.js";
 import { makeJutsu3 } from "./jutsu3.js";
+import { makeJutsu4 } from "./jutsu4.js";
 import { makeReleases } from "./releases.js";
 import { initCurrency } from "./currency.js";
 import { initQuests } from "./quests.js";
@@ -34,6 +35,7 @@ import { initXpShards } from "./xpshards.js";
 import { initGrace, graceBlocks } from "./grace.js";
 import { initRampage } from "./rampage.js";
 import { initJuubi } from "./juubi.js";
+import { initTools } from "./tools.js";
 import { initBans } from "./bans.js";
 import { initTitles, makeTitleJutsu, titleDamageMultiplier, titleRegenMultiplier, noteTitleCast, hasTitle, TITLES } from "./titles.js";
 import { levelDamageFactor, bossDamageFactor } from "./levels.js";
@@ -1195,6 +1197,7 @@ const npcApi = {
 };
 Object.assign(JUTSU, makeJutsu2(npcApi));
 Object.assign(JUTSU, makeJutsu3(npcApi));
+Object.assign(JUTSU, makeJutsu4(npcApi)); // v1.55: the fourth wave
 Object.assign(JUTSU, makeTitleJutsu(npcApi)); // v1.54: the titles' scrolls
 {
   const rel = makeReleases(npcApi);
@@ -1211,6 +1214,7 @@ initXpShards(npcApi);
 initGrace(npcApi);
 initRampage(npcApi);
 initJuubi(npcApi); // v1.54: the Ten-Tails (spawn egg only)
+initTools(npcApi); // v1.55: ninja tools & food
 initBans();
 initTitles({ ...npcApi, refreshName: applyNameTag });
 initEdoTensei(npcApi);

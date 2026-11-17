@@ -1,0 +1,32 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:item": {
+    "description": {
+      "identifier": "aegis:food_pill",
+      "menu_category": {
+        "category": "items"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "aegis_food_pill"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "§6Food Pill§r\n§7+80 chakra and Strength — hard on the stomach"
+      },
+      "minecraft:max_stack_size": 16,
+      "minecraft:food": {
+        "nutrition": 2,
+        "saturation_modifier": 0.2,
+        "can_always_eat": true
+      },
+      "minecraft:use_animation": "eat",
+      "minecraft:use_modifiers": {
+        "use_duration": 0.8,
+        "movement_modifier": 0.5
+      }
+    }
+  }
+}

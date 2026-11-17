@@ -1,0 +1,23 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:item": {
+    "description": {
+      "identifier": "aegis:smoke_bomb",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "aegis_smoke_bomb"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "Smoke Bomb\n§7Right-click: vanish in a cloud of smoke"
+      },
+      "minecraft:max_stack_size": 16,
+      "minecraft:hand_equipped": true
+    }
+  }
+}

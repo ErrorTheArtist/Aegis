@@ -2,6 +2,7 @@
 // Natural rogue ninja spawn at night; Akatsuki hunt players who carry a Tailed Beast.
 
 import { world, system } from "@minecraft/server";
+import { npcSealed } from "./jutsu4.js";
 import { isGraced } from "./grace.js";
 import { VILLAGES } from "./villages.js";
 import { bossDamageFactor } from "./levels.js";
@@ -262,6 +263,12 @@ function update(e, now) {
     return;
   }
   const isBoss = isLegend || e.typeId === "aegis:akatsuki";
+  if (npcSealed(e)) {
+    // Five Elements Seal: no jutsu until it wears off (they still fight hand to hand)
+    if (now % 20 < 10) api.particle(e.dimension, "aegis:cine_ring", e.location, [1, 0.85, 0.3]);
+    st.next = now + 20;
+    return;
+  }
   const found = nearest(e, survivalPlayersNear(e.dimension, e.location, isBoss ? 32 : 20));
   if (!found) return;
   let cd = 60;

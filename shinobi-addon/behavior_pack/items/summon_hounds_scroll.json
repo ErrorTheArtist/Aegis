@@ -1,0 +1,23 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:item": {
+    "description": {
+      "identifier": "aegis:summon_hounds_scroll",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "aegis_summon_hounds_scroll"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "§dSummoning Jutsu: Ninja Hounds§r\n§7Three hounds for 45s (40 chakra)"
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:glint": true
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:item": {
+    "description": {
+      "identifier": "aegis:summon_hawk_scroll",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "aegis_summon_hawk_scroll"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "§dSummoning Jutsu: Hawk§r\n§7A hawk for 45s (40 chakra)"
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:glint": true
+    }
+  }
+}

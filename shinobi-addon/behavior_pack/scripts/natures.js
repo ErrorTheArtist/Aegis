@@ -46,6 +46,13 @@ export const JUTSU_NATURE = {
   "aegis:earth_dragon_scroll": "earth",
   "aegis:headhunter_scroll": "earth",
   "aegis:swamp_scroll": "earth",
+  // wave 4 (v1.55)
+  "aegis:toad_oil_scroll": "fire",
+  "aegis:great_waterfall_scroll": "water",
+  "aegis:gale_palm_scroll": "wind",
+  "aegis:raikiri_scroll": "lightning",
+  "aegis:black_panther_scroll": "lightning",
+  "aegis:mud_river_scroll": "earth",
 };
 
 // Level + price (in units of 100 Ryō) for your 2nd, 3rd, 4th and 5th release.

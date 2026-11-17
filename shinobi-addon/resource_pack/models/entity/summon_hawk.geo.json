@@ -1,0 +1,262 @@
+{
+  "format_version": "1.12.0",
+  "minecraft:geometry": [
+    {
+      "description": {
+        "identifier": "geometry.aegis.summon_hawk",
+        "texture_width": 128,
+        "texture_height": 128,
+        "visible_bounds_width": 5,
+        "visible_bounds_height": 4,
+        "visible_bounds_offset": [
+          0,
+          1,
+          0
+        ]
+      },
+      "bones": [
+        {
+          "name": "body",
+          "pivot": [
+            0,
+            14,
+            0
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -3,
+                11,
+                -5
+              ],
+              "size": [
+                6,
+                6,
+                11
+              ],
+              "uv": [
+                0,
+                0
+              ]
+            },
+            {
+              "origin": [
+                -2.5,
+                10.6,
+                -4
+              ],
+              "size": [
+                5,
+                2,
+                9
+              ],
+              "uv": [
+                0,
+                64
+              ]
+            }
+          ]
+        },
+        {
+          "name": "head",
+          "parent": "body",
+          "pivot": [
+            0,
+            16,
+            -5
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -2.5,
+                15,
+                -9
+              ],
+              "size": [
+                5,
+                5,
+                5
+              ],
+              "uv": [
+                0,
+                64
+              ]
+            },
+            {
+              "origin": [
+                -1,
+                15.5,
+                -11
+              ],
+              "size": [
+                2,
+                2,
+                2
+              ],
+              "uv": [
+                64,
+                96
+              ]
+            },
+            {
+              "origin": [
+                -2.75,
+                17.5,
+                -8
+              ],
+              "size": [
+                0.5,
+                1,
+                1
+              ],
+              "uv": [
+                0,
+                96
+              ]
+            },
+            {
+              "origin": [
+                2.25,
+                17.5,
+                -8
+              ],
+              "size": [
+                0.5,
+                1,
+                1
+              ],
+              "uv": [
+                0,
+                96
+              ]
+            }
+          ]
+        },
+        {
+          "name": "wing_l",
+          "parent": "body",
+          "pivot": [
+            3,
+            16,
+            0
+          ],
+          "cubes": [
+            {
+              "origin": [
+                3,
+                15.5,
+                -4
+              ],
+              "size": [
+                12,
+                1,
+                8
+              ],
+              "uv": [
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "name": "wing_r",
+          "parent": "body",
+          "pivot": [
+            -3,
+            16,
+            0
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -15,
+                15.5,
+                -4
+              ],
+              "size": [
+                12,
+                1,
+                8
+              ],
+              "uv": [
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "name": "tail",
+          "parent": "body",
+          "pivot": [
+            0,
+            13,
+            6
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -2.5,
+                12.5,
+                6
+              ],
+              "size": [
+                5,
+                1,
+                6
+              ],
+              "uv": [
+                0,
+                96
+              ]
+            }
+          ]
+        },
+        {
+          "name": "talons",
+          "parent": "body",
+          "pivot": [
+            0,
+            11,
+            0
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -2,
+                8,
+                -1
+              ],
+              "size": [
+                1,
+                3,
+                1
+              ],
+              "uv": [
+                64,
+                96
+              ]
+            },
+            {
+              "origin": [
+                1,
+                8,
+                -1
+              ],
+              "size": [
+                1,
+                3,
+                1
+              ],
+              "uv": [
+                64,
+                96
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

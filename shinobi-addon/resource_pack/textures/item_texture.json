@@ -556,6 +556,108 @@
     },
     "aegis_advanced_rinnegan": {
       "textures": "textures/items/aegis/advanced_rinnegan"
+    },
+    "aegis_toad_oil_scroll": {
+      "textures": "textures/items/aegis/toad_oil_scroll"
+    },
+    "aegis_great_waterfall_scroll": {
+      "textures": "textures/items/aegis/great_waterfall_scroll"
+    },
+    "aegis_gale_palm_scroll": {
+      "textures": "textures/items/aegis/gale_palm_scroll"
+    },
+    "aegis_raikiri_scroll": {
+      "textures": "textures/items/aegis/raikiri_scroll"
+    },
+    "aegis_black_panther_scroll": {
+      "textures": "textures/items/aegis/black_panther_scroll"
+    },
+    "aegis_mud_river_scroll": {
+      "textures": "textures/items/aegis/mud_river_scroll"
+    },
+    "aegis_planetary_rasengan_scroll": {
+      "textures": "textures/items/aegis/planetary_rasengan_scroll"
+    },
+    "aegis_shadow_snakes_scroll": {
+      "textures": "textures/items/aegis/shadow_snakes_scroll"
+    },
+    "aegis_clone_explosion_scroll": {
+      "textures": "textures/items/aegis/clone_explosion_scroll"
+    },
+    "aegis_flying_raijin_scroll": {
+      "textures": "textures/items/aegis/flying_raijin_scroll"
+    },
+    "aegis_five_elements_seal_scroll": {
+      "textures": "textures/items/aegis/five_elements_seal_scroll"
+    },
+    "aegis_tree_binding_scroll": {
+      "textures": "textures/items/aegis/tree_binding_scroll"
+    },
+    "aegis_nirvana_scroll": {
+      "textures": "textures/items/aegis/nirvana_scroll"
+    },
+    "aegis_crow_genjutsu_scroll": {
+      "textures": "textures/items/aegis/crow_genjutsu_scroll"
+    },
+    "aegis_hundred_healings_scroll": {
+      "textures": "textures/items/aegis/hundred_healings_scroll"
+    },
+    "aegis_morning_peacock_scroll": {
+      "textures": "textures/items/aegis/morning_peacock_scroll"
+    },
+    "aegis_daytime_tiger_scroll": {
+      "textures": "textures/items/aegis/daytime_tiger_scroll"
+    },
+    "aegis_summon_hounds_scroll": {
+      "textures": "textures/items/aegis/summon_hounds_scroll"
+    },
+    "aegis_summon_hawk_scroll": {
+      "textures": "textures/items/aegis/summon_hawk_scroll"
+    },
+    "aegis_kabutowari": {
+      "textures": "textures/items/aegis/kabutowari"
+    },
+    "aegis_raijin_sword": {
+      "textures": "textures/items/aegis/raijin_sword"
+    },
+    "aegis_adamantine_staff": {
+      "textures": "textures/items/aegis/adamantine_staff"
+    },
+    "aegis_smoke_bomb": {
+      "textures": "textures/items/aegis/smoke_bomb"
+    },
+    "aegis_flash_bomb": {
+      "textures": "textures/items/aegis/flash_bomb"
+    },
+    "aegis_senbon": {
+      "textures": "textures/items/aegis/senbon"
+    },
+    "aegis_fuma_shuriken": {
+      "textures": "textures/items/aegis/fuma_shuriken"
+    },
+    "aegis_explosive_kunai": {
+      "textures": "textures/items/aegis/explosive_kunai"
+    },
+    "aegis_raijin_kunai": {
+      "textures": "textures/items/aegis/raijin_kunai"
+    },
+    "aegis_ninja_wire": {
+      "textures": "textures/items/aegis/ninja_wire"
+    },
+    "aegis_dango": {
+      "textures": "textures/items/aegis/dango"
+    },
+    "aegis_food_pill": {
+      "textures": "textures/items/aegis/food_pill"
+    },
+    "aegis_blood_pill": {
+      "textures": "textures/items/aegis/blood_pill"
+    },
+    "aegis_ration_pill": {
+      "textures": "textures/items/aegis/ration_pill"
+    },
+    "aegis_curry_of_life": {
+      "textures": "textures/items/aegis/curry_of_life"
     }
   }
 }

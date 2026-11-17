@@ -1,0 +1,23 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:item": {
+    "description": {
+      "identifier": "aegis:ninja_wire",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "aegis_ninja_wire"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "Ninja Wire\n§7Right-click an enemy: snare and pull them"
+      },
+      "minecraft:max_stack_size": 16,
+      "minecraft:hand_equipped": true
+    }
+  }
+}

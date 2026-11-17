@@ -140,6 +140,9 @@ const C = {
   nuibari: [0.95, 0.95, 1.0],
   shibuki: [1.0, 0.55, 0.15],
   chakra_blades: [0.55, 1.0, 0.7],
+  kabutowari: [0.85, 0.85, 0.9],
+  raijin_sword: [1.0, 0.92, 0.45],
+  adamantine_staff: [1.0, 0.85, 0.4],
 };
 
 const SWORDS = {
@@ -401,6 +404,117 @@ const SWORDS = {
     },
     held(p) {
       if (Math.random() < 0.35) api.particle(p.dimension, "aegis:slash", api.sub(api.handPos(p), { x: 0, y: 0.3, z: 0 }), C.chakra_blades);
+    },
+  },
+
+  // ---- v1.55 ----
+  // Kabutowari, the Helmet Splitter: the axe comes down and breaks the enemy's guard, then the hammer follows.
+  "aegis:kabutowari": {
+    id: "kabutowari", text: "§7", special: "Helmet Splitter", cost: 25, cd: 120,
+    cast(p) {
+      const t = inFront(p, 4.5, 0.35)[0];
+      if (!t) {
+        p.onScreenDisplay.setActionBar("§7Helmet Splitter needs an enemy right in front of you.");
+        return false;
+      }
+      api.anim(p, "animation.aegis.sword_overhead");
+      arcOverhead(p, C.kabutowari, { radius: 3 });
+      system.runTimeout(() => {
+        if (!api.isValid(p) || !api.isValid(t)) return;
+        api.hurt(t, 18, p);
+        hitMark(p, t, C.kabutowari);
+        api.sound(p.dimension, "random.anvil_land", t.location, 1, 0.8);
+        try {
+          t.removeEffect("resistance"); // the guard breaks
+        } catch {
+          /* ignore */
+        }
+        eff(t, "weakness", 120, 1);
+        eff(t, "slowness", 30, 1);
+      }, 6);
+      system.runTimeout(() => {
+        if (!api.isValid(p) || !api.isValid(t)) return;
+        api.hurt(t, 6, p);
+        const away = api.norm({ x: t.location.x - p.location.x, y: 0, z: t.location.z - p.location.z });
+        api.knockback(t, away.x, away.z, 1.6, 0.5);
+        api.particle(p.dimension, "aegis:dust", t.location);
+        api.sound(p.dimension, "aegis.hit_heavy", t.location, 1.2, 0.7);
+      }, 14);
+    },
+    onHit(p, t) {
+      if (Math.random() < 0.2) eff(t, "slowness", 20, 0); // a dazing blow
+    },
+  },
+
+  // The Thunder God Sword: its lightning blade lengthens into a thrust that runs through a whole line of enemies.
+  "aegis:raijin_sword": {
+    id: "raijin_sword", text: "§e", special: "Thunder God Thrust", cost: 25, cd: 90,
+    cast(p) {
+      api.anim(p, "animation.aegis.sword_thrust");
+      api.sound(p.dimension, "aegis.chidori", p.location, 1.2, 1.3);
+      system.runTimeout(() => {
+        if (!api.isValid(p)) return;
+        const { f } = basis(p);
+        const from = api.add(p.location, { x: 0, y: 1.2, z: 0 });
+        const to = api.add(from, api.scale(f, 9));
+        line(p.dimension, from, to, "aegis:chidori_arc", C.raijin_sword, 0.6);
+        api.sound(p.dimension, "aegis.lightning", to, 1.2, 1.4);
+        for (const e of targetsAround(p, api.add(p.location, api.scale(f, 4.5)), 5.5)) {
+          const v = api.sub(e.location, p.location);
+          const along = v.x * f.x + v.z * f.z;
+          if (along < 0 || along > 9.5 || Math.abs(v.x * f.z - v.z * f.x) > 1.6) continue;
+          api.hurt(e, 14, p);
+          eff(e, "slowness", 30, 2);
+          api.particle(p.dimension, "aegis:lightning_burst", api.add(e.location, { x: 0, y: 1, z: 0 }), C.raijin_sword);
+        }
+      }, 5);
+    },
+    onHit(p, t) {
+      if (Math.random() < 0.25) {
+        api.hurt(t, 3, p);
+        api.particle(p.dimension, "aegis:chidori_arc", api.add(t.location, { x: 0, y: 1, z: 0 }), C.raijin_sword);
+      }
+    },
+  },
+
+  // Enma's Adamantine Staff: it shoots out to ten blocks long (sneak: a whirl all around you).
+  "aegis:adamantine_staff": {
+    id: "adamantine_staff", text: "§6", special: "Extending Staff", cost: 20, cd: 80,
+    cast(p) {
+      if (p.isSneaking) {
+        api.anim(p, "animation.aegis.sword_spin");
+        arcSpin(p, C.adamantine_staff, 4.2, 8);
+        system.runTimeout(() => {
+          if (!api.isValid(p)) return;
+          for (const e of targetsAround(p, p.location, 4.6)) {
+            api.hurt(e, 10, p);
+            const away = api.norm({ x: e.location.x - p.location.x, y: 0, z: e.location.z - p.location.z });
+            api.knockback(e, away.x, away.z, 2, 0.4);
+            hitMark(p, e, C.adamantine_staff);
+          }
+        }, 4);
+        return;
+      }
+      api.anim(p, "animation.aegis.sword_thrust");
+      system.runTimeout(() => {
+        if (!api.isValid(p)) return;
+        const { f } = basis(p);
+        const from = api.add(p.location, { x: 0, y: 1.2, z: 0 });
+        line(p.dimension, from, api.add(from, api.scale(f, 10)), "aegis:slash", C.adamantine_staff, 0.5);
+        api.sound(p.dimension, "item.trident.throw", p.location, 1, 0.6);
+        for (const e of targetsAround(p, api.add(p.location, api.scale(f, 5)), 6)) {
+          const v = api.sub(e.location, p.location);
+          const along = v.x * f.x + v.z * f.z;
+          if (along < 0 || along > 10.5 || Math.abs(v.x * f.z - v.z * f.x) > 1.4) continue;
+          api.hurt(e, 12, p);
+          api.knockback(e, f.x, f.z, 3, 0.5);
+          api.particle(p.dimension, "aegis:dust", e.location);
+        }
+      }, 4);
+    },
+    onHit(p, t) {
+      const away = api.norm({ x: t.location.x - p.location.x, y: 0, z: t.location.z - p.location.z });
+      api.knockback(t, away.x, away.z, 0.8, 0.2); // the staff's weight
     },
   },
 };

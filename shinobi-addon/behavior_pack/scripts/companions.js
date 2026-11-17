@@ -10,6 +10,9 @@ const SUMMONS = {
   "aegis:summon_toad_scroll": { entity: "aegis:summon_toad", name: "Toad", sound: "mob.slime.big" },
   "aegis:summon_slug_scroll": { entity: "aegis:summon_slug", name: "Slug", sound: "mob.slime.small" },
   "aegis:summon_snake_scroll": { entity: "aegis:summon_snake", name: "Snake", sound: "mob.silverfish.say" },
+  // v1.55: a pack of three ninja hounds (their bites pin), and a hawk (dives at enemies, lifts its summoner's jumps)
+  "aegis:summon_hounds_scroll": { entity: "aegis:summon_hound", name: "Ninja Hound", count: 3, sound: "mob.wolf.bark" },
+  "aegis:summon_hawk_scroll": { entity: "aegis:summon_hawk", name: "Hawk", sound: "mob.parrot.idle" },
 };
 const SUMMON_COST = 40;
 const SUMMON_CD = 1200; // 60s
@@ -180,18 +183,22 @@ export function handleSummonUse(player, itemStack) {
   const h = api.norm({ x: d.x, y: 0, z: d.z });
   const at = api.add(player.location, api.scale(h, 3));
   system.runTimeout(() => {
-    try {
-      const e = player.dimension.spawnEntity(s.entity, at);
-      api.sound(player.dimension, "aegis.summon", at, 1.8, 1);
-      tame(e, player);
-      e.nameTag = `${player.name}'s ${s.name}`;
-      api.particle(player.dimension, "aegis:smoke_puff", at);
-      api.particle(player.dimension, "minecraft:huge_explosion_emitter", at);
-      api.sound(player.dimension, s.sound, at, 1.5, 0.6);
-      player.onScreenDisplay.setActionBar(`§dSummoning Jutsu: ${s.name}!`);
-    } catch {
-      /* ignore */
+    const n = s.count ?? 1;
+    for (let i = 0; i < n; i++) {
+      const spot = n === 1 ? at : api.add(at, { x: Math.cos((i / n) * Math.PI * 2) * 1.5, y: 0, z: Math.sin((i / n) * Math.PI * 2) * 1.5 });
+      try {
+        const e = player.dimension.spawnEntity(s.entity, spot);
+        tame(e, player);
+        e.nameTag = `${player.name}'s ${s.name}`;
+        api.particle(player.dimension, "aegis:smoke_puff", spot);
+      } catch {
+        /* ignore */
+      }
     }
+    api.sound(player.dimension, "aegis.summon", at, 1.8, 1);
+    api.particle(player.dimension, "minecraft:huge_explosion_emitter", at);
+    api.sound(player.dimension, s.sound, at, 1.5, 0.6);
+    player.onScreenDisplay.setActionBar(`§dSummoning Jutsu: ${n > 1 ? `${s.name}s ×${n}` : s.name}!`);
   }, 8);
   return true;
 }
@@ -241,6 +248,28 @@ function summonSpecials() {
           api.particle(e.dimension, "aegis:beast_mist", f.location, [0.6, 0.95, 0.4]);
         }
       }
+      if (e.typeId === "aegis:summon_hawk" && owner && owner.dimension.id === e.dimension.id) {
+        // the hawk carries its summoner: softer landings and higher jumps while it's out
+        try {
+          owner.addEffect("slow_falling", 60, { amplifier: 0, showParticles: false });
+          owner.addEffect("jump_boost", 60, { amplifier: 1, showParticles: false });
+        } catch {
+          /* ignore */
+        }
+        // …and dives at an enemy near them
+        const prey = owner.dimension.getEntities({ location: owner.location, maxDistance: 12, families: ["monster"] }).find((f) => api.canBeHit(f, owner));
+        if (prey && Math.random() < 0.6) {
+          try {
+            e.teleport(api.add(prey.location, { x: 0, y: 2.5, z: 0 }));
+          } catch {
+            /* ignore */
+          }
+          api.hurt(prey, 6, e);
+          api.knockback(prey, 0, 0, 0, 0.5);
+          api.particle(e.dimension, "aegis:wind_gust", prey.location, [0.9, 0.8, 0.6]);
+          api.sound(e.dimension, "mob.parrot.fly", prey.location, 1, 0.7);
+        }
+      }
       // keep summons with their summoner
       if (owner && owner.dimension.id === e.dimension.id) {
         const d = api.sub(owner.location, e.location);
@@ -261,6 +290,17 @@ export function initCompanions(helpers) {
   world.afterEvents.entityDie.subscribe(({ deadEntity, damageSource }) => {
     const k = damageSource?.damagingEntity;
     if (k?.typeId === "aegis:genin") companionKill(k, deadEntity);
+  });
+
+  // Ninja hounds pin what they bite (Kakashi's Earth Release: Tracking Fang).
+  world.afterEvents.entityHitEntity.subscribe(({ damagingEntity, hitEntity }) => {
+    if (damagingEntity?.typeId !== "aegis:summon_hound") return;
+    try {
+      hitEntity.addEffect("slowness", 40, { amplifier: 2 });
+    } catch {
+      /* ignore */
+    }
+    api.particle(hitEntity.dimension, "aegis:dust", hitEntity.location);
   });
 
   // Snake bites poison.

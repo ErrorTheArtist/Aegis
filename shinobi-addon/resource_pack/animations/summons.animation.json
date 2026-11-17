@@ -127,6 +127,86 @@
           ]
         }
       }
+    },
+    "animation.aegis.summon_hound.idle": {
+      "loop": true,
+      "bones": {
+        "head": {
+          "rotation": [
+            "q.target_x_rotation * 0.5",
+            "q.target_y_rotation * 0.5",
+            0
+          ]
+        },
+        "leg0": {
+          "rotation": [
+            "1 * math.cos(q.modified_distance_moved * 30) * 30 * math.min(1, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg1": {
+          "rotation": [
+            "-1 * math.cos(q.modified_distance_moved * 30) * 30 * math.min(1, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg2": {
+          "rotation": [
+            "-1 * math.cos(q.modified_distance_moved * 30) * 30 * math.min(1, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg3": {
+          "rotation": [
+            "1 * math.cos(q.modified_distance_moved * 30) * 30 * math.min(1, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "tail": {
+          "rotation": [
+            25,
+            "math.sin(q.life_time * 700) * 28",
+            0
+          ]
+        }
+      }
+    },
+    "animation.aegis.summon_hawk.idle": {
+      "loop": true,
+      "bones": {
+        "head": {
+          "rotation": [
+            "q.target_x_rotation * 0.5",
+            "q.target_y_rotation * 0.5",
+            0
+          ]
+        },
+        "body": {
+          "position": [
+            0,
+            "14 + math.sin(q.life_time * 220) * 1.5",
+            0
+          ]
+        },
+        "wing_l": {
+          "rotation": [
+            0,
+            0,
+            "-15 + math.sin(q.life_time * 900) * 38"
+          ]
+        },
+        "wing_r": {
+          "rotation": [
+            0,
+            0,
+            "15 - math.sin(q.life_time * 900) * 38"
+          ]
+        }
+      }
     }
   }
 }

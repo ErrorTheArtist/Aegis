@@ -215,6 +215,38 @@ SWORDS["gunbai"] = dict(
            box((-0.6, -1.4, -18.4), (1.2, 2.8, 2.8), "accent2")])
 
 
+# ---- v1.55: the last of the Seven Swords, the Second Hokage's sword and Enma's staff (swords.js) ----
+SWORDS["kabutowari"] = dict(
+    name="Kabutowari", damage=12, durability=2200, owner="the Helmet Splitter — an axe and a hammer joined by a chain",
+    colors=dict(steel=(176, 180, 186), edge=(236, 238, 242), dark=(52, 50, 56), wrap=(96, 64, 40),
+                accent=(150, 150, 158), accent2=(196, 160, 70), light=(255, 255, 255), red=(150, 40, 40)),
+    slash=(0.85, 0.85, 0.9), recipe=None,
+    cubes=[box((-0.7, -0.7, -15), (1.4, 1.4, 19), "wrap"), box((-0.9, -0.9, 3.5), (1.8, 1.8, 1), "dark"),
+           box((-0.45, -1.2, -17), (0.9, 7.2, 5.5), "steel"), box((-0.5, 5.6, -17.5), (1.0, 1.3, 6.5), "edge"),   # the axe
+           box((-0.55, -3.4, -16), (1.1, 2.4, 3), "dark"),
+           *[box((-0.35, -0.35, 4.6 + k * 1.5), (0.7, 0.7, 1.1), "accent") for k in range(4)],                   # the chain
+           box((-1.7, -1.7, 10.6), (3.4, 3.4, 4.2), "dark"), box((-1.8, -1.8, 11.4), (3.6, 3.6, 0.8), "accent2"),  # the hammer
+           box((-1.8, -1.8, 13.4), (3.6, 3.6, 0.8), "accent2")])
+SWORDS["raijin_sword"] = dict(
+    name="Thunder God Sword", damage=11, durability=2400, owner="the Second Hokage's sword — its blade is lightning",
+    colors=dict(steel=(255, 236, 140), edge=(255, 255, 230), dark=(40, 36, 46), wrap=(60, 40, 90),
+                accent=(255, 214, 90), accent2=(150, 220, 255), light=(255, 255, 255), red=(150, 40, 40)),
+    slash=(1.0, 0.92, 0.45), recipe=None,
+    cubes=[box((-0.8, -0.8, -3), (1.6, 1.6, 7), "wrap"), box((-1.0, -1.0, 4), (2.0, 2.0, 1), "dark"),
+           box((-2.2, -0.6, -4), (4.4, 1.2, 1), "dark"),
+           *[box((-0.45, -0.9 + (i % 2) * 0.7, -5 - i * 2.7), (0.9, 1.5, 3.0), "steel" if i % 2 else "accent") for i in range(8)],
+           *[box((-0.25, -0.35 + (i % 2) * 0.7, -5.2 - i * 2.7), (0.5, 0.7, 2.6), "light") for i in range(8)],
+           box((-0.3, 0.4, -12), (0.6, 0.4, 5), "accent2"), box((-0.3, -1.2, -20), (0.6, 0.4, 4), "accent2")])
+SWORDS["adamantine_staff"] = dict(
+    name="Adamantine Staff", damage=10, durability=2600, owner="Enma, the Monkey King, become a staff",
+    colors=dict(steel=(46, 42, 48), edge=(90, 84, 96), dark=(30, 26, 32), wrap=(120, 40, 36),
+                accent=(240, 196, 70), accent2=(255, 230, 140), light=(255, 255, 240), red=(170, 40, 30)),
+    slash=(1.0, 0.85, 0.4), recipe=None,
+    cubes=[box((-0.6, -0.6, -29), (1.2, 1.2, 40), "steel"),
+           box((-0.95, -0.95, -31), (1.9, 1.9, 3), "accent"), box((-0.95, -0.95, 9), (1.9, 1.9, 3), "accent"),
+           box((-0.8, -0.8, -27.6), (1.6, 1.6, 0.6), "accent2"), box((-0.8, -0.8, 7.8), (1.6, 1.6, 0.6), "accent2"),
+           box((-0.75, -0.75, -2), (1.5, 1.5, 5), "wrap")])
+
 def palette(colors):
     img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
     random.seed(sum(sum(v) for k, v in colors.items() if k != "sheath"))

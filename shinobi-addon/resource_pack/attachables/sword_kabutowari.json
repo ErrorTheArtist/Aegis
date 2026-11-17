@@ -1,0 +1,47 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:attachable": {
+    "description": {
+      "identifier": "aegis:kabutowari",
+      "materials": {
+        "default": "entity_alphatest",
+        "enchanted": "entity_alphatest_glint"
+      },
+      "textures": {
+        "default": "textures/models/swords/kabutowari",
+        "enchanted": "textures/misc/enchanted_item_glint"
+      },
+      "geometry": {
+        "default": "geometry.aegis.sword_kabutowari"
+      },
+      "animations": {
+        "third": "animation.aegis.sword.hold_third_person",
+        "first": "animation.aegis.sword.hold_first_person",
+        "carry": "animation.aegis.sword.carry",
+        "settle": "animation.aegis.sword.settle",
+        "worn": "controller.animation.aegis.sword_carry",
+        "hide_back": "animation.aegis.sword.hide_back",
+        "hide_hand": "animation.aegis.sword.hide_hand"
+      },
+      "scripts": {
+        "animate": [
+          {
+            "worn": "!c.is_first_person && c.item_slot == 'main_hand'"
+          },
+          {
+            "first": "c.is_first_person && c.item_slot == 'main_hand'"
+          },
+          {
+            "hide_back": "c.item_slot == 'main_hand' || c.is_first_person"
+          },
+          {
+            "hide_hand": "c.item_slot != 'main_hand'"
+          }
+        ]
+      },
+      "render_controllers": [
+        "controller.render.item_default"
+      ]
+    }
+  }
+}

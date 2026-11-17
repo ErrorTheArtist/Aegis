@@ -617,6 +617,35 @@ def snake():
     return b, [], segs
 
 
+def hound():
+    """A ninja hound (v1.55): a compact dog with a forehead protector on its brow, perked ears and a wagging tail."""
+    b = [{"name": "body", "pivot": [0, 9, 0], "cubes": [cube([-4, 6, -7], [8, 7, 14], MAIN), cube([-3.5, 5.6, -6], [7, 2, 12], ACCENT)]},
+         {"name": "head", "parent": "body", "pivot": [0, 12, -7], "cubes": [
+             cube([-4, 9, -13], [8, 7, 7], MAIN), cube([-2.5, 9, -16], [5, 4, 3], ACCENT), cube([-1, 12, -16.3], [2, 1.2, 0.5], DARK),
+             cube([-4, 16, -10], [2, 3, 2], MAIN), cube([2, 16, -10], [2, 3, 2], MAIN),
+             cube([-4.25, 14.4, -13.25], [8.5, 1.3, 7.1], DARK),
+             cube([-3, 12.6, -13.35], [2, 1.2, 0.5], EYE), cube([1, 12.6, -13.35], [2, 1.2, 0.5], EYE)]},
+         {"name": "tail", "parent": "body", "pivot": [0, 12, 7], "cubes": [cube([-1, 11, 7], [2, 2, 6], MAIN)]}]
+    legs = []
+    for i, (x, z) in enumerate([(-4, -6), (2, -6), (-4, 4), (2, 4)]):
+        legs.append(f"leg{i}")
+        b.append({"name": f"leg{i}", "parent": "body", "pivot": [x + 1, 6, z + 1], "cubes": [cube([x, 0, z], [2, 6, 2], ACCENT)]})
+    return b, legs, []
+
+
+def hawk():
+    """A summoned hawk (v1.55): brown wings and back, a white head with a yellow beak — it hovers and beats its wings."""
+    b = [{"name": "body", "pivot": [0, 14, 0], "cubes": [cube([-3, 11, -5], [6, 6, 11], MAIN), cube([-2.5, 10.6, -4], [5, 2, 9], ACCENT)]},
+         {"name": "head", "parent": "body", "pivot": [0, 16, -5], "cubes": [
+             cube([-2.5, 15, -9], [5, 5, 5], ACCENT), cube([-1, 15.5, -11], [2, 2, 2], EYE),
+             cube([-2.75, 17.5, -8], [0.5, 1, 1], DARK), cube([2.25, 17.5, -8], [0.5, 1, 1], DARK)]},
+         {"name": "wing_l", "parent": "body", "pivot": [3, 16, 0], "cubes": [cube([3, 15.5, -4], [12, 1, 8], MAIN)]},
+         {"name": "wing_r", "parent": "body", "pivot": [-3, 16, 0], "cubes": [cube([-15, 15.5, -4], [12, 1, 8], MAIN)]},
+         {"name": "tail", "parent": "body", "pivot": [0, 13, 6], "cubes": [cube([-2.5, 12.5, 6], [5, 1, 6], DARK)]},
+         {"name": "talons", "parent": "body", "pivot": [0, 11, 0], "cubes": [cube([-2, 8, -1], [1, 3, 1], EYE), cube([1, 8, -1], [1, 3, 1], EYE)]}]
+    return b, [], []
+
+
 ANIMALS = {
     "summon_toad": dict(name="Summoned Toad", build=toad, tex=((200, 70, 40), (110, 60, 140), (60, 20, 15), (250, 220, 60)), stripes=(120, 50, 150),
                         hp=120, dmg=10, speed=0.28, box=(1.6, 1.7), egg=("#c84628", "#6e3c8c")),
@@ -624,6 +653,11 @@ ANIMALS = {
                         hp=90, dmg=4, speed=0.18, box=(1.2, 1.2), egg=("#ebf0f5", "#5a96e6")),
     "summon_snake": dict(name="Summoned Snake", build=snake, tex=((110, 60, 150), (230, 220, 200), (30, 20, 40), (250, 200, 40)), stripes=(80, 40, 110),
                          hp=70, dmg=7, speed=0.4, box=(1.0, 0.8), egg=("#6e3c96", "#e6dcc8")),
+    # v1.55
+    "summon_hound": dict(name="Ninja Hound", build=hound, tex=((110, 80, 55), (225, 205, 175), (40, 45, 70), (30, 25, 25)), stripes=None,
+                         hp=40, dmg=4, speed=0.42, box=(0.7, 0.85), egg=("#6e5037", "#e1cdaf")),
+    "summon_hawk": dict(name="Summoned Hawk", build=hawk, tex=((120, 80, 50), (240, 238, 230), (60, 40, 25), (250, 200, 50)), stripes=None,
+                        hp=50, dmg=6, speed=0.45, box=(0.8, 0.9), egg=("#785032", "#f0eee6")),
 }
 anim_all = {}
 for aid, a in ANIMALS.items():
@@ -643,6 +677,12 @@ for aid, a in ANIMALS.items():
         ab["body"] = {"scale": [1, "1 + math.sin(q.life_time * 200) * 0.05", "1 - math.sin(q.life_time * 200) * 0.03"]}
     if aid == "summon_toad":
         ab["body"] = {"scale": [f"1 + math.sin(q.life_time * 120) * 0.03", 1, f"1 + math.sin(q.life_time * 120) * 0.03"]}
+    if aid == "summon_hound":
+        ab["tail"] = {"rotation": [25, "math.sin(q.life_time * 700) * 28", 0]}
+    if aid == "summon_hawk":   # it hovers a block up and beats its wings
+        ab["body"] = {"position": [0, "14 + math.sin(q.life_time * 220) * 1.5", 0]}
+        ab["wing_l"] = {"rotation": [0, 0, "-15 + math.sin(q.life_time * 900) * 38"]}
+        ab["wing_r"] = {"rotation": [0, 0, "15 - math.sin(q.life_time * 900) * 38"]}
     anim_all[f"animation.aegis.{aid}.idle"] = {"loop": True, "bones": ab}
     w(RP / "entity" / f"{aid}.entity.json", {"format_version": "1.10.0", "minecraft:client_entity": {"description": {
         "identifier": f"aegis:{aid}", "materials": {"default": "entity_alphatest"},

@@ -14,6 +14,7 @@ import { world, system } from "@minecraft/server";
 import { isGraced } from "./grace.js";
 import { showTitle } from "./hud.js";
 import { beastAwakenFx, aura, sfx } from "./cinematic.js";
+import { npcSealed } from "./jutsu4.js";
 
 export const JUUBI = "aegis:juubi";
 const NAME = "§4The Ten-Tails§r";
@@ -242,6 +243,7 @@ function update(boss, now) {
     /* ignore */
   }
 
+  if (npcSealed(boss)) return; // Five Elements Seal: its chakra is sealed for a moment
   const target = nearest(boss);
   if (!target) return;
   const d = api.sub(target.location, boss.location);

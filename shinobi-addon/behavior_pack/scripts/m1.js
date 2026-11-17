@@ -23,7 +23,7 @@ const BLADE = [
   { anim: "m1_slash2", bonus: 0 },
   { anim: "m1_slash3", bonus: 2, finisher: true },
 ];
-const BLADES = /sword|kunai|kusanagi|samehada|kubikiribocho|hiramekarei|kiba|nuibari|shibuki|chakra_blades|totsuka|gunbai|chakra_rod|_axe$|trident|mace/;
+const BLADES = /sword|kunai|kusanagi|samehada|kubikiribocho|hiramekarei|kiba|nuibari|shibuki|chakra_blades|totsuka|gunbai|chakra_rod|kabutowari|adamantine_staff|_axe$|trident|mace/;
 
 let api;
 const combo = new Map(); // player id -> { step, tick, target }

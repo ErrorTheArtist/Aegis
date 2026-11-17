@@ -1,0 +1,32 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "aegis:summon_hound",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/aegis/summon_hound"
+      },
+      "geometry": {
+        "default": "geometry.aegis.summon_hound"
+      },
+      "animations": {
+        "idle": "animation.aegis.summon_hound.idle"
+      },
+      "scripts": {
+        "animate": [
+          "idle"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ],
+      "spawn_egg": {
+        "base_color": "#6e5037",
+        "overlay_color": "#e1cdaf"
+      }
+    }
+  }
+}

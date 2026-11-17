@@ -21,6 +21,7 @@
 import { world, system, ItemStack, ItemLockMode } from "@minecraft/server";
 import { isGraced } from "./grace.js";
 import { rampageHolder, rampageText } from "./rampage.js";
+import { npcSealed } from "./jutsu4.js";
 import { ActionFormData, MessageFormData } from "@minecraft/server-ui";
 import { showTitle } from "./hud.js";
 import { transformCinematic, beastAwakenFx, impactFx, aura, sfx, inCinematic } from "./cinematic.js";
@@ -468,7 +469,7 @@ function updateBoss(boss, now) {
   }
   // Chakra aura + natural toughness
   api.particle(boss.dimension, "aegis:beast_aura", boss.location, b.color);
-  if (beingSealed.has(boss.id)) return; // bound by sealing chains
+  if (beingSealed.has(boss.id) || npcSealed(boss)) return; // bound by sealing chains / the Five Elements Seal
   if (!boss.getEffect?.("resistance")) eff(boss, "resistance", 999999, st.enraged ? 1 : 0, false);
 
   // Phase 2 at half health

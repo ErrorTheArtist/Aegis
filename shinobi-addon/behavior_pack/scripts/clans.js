@@ -8,6 +8,7 @@
 //   /scriptevent aegis:clan mangekyo        — instantly awaken the Mangekyō (Uchiha only)
 //   /scriptevent aegis:clan eternal         — instantly awaken the Eternal Mangekyō (Uchiha only)
 
+import { wantedTag } from "./bounty.js";
 import { world, system, ItemStack, ItemLockMode } from "@minecraft/server";
 import { showTitle } from "./hud.js";
 import { uzumakiSealMenu } from "./bijuu.js";
@@ -205,7 +206,7 @@ export function applyNameTag(player) {
     const title = kage ? `${KAGE_VILLAGES[kage].title} ` : isSannin(player) ? "§aSannin " : rank ? `§7${RANKS[rank]} ` : "";
     const lv = `${title}§eLv.${getLevel(player)}§r`;
     const vt = isRogue(player) ? rogueTag : villageTag(getVillage(player));
-    const tt = titlePrefix(player); // a title of legend (v1.54)
+    const tt = titlePrefix(player) + wantedTag(player); // a title of legend (v1.54), [Wanted] (v1.55)
     player.nameTag = clan ? `${vt}${tt}${clan.color}[${clan.name}]§r ${lv} ${player.name}` : `${vt}${tt}${lv} ${player.name}`;
   } catch {
     /* ignore */

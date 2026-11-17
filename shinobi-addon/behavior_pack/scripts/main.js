@@ -36,6 +36,9 @@ import { initGrace, graceBlocks } from "./grace.js";
 import { initRampage } from "./rampage.js";
 import { initJuubi } from "./juubi.js";
 import { initTools } from "./tools.js";
+import { initBounty } from "./bounty.js";
+import { initAchievements, noteAchCast } from "./achievements.js";
+import { initDailies, noteDailyCast } from "./dailies.js";
 import { initBans } from "./bans.js";
 import { initTitles, makeTitleJutsu, titleDamageMultiplier, titleRegenMultiplier, noteTitleCast, hasTitle, TITLES } from "./titles.js";
 import { levelDamageFactor, bossDamageFactor } from "./levels.js";
@@ -398,6 +401,8 @@ world.afterEvents.itemUse.subscribe(({ source: player, itemStack }) => {
   startCooldown(player, itemStack.typeId, jutsu.cooldown);
   registerCast(player, itemStack.typeId, cost);
   noteCast(player, itemStack.typeId);
+  noteAchCast(player, itemStack.typeId); // v1.55: achievements
+  noteDailyCast(player, itemStack.typeId); // …and daily missions
   player.onScreenDisplay.setActionBar(`§6${jutsu.name}!${natureTag(player, itemStack.typeId)}`);
 });
 
@@ -1215,6 +1220,9 @@ initGrace(npcApi);
 initRampage(npcApi);
 initJuubi(npcApi); // v1.54: the Ten-Tails (spawn egg only)
 initTools(npcApi); // v1.55: ninja tools & food
+initBounty({ ...npcApi, refreshName: applyNameTag }); // v1.55: the Bingo Book
+initAchievements(npcApi); // v1.55: achievements
+initDailies(npcApi); // v1.55: daily missions & login streak
 initBans();
 initTitles({ ...npcApi, refreshName: applyNameTag });
 initEdoTensei(npcApi);

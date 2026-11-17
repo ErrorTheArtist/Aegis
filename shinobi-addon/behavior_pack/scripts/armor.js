@@ -16,6 +16,14 @@ export const KAGE_VILLAGES = {
 };
 const KAGE_PROP = "aegis:kage";
 const SANNIN_PROP = "aegis:sannin";
+// which Sannin's legacy they were given (v1.55: the Bingo Book checks for the Toad Sage)
+export const sanninOf = (player) => {
+  try {
+    return player.getDynamicProperty("aegis:sannin_of");
+  } catch {
+    return undefined;
+  }
+};
 export const isSannin = (player) => {
   try {
     return player.getDynamicProperty(SANNIN_PROP) === true;
@@ -331,6 +339,7 @@ export function initArmor(helpers) {
     const arg = String(message ?? "").trim().toLowerCase();
     if (arg === "clear") {
       sourceEntity.setDynamicProperty(SANNIN_PROP, undefined);
+      sourceEntity.setDynamicProperty("aegis:sannin_of", undefined);
       api.refreshName?.(sourceEntity);
       return sourceEntity.sendMessage("§7Sannin title removed.");
     }
@@ -338,6 +347,7 @@ export function initArmor(helpers) {
       return sourceEntity.sendMessage("§7Usage: /scriptevent aegis:sannin [jiraiya|tsunade|orochimaru|clear]");
     }
     sourceEntity.setDynamicProperty(SANNIN_PROP, true);
+    if (arg) sourceEntity.setDynamicProperty("aegis:sannin_of", arg);
     if (arg) giveSet(sourceEntity, arg);
     api.refreshName?.(sourceEntity);
     world.sendMessage(`§e${sourceEntity.name} has been named one of the §aLegendary Sannin§e${arg ? ` §7(${SANNIN_SETS[arg]}§7's legacy)` : ""}§e!`);

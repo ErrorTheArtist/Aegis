@@ -4,7 +4,8 @@
 // The holder gets the title's reward gear — creative-only items nobody can get any other way, kept on death — its
 // perks, and the title over their name. /tag <player> remove pain takes the title and its perks away (the gear stays,
 // but only the title's holder can use it). The requirements are in the Shinobi Record → Titles, ticked where the add-on
-// can check them; the rest (duels, bounties) are for the admin to judge.
+// can check them — since v1.55 that includes bounties and the players you've defeated (the Bingo Book, bounty.js); only
+// "every village quest chain without dying" is left for the admin to judge.
 
 import { world, system, ItemStack } from "@minecraft/server";
 import { ActionFormData } from "@minecraft/server-ui";
@@ -15,6 +16,7 @@ import { getVillage, everLeft, rogueOf, getHonor } from "./villages.js";
 import { hasSageTraining } from "./sage.js";
 import { kamuiHolder } from "./kamui.js";
 import { JUTSU_NATURE } from "./natures.js";
+import { bountyOf, pvpRecord } from "./bounty.js";
 
 const REWARDED = "aegis:titles_rewarded"; // titles whose gear this player has been given (once each)
 const ACTIVE = "aegis:titles_active"; // titles they held at the last check (to announce changes)
@@ -59,13 +61,14 @@ const R = {
   left: ["Leave your village", (p) => everLeft(p)],
   ms: ["Own the Mangekyō Sharingan", hasMS],
   kills: ["Defeat 3,000 hostile ninja", (p) => ninjaKills(p) >= 3000],
-  kage: ["Defeat a Kage-rank player", null],
-  bounty2: ["Have a bounty of at least 2 Million Ryō", null],
+  kage: ["Defeat a Kage-rank player", (p) => !!pvpRecord(p).kage],
+  bounty2: ["Have a bounty of at least 2 Million Ryō", (p) => bountyOf(p) >= 2000000],
 };
 export const TITLES = {
   pain: {
     name: "§5Pain", short: "§5Pain",
-    reqs: [R.left, R.lvl300, ["Defeat the player holding the title The Toad Sage", null], ["Have a bounty of at least 5 Million Ryō", null],
+    reqs: [R.left, R.lvl300, ["Defeat the player holding the title The Toad Sage", (p) => !!pvpRecord(p).toad],
+      ["Have a bounty of at least 5 Million Ryō", (p) => bountyOf(p) >= 5000000],
       ["Must have the Ōtsutsuki Clan", (p) => clanOf(p) === "otsutsuki"]],
     rewards: ["aegis:advanced_rinnegan", "aegis:adv_shinra_tensei_scroll", "aegis:adv_chibaku_tensei_scroll", "aegis:chakra_rod"],
     perks: "+15% damage vs groups (2 or more enemies near your target)",
@@ -80,7 +83,7 @@ export const TITLES = {
   tobi: {
     name: "§6Tobi", short: "§6Tobi",
     reqs: [R.lvl300, ["Be the Kamui holder in the world", (p) => kamuiHolder()?.id === p.id], R.ms, R.left,
-      ["Defeat a Jōnin-rank feared and respected player", null], R.bounty2],
+      ["Defeat a Jōnin-rank feared and respected player", (p) => !!pvpRecord(p).jonin], R.bounty2],
     rewards: ["aegis:tobi_mask", "aegis:gunbai", "aegis:kamui_shuriken_scroll"],
     perks: "Kamui cooldown −30% · +10% jutsu damage",
   },

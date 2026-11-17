@@ -13,6 +13,9 @@
 //   /scriptevent aegis:level set 50       — set your level (points are recalculated)
 //   /scriptevent aegis:level xp 5000      — add XP
 
+import { bingoBook } from "./bounty.js";
+import { achievementsMenu } from "./achievements.js";
+import { dailyMenu } from "./dailies.js";
 import { world, system, ItemStack, ItemLockMode } from "@minecraft/server";
 import { showTitle } from "./hud.js";
 import { ActionFormData, ModalFormData, MessageFormData } from "@minecraft/server-ui";
@@ -200,6 +203,9 @@ export async function openStats(player) {
   form.button("§6Ryō Wallet\n§r§7pay players · exchange emeralds");
   form.button("§aVillage\n§r§7chat · leaderboard · return home · leave");
   form.button("§5Titles\n§r§7Pain · Itachi · Tobi · Sasuke · Naruto");
+  form.button("§cBingo Book\n§r§7bounties · most wanted · PvP record");
+  form.button("§6Achievements\n§r§750 to unlock");
+  form.button("§aDaily\n§r§7missions · login streak");
 
   const res = await form.show(player);
   if (res.canceled || res.selection === undefined) return;
@@ -207,6 +213,9 @@ export async function openStats(player) {
   if (res.selection === ids.length + 1) return walletMenu(player);
   if (res.selection === ids.length + 2) return villageMenu(player);
   if (res.selection === ids.length + 3) return titlesMenu(player, () => openStats(player));
+  if (res.selection === ids.length + 4) return bingoBook(player, () => openStats(player));
+  if (res.selection === ids.length + 5) return achievementsMenu(player, () => openStats(player));
+  if (res.selection === ids.length + 6) return dailyMenu(player, () => openStats(player));
   const id = ids[res.selection];
   const room = Math.min(getPoints(player), STAT_CAP - getStat(player, id));
   if (room <= 0) {

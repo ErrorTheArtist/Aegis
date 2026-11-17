@@ -40,6 +40,34 @@ export const LEGENDS = {
   hanzo: { name: "§5Hanzō of the Salamander", skin: 68, color: [0.55, 0.3, 0.75], phase: "Salamander's Venom", village: "rain",
     entrance: "§7The rain falls harder…",
     drops: [["aegis:water_prison_scroll", 1, 1], ["aegis:water_shockwave_scroll", 1, 0.4], ["aegis:ryo", 64, 1], ["aegis:rain_headband", 1, 0.5]] },
+  // ---- v1.55: eight more legends ----
+  kakashi: { name: "§bKakashi Hatake", skin: 70, color: [0.6, 0.85, 1], phase: "Mangekyō Sharingan: Kamui", village: "leaf",
+    entrance: "§7looks up from his book…",
+    drops: [["aegis:raikiri_scroll", 1, 1], ["aegis:summon_hounds_scroll", 1, 0.5], ["aegis:lightning_hound_scroll", 1, 0.4], ["aegis:kunai", 16, 1]] },
+  guy: { name: "§aMight Guy", skin: 71, color: [0.3, 0.85, 0.4], phase: "Eight Inner Gates", village: "leaf",
+    entrance: "§7Dynamic ENTRY!",
+    drops: [["aegis:morning_peacock_scroll", 1, 1], ["aegis:daytime_tiger_scroll", 1, 0.35], ["aegis:eight_gates_scroll", 1, 0.4], ["aegis:curry_of_life", 2, 1]] },
+  jiraiya: { name: "§cJiraiya §7the Toad Sage", skin: 72, color: [0.95, 0.45, 0.3], phase: "Sage Mode", village: "leaf",
+    entrance: "§7lands with a dramatic pose!",
+    drops: [["aegis:toad_oil_scroll", 1, 1], ["aegis:summon_toad_scroll", 1, 0.5], ["aegis:sphere_scroll", 1, 0.4], ["aegis:ninja_wire", 8, 0.5]] },
+  orochimaru: { name: "§5Orochimaru", skin: 73, color: [0.55, 0.35, 0.7], phase: "White Snake",
+    entrance: "§7slithers out of the shadows…",
+    drops: [["aegis:shadow_snakes_scroll", 1, 1], ["aegis:summon_snake_scroll", 1, 0.5], ["aegis:five_elements_seal_scroll", 1, 0.3], ["aegis:kusanagi", 1, 0.2]] },
+  hashirama: { name: "§aHashirama Senju §8[Edo Tensei]", skin: 30, color: [0.4, 0.8, 0.3], phase: "Sage Mode", village: "leaf",
+    entrance: "§7returns from the dead!",
+    drops: [["aegis:wood_forest_scroll", 1, 0.6], ["aegis:wood_dragon_scroll", 1, 0.5], ["aegis:hundred_healings_scroll", 1, 0.35], ["aegis:ryo", 64, 1]] },
+  tobirama: { name: "§9Tobirama Senju §8[Edo Tensei]", skin: 31, color: [0.3, 0.6, 1], phase: "Flying Thunder God Split", village: "leaf",
+    entrance: "§7returns from the dead!",
+    drops: [["aegis:water_dragon_scroll", 1, 1], ["aegis:flying_raijin_scroll", 1, 0.4], ["aegis:raijin_kunai", 1, 0.35],
+      ["aegis:great_waterfall_scroll", 1, 0.5], ["aegis:raijin_sword", 1, 0.12]] },
+  obito: { name: "§fObito Uchiha §7[Ten-Tails Jinchūriki]", skin: 74, color: [0.75, 0.75, 0.8], phase: "Six Paths Power",
+    entrance: "§7descends with the Ten-Tails' power!",
+    drops: [["aegis:ryo", 64, 1], ["aegis:ryo", 64, 1], ["aegis:bijuu_scroll", 1, 0.25], ["aegis:tree_binding_scroll", 1, 0.4],
+      ["aegis:wood_forest_scroll", 1, 0.3], ["aegis:reroll_scroll", 1, 0.3]] },
+  kaguya: { name: "§dKaguya Ōtsutsuki", skin: 75, color: [0.85, 0.8, 1], phase: "Rabbit Goddess",
+    entrance: "§7The Rabbit Goddess has awakened…",
+    drops: [["aegis:ryo", 64, 1], ["aegis:ryo", 64, 1], ["aegis:ryo", 64, 1], ["aegis:reroll_scroll", 1, 0.6], ["aegis:hundred_healings_scroll", 1, 0.4],
+      ["aegis:nirvana_scroll", 1, 0.4], ["aegis:planetary_rasengan_scroll", 1, 0.25]] },
 };
 // v1.51 colours
 const SAND = [0.86, 0.72, 0.45];
@@ -52,6 +80,11 @@ const ROCK = [0.6, 0.45, 0.3];
 const VENOM = [0.55, 0.3, 0.75];
 const WOOD = [0.45, 0.32, 0.18];
 const reformed = new Set(); // Edo Madara: his body reforms once
+// Villains don't guard the area while they wait for a challenger (v1.54's Madara rule); the backers make enemy ninja
+// near them stronger instead.
+export const VILLAINS = new Set(["madara", "orochimaru", "obito", "kaguya"]);
+const BACKERS = new Set(["madara", "orochimaru", "obito"]);
+export const LEGEND_SHARDS = { madara: 8, hashirama: 8, tobirama: 6, obito: 10, kaguya: 15 }; // the others drop 4–5
 
 let api;
 const phase2 = new Set(); // entity ids that entered their second phase
@@ -1219,7 +1252,652 @@ function edoReform(boss) {
 // strength grows near him). If nobody's left to fight for 30 seconds, a spawner's legend heals up and waits again.
 // Legends a quest calls up fight straight away.
 // ---------------------------------------------------------------------------
+
+// ===========================================================================
+// v1.55 movesets: Kakashi, Might Guy, Jiraiya, Orochimaru, Hashirama, Tobirama, Obito, Kaguya
+// ===========================================================================
+const BOLT2 = [0.6, 0.85, 1];
+const GREEN = [0.3, 0.85, 0.4];
+const TOAD = [0.95, 0.45, 0.3];
+const SNAKE = [0.55, 0.35, 0.7];
+const SENJU = [0.4, 0.8, 0.3];
+const TSB = [0.18, 0.15, 0.22]; // the truth-seeking balls
+const GODDESS = [0.85, 0.8, 1];
+const KAMUI = [0.55, 0.35, 0.8];
+const guyGates = new Map(); // boss id -> the gate he's opened (3, 6, 7, 8)
+const nightGuyDone = new Set();
+
+function hpFrac(e) {
+  try {
+    const h = e.getComponent("minecraft:health");
+    return h.currentValue / h.effectiveMax;
+  } catch {
+    return 1;
+  }
+}
+
+// Everyone in a cone toward the target.
+function coneBlast(boss, t, range, minDot, dmg, color, particle, extra) {
+  const o = { ...boss.location };
+  const d = dirTo(boss, t);
+  for (let i = 2; i <= range; i += 2) {
+    for (const s of [-1, 0, 1]) api.particle(boss.dimension, particle, add(o, { x: d.x * i - d.z * s * i * 0.3, y: 1, z: d.z * i + d.x * s * i * 0.3 }), color);
+  }
+  for (const e of victims(boss, o, range)) {
+    const v = api.sub(e.location, o);
+    const len = Math.hypot(v.x, v.z);
+    if (len < 0.5 || (v.x * d.x + v.z * d.z) / len < minDot) continue;
+    api.hurt(e, dmg, boss);
+    extra?.(e);
+  }
+}
+
+// Everyone in a straight lane toward the target.
+function laneHit(boss, t, length, half, dmg, color, particle, extra) {
+  const o = { ...boss.location };
+  const d = dirTo(boss, t);
+  for (let i = 1; i <= length; i++) api.particle(boss.dimension, particle, add(o, { x: d.x * i, y: 1.3, z: d.z * i }), color);
+  for (const e of victims(boss, add(o, { x: d.x * length / 2, y: 0, z: d.z * length / 2 }), length / 2 + half + 1)) {
+    const v = api.sub(e.location, o);
+    const along = v.x * d.x + v.z * d.z;
+    if (along < 0 || along > length + 0.5 || Math.abs(v.x * d.z - v.z * d.x) > half) continue;
+    api.hurt(e, dmg, boss);
+    extra?.(e, d);
+  }
+}
+
+// A safe spot near pos (on the ground), or undefined.
+function groundNear(dim, pos) {
+  const y = api.surfaceY(dim, pos);
+  return y === undefined ? undefined : { x: pos.x, y, z: pos.z };
+}
+
+const kunaiFan = (boss, t, n = 5) => {
+  api.anim(boss, "animation.aegis.throw_overhead");
+  fan(boss, t, n, 0.15, { noOrb: true, speed: 1.8, maxAge: 16, damage: 4, radius: 1.2, knock: 0.2, fire: 0,
+    trail: "aegis:slash", burst: "aegis:slash", color: [0.85, 0.85, 0.9], hitRadius: 1.1, power: 0.3 });
+};
+
+// Kamui: the space around the target twists — whoever is still inside when it closes is warped away.
+function kamuiWarp(boss, t, dmg = 22) {
+  const at = { ...t.location };
+  api.anim(boss, "animation.aegis.eye_activate");
+  sfx(boss.dimension, "aegis.eye", boss.location, 1.4, 0.7);
+  warnAll(boss, at, 5, "§5Kamui!", "§7Get out of the swirl!");
+  for (let k = 0; k < 24; k += 4) system.runTimeout(() => api.particle(boss.dimension, "aegis:cine_swirl", add(at, { x: 0, y: 1, z: 0 }), KAMUI), k);
+  system.runTimeout(() => {
+    if (!api.isValid(boss)) return;
+    for (const e of victims(boss, at, 2.8)) {
+      api.hurt(e, dmg, boss, "magic");
+      const a = Math.random() * Math.PI * 2;
+      const to = groundNear(boss.dimension, add(e.location, { x: Math.cos(a) * 10, y: 1, z: Math.sin(a) * 10 }));
+      if (to) {
+        try {
+          e.teleport(to);
+        } catch {
+          /* ignore */
+        }
+      }
+      api.particle(boss.dimension, "aegis:cine_swirl", e.location, KAMUI);
+    }
+  }, 26);
+}
+
+// ---- Kakashi Hatake ----
+function trackingFang(boss, t) {
+  // Earth Release: Tracking Fang — ninja hounds burst out of the ground and pin the target
+  api.anim(boss, "animation.aegis.summon_slam");
+  sfx(boss.dimension, "aegis.summon", boss.location, 1.2, 1.2);
+  const at = { ...t.location };
+  api.particle(boss.dimension, "aegis:dust", at);
+  system.runTimeout(() => {
+    if (!api.isValid(boss)) return;
+    api.sound(boss.dimension, "mob.wolf.growl", at, 1.6, 1);
+    for (let k = 0; k < 6; k++) api.particle(boss.dimension, "aegis:earth_burst", add(at, { x: Math.cos(k) * 1.2, y: 0.3, z: Math.sin(k) * 1.2 }));
+    blast(boss, at, 2.2, 10, 0.2, (e) => {
+      eff(e, "slowness", 50, 255);
+      if (e.typeId === "minecraft:player") e.onScreenDisplay?.setActionBar("§7The ninja hounds have you pinned!");
+    });
+  }, 14);
+}
+
+function kakashiAI(boss, t, dist, p2) {
+  const r = Math.random();
+  if (p2 && r < 0.25) {
+    kamuiWarp(boss, t);
+    return 140;
+  }
+  if (dist < 4.5) {
+    // Raikiri
+    sfx(boss.dimension, "aegis.chidori", boss.location, 1.4, 0.9);
+    dashStrike(boss, t, BOLT2, p2 ? 22 : 16, 10, "animation.aegis.chidori_charge");
+    return 70;
+  }
+  if (r < 0.3) {
+    trackingFang(boss, t);
+    return 110;
+  }
+  if (r < 0.55) {
+    // Lightning Hound
+    api.anim(boss, "animation.aegis.lightning_burst");
+    chargeFx(boss, BOLT2, 10, "aegis.thunder");
+    system.runTimeout(() => api.isValid(boss) && api.isValid(t) && shoot(boss, t, { noOrb: true, speed: 1.3, maxAge: 36, damage: 14, radius: 2.5,
+      knock: 1, fire: 0, home: t, turn: 0.2, trail: "aegis:chidori_arc", burst: "aegis:lightning_burst", color: BOLT2, hitRadius: 1.4, power: 1,
+      effects: [["slowness", 40, 2]] }), 10);
+    return 90;
+  }
+  if (r < 0.75) {
+    waterDragon(boss, t); // copied with the Sharingan
+    return 100;
+  }
+  kunaiFan(boss, t);
+  return 60;
+}
+
+// ---- Might Guy ----
+const GATE_NAMES = { 3: "Gate of Life", 6: "Gate of Joy", 7: "Gate of Wonder", 8: "Gate of Death" };
+function guyGate(boss) {
+  const f = hpFrac(boss);
+  const want = f < 0.12 ? 8 : f < 0.25 ? 7 : f < 0.5 ? 6 : f < 0.75 ? 3 : 0;
+  const have = guyGates.get(boss.id) ?? 0;
+  if (want > have) {
+    guyGates.set(boss.id, want);
+    api.anim(boss, "animation.aegis.gates_release");
+    impactFx(boss.dimension, boss.location, want === 8 ? [1, 0.3, 0.2] : GREEN, 2 + want * 0.2);
+    sfx(boss.dimension, "aegis.gates", boss.location, 2.4, 1);
+    eff(boss, "strength", 999999, Math.min(4, Math.floor(want / 2)));
+    eff(boss, "speed", 999999, want >= 6 ? 2 : 1);
+    warnAll(boss, boss.location, 40, "§aMight Guy", `§7opens the ${GATE_NAMES[want]}!`);
+  }
+  return guyGates.get(boss.id) ?? 0;
+}
+
+function morningPeacock(boss, t) {
+  for (let i = 0; i < 10; i++) {
+    system.runTimeout(() => {
+      if (!api.isValid(boss) || !api.isValid(t)) return;
+      api.anim(boss, i % 2 ? "animation.aegis.m1_cross" : "animation.aegis.m1_jab");
+      api.particle(boss.dimension, "aegis:fire_burst", chest(t), [1, 0.55, 0.2]);
+      if (flat(t.location, boss.location) < 5.5) api.hurt(t, 3, boss);
+    }, 4 + i * 2);
+  }
+  system.runTimeout(() => {
+    if (!api.isValid(boss) || !api.isValid(t)) return;
+    const d = dirTo(boss, t);
+    if (flat(t.location, boss.location) < 6) {
+      api.hurt(t, 10, boss);
+      api.knockback(t, d.x, d.z, 3, 0.9);
+    }
+    impactFx(boss.dimension, t.location, [1, 0.55, 0.2], 2);
+  }, 26);
+}
+
+function nightGuy(boss, t) {
+  // the Eighth Gate: one kick that bends space — and then he's spent
+  warnAll(boss, boss.location, 40, "§cNight Guy!", "§7The Eighth Gate — get out of the way!");
+  api.anim(boss, "animation.aegis.gates_release");
+  chargeFx(boss, [1, 0.25, 0.2], 30, "aegis.gates");
+  for (let k = 0; k < 30; k += 5) system.runTimeout(() => api.isValid(boss) && aura(boss, [1, 0.25, 0.2], true), k);
+  system.runTimeout(() => {
+    if (!api.isValid(boss)) return;
+    const target = api.isValid(t) ? t : undefined;
+    const d = target ? dirTo(boss, target) : api.norm({ x: boss.getViewDirection().x, y: 0, z: boss.getViewDirection().z });
+    const o = { ...boss.location };
+    api.knockback(boss, d.x, d.z, 6, 0.3);
+    for (let i = 0; i <= 14; i++) api.particle(boss.dimension, "aegis:cine_flame", add(o, { x: d.x * i, y: 1, z: d.z * i }), [1, 0.25, 0.2]);
+    for (const e of victims(boss, add(o, { x: d.x * 7, y: 0, z: d.z * 7 }), 9)) {
+      const v = api.sub(e.location, o);
+      const along = v.x * d.x + v.z * d.z;
+      if (along < 0 || along > 15 || Math.abs(v.x * d.z - v.z * d.x) > 2.5) continue;
+      api.hurt(e, 45, boss);
+      api.knockback(e, d.x, d.z, 4, 1);
+    }
+    shake(boss.dimension, o, 1, 1.2, 40);
+    sfx(boss.dimension, "aegis.boom", o, 3, 0.6);
+    system.runTimeout(() => {
+      if (!api.isValid(boss)) return;
+      for (const id of ["strength", "speed"]) {
+        try {
+          boss.removeEffect(id);
+        } catch {
+          /* ignore */
+        }
+      }
+      eff(boss, "slowness", 400, 2);
+      eff(boss, "weakness", 400, 2);
+      for (const p of playersAround(boss.dimension, boss.location, 40)) p.onScreenDisplay?.setActionBar("§7Might Guy is burnt out — now's your chance!");
+    }, 20);
+  }, 30);
+}
+
+function guyAI(boss, t, dist, p2) {
+  const gate = guyGate(boss);
+  if (gate >= 8 && !nightGuyDone.has(boss.id)) {
+    nightGuyDone.add(boss.id);
+    nightGuy(boss, t);
+    return 220;
+  }
+  if (gate >= 7 && Math.random() < 0.3) {
+    // Daytime Tiger
+    api.anim(boss, "animation.aegis.power_up");
+    chargeFx(boss, [1, 0.8, 0.35], 14, "aegis.gates");
+    system.runTimeout(() => api.isValid(boss) && api.isValid(t) && shoot(boss, t, { noOrb: true, speed: 1.3, maxAge: 30, damage: 26, radius: 4.5, knock: 3,
+      fire: 0, trail: "aegis:rasengan_wind", burst: "aegis:chakra_burst", color: [1, 0.8, 0.35], hitRadius: 2, power: 2.4 }), 14);
+    return 140;
+  }
+  if (gate >= 6 && dist < 5 && Math.random() < 0.5) {
+    morningPeacock(boss, t);
+    return 120;
+  }
+  if (dist < 4) {
+    // Leaf Hurricane
+    api.anim(boss, "animation.aegis.leaf_hurricane");
+    sfx(boss.dimension, "aegis.wind", boss.location, 1.4, 1.2);
+    system.runTimeout(() => api.isValid(boss) && (api.particle(boss.dimension, "aegis:wind_gust", boss.location, GREEN), blast(boss, boss.location, 3.8, p2 ? 16 : 12, 2.4)), 6);
+    return 50;
+  }
+  if (dist > 6) {
+    // Dynamic Entry!
+    dashStrike(boss, t, GREEN, p2 ? 18 : 12, 6, "animation.aegis.dynamic_entry", 3.6);
+    return 70;
+  }
+  // Leaf Gale: a sweeping kick that throws up a gust
+  api.anim(boss, "animation.aegis.leaf_hurricane");
+  coneBlast(boss, t, 6, 0.6, 10, GREEN, "aegis:wind_gust", (e) => {
+    const d = dirTo(boss, e);
+    api.knockback(e, d.x, d.z, 2, 0.4);
+  });
+  return 60;
+}
+
+// ---- Jiraiya ----
+function toadFlame(boss, t, pulses, dmg = 6) {
+  api.anim(boss, "animation.aegis.jutsu_breath");
+  chargeFx(boss, TOAD, 12, "aegis.inhale");
+  sfx(boss.dimension, "aegis.fire_roar", boss.location, 2, 0.8);
+  for (let k = 0; k < pulses; k++) {
+    system.runTimeout(() => api.isValid(boss) && api.isValid(t) && coneBlast(boss, t, 11, 0.75, dmg, [1, 0.45, 0.1], "aegis:cine_flame", (e) => {
+      try {
+        e.setOnFire(5, true);
+      } catch {
+        /* ignore */
+      }
+    }), 12 + k * 6);
+  }
+}
+
+function frogSong(boss) {
+  // Demonic Illusion: Gamarinshō — the two toads' duet freezes everyone who hears it
+  api.anim(boss, "animation.aegis.mind_seal");
+  sfx(boss.dimension, "aegis.eye", boss.location, 1.6, 0.6);
+  api.sound(boss.dimension, "mob.slime.big", boss.location, 2, 0.5);
+  for (const p of playersAround(boss.dimension, boss.location, 14)) {
+    showTitle(p, "§2Gamarinshō", { subtitle: "§7The toads' song fills your head…", fadeInDuration: 2, stayDuration: 40, fadeOutDuration: 10 });
+    eff(p, "slowness", 50, 255);
+    eff(p, "nausea", 120, 0);
+    eff(p, "blindness", 40, 0);
+    api.hurt(p, 6, boss, "magic");
+  }
+}
+
+function jiraiyaAI(boss, t, dist, p2) {
+  const r = Math.random();
+  if (p2 && r < 0.2) {
+    frogSong(boss);
+    return 160;
+  }
+  if (p2 && r < 0.4) {
+    // Sage Art: Goemon — fire, wind and toad oil together
+    warnAll(boss, boss.location, 30, "§cSage Art: Goemon", "§7a river of burning oil!");
+    toadFlame(boss, t, 4, 10);
+    return 130;
+  }
+  if (dist < 4.5) {
+    // Rasengan
+    dashStrike(boss, t, [0.4, 0.75, 1], p2 ? 22 : 16, 10);
+    return 70;
+  }
+  if (r < 0.35) {
+    toadFlame(boss, t, 3);
+    return 110;
+  }
+  if (r < 0.55) {
+    // Needle Jizō: his hair hardens into a ball of needles
+    api.anim(boss, "animation.aegis.power_up");
+    eff(boss, "resistance", 100, 2);
+    for (let k = 0; k < 12; k++) {
+      const a = (k / 12) * Math.PI * 2;
+      api.particle(boss.dimension, "aegis:slash", add(boss.location, { x: Math.cos(a) * 1.6, y: 1.2, z: Math.sin(a) * 1.6 }), [0.95, 0.95, 0.9]);
+    }
+    system.runTimeout(() => api.isValid(boss) && blast(boss, boss.location, 3.5, 9, 1.8), 6);
+    return 90;
+  }
+  if (r < 0.75) {
+    // Toad Mouth Trap: the ground under the target turns into toad flesh
+    const at = { ...t.location };
+    api.anim(boss, "animation.aegis.summon_slam");
+    sfx(boss.dimension, "aegis.summon", boss.location, 1.2, 0.8);
+    for (let k = 0; k < 60; k += 10) {
+      system.runTimeout(() => {
+        if (!api.isValid(boss)) return;
+        api.particle(boss.dimension, "aegis:swamp_mud", at);
+        api.particle(boss.dimension, "aegis:swamp_bubble", at);
+        blast(boss, at, 3, 4, 0, (e) => eff(e, "slowness", 30, 3));
+      }, 10 + k);
+    }
+    return 120;
+  }
+  // Hair Needle Senbon
+  api.anim(boss, "animation.aegis.hand_signs");
+  fan(boss, t, 5, 0.18, { noOrb: true, speed: 1.7, maxAge: 18, damage: 5, radius: 1.2, knock: 0.2, fire: 0, trail: "aegis:slash",
+    burst: "aegis:slash", color: [0.95, 0.95, 0.9], hitRadius: 1.1, power: 0.3 });
+  return 70;
+}
+
+// ---- Orochimaru ----
+function orochimaruAI(boss, t, dist, p2) {
+  const r = Math.random();
+  if (p2 && r < 0.3) {
+    // Eight Branches Technique: eight great serpent heads strike one after another
+    const at = { ...t.location };
+    warnAll(boss, at, 20, "§5Eight Branches Technique", "§7eight serpents strike!");
+    for (let k = 0; k < 8; k++) {
+      system.runTimeout(() => {
+        if (!api.isValid(boss)) return;
+        const a = (k / 8) * Math.PI * 2;
+        const p = add(at, { x: Math.cos(a) * 2.5, y: 0, z: Math.sin(a) * 2.5 });
+        api.particle(boss.dimension, "aegis:earth_burst", p);
+        api.particle(boss.dimension, "aegis:slash", add(p, { x: 0, y: 1.5, z: 0 }), SNAKE);
+        blast(boss, p, 2.6, 7, 1.2, (e) => eff(e, "poison", 60, 1));
+      }, 10 + k * 5);
+    }
+    return 150;
+  }
+  if (dist < 5) {
+    // the Sword of Kusanagi shoots out of his mouth
+    api.anim(boss, "animation.aegis.sword_thrust");
+    system.runTimeout(() => api.isValid(boss) && api.isValid(t) && laneHit(boss, t, 7, 1.4, p2 ? 20 : 14, [0.8, 0.85, 0.95], "aegis:slash"), 6);
+    sfx(boss.dimension, "aegis.slash", boss.location, 1.2, 1.2);
+    return 60;
+  }
+  if (r < 0.35) {
+    // Striking Shadow Snakes
+    api.anim(boss, "animation.aegis.palm_thrust");
+    api.sound(boss.dimension, "mob.silverfish.say", boss.location, 1.5, 0.6);
+    fan(boss, t, p2 ? 5 : 3, 0.2, { noOrb: true, speed: 1.3, maxAge: 18, damage: 8, radius: 1.4, knock: 0.3, fire: 0, trail: "aegis:slash",
+      burst: "aegis:slash", color: SNAKE, hitRadius: 1.3, power: 0.4, effects: [["poison", 80, 1], ["slowness", 40, 2]] });
+    return 90;
+  }
+  if (r < 0.55) {
+    // Many Hidden Shadow Snake Hands: snakes burst out all around him
+    api.anim(boss, "animation.aegis.both_palms");
+    for (let k = 0; k < 12; k++) {
+      const a = (k / 12) * Math.PI * 2;
+      api.particle(boss.dimension, "aegis:slash", add(boss.location, { x: Math.cos(a) * 3, y: 1, z: Math.sin(a) * 3 }), SNAKE);
+    }
+    system.runTimeout(() => api.isValid(boss) && blast(boss, boss.location, 6, 10, 1.6, (e) => eff(e, "poison", 100, 1)), 6);
+    return 110;
+  }
+  if (r < 0.75) {
+    // Wind Release: Great Breakthrough
+    api.anim(boss, "animation.aegis.wind_palm");
+    coneBlast(boss, t, 9, 0.7, 10, [0.75, 1, 0.85], "aegis:wind_gust", (e) => {
+      const d = dirTo(boss, e);
+      api.knockback(e, d.x, d.z, 2.6, 0.4);
+    });
+    return 90;
+  }
+  poisonMist(boss, t, p2);
+  return 110;
+}
+
+// ---- Hashirama Senju ----
+function hashiramaAI(boss, t, dist, p2) {
+  const r = Math.random();
+  if (p2 && r < 0.25) {
+    // Sage Mode — Gate of the Great God: huge wooden gates crash down on the target
+    const at = { ...t.location };
+    warnAll(boss, at, 10, "§2Gate of the Great God", "§7move — NOW!");
+    for (let k = 0; k < 30; k += 5) system.runTimeout(() => api.particle(boss.dimension, "aegis:cine_ring", add(at, { x: 0, y: 0.1, z: 0 }), SENJU), k);
+    system.runTimeout(() => {
+      if (!api.isValid(boss)) return;
+      for (let y = 6; y >= 0; y -= 1) api.particle(boss.dimension, "aegis:wood_burst", add(at, { x: 0, y, z: 0 }), WOOD);
+      api.particle(boss.dimension, "minecraft:huge_explosion_emitter", at);
+      shake(boss.dimension, at, 0.8, 1, 30);
+      sfx(boss.dimension, "aegis.earth_break", at, 2.5, 0.5);
+      blast(boss, at, 5, 30, 2, (e) => eff(e, "slowness", 60, 2));
+    }, 32);
+    return 170;
+  }
+  if (dist < 4.5) {
+    // Wood Release: Cutting Technique — wooden spikes burst from his arms
+    api.anim(boss, "animation.aegis.palm_thrust");
+    for (let k = 0; k < 8; k++) api.particle(boss.dimension, "aegis:wood_burst", add(boss.location, { x: Math.cos(k) * 2, y: 1, z: Math.sin(k) * 2 }), WOOD);
+    system.runTimeout(() => api.isValid(boss) && blast(boss, boss.location, 4.2, p2 ? 18 : 14, 2.2), 5);
+    return 60;
+  }
+  if (r < 0.3) {
+    // Deep Forest Emergence: trees burst up everywhere around the target
+    const at = { ...t.location };
+    api.anim(boss, "animation.aegis.earth_slam");
+    chargeFx(boss, SENJU, 14, "aegis.wood");
+    warnAll(boss, at, 12, "§2Deep Forest Emergence", "§7the trees are coming up!");
+    for (let k = 0; k < 6; k++) {
+      system.runTimeout(() => {
+        if (!api.isValid(boss)) return;
+        for (let i = 0; i < 5; i++) {
+          const a = Math.random() * Math.PI * 2;
+          const rr = Math.random() * 8;
+          const p = add(at, { x: Math.cos(a) * rr, y: 0, z: Math.sin(a) * rr });
+          for (let y = 0; y < 3; y += 0.8) api.particle(boss.dimension, "aegis:wood_burst", add(p, { x: 0, y, z: 0 }), WOOD);
+        }
+        blast(boss, at, 9, 4, 0.4, (e) => eff(e, "slowness", 30, 1));
+      }, 14 + k * 10);
+    }
+    return 140;
+  }
+  if (r < 0.55) {
+    woodLine(boss, t);
+    return 110;
+  }
+  if (r < 0.75 && clonesOf(boss) < 2) {
+    clones(boss, 30, "§aHashirama §7(Wood Clone)", 2, "aegis:wood_burst");
+    return 120;
+  }
+  // his famous healing
+  api.anim(boss, "animation.aegis.heal_palms");
+  heal(boss, 60);
+  api.particle(boss.dimension, "aegis:heal", boss.location, SENJU);
+  return 100;
+}
+
+// ---- Tobirama Senju ----
+function tobiramaAI(boss, t, dist, p2) {
+  const r = Math.random();
+  if (p2 && r < 0.3) {
+    // Flying Thunder God: three strikes from three directions in a blink
+    for (let k = 0; k < 3; k++) system.runTimeout(() => api.isValid(boss) && api.isValid(t) && teleportStrike(boss, t, 10, WATER), k * 10);
+    return 120;
+  }
+  if (dist < 4.5) {
+    // the Thunder God Sword
+    api.anim(boss, "animation.aegis.sword_thrust");
+    system.runTimeout(() => api.isValid(boss) && api.isValid(t) && laneHit(boss, t, 7, 1.5, p2 ? 20 : 14, [1, 0.92, 0.45], "aegis:chidori_arc",
+      (e) => eff(e, "slowness", 30, 2)), 5);
+    sfx(boss.dimension, "aegis.chidori", boss.location, 1.2, 1.3);
+    return 55;
+  }
+  if (r < 0.35) {
+    teleportStrike(boss, t, p2 ? 18 : 14, WATER);
+    return 70;
+  }
+  if (r < 0.6) {
+    waterDragon(boss, t);
+    return 100;
+  }
+  if (r < 0.8) {
+    // Water Formation Wall
+    api.anim(boss, "animation.aegis.water_seals");
+    eff(boss, "resistance", 100, 2);
+    for (let k = 0; k < 16; k++) {
+      const a = (k / 16) * Math.PI * 2;
+      api.particle(boss.dimension, "aegis:water_splash", add(boss.location, { x: Math.cos(a) * 2.5, y: 0.5, z: Math.sin(a) * 2.5 }), WATER);
+    }
+    system.runTimeout(() => api.isValid(boss) && blast(boss, boss.location, 4.5, 10, 3, (e) => eff(e, "slowness", 60, 1)), 6);
+    return 100;
+  }
+  kunaiFan(boss, t);
+  return 60;
+}
+
+// ---- Obito Uchiha, the Ten-Tails' Jinchūriki ----
+function truthSeekingBalls(boss, t, n) {
+  if (!t || !n) {
+    // (phase two: a ring of black orbs flares round him)
+    for (let k = 0; k < 9; k++) {
+      const a = (k / 9) * Math.PI * 2;
+      api.particle(boss.dimension, "aegis:beast_burst", add(boss.location, { x: Math.cos(a) * 1.6, y: 2.2, z: Math.sin(a) * 1.6 }), TSB);
+    }
+    return;
+  }
+  api.anim(boss, "animation.aegis.both_palms");
+  for (let k = 0; k < n; k++) {
+    system.runTimeout(() => api.isValid(boss) && api.isValid(t) && shoot(boss, t, { orbEvent: "aegis:as_bijuudama", speed: 1.1, maxAge: 40, damage: 14,
+      radius: 2.5, knock: 1.4, fire: 0, trail: "aegis:beast_aura", burst: "aegis:beast_burst", color: TSB, hitRadius: 1.5, power: 1.2,
+      effects: [["weakness", 100, 1]] }), 6 + k * 6);
+  }
+}
+
+function obitoAI(boss, t, dist, p2) {
+  const r = Math.random();
+  if (p2 && r < 0.2) {
+    bijuuBomb(boss, t, [0.75, 0.75, 0.8]);
+    return 140;
+  }
+  if (p2 && r < 0.35) {
+    woodLine(boss, t);
+    return 110;
+  }
+  if (dist < 4.5) {
+    // the Six Paths staff
+    api.anim(boss, "animation.aegis.sword_spin");
+    system.runTimeout(() => api.isValid(boss) && (impactFx(boss.dimension, boss.location, TSB, 1.6), blast(boss, boss.location, 4.5, p2 ? 22 : 16, 2.4)), 6);
+    return 60;
+  }
+  if (r < 0.3) {
+    truthSeekingBalls(boss, t, p2 ? 5 : 3);
+    return 100;
+  }
+  if (r < 0.5) {
+    kamuiWarp(boss, t);
+    return 120;
+  }
+  if (r < 0.7) {
+    // the war fan's gale
+    api.anim(boss, "animation.aegis.sword_overhead");
+    coneBlast(boss, t, 10, 0.65, 14, [0.9, 0.85, 0.75], "aegis:wind_gust", (e) => {
+      const d = dirTo(boss, e);
+      api.knockback(e, d.x, d.z, 2.8, 0.5);
+    });
+    return 90;
+  }
+  fireAnnihilation(boss, t, p2);
+  return 120;
+}
+
+// ---- Kaguya Ōtsutsuki ----
+function hairBind(boss) {
+  // her hair lashes out and binds everyone around her
+  api.anim(boss, "animation.aegis.both_palms");
+  for (const e of victims(boss, boss.location, 15)) {
+    const a = chest(boss);
+    const b = chest(e);
+    for (let i = 0; i <= 8; i++) api.particle(boss.dimension, "aegis:thread", add(a, api.scale(api.sub(b, a), i / 8)), GODDESS);
+    eff(e, "slowness", 50, 255);
+    api.hurt(e, 6, boss);
+  }
+}
+
+function kaguyaAI(boss, t, dist, p2) {
+  const r = Math.random();
+  if (r < 0.15) {
+    // Dimension Shift: she drags everyone near her into another world — up into the sky and down again
+    const players = playersAround(boss.dimension, boss.location, 30);
+    if (players.length) {
+      api.anim(boss, "animation.aegis.both_palms");
+      sfx(boss.dimension, "aegis.transform", boss.location, 2.5, 0.6);
+      for (const p of players) {
+        showTitle(p, "§fDimension Shift!", { subtitle: "§7…the world changes around you", fadeInDuration: 0, stayDuration: 30, fadeOutDuration: 10 });
+        eff(p, "blindness", 25, 0);
+        eff(p, "levitation", 30, 4);
+        system.runTimeout(() => api.isValid(p) && eff(p, "slow_falling", 120, 0), 30);
+        api.hurt(p, 8, boss, "magic");
+      }
+      return 170;
+    }
+  }
+  if (p2 && r < 0.3) {
+    hairBind(boss);
+    return 130;
+  }
+  if (dist < 4.5) {
+    // Eight Trigrams Vacuum Palm
+    api.anim(boss, "animation.aegis.palm_thrust");
+    system.runTimeout(() => {
+      if (!api.isValid(boss) || !api.isValid(t)) return;
+      const d = dirTo(boss, t);
+      api.hurt(t, 14, boss);
+      api.knockback(t, d.x, d.z, 4, 0.7);
+      impactFx(boss.dimension, t.location, GODDESS, 1.6);
+    }, 6);
+    return 60;
+  }
+  if (r < 0.45) {
+    // All-Killing Ash Bones: bones that crumble whoever they strike
+    api.anim(boss, "animation.aegis.palm_thrust");
+    fan(boss, t, p2 ? 6 : 4, 0.14, { noOrb: true, speed: 1.6, maxAge: 22, damage: 12, radius: 1.3, knock: 0.3, fire: 0, trail: "aegis:slash",
+      burst: "aegis:edo_ash", color: [0.95, 0.94, 0.9], hitRadius: 1.2, power: 0.5, effects: [["wither", 80, 1]] });
+    return 90;
+  }
+  if (r < 0.65) {
+    // Expansive Truth-Seeking Ball: slow and huge — run!
+    warnAll(boss, boss.location, 40, "§fExpansive Truth-Seeking Ball", "§7run from it!");
+    api.anim(boss, "animation.aegis.both_palms");
+    chargeFx(boss, GODDESS, 24, "aegis.charge");
+    system.runTimeout(() => api.isValid(boss) && api.isValid(t) && shoot(boss, t, { orbEvent: "aegis:as_bijuudama_big", speed: 0.55, maxAge: 80,
+      damage: 30, radius: 8, knock: 3, fire: 0, trail: "aegis:beast_aura", burst: "aegis:beast_burst", color: TSB, hitRadius: 2.6, power: 3, home: t,
+      turn: 0.04 }), 24);
+    return 150;
+  }
+  // Yomotsu Hirasaka: she steps through a portal and strikes from behind
+  api.particle(boss.dimension, "aegis:cine_swirl", boss.location, GODDESS);
+  teleportStrike(boss, t, 16, GODDESS);
+  return 90;
+}
+
+Object.assign(AI, { kakashi: kakashiAI, guy: guyAI, jiraiya: jiraiyaAI, orochimaru: orochimaruAI, hashirama: hashiramaAI, tobirama: tobiramaAI,
+  obito: obitoAI, kaguya: kaguyaAI });
+
+const DEFEAT_LINES = {
+  madara: "…Impressive. This world may yet surprise me.",
+  kakashi: "Well… you've grown. Take your reward — you earned it.",
+  guy: "YOSH! Your youth burned brighter than mine today!",
+  jiraiya: "Hah! Not bad, kid. Not bad at all.",
+  orochimaru: "Kukuku… I'll be back. I always come back.",
+  hashirama: "The Will of Fire burns in you. Good.",
+  tobirama: "Hmph. Adequate. Take your reward.",
+  obito: "…Maybe you're right. Maybe there was another way.",
+  kaguya: "Impossible… my chakra… it is all mine…",
+};
 const CHALLENGE_LINES = {
+  kakashi: "Yo. A challenge? …Fine, I'll put my book away. Beat me and the reward's yours.",
+  guy: "YOSH! The springtime of youth burns bright in you! Defeat me and I'll reward your youthful spirit!",
+  jiraiya: "You want to fight the Gallant Jiraiya? Beat me and I'll make it worth your while — the research can wait.",
+  orochimaru: "Kukuku… such an interesting body. Fight me — if you win, I'll even let you have a little reward.",
+  hashirama: "Ah, a young one with fire in their eyes! Let's spar — beat me and I'll reward you, like a Hokage should.",
+  tobirama: "State your business. A challenge? Very well. Defeat me and you'll be rewarded — but I won't go easy.",
+  obito: "This world is hell… Show me your resolve. Defeat me and take what you will.",
+  kaguya: "All chakra belongs to me… You dare challenge the Rabbit Goddess? Win, and I shall grant you a gift.",
   naruto: "Hey! You look pretty strong — wanna fight me? Beat me and I'll give you something awesome, believe it!",
   sasuke: "…You want to test yourself against me? Fine. Win, and you can keep what you find.",
   tsunade: "A challenge, huh? I don't hold back. Knock me down and I'll make it worth your while.",
@@ -1262,7 +1940,7 @@ function rewardText(id) {
   const L = LEGENDS[id];
   const sure = L.drops.filter(([, , c]) => c >= 1).map(([it, n]) => (it === "aegis:ryo" ? `${(n * 100).toLocaleString("en-US")} Ryō` : itemName(it)));
   const maybe = L.drops.filter(([, , c]) => c < 1).map(([it]) => itemName(it));
-  return `§f${[...sure, `${id === "madara" ? 8 : "4–5"} XP Shards`, "Ryō"].join("§7, §f")}${maybe.length ? `§7 — and maybe: §f${maybe.join("§7, §f")}` : ""}`;
+  return `§f${[...sure, `${LEGEND_SHARDS[id] ?? "4–5"} XP Shards`, "Ryō"].join("§7, §f")}${maybe.length ? `§7 — and maybe: §f${maybe.join("§7, §f")}` : ""}`;
 }
 
 // Back to waiting: healed, calm, phase two undone.
@@ -1290,7 +1968,7 @@ export function makeCalm(boss, line) {
   try {
     boss.addTag("aegis_calm");
     boss.setDynamicProperty("aegis:state", "calm");
-    boss.triggerEvent(id === "madara" ? "aegis:calm_madara" : "aegis:calm");
+    boss.triggerEvent(VILLAINS.has(id) ? "aegis:calm_madara" : "aegis:calm");
   } catch {
     /* ignore */
   }
@@ -1359,8 +2037,9 @@ export function calmUpdate(boss) {
   const id = memberOf(boss);
   const L = LEGENDS[id];
   if (!L) return 40;
-  if (id === "madara") {
-    // Madara backs the rogues: enemy ninja near him grow stronger
+  if (VILLAINS.has(id)) {
+    if (!BACKERS.has(id)) return 60; // Kaguya cares for no one
+    // Madara (and Orochimaru, and Obito) back the rogues: enemy ninja near them grow stronger
     try {
       for (const e of boss.dimension.getEntities({ location: boss.location, maxDistance: 16 })) {
         if (!GUARD_FOES.has(e.typeId)) continue;
@@ -1431,6 +2110,19 @@ function enterPhase2(boss, id) {
   }
   if (id === "zabuza") clones(boss, L.skin, "§bZabuza §7(Water Clone)", 2, "aegis:water_splash");
   if (id === "killer_bee") eff(boss, "regeneration", 200, 1); // the Eight-Tails' chakra
+  if (id === "orochimaru") {
+    // he sheds his skin: a new body, healed
+    heal(boss, (boss.getComponent("minecraft:health")?.effectiveMax ?? 1100) * 0.25);
+    api.particle(boss.dimension, "aegis:smoke_puff", boss.location);
+    for (const p of playersAround(boss.dimension, boss.location, 48)) p.sendMessage("§5Orochimaru§7 sheds his skin — a fresh body!");
+  }
+  if (id === "tobirama") clones(boss, L.skin, "§9Tobirama §7(Shadow Clone)", 2);
+  if (id === "hashirama") eff(boss, "regeneration", 200, 1); // Sage Mode
+  if (id === "obito") {
+    heal(boss, (boss.getComponent("minecraft:health")?.effectiveMax ?? 2600) * 0.15); // the Six Paths' Yang
+    truthSeekingBalls(boss, undefined, 0);
+  }
+  if (id === "kaguya") hairBind(boss);
   if (id === "hanzo") {
     // a burst of venom
     for (let a = 0; a < 8; a++) api.particle(boss.dimension, "aegis:beast_mist", add(boss.location, { x: Math.cos(a) * 2.5, y: 0.8, z: Math.sin(a) * 2.5 }), VENOM);
@@ -1587,6 +2279,6 @@ export function initLegends(helpers) {
     fights.delete(deadEntity.id);
     const killer = damageSource?.damagingEntity;
     world.sendMessage(`§e${L.name}§e was defeated${killer?.typeId === "minecraft:player" ? ` by §f${killer.name}` : ""}§e!`);
-    if (killer?.typeId === "minecraft:player") killer.sendMessage(`${L.name}§f: ${id === "madara" ? "…Impressive. This world may yet surprise me." : "Heh… you've earned it. Take your reward."}`);
+    if (killer?.typeId === "minecraft:player") killer.sendMessage(`${L.name}§f: ${DEFEAT_LINES[id] ?? "Heh… you've earned it. Take your reward."}`);
   });
 }

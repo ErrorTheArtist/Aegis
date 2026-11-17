@@ -11,7 +11,7 @@
           "type": "int",
           "range": [
             0,
-            69
+            75
           ],
           "default": 0,
           "client_sync": true
@@ -131,6 +131,81 @@
         "minecraft:health": {
           "value": 900,
           "max": 900
+        }
+      },
+      "aegis:legend_kakashi": {
+        "minecraft:health": {
+          "value": 1000,
+          "max": 1000
+        }
+      },
+      "aegis:legend_guy": {
+        "minecraft:health": {
+          "value": 1100,
+          "max": 1100
+        }
+      },
+      "aegis:legend_jiraiya": {
+        "minecraft:health": {
+          "value": 1050,
+          "max": 1050
+        }
+      },
+      "aegis:legend_orochimaru": {
+        "minecraft:health": {
+          "value": 1100,
+          "max": 1100
+        },
+        "minecraft:equipment": {
+          "table": "loot_tables/equipment/aegis_orochimaru.json",
+          "slot_drop_chance": [
+            {
+              "slot": "slot.weapon.mainhand",
+              "drop_chance": 0.0
+            }
+          ]
+        }
+      },
+      "aegis:legend_hashirama": {
+        "minecraft:health": {
+          "value": 1700,
+          "max": 1700
+        }
+      },
+      "aegis:legend_tobirama": {
+        "minecraft:health": {
+          "value": 1300,
+          "max": 1300
+        },
+        "minecraft:equipment": {
+          "table": "loot_tables/equipment/aegis_tobirama.json",
+          "slot_drop_chance": [
+            {
+              "slot": "slot.weapon.mainhand",
+              "drop_chance": 0.0
+            }
+          ]
+        }
+      },
+      "aegis:legend_obito": {
+        "minecraft:health": {
+          "value": 2600,
+          "max": 2600
+        },
+        "minecraft:equipment": {
+          "table": "loot_tables/equipment/aegis_obito.json",
+          "slot_drop_chance": [
+            {
+              "slot": "slot.weapon.mainhand",
+              "drop_chance": 0.0
+            }
+          ]
+        }
+      },
+      "aegis:legend_kaguya": {
+        "minecraft:health": {
+          "value": 3000,
+          "max": 3000
         }
       },
       "aegis:fighting": {
@@ -500,6 +575,62 @@
         "add": {
           "component_groups": [
             "aegis:legend_hanzo"
+          ]
+        }
+      },
+      "aegis:legend_kakashi": {
+        "add": {
+          "component_groups": [
+            "aegis:legend_kakashi"
+          ]
+        }
+      },
+      "aegis:legend_guy": {
+        "add": {
+          "component_groups": [
+            "aegis:legend_guy"
+          ]
+        }
+      },
+      "aegis:legend_jiraiya": {
+        "add": {
+          "component_groups": [
+            "aegis:legend_jiraiya"
+          ]
+        }
+      },
+      "aegis:legend_orochimaru": {
+        "add": {
+          "component_groups": [
+            "aegis:legend_orochimaru"
+          ]
+        }
+      },
+      "aegis:legend_hashirama": {
+        "add": {
+          "component_groups": [
+            "aegis:legend_hashirama"
+          ]
+        }
+      },
+      "aegis:legend_tobirama": {
+        "add": {
+          "component_groups": [
+            "aegis:legend_tobirama"
+          ]
+        }
+      },
+      "aegis:legend_obito": {
+        "add": {
+          "component_groups": [
+            "aegis:legend_obito"
+          ]
+        }
+      },
+      "aegis:legend_kaguya": {
+        "add": {
+          "component_groups": [
+            "aegis:legend_kaguya"
           ]
         }
       },

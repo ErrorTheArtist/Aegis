@@ -314,6 +314,13 @@ SKINS = [
     ("hanzo", dict(hair=(38, 38, 46), top=(54, 52, 60), sleeve_len=11, pants=(38, 38, 44), mask="lower", long_hair=True)),
     # v1.52: the Travel Master (Fast Travel; gen_npc_models.py)
     ("travel_master", dict(hair=(92, 62, 40), top=(38, 98, 106), sleeve_len=8, pants=(62, 60, 70), belt=(104, 72, 44))),
+    # v1.55: the new legends (skins 70-75; their models are in tools/gen_npc_models.py)
+    ("kakashi", dict(hair=(206, 210, 216), top=(84, 110, 66), pants=(40, 46, 70), mask="lower")),
+    ("guy", dict(hair=(24, 24, 30), top=(64, 140, 62), pants=(64, 140, 62))),
+    ("jiraiya", dict(hair=(238, 238, 232), top=(98, 110, 58), pants=(98, 110, 58))),
+    ("orochimaru", dict(hair=(24, 24, 30), top=(208, 202, 188), pants=(62, 56, 74))),
+    ("obito", dict(hair=(234, 234, 230), top=(236, 232, 222), pants=(36, 34, 40))),
+    ("kaguya", dict(hair=(240, 236, 246), top=(246, 242, 248), pants=(246, 242, 248))),
 ]
 (RP / "textures" / "entity" / "aegis" / "npc").mkdir(parents=True, exist_ok=True)
 for name, o in SKINS:
@@ -467,8 +474,12 @@ client_humanoid("akatsuki", ("#141418", "#c81419"))
 
 # Legendary bosses — only ever created by an NPC Spawner (no spawn rules).
 LEGEND_HP = {"naruto": 900, "sasuke": 850, "tsunade": 950, "sarutobi": 800, "minato": 750, "madara": 1800,
-             "gaara": 950, "zabuza": 850, "killer_bee": 1000, "onoki": 900, "hanzo": 900}
-LEGEND_EQUIP = {"sasuke": "aegis:kusanagi_drawn", "zabuza": "aegis:kubikiribocho"}   # what they hold (it never drops)
+             "gaara": 950, "zabuza": 850, "killer_bee": 1000, "onoki": 900, "hanzo": 900,
+             # v1.55
+             "kakashi": 1000, "guy": 1100, "jiraiya": 1050, "orochimaru": 1100, "hashirama": 1700, "tobirama": 1300,
+             "obito": 2600, "kaguya": 3000}
+LEGEND_EQUIP = {"sasuke": "aegis:kusanagi_drawn", "zabuza": "aegis:kubikiribocho",   # what they hold (it never drops)
+                "orochimaru": "aegis:kusanagi_drawn", "tobirama": "aegis:raijin_sword", "obito": "aegis:gunbai"}
 # v1.54: a legend from a spawner waits calmly ("aegis:calm") until a player talks to it and accepts its challenge
 # ("aegis:challenge" → fighting). While calm it can't be hurt by players and hunts hostile ninja instead — except
 # Madara ("aegis:calm_madara"), who sides with them. legends.js switches the states.

@@ -1,12 +1,14 @@
 // XP Shards (v1.52) — crystals of a fallen boss's chakra. Right-click one to absorb it: about a third of the XP your
 // next level needs, whatever your level (at least 100 XP). Sneak + right-click absorbs the whole stack.
 // Almost every boss drops them when a player (or a player's companion, clone or summon) brings it down:
-//   Legendary shinobi 4–5 (Edo Madara 8) · Akatsuki members 3 · Tailed Beasts 5 (Kurama 7) · the Ten-Tails 12.
+//   Legendary shinobi 4–5 (Edo Madara and Hashirama 8, Tobirama 6, Obito 10, Kaguya 15) · Akatsuki members 3 · Tailed Beasts 5
+//   (Kurama 7) · the Ten-Tails 12.
 // They're also paid by the bigger Quest Board quests and A/S-rank missions.
 //   /scriptevent aegis:xpshard [n]   — give yourself n shards (testing)
 
 import { world, system, ItemStack } from "@minecraft/server";
 import { gainXp, getLevel, xpToNext, MAX_LEVEL } from "./levels.js";
+import { LEGEND_SHARDS } from "./legends.js";
 
 export const XP_SHARD = "aegis:xp_shard";
 const SHARE = 0.35; // of the XP to your next level
@@ -29,7 +31,7 @@ export function shardsFor(e) {
     } catch {
       /* ignore */
     }
-    return id === "madara" ? 8 : 4 + (Math.random() < 0.5 ? 1 : 0);
+    return LEGEND_SHARDS[id] ?? 4 + (Math.random() < 0.5 ? 1 : 0);
   }
   if (t === "aegis:akatsuki") return 3;
   if (TAILED_BEASTS.has(t)) return t === "aegis:kurama" ? 7 : 5;

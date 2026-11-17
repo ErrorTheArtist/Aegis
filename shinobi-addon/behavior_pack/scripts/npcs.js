@@ -6,6 +6,7 @@
 // (or sneak-interact with one of its NPCs) in creative to reconfigure it.
 //   /scriptevent aegis:spawner   — open the settings of the spawner you're looking at
 
+import { VILLAINS } from "./legends.js";
 import { world, system, ItemStack } from "@minecraft/server";
 import { ActionFormData, ModalFormData, MessageFormData } from "@minecraft/server-ui";
 import { showTitle } from "./hud.js";
@@ -31,7 +32,8 @@ const SKIN_NAMES = ["Sensei", "Elder", "Weaponsmith", "Ramen chef", "Hokage", "P
   "Mizukage", "Raikage", "Tsuchikage", "Rain commander", "Mist shinobi", "Cloud kunoichi", "Stone kunoichi", "Rain shinobi",
   "Mist jōnin", "Cloud jōnin", "Stone jōnin", "Rain jōnin", "Mist swordsman", "Cloud blademaster", "Stone smith", "Umbrella master",
   "Mist genin (boy)", "Mist genin (girl)", "Cloud genin (boy)", "Cloud genin (girl)", "Stone genin (boy)", "Stone genin (girl)",
-  "Rain genin (boy)", "Rain genin (girl)", "Gaara", "Zabuza", "Killer B", "Ōnoki", "Hanzō", "Travel master"]; // index = skin number (tools/gen_npcs.py SKINS)
+  "Rain genin (boy)", "Rain genin (girl)", "Gaara", "Zabuza", "Killer B", "Ōnoki", "Hanzō", "Travel master",
+  "Kakashi", "Might Guy", "Jiraiya", "Orochimaru", "Obito (Ten-Tails)", "Kaguya"]; // index = skin number (tools/gen_npcs.py SKINS)
 
 export const NPC_TYPES = {
   sensei: { label: "Jutsu Sensei (jutsu shop)", entity: "aegis:npc", skin: 0, name: "§bJutsu Sensei", friendly: true,
@@ -71,6 +73,15 @@ export const NPC_TYPES = {
   killer_bee_boss: { label: "§eLegend: Killer B (Hidden Cloud)", entity: "aegis:legend", skin: 66, name: "§eKiller B", boss: true, legend: "killer_bee" },
   onoki_boss: { label: "§6Legend: Ōnoki, the Third Tsuchikage (Hidden Stone)", entity: "aegis:legend", skin: 67, name: "§6Ōnoki §7the Third Tsuchikage", boss: true, legend: "onoki" },
   hanzo_boss: { label: "§5Legend: Hanzō of the Salamander (Hidden Rain)", entity: "aegis:legend", skin: 68, name: "§5Hanzō of the Salamander", boss: true, legend: "hanzo" },
+  // v1.55: eight more
+  kakashi_boss: { label: "§bLegend: Kakashi Hatake (Hidden Leaf)", entity: "aegis:legend", skin: 70, name: "§bKakashi Hatake", boss: true, legend: "kakashi" },
+  guy_boss: { label: "§aLegend: Might Guy (Hidden Leaf)", entity: "aegis:legend", skin: 71, name: "§aMight Guy", boss: true, legend: "guy" },
+  jiraiya_boss: { label: "§cLegend: Jiraiya the Toad Sage (Hidden Leaf)", entity: "aegis:legend", skin: 72, name: "§cJiraiya §7the Toad Sage", boss: true, legend: "jiraiya" },
+  orochimaru_boss: { label: "§5Legend: Orochimaru (rogue Sannin)", entity: "aegis:legend", skin: 73, name: "§5Orochimaru", boss: true, legend: "orochimaru" },
+  hashirama_boss: { label: "§aLegend: Edo Hashirama Senju (raid boss)", entity: "aegis:legend", skin: 30, name: "§aHashirama Senju §8[Edo Tensei]", boss: true, legend: "hashirama" },
+  tobirama_boss: { label: "§9Legend: Edo Tobirama Senju", entity: "aegis:legend", skin: 31, name: "§9Tobirama Senju §8[Edo Tensei]", boss: true, legend: "tobirama" },
+  obito_boss: { label: "§fLegend: Obito, the Ten-Tails' Jinchūriki (raid boss)", entity: "aegis:legend", skin: 74, name: "§fObito Uchiha §7[Ten-Tails Jinchūriki]", boss: true, legend: "obito" },
+  kaguya_boss: { label: "§dLegend: Kaguya Ōtsutsuki (final raid boss)", entity: "aegis:legend", skin: 75, name: "§dKaguya Ōtsutsuki", boss: true, legend: "kaguya" },
 };
 const TYPE_IDS = Object.keys(NPC_TYPES);
 
@@ -449,7 +460,7 @@ export function setupNpc(e, cfg, extra = {}) {
       } else {
         e.addTag("aegis_calm");
         e.setDynamicProperty("aegis:state", "calm");
-        e.triggerEvent(t.legend === "madara" ? "aegis:calm_madara" : "aegis:calm");
+        e.triggerEvent(VILLAINS.has(t.legend) ? "aegis:calm_madara" : "aegis:calm");
       }
     }
     e.setProperty("aegis:skin", resolveSkin(cfg));

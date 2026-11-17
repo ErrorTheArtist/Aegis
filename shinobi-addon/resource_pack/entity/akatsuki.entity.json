@@ -77,6 +77,12 @@
         "s67": "textures/entity/aegis/npc/onoki",
         "s68": "textures/entity/aegis/npc/hanzo",
         "s69": "textures/entity/aegis/npc/travel_master",
+        "s70": "textures/entity/aegis/npc/kakashi",
+        "s71": "textures/entity/aegis/npc/guy",
+        "s72": "textures/entity/aegis/npc/jiraiya",
+        "s73": "textures/entity/aegis/npc/orochimaru",
+        "s74": "textures/entity/aegis/npc/obito",
+        "s75": "textures/entity/aegis/npc/kaguya",
         "gear_hokage": "textures/entity/aegis/npc/gear_hokage",
         "gear_rogue": "textures/entity/aegis/npc/gear_rogue",
         "gear_sound": "textures/entity/aegis/npc/gear_sound",
@@ -118,7 +124,13 @@
         "gear_killer_bee": "textures/entity/aegis/npc/gear_killer_bee",
         "gear_onoki": "textures/entity/aegis/npc/gear_onoki",
         "gear_hanzo": "textures/entity/aegis/npc/gear_hanzo",
-        "gear_travel_master": "textures/entity/aegis/npc/gear_travel_master"
+        "gear_travel_master": "textures/entity/aegis/npc/gear_travel_master",
+        "gear_kakashi": "textures/entity/aegis/npc/gear_kakashi",
+        "gear_guy": "textures/entity/aegis/npc/gear_guy",
+        "gear_jiraiya": "textures/entity/aegis/npc/gear_jiraiya",
+        "gear_orochimaru": "textures/entity/aegis/npc/gear_orochimaru",
+        "gear_obito": "textures/entity/aegis/npc/gear_obito",
+        "gear_kaguya": "textures/entity/aegis/npc/gear_kaguya"
       },
       "geometry": {
         "default": "geometry.humanoid.custom",
@@ -163,7 +175,13 @@
         "gear_killer_bee": "geometry.aegis.gear_killer_bee",
         "gear_onoki": "geometry.aegis.gear_onoki",
         "gear_hanzo": "geometry.aegis.gear_hanzo",
-        "gear_travel_master": "geometry.aegis.gear_travel_master"
+        "gear_travel_master": "geometry.aegis.gear_travel_master",
+        "gear_kakashi": "geometry.aegis.gear_kakashi",
+        "gear_guy": "geometry.aegis.gear_guy",
+        "gear_jiraiya": "geometry.aegis.gear_jiraiya",
+        "gear_orochimaru": "geometry.aegis.gear_orochimaru",
+        "gear_obito": "geometry.aegis.gear_obito",
+        "gear_kaguya": "geometry.aegis.gear_kaguya"
       },
       "animations": {
         "humanoid_base_pose": "animation.humanoid.base_pose",
@@ -313,6 +331,24 @@
         },
         {
           "controller.render.aegis.npc_gear_travel_master": "q.property('aegis:skin') == 69"
+        },
+        {
+          "controller.render.aegis.npc_gear_kakashi": "q.property('aegis:skin') == 70"
+        },
+        {
+          "controller.render.aegis.npc_gear_guy": "q.property('aegis:skin') == 71"
+        },
+        {
+          "controller.render.aegis.npc_gear_jiraiya": "q.property('aegis:skin') == 72"
+        },
+        {
+          "controller.render.aegis.npc_gear_orochimaru": "q.property('aegis:skin') == 73"
+        },
+        {
+          "controller.render.aegis.npc_gear_obito": "q.property('aegis:skin') == 74"
+        },
+        {
+          "controller.render.aegis.npc_gear_kaguya": "q.property('aegis:skin') == 75"
         }
       ],
       "enable_attachables": true,

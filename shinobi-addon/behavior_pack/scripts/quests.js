@@ -18,8 +18,10 @@ const QUEST_PROP = "aegis:quest";
 const DONE_PROP = "aegis:quests_done";
 
 const BEASTS = ["shukaku", "matatabi", "isobu", "son_goku", "kokuo", "saiken", "chomei", "gyuki", "kurama"];
-const LEGEND_IDS = ["naruto", "sasuke", "tsunade", "sarutobi", "minato", "madara", "gaara", "zabuza", "killer_bee", "onoki", "hanzo"];
-const RANDOM_LEGENDS = LEGEND_IDS.filter((l) => l !== "madara"); // (the raid boss only comes when asked for by name)
+const LEGEND_IDS = ["naruto", "sasuke", "tsunade", "sarutobi", "minato", "madara", "gaara", "zabuza", "killer_bee", "onoki", "hanzo",
+  "kakashi", "guy", "jiraiya", "orochimaru", "hashirama", "tobirama", "obito", "kaguya"];
+const RAID_BOSSES = ["madara", "hashirama", "obito", "kaguya"];
+const RANDOM_LEGENDS = LEGEND_IDS.filter((l) => !RAID_BOSSES.includes(l)); // (the raid bosses only come when asked for by name)
 const cap = (s) => s.split("_").map((w) => w[0].toUpperCase() + w.slice(1)).join(" ");
 const member = (e) => {
   try {
@@ -80,7 +82,8 @@ export const QUEST_TARGETS = {
     spawn: (dim, at, tags) => spawnNinja(`${RANDOM_LEGENDS[Math.floor(Math.random() * RANDOM_LEGENDS.length)]}_boss`)(dim, at, tags) },
   ...Object.fromEntries(LEGEND_IDS.map((l) => [`legend_${l}`, {
     label: `Legend: ${{ sarutobi: "Hiruzen Sarutobi", madara: "Edo Madara Uchiha", zabuza: "Zabuza Momochi", killer_bee: "Killer B", onoki: "Ōnoki",
-      hanzo: "Hanzō of the Salamander" }[l] ?? cap(l)}`,
+      hanzo: "Hanzō of the Salamander", kakashi: "Kakashi Hatake", guy: "Might Guy", jiraiya: "Jiraiya", hashirama: "Edo Hashirama Senju",
+      tobirama: "Edo Tobirama Senju", obito: "Obito (Ten-Tails Jinchūriki)", kaguya: "Kaguya Ōtsutsuki" }[l] ?? cap(l)}`,
     match: (e) => e.typeId === "aegis:legend" && member(e) === l,
     spawn: spawnNinja(`${l}_boss`),
   }])),

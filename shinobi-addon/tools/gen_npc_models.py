@@ -1909,6 +1909,200 @@ def travel_master_gear():
 # ===========================================================================
 # Registry
 # ===========================================================================
+
+# ===========================================================================
+# v1.55: eight new legends (skins 70-75; Hashirama and Tobirama keep their hand-made skins 30 and 31)
+# ===========================================================================
+def leaf_vest_nr(g, tex, c, R):
+    """The Leaf flak jacket on the standard ninja gear texture layout."""
+    leaf_vest(g, tex, c, R["VF"], R["VB"], R["VS"], R["COLLAR"], (40, 16, 6, 6), (46, 16, 8, 6), R["VBAND"])
+
+
+LEAF_JACKET = dict(vest=(84, 110, 66), vest_d=(64, 86, 50), vest_h=(100, 128, 80), vest_dd=(54, 72, 42), pouch=(92, 120, 72), red=(170, 44, 40),
+                   plate=(190, 194, 204), plate_d=(130, 134, 146), mark=(60, 64, 76))
+
+# --- Kakashi Hatake, the Copy Ninja: silver hair swept to one side, the headband slanted over his Sharingan eye, the mask
+KK = dict(LEAF_JACKET, skin=(232, 200, 170), skin_d=(200, 166, 136), hair=(206, 210, 216), hair_h=(238, 242, 246), iris=(50, 50, 56),
+          brow=(170, 176, 184), mask=(40, 46, 70), band=(40, 46, 70), torso=(84, 110, 66), shirt=(40, 46, 70), sleeve=(40, 46, 70),
+          sleeve_to=11, forearm="glove", glove=(46, 52, 78), pants=(40, 46, 70), cloth=(226, 222, 210), cloth_d=(190, 186, 174),
+          sandal=(40, 46, 70))
+KAKASHI = dict(front=["HhHHhHHh", "HSHhSHHh", "BBBBBBBB", "SKKSBBBB", "SEISBBBB", "DDDDDDDD", "DDDDDDDD", "DDDDDDDD"],
+               side=["HHHHHHHH", "HHHHHHHH", "BBBBBBBB", "HHHSSSSS", "HHHsSSSS", "HHHDDDDD", "HHDDDDDD", "HDDDDDDD"],
+               back=["HHhHHhHH", "HHHHHHHH", "BBBBBBBB", "HhHHHHhH", "HHHHHHHH", "HHhHHhHH", "DDDDDDDD", "DDDDDDDD"],
+               front1=["H.hH.h.H", ".H..H..h"], side1=None, back1=None)
+KAKASHI_HAIR = [((-3.8, 31.0, -2.0), (2.6, 3.4, 2.6), (-8, 0, -40)), ((-1.4, 31.4, -1.4), (2.6, 4.2, 2.6), (-12, 0, -38)),
+                ((1.0, 31.2, -1.2), (2.6, 4.0, 2.6), (-14, 0, -44)), ((-2.6, 31.0, 1.0), (2.6, 3.8, 2.6), (-30, 0, -36)),
+                ((0.0, 30.8, 1.6), (2.6, 3.6, 2.6), (-38, 0, -40)), ((-1.2, 29.8, 2.8), (2.4, 3.0, 2.4), (-60, 0, -20))]
+
+
+def kakashi_gear():
+    return ninja_gear(KK, "geometry.aegis.gear_kakashi", LEAF, vest=leaf_vest_nr, band="tilt", hair=KAKASHI_HAIR,
+                      extras=(lambda g, t, c_, R: lower_wrap(g, t, c_, R, KK["mask"], height=3.4),))
+
+
+# --- Might Guy: the bowl cut and the eyebrows, a green jumpsuit, orange leg warmers, his headband worn as a belt -------
+MG = dict(LEAF_JACKET, skin=(232, 200, 170), skin_d=(200, 166, 136), hair=(24, 24, 30), hair_h=(84, 90, 110), iris=(20, 20, 24),
+          brow=(20, 20, 24), mouth=(150, 70, 60), cloth=(240, 130, 40), cloth_d=(200, 100, 26), torso=(64, 140, 62), shirt=(64, 140, 62),
+          sleeve=(64, 140, 62), sleeve_to=11, forearm="glove", glove=(64, 140, 62), pants=(64, 140, 62), sandal=(40, 46, 70),
+          band=(196, 40, 40))
+GUY = dict(front=["HhHHHHhH", "HHHHHHHH", "hHHHHHHh", "KKKSSKKK", "SEISSIES", "SSSssSSS", "SQEEEEQS", "sSSSSSSs"],
+           side=["HHHHHHHH", "HHHHHHHH", "HHHHHHHH", "HHHHHSSS", "HHHHsSSS", "HHHSSSSS", "HHSSSSSS", "HSSSSSSS"],
+           back=["HHhHHhHH", "HHHHHHHH", "HHHHHHHH", "HHHHHHHH", "HHHHHHHH", "HhHHHHhH", "sSSSSSSs", "ssssssss"],
+           front1=None, side1=None, back1=None)
+
+
+def bowl_cut(g, tex, c, R):
+    """A glossy black bowl cut: a cap over the head with a straight fringe."""
+    tex_fill(tex, R["HAIR"], lambda u, v, wd, ht: mul(c["hair"], 1.0) if (u + v) % 5 else mul(c["hair_h"], 1.0))
+    bc = g.bone("g_bowl", "head", (0, 28, 0))
+    g.cube(bc, (-4, 28.4, -4), (8, 3.6, 8), uv(rest=R["HAIR"]), inflate=0.45)
+    g.cube(bc, (-4.2, 27.9, -4.55), (8.4, 0.7, 0.4), uv(rest=R["HAIR"]))
+
+
+def waist_headband(g, tex, c, R, mark=LEAF):
+    """Might Guy's forehead protector, tied round his waist."""
+    tex_fill(tex, R["BAND"], lambda u, v, wd, ht: mul(c["band"], 1.08 if v == 0 else 0.92))
+    tex_fill(tex, R["PLATE"], lambda u, v, wd, ht: c["plate_d"] if (u in (0, wd - 1) or v in (0, ht - 1)) else mul(c["plate"], 1.06 - 0.12 * v / ht))
+    symbol(mark, c["mark"])(ImageDraw.Draw(tex), R["PLATE"])
+    wb = g.bone("g_waistband", "body", (0, 13, 0))
+    g.cube(wb, (-4, 12.3, -2), (8, 1.4, 4), ring(R["BAND"]), inflate=0.66)
+    g.cube(wb, (-2.5, 11.8, -2.85), (5.0, 2.4, 0.5), uv(north=R["PLATE"], rest=(R["PLATE"][0], R["PLATE"][1], 2, 2)))
+
+
+def guy_gear():
+    return ninja_gear(MG, "geometry.aegis.gear_guy", LEAF, vest=leaf_vest_nr, band=None,
+                      extras=(bowl_cut, waist_headband))
+
+
+# --- Jiraiya, the Toad Sage: a mane of white hair, the horned "oil" headband, red lines under his eyes, a red haori ----
+OIL = ["#.#.###",      # 油 (oil), simplified
+       "..#.#.#",
+       "#.#####",
+       "..#.#.#",
+       "#.#####",
+       "..#.#.#",
+       "#.#####"]
+JR = dict(skin=(230, 196, 160), skin_d=(198, 162, 128), hair=(238, 238, 232), hair_h=(255, 255, 250), iris=(40, 30, 24), brow=(220, 220, 214),
+          ring=(200, 40, 40), mouth=(150, 92, 80), band=(110, 110, 120), plate=(196, 200, 210), plate_d=(140, 144, 156), mark=(60, 60, 70),
+          torso=(98, 110, 58), shirt=(62, 62, 66), sleeve=(98, 110, 58), sleeve_to=8, forearm="skin", pants=(98, 110, 58),
+          cloth=(210, 202, 184), cloth_d=(176, 168, 150), sandal=(140, 96, 56), vest=(196, 52, 42), vest_d=(150, 34, 28), vest_h=(220, 80, 64),
+          gold=(236, 196, 70))
+JIRAIYA = dict(front=["HhHHhHHh", "HHSHHSHH", "BBBBBBBB", "SKKSSKKS", "SEISSIES", "SRSssSRS", "SRSQQSRS", "sSSSSSSs"],
+               side=["HHHHHHHH", "HHHHHHHH", "BBBBBBBB", "HHHSSSSS", "HHHsSSSS", "HHHsSSSS", "HHSSSSSS", "HHSSSSSS"],
+               back=["HHhHHhHH", "HHHHHHHH", "BBBBBBBB"] + ["HHHHHHHH"] * 5, front1=["H.hH.h.H", ".H..H..h"], side1=None, back1=None)
+
+
+def haori(g, tex, c, R):
+    """Jiraiya's red haori: open at the front over the green kimono, two yellow circles on the back."""
+    def front(u, v, wd, ht):
+        return mul(c["vest"], 1.04 - 0.14 * v / ht) if (u < 4 or u > 11) else None
+
+    def back(u, v, wd, ht):
+        for cx in (4.5, 11.5):
+            if (u - cx) ** 2 + (v - 13) ** 2 <= 6:
+                return c["gold"]
+        return mul(c["vest"], 1.04 - 0.14 * v / ht)
+    vest = g.bone("g_vest", "body", (0, 24, 0))
+    shell(g, tex, c, R, vest, y0=8.6, h=15.4, inflate=0.75, front=front, back=back)
+
+
+def horned_band(g, tex, c, R):
+    """The Toad Sage's headband: the "oil" plate between two little horns."""
+    hb = band_plate(g, tex, R["BAND"], R["PLATE"], c["band"], c["plate"], c["plate_d"], symbol(OIL, c["mark"]))
+    tex_fill(tex, R["NECK"], lambda u, v, wd, ht: mul((200, 40, 40), 1.1 - 0.06 * v))
+    for x, rz in ((-3.6, 20), (2.4, -20)):
+        g.cube(hb, (x, 30.4, -5.0), (1.2, 2.6, 1.2), uv(rest=R["NECK"]), rotation=(0, 0, rz), pivot=(x + 0.6, 30.4, -4.4))
+
+
+def big_scroll(g, tex, c, r):
+    """A huge scroll carried across the lower back."""
+    tex_fill(tex, r, lambda u, v, wd, ht: (200, 60, 40) if u in (0, 1, wd - 2, wd - 1) else ((236, 224, 196) if v % 4 else (210, 196, 166)))
+    sc = g.bone("g_scroll", "body", (0, 13, 3.6))
+    g.cube(sc, (-6.5, 11.2, 2.4), (13.0, 3.2, 3.2), uv(rest=r))
+
+
+def jiraiya_gear():
+    return ninja_gear(JR, "geometry.aegis.gear_jiraiya", LEAF, vest=haori, band=None, hair=SPIKY,
+                      extras=(horned_band, lambda g, t, c_, R: long_hair(g, t, c_, R, length=14.0),
+                              lambda g, t, c_, R: big_scroll(g, t, c_, R["X2"])))
+
+
+# --- Orochimaru: deathly pale, long black hair, yellow snake eyes in purple shadow, the robe and the purple rope ------
+OR = dict(skin=(238, 234, 230), skin_d=(206, 200, 198), hair=(24, 24, 30), hair_h=(60, 60, 74), iris=(232, 200, 60), brow=(40, 40, 46),
+          ring=(140, 80, 170), mouth=(150, 110, 150), torso=(208, 202, 188), shirt=(38, 34, 44), sleeve=(208, 202, 188), sleeve_to=11,
+          forearm="skin", pants=(62, 56, 74), cloth=(220, 216, 206), cloth_d=(186, 182, 172), sandal=(40, 36, 46), rope=(118, 64, 160))
+OROCHIMARU = dict(front=["HhHHhHHh", "HHSHHSHH", "HSSSSSSH", "HKKSSKKH", "HRIRRIRH", "HSSssSSH", "HSSQQSSH", "HsSSSSsH"],
+                  side=["HHHHHHHH", "HHHHHHHH", "HHHHHHHH", "HHHHHSSS", "HHHHsSRS", "HHHHSSSS", "HHHHSSSS", "HHHHSSSS"],
+                  back=["HHhHHhHH"] + ["HHHHHHHH"] * 7, front1=None, side1=None, back1=None)
+
+
+def orochimaru_gear():
+    return ninja_gear(OR, "geometry.aegis.gear_orochimaru", LEAF, band=None,
+                      extras=(lambda g, t, c_, R: long_hair(g, t, c_, R, length=13.0, bangs=True), lambda g, t, c_, R: rope_belt(g, t, c_, R["X3"])))
+
+
+# --- Obito Uchiha, the Ten-Tails' Jinchūriki: white hair, a scarred face, Sharingan and Rinnegan, a white robe with the
+#     nine magatama round its collar, and the Six Paths staff on his back -------------------------------------------------
+OB = dict(skin=(232, 206, 180), skin_d=(196, 176, 160), hair=(234, 234, 230), hair_h=(255, 255, 255), iris=(210, 30, 30), ring=(150, 110, 210),
+          brow=(214, 214, 210), mouth=(150, 96, 88), torso=(236, 232, 222), shirt=(36, 34, 40), sleeve=(236, 232, 222), sleeve_to=11,
+          forearm="skin", pants=(36, 34, 40), cloth=(52, 50, 58), cloth_d=(36, 34, 40), sandal=(30, 30, 36))
+OBITO = dict(front=["HhHHhHHh", "HSHhSHHS", "sSSSSSSS", "sKKSSKKS", "sEISSRES", "ssSssSSS", "sSsQQsSS", "ssSSSSSs"],
+             side=["HHHHHHHH", "HHHHHHHS", "HHHHSSSS", "HHHSSSSs", "HHHsSSss", "HHHsSSSs", "HHSSSSSS", "HSSSSSSS"],
+             back=["HHhHHhHH", "HHHHHHHH", "HhHHHHhH", "HHHHHHHH", "HHhHHhHH", "HHHHHHHH", "HHHHHHHH", "sHHHHHHs"],
+             front1=["H.hH.h.H", ".H..H..h"], side1=None, back1=None)
+
+
+def magatama_collar(g, tex, c, R):
+    """A high white collar with the nine black magatama (the Six Paths' tomoe) around it."""
+    tex_fill(tex, R["COLLAR"], lambda u, v, wd, ht: (24, 22, 28) if (v in (1, 2) and u % 2 == 0 and u < 18) else mul(c["torso"], 1.02 - 0.05 * v))
+    co = g.bone("g_collar", "body", (0, 24, 0))
+    g.cube(co, (-4.1, 22.4, -2.3), (8.2, 2.8, 4.6), ring(R["COLLAR"]), inflate=0.48)
+
+
+def six_paths_staff(g, tex, c, r):
+    """The shakujō: a tall black staff with a ring at its top, carried on the back."""
+    tex_fill(tex, r, lambda u, v, wd, ht: (30, 28, 34) if v > 2 else (220, 210, 170))
+    st = g.bone("g_staff", "body", (0, 18, 3.2), (0, 0, 24))
+    g.cube(st, (-0.5, 4.0, 3.0), (1.0, 26.0, 1.0), uv(rest=(r[0], r[1] + 3, 2, 8)))
+    for y, x in ((30.0, -1.8), (32.6, -1.8)):
+        g.cube(st, (x, y, 3.0), (3.6, 0.6, 1.0), uv(rest=(r[0], r[1], 4, 2)))
+    for x in (-1.8, 1.2):
+        g.cube(st, (x, 30.0, 3.0), (0.6, 3.2, 1.0), uv(rest=(r[0], r[1], 4, 2)))
+
+
+def obito_gear():
+    return ninja_gear(OB, "geometry.aegis.gear_obito", LEAF, band=None, hair=SPIKY,
+                      extras=(magatama_collar, lambda g, t, c_, R: six_paths_staff(g, t, c_, R["X1"])))
+
+
+# --- Kaguya Ōtsutsuki, the Rabbit Goddess: floor-length white hair, two horns, the Byakugan and a red third eye, a white
+#     kimono with lilac trim -----------------------------------------------------------------------------------------------
+KG = dict(skin=(246, 242, 242), skin_d=(220, 214, 218), hair=(240, 236, 246), hair_h=(255, 255, 255), eye=(246, 244, 252), iris=(214, 208, 232),
+          ring=(210, 40, 50), brow=(232, 228, 240), lip=(196, 150, 190), mouth=(196, 150, 190), robe=(246, 242, 248), robe_d=(214, 210, 222),
+          trim=(160, 130, 206), trim_d=(122, 96, 170), under=(226, 222, 238), under_d=(196, 192, 210), sandal=(214, 210, 222), ink=(246, 242, 248),
+          horn=(236, 228, 214))
+KAGUYA = dict(front=["HhHHhHHh", "HHHHHHHH", "HSSRRSSH", "HKKSSKKH", "HEISSIEH", "HSSssSSH", "HSSLLSSH", "HsSSSSsH"],
+              side=["HHHHHHHH", "HHHHHHHH", "HHHHHHHH", "HHHHHSSS", "HHHHsSSS", "HHHHSSSS", "HHHHSSSS", "HHHHSSSS"],
+              back=["HHhHHhHH"] + ["HHHHHHHH"] * 7, front1=None, side1=None, back1=None)
+BLANK = ["......."] * 7
+
+
+def kaguya_gear():
+    def extra(g, tex):
+        r = (48, 0, 8, 16)
+        tex_fill(tex, r, lambda u, v, wd, ht: mul(KG["hair"], 1.04 - 0.12 * v / ht - (0.04 if u % 3 == 0 else 0)))
+        lh = g.bone("g_longhair", "head", (0, 29, 3.8))
+        g.cube(lh, (-4.6, 3.0, 3.7), (9.2, 28.5, 1.2), uv(rest=r))                                  # down to her heels
+        for x in (-4.9, 3.9):
+            g.cube(lh, (x, 18.0, -3.8), (1.0, 13.0, 7.6), uv(rest=r))
+        hr = (56, 0, 4, 4)
+        tex_fill(tex, hr, lambda u, v, wd, ht: mul(KG["horn"], 1.1 - 0.1 * v))
+        horns = g.bone("g_horns", "head", (0, 32, 0))
+        for x, rz in ((-3.0, 18), (1.8, -18)):
+            g.cube(horns, (x, 31.6, -1.6), (1.2, 3.4, 1.2), uv(rest=hr), rotation=(-10, 0, rz), pivot=(x + 0.6, 31.6, -1.0))
+    return kage_gear(KG, BLANK, "geometry.aegis.gear_kaguya", extra, with_hat=False)
+
+
 MODELS = {
     "sound": (sound_skin, sound_gear),
     "chunin": (leaf_skin_v3, leaf_gear_v3),
@@ -1958,6 +2152,13 @@ MODELS = {
     "travel_master": (travel_master_skin, travel_master_gear),
     # v1.54: the Hokage (skin 4) in the robe of office, like the other four Kage
     "hokage": (lambda: kage_skin(HK, HOKAGE_FACE, 4), hokage_gear),
+    # v1.55: the new legends (skins 70-75)
+    "kakashi": (lambda: ninja_skin(KK, KAKASHI, 70), kakashi_gear),
+    "guy": (lambda: ninja_skin(MG, GUY, 71), guy_gear),
+    "jiraiya": (lambda: ninja_skin(JR, JIRAIYA, 72), jiraiya_gear),
+    "orochimaru": (lambda: ninja_skin(OR, OROCHIMARU, 73), orochimaru_gear),
+    "obito": (lambda: ninja_skin(OB, OBITO, 74), obito_gear),
+    "kaguya": (lambda: kage_skin(KG, KAGUYA, 75), kaguya_gear),
 }
 
 FLUTTER = {

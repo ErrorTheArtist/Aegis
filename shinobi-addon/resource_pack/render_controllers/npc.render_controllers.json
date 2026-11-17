@@ -74,7 +74,13 @@
             "Texture.s66",
             "Texture.s67",
             "Texture.s68",
-            "Texture.s69"
+            "Texture.s69",
+            "Texture.s70",
+            "Texture.s71",
+            "Texture.s72",
+            "Texture.s73",
+            "Texture.s74",
+            "Texture.s75"
           ]
         }
       },
@@ -548,6 +554,72 @@
       ],
       "textures": [
         "Texture.gear_travel_master"
+      ]
+    },
+    "controller.render.aegis.npc_gear_kakashi": {
+      "geometry": "Geometry.gear_kakashi",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_kakashi"
+      ]
+    },
+    "controller.render.aegis.npc_gear_guy": {
+      "geometry": "Geometry.gear_guy",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_guy"
+      ]
+    },
+    "controller.render.aegis.npc_gear_jiraiya": {
+      "geometry": "Geometry.gear_jiraiya",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_jiraiya"
+      ]
+    },
+    "controller.render.aegis.npc_gear_orochimaru": {
+      "geometry": "Geometry.gear_orochimaru",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_orochimaru"
+      ]
+    },
+    "controller.render.aegis.npc_gear_obito": {
+      "geometry": "Geometry.gear_obito",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_obito"
+      ]
+    },
+    "controller.render.aegis.npc_gear_kaguya": {
+      "geometry": "Geometry.gear_kaguya",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_kaguya"
       ]
     }
   }

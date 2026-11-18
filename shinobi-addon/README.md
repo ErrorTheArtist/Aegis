@@ -12,7 +12,7 @@ Uses the real Naruto names (Rasengan, Shadow Clone Jutsu, etc.) — personal use
 - **Things to do** — [Story](#story-the-path-of-the-shinobi-v156) · [Factions](#factions-akatsuki--anbu-v156) · [Bingo Book](#bingo-book-v155) · [Achievements](#achievements-v155) · [Daily missions](#daily-missions--login-streak-v155) · [World events](#world-events-v155)
 - **The world** — [Tailed Beasts](#tailed-beasts-bosses) · [NPCs](#npcs) · [Legendary bosses](#legendary-bosses-npc-spawner-only) · [Enemies](#enemies) · [Fast Travel](#fast-travel)
 - **For admins** — [Admin Panel](#admin-panel-v156) · [Grace period](#grace-period-no-fighting) · [Lag clear](#lag-clear) · [Vanilla items](#vanilla-items-v154)
-- **What's new** — [v1.56](#story-factions-the-kaguya-clan-and-an-admin-panel-v156) and every version before it, at the end
+- **What's new** — [v1.57](#the-leaf-weaponsmith-and-the-leaf-genin-remodelled-v157) · [v1.56](#story-factions-the-kaguya-clan-and-an-admin-panel-v156) and every version before it, at the end
 
 ## Install
 
@@ -1107,9 +1107,9 @@ the spawner's *Outfit* list.
 |---|---|---|---|---|---|---|
 | **Kage / leader** (Mission Desk) | Hokage | Kazekage | Mizukage | Raikage | Tsuchikage | Rain Commander |
 | **Jutsu Sensei** · **Exam Proctor** | Sensei · Proctor | Sand jōnin | Mist jōnin | Cloud jōnin | Stone jōnin | Rain jōnin |
-| **Weaponsmith** | Weaponsmith | Puppet Master (*Puppet Workshop*) | Mist Swordsman (*Swordsmith of the Mist*) | Cloud Blademaster (*Cloud Blade Forge*) | Stone Smith (*Stone Forge*) | Umbrella Master (*Umbrella Armory*) |
+| **Weaponsmith** | Leaf Weaponsmith | Puppet Master (*Puppet Workshop*) | Mist Swordsman (*Swordsmith of the Mist*) | Cloud Blademaster (*Cloud Blade Forge*) | Stone Smith (*Stone Forge*) | Umbrella Master (*Umbrella Armory*) |
 | **Village Shinobi** (chatter) · **Quest Giver** | Leaf shinobi / kunoichi | Sand shinobi | Mist shinobi | Cloud kunoichi | Stone kunoichi | Rain shinobi |
-| **Genin** (companion) | three Leaf genin | Sand genin boy / girl | Mist genin boy / girl | Cloud genin boy / girl | Stone genin boy / girl | Rain genin boy / girl |
+| **Genin** (companion) | three Leaf genin (orange · blue · pink) | Sand genin boy / girl | Mist genin boy / girl | Cloud genin boy / girl | Stone genin boy / girl | Rain genin boy / girl |
 
 The looks:
 - **Kage**: the white Kage robe and tall Kage hat in each village's colour, with its kanji on the hat's badge (火 red,
@@ -1126,9 +1126,18 @@ The looks:
   cloud, mountain, falling rain).
 - **Jōnin**: the Sand's head-wrap and face veil; the Mist's bandana, face mask and short sword; the Cloud's white hair over
   one eye and a long sword; the Stone's beard; the Rain's hood and respirator.
-- **Weaponsmiths**: a puppet master with a bandaged puppet on his back; a swordsman with a bandage-wrapped face and a huge
-  cleaver; a blademaster in sunglasses and a white scarf with four swords fanned on his back; a bald, bearded smith in
-  goggles and a leather apron with a stone hammer; an umbrella master with a respirator and a folded umbrella.
+- **Weaponsmiths**: the **Leaf Weaponsmith** (remodelled in v1.57) — forge-tanned, a trimmed goatee and a burn scar, the
+  Leaf headband tied as a navy bandana, a towel twisted round his neck, an indigo sashiko work jacket with rolled sleeves,
+  a leather apron branded with the Leaf swirl, a tool belt with a hammer tucked in front and tongs at the hip, leather
+  bracers, and a sheathed katana and a great weapon scroll on his back; a puppet master with a bandaged puppet on his
+  back; a swordsman with a bandage-wrapped face and a huge cleaver; a blademaster in sunglasses and a white scarf with
+  four swords fanned on his back; a bald, bearded smith in goggles and a leather apron with a stone hammer; an umbrella
+  master with a respirator and a folded umbrella.
+- **Leaf Genin** (remodelled in v1.57; a recruited Leaf genin is one of the three): a blond boy in an orange track jacket
+  with navy shoulders, a white collar and big spiky hair, a plaster on his cheek; a dark-haired boy in a high-collared navy
+  shirt, white shorts and knitted arm warmers, his hair swept back and a tantō at the small of his back; a pink-haired
+  girl in a red top with a flared skirt over dark shorts, black gloves, a bob with bangs and a red-cloth Leaf hairband
+  over the crown. All three have the kunai holster, taped shins and a pouch.
 
 The Ramen Shop, Travelling Merchant and Travel Master serve every village as they are. (The Clan Elder was removed in
 v1.54 — its training moved to the Jutsu Sensei; old Clan Elder spawners retire on their own.)
@@ -1474,6 +1483,17 @@ hoes, food, farming, building, crafting.
 ```
 
 The timers start when the server starts. The times are the constants at the top of `behavior_pack/scripts/lagclear.js`.
+
+## The Leaf Weaponsmith and the Leaf Genin, remodelled (v1.57)
+
+- The last two Leaf NPCs still in the old flat style now match every other village: hand-painted skins with 3D gear.
+  - **Leaf Weaponsmith** — navy Leaf bandana, towel round the neck, branded leather apron, tool belt with a hammer and
+    tongs, leather bracers, a sheathed katana and a great weapon scroll on his back.
+  - **Leaf Genin** — three distinct Academy graduates (orange, blue and pink), each with their own hair, outfit and
+    gear. See *Village NPCs* for the details.
+- They keep their skin numbers (2 and 6–8), so every Weaponsmith and Genin already placed in your world changes look by
+  itself — nothing to respawn. On the NPC Spawner's *Outfit* list they're now *Leaf weaponsmith* and *Leaf genin
+  (orange / blue / pink)*.
 
 ## Story, factions, the Kaguya clan and an Admin Panel (v1.56)
 

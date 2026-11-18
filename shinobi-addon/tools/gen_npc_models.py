@@ -2312,6 +2312,452 @@ def fur_collar(g, tex):
     g.cube(fc, (-4.8, 21.6, -2.8), (9.6, 2.8, 5.6), ring(r), inflate=0.3)
 
 
+# ===========================================================================
+# v1.57: the Leaf Weaponsmith (skin 2) and the Leaf Genin (skins 6, 7, 8) — they were the last NPCs still in the old
+# flat style.
+#   Leaf Weaponsmith — a forge-tanned smith with a trimmed goatee and a burn scar, the Leaf headband tied as a navy
+#     bandana, a towel twisted round his neck, an indigo sashiko work jacket with rolled sleeves, a heavy leather apron
+#     branded with the Leaf swirl, a tool belt with a hammer tucked in front and tongs at the hip, leather bracers, and on
+#     his back a sheathed katana and a great weapon-summoning scroll.
+#   Leaf Genin — three Academy graduates: a blond boy in an orange track jacket (navy shoulders, white collar, big spiky
+#     hair, a plaster on his cheek); a dark-haired boy in a high-collared navy shirt, white shorts and arm warmers, his
+#     hair swept back, a tantō at the small of his back; a pink-haired girl in a red top with a short skirt over dark
+#     shorts, a bob with bangs and a red-cloth Leaf hairband over the crown.
+# ===========================================================================
+def leaf_swirl(u, v, ox=0, oy=0):
+    """True on the Leaf swirl (the 7×5 LEAF mark) at offset (ox, oy)."""
+    j, i = v - oy, u - ox
+    return 0 <= j < len(LEAF) and 0 <= i < len(LEAF[j]) and LEAF[j][i] == "#"
+
+
+LSM = dict(PLATE_C, skin=(214, 168, 128), skin_d=(182, 136, 100), hair=(64, 44, 32), hair_h=(92, 66, 48), iris=(70, 46, 30),
+           brow=(48, 34, 26), mouth=(132, 78, 66), beard=(62, 44, 34), cheek=(226, 140, 128), band=(36, 54, 124),
+           indigo=(46, 58, 102), indigo_d=(32, 42, 78), indigo_h=(70, 84, 132), stitch=(176, 186, 214), pants=(50, 50, 60),
+           pants_d=(36, 36, 44), cloth=(222, 216, 202), cloth_d=(186, 180, 166), sandal=(58, 42, 32), leather=(124, 82, 50),
+           leather_d=(88, 56, 34), leather_h=(156, 108, 68), towel=(238, 234, 224), towel_s=(66, 92, 168), lacquer=(30, 28, 34),
+           lacquer_h=(70, 64, 76), cord=(170, 40, 44), steel=(186, 192, 202), wood=(126, 92, 58), paper=(232, 222, 196))
+SMITH_FACE = dict(front=["BBBBBBBB", "BBBBBBBB", "HSSSSSSH", "KKKSSKKK", "SEISSIES", "SSSssSCS", "SGGQQGGS", "sSSGGSSs"],
+                  side=["BBBBBBBB", "BBBBBBBB", "HHHSSSSS", "HHHSSSSS", "HHHsSSSS", "HHHsSSSS", "HHHSSSSG", "HHSSSSGG"],
+                  back=["BBBBBBBB", "BBBBBBBB", "HHHHHHHH", "HHhHHhHH", "HHHHHHHH", "HhHHHHhH", "HHHHHHHH", "sHHHHHHs"],
+                  front1=None, side1=None, back1=None)
+
+
+def leaf_smith_skin():
+    c = LSM
+    s = Skin(2)
+    paint_head(s, c, SMITH_FACE)
+    S, s_ = c["skin"], c["skin_d"]
+    IN, ID, IH, ST = c["indigo"], c["indigo_d"], c["indigo_h"], c["stitch"]
+
+    def sashiko(f, u, v, wd, ht, base=IN):
+        px = s.cloth(base, f, u, v, wd, ht, 0.04)
+        return mix(px, ST, 0.3) if (u + v) % 4 == 0 and v % 2 == 0 else px    # the white running stitches
+
+    def body(f, u, v, wd, ht):
+        if v == 10:
+            return c["leather_d"]                                                 # the obi under the tool belt
+        if v == 11:
+            return s.cloth(c["pants"], f, u, v, wd, ht)
+        if f == "front":
+            d = abs(u - 3.5)
+            if d < 2 - v:
+                return s.cloth(S, f, u, v, wd, ht, 0.02)                           # the chest in the crossed collar
+            if 2 - v <= d < 3 - v:
+                return IH                                                          # the collar's edge
+            if u == 7 - v // 2 and v >= 2:
+                return ID                                                          # the overlap, down to the left
+        if f == "back" and leaf_swirl(u, v, 0, 2):
+            return mix(IN, ST, 0.5)                                                # the Leaf mon on the back
+        return sashiko(f, u, v, wd, ht)
+    s.paint("body", SIDES, body)
+    s.paint("body", ("top",), lambda f, u, v, wd, ht: IN)
+    s.paint("body", ("bottom",), lambda f, u, v, wd, ht: c["pants"])
+    for arm in ("rarm", "larm"):
+        def paint(f, u, v, wd, ht):
+            if v < 4:
+                return sashiko(f, u, v, wd, ht)
+            if v == 4:
+                return s.cloth(IH, f, u, v, wd, ht, 0.03)                         # the rolled sleeve
+            if v >= 11:
+                return mul(S, 0.96)
+            px = s.cloth(S, f, u, v, wd, ht, 0.03)
+            return mul(px, 0.93) if (u * 3 + v * 5) % 11 == 0 else px              # freckled by sparks
+        s.paint(arm, SIDES, paint)
+        s.paint(arm, ("top",), lambda f, u, v, wd, ht: IN)
+        s.paint(arm, ("bottom",), lambda f, u, v, wd, ht: s_)
+        s.paint(arm, SIDES, lambda f, u, v, wd, ht: s.cloth(IH, f, u, v, wd, ht, 0.03) if v == 4 else None, layer=1)
+    for leg in ("rleg", "lleg"):
+        s.paint(leg, SIDES, lambda f, u, v, wd, ht: s.cloth(c["pants"], f, u, v, wd, ht) if v < 7 else
+                ((c["cloth"] if (u + v * 2) % 4 < 2 else c["cloth_d"]) if v < 11 else c["sandal"]))
+        s.paint(leg, ("top",), lambda f, u, v, wd, ht: c["pants"])
+        s.paint(leg, ("bottom",), lambda f, u, v, wd, ht: c["sandal"])
+        s.put(leg, "front", 1, 11, S)
+        s.paint(leg, SIDES, lambda f, u, v, wd, ht: s.cloth(c["pants_d"], f, u, v, wd, ht, 0.03) if v < 6 else None, layer=1)  # baggy
+    return s.img
+
+
+WSR = dict(BAND=(0, 0, 32, 2), PLATE=(0, 2, 12, 7), TIES=(12, 2, 4, 8), WRAP_S=(32, 2, 16, 8), WRAP_T=(48, 2, 8, 8),
+           APRON=(0, 12, 8, 16), APRON_E=(8, 12, 2, 16), TOWEL=(12, 12, 32, 3), TOWEL_E=(44, 12, 4, 10), BELT=(12, 16, 32, 2),
+           BUCKLE=(48, 12, 4, 3), SCROLL=(12, 19, 16, 6), SCAP=(28, 19, 4, 4), SBAND=(32, 19, 6, 2), HANDLE=(52, 12, 2, 10),
+           HHEAD=(54, 12, 6, 4), TONGS=(60, 12, 2, 10), SHEATH=(0, 30, 4, 16), GRIP=(4, 30, 3, 8), GUARD=(7, 30, 4, 2),
+           STRAP=(11, 30, 2, 12), BRACER=(16, 30, 16, 4), SHIN=(16, 34, 16, 4))
+
+
+def leaf_smith_gear():
+    c = dict(LSM, mark=(70, 74, 86))
+    R = WSR
+    g = G.Gear("geometry.aegis.gear_weaponsmith")
+    tex = Image.new("RGBA", (GW, GW), (0, 0, 0, 0))
+    L, Ld, Lh = c["leather"], c["leather_d"], c["leather_h"]
+    head_band(g, tex, c, R, LEAF, "bandana")
+
+    # the towel twisted round the neck, its ends hanging over the apron
+    tex_fill(tex, R["TOWEL"], lambda u, v, wd, ht: c["towel_s"] if (u // 3) % 4 == 1 and v == 1 else
+             mul(c["towel"], 1.04 - 0.07 * v - (0.06 if (u + 2 * v) % 4 == 0 else 0)))
+    tex_fill(tex, R["TOWEL_E"], lambda u, v, wd, ht: c["towel_s"] if v in (6, 7) else mul(c["towel"], 1.03 - 0.025 * v))
+    tw = g.bone("g_towel", "body", (0, 23.4, 0))
+    g.cube(tw, (-4, 22.4, -2), (8, 1.9, 4), ring(R["TOWEL"]), inflate=0.78)
+    end = uv(north=R["TOWEL_E"], south=R["TOWEL_E"], rest=(R["TOWEL_E"][0], R["TOWEL_E"][1], 1, 1))
+    g.cube(tw, (-3.3, 17.2, -3.45), (1.7, 5.4, 0.42), end)
+    g.cube(tw, (1.5, 18.6, -3.45), (1.7, 4.0, 0.42), end)
+
+    # the leather apron, branded with the Leaf swirl, a pocket across the front
+    def apron_px(u, v, wd, ht):
+        if u in (0, wd - 1) or v == ht - 1:
+            return Ld
+        if leaf_swirl(u, v, 0, 3):
+            return mul(Ld, 0.82)
+        if v == 10:
+            return Lh                                                             # the pocket's top edge
+        if v > 10 and u in (2, 5):
+            return mul(Ld, 0.95)                                                  # its seams
+        return mul(L, (1.06 - 0.14 * v / ht) * (0.93 if (u + v * 3) % 7 == 0 else 1))
+    tex_fill(tex, R["APRON"], apron_px)
+    tex_fill(tex, R["APRON_E"], lambda u, v, wd, ht: Ld if u else mul(Ld, 0.85))
+    ap = g.bone("g_apron", "body", (0, 22, -2.6))
+    g.cube(ap, (-3.5, 7.6, -2.95), (7.0, 15.4, 0.4), uv(north=R["APRON"], south=R["APRON"], rest=(R["APRON_E"][0], R["APRON_E"][1], 1, 1)))
+    for x in (-3.4, 2.8):                                                         # the straps over the shoulders
+        g.cube(ap, (x, 22.8, -2.9), (0.6, 1.5, 5.2), uv(rest=R["APRON_E"]))
+
+    # the tool belt over the apron: buckle, a hammer tucked in front, tongs at the left hip
+    tex_fill(tex, R["BELT"], lambda u, v, wd, ht: mul(Ld, 1.12 if v == 0 else 0.94) if (u % 6) else mul(Ld, 0.75))
+    tex_fill(tex, R["BUCKLE"], lambda u, v, wd, ht: (176, 168, 150) if (u in (0, wd - 1) or v in (0, ht - 1)) else (84, 78, 72))
+    bt = g.bone("g_toolbelt", "body", (0, 13, 0))
+    g.cube(bt, (-4, 12.2, -2), (8, 1.6, 4), ring(R["BELT"]), inflate=0.62)
+    g.cube(bt, (-3.6, 12.25, -3.2), (7.2, 1.5, 0.3), uv(north=R["BELT"], rest=(R["BELT"][0], R["BELT"][1], 2, 1)))
+    g.cube(bt, (-0.8, 12.05, -3.45), (1.6, 1.9, 0.3), uv(rest=R["BUCKLE"]))
+    tex_fill(tex, R["HANDLE"], lambda u, v, wd, ht: c["wood"] if u else mul(c["wood"], 0.78))
+    tex_fill(tex, R["HHEAD"], lambda u, v, wd, ht: mul(c["steel"], 1.12 - 0.1 * v) if 0 < u < wd - 1 else mul(c["steel"], 0.7))
+    hm = g.bone("g_hammer", "body", (-2.4, 13.2, -3.4), (0, 0, 14))
+    g.cube(hm, (-2.75, 8.6, -3.75), (0.7, 5.6, 0.7), uv(rest=R["HANDLE"]))
+    g.cube(hm, (-3.9, 13.9, -4.0), (3.0, 1.3, 1.2), uv(rest=R["HHEAD"]))
+    tex_fill(tex, R["TONGS"], lambda u, v, wd, ht: mul((96, 92, 92), 1.1 if u else 0.85))
+    tg = g.bone("g_tongs", "body", (3.9, 13, 0), (0, 0, -8))
+    for z in (-0.6, 0.15):
+        g.cube(tg, (4.05, 6.8, z), (0.45, 6.6, 0.45), uv(rest=R["TONGS"]))
+    g.cube(tg, (4.0, 12.4, -0.7), (0.55, 1.0, 1.4), uv(rest=R["TONGS"]))
+
+    # on the back: a sheathed katana (hilt over the right shoulder) and the great weapon scroll across the small of the back
+    tex_fill(tex, R["SHEATH"], lambda u, v, wd, ht: c["cord"] if v in (3, 4) else mul(c["lacquer_h"] if u == 1 else c["lacquer"], 1.0))
+    tex_fill(tex, R["GRIP"], lambda u, v, wd, ht: (228, 222, 210) if (u + v) % 2 else (36, 32, 40))
+    tex_fill(tex, R["GUARD"], lambda u, v, wd, ht: (190, 160, 70) if v == 0 else (140, 112, 44))
+    tex_fill(tex, R["STRAP"], lambda u, v, wd, ht: Ld if u else mul(Ld, 0.8))
+    kt = g.bone("g_katana", "body", (0, 18.5, 3.2), (0, 0, -36))
+    g.cube(kt, (-0.75, 8.6, 2.75), (1.5, 15.4, 0.75), uv(north=R["SHEATH"], south=R["SHEATH"], rest=(R["SHEATH"][0] + 1, R["SHEATH"][1], 1, 16)))
+    g.cube(kt, (-1.4, 24.0, 2.6), (2.8, 0.5, 1.05), uv(rest=R["GUARD"]))
+    g.cube(kt, (-0.6, 24.5, 2.8), (1.2, 4.6, 0.7), uv(rest=R["GRIP"]))
+    st = g.bone("g_kstrap", "body", (0, 18, 2.4), (0, 0, 40))                     # its strap, from the right hip to the left shoulder
+    g.cube(st, (-0.55, 11.2, 2.15), (1.1, 13.4, 0.3), uv(north=R["STRAP"], south=R["STRAP"], rest=(R["STRAP"][0], R["STRAP"][1], 1, 1)))
+    g.cube(st, (-0.55, 11.2, -2.45), (1.1, 13.4, 0.3), uv(north=R["STRAP"], south=R["STRAP"], rest=(R["STRAP"][0], R["STRAP"][1], 1, 1)))
+
+    def paper(u, v, wd, ht):
+        if v in (0, ht - 1):
+            return mul(c["paper"], 0.86)
+        if (u * 7 + v * 3) % 5 == 0 and 1 < v < ht - 2:
+            return (52, 46, 52)                                                    # the sealing script
+        return mul(c["paper"], 1.02 - 0.03 * (u % 3))
+    tex_fill(tex, R["SCROLL"], paper)
+    tex_fill(tex, R["SCAP"], lambda u, v, wd, ht: mul(c["cord"], 1.15) if (u in (1, 2) and v in (1, 2)) else mul(c["cord"], 0.82))
+    tex_fill(tex, R["SBAND"], lambda u, v, wd, ht: (220, 190, 80) if v == 0 else (176, 140, 50))
+    sc = g.bone("g_wscroll", "body", (0, 15.3, 3.6))
+    g.cube(sc, (-4.0, 14.1, 2.5), (8.0, 2.4, 2.4), uv(north=R["SCROLL"], south=R["SCROLL"], up=R["SCROLL"], down=R["SCROLL"], rest=R["SCAP"]))
+    for x in (-4.45, 4.0):
+        g.cube(sc, (x, 13.9, 2.3), (0.45, 2.8, 2.8), uv(rest=R["SCAP"]))
+    g.cube(sc, (-0.9, 13.9, 2.3), (1.8, 2.8, 2.8), uv(rest=R["SBAND"]))
+
+    # leather bracers, wrapped shins
+    G.wraps(g, tex, "g_bracer_r", "rightArm", (-8, 12.9, -2), (4, 3.6, 4), R["BRACER"], L, Ld, 0.22)
+    G.wraps(g, tex, "g_bracer_l", "leftArm", (4, 12.9, -2), (4, 3.6, 4), R["BRACER"], L, Ld, 0.22)
+    tex_fill(tex, R["BRACER"], lambda u, v, wd, ht: Ld if v in (0, ht - 1) else            # stitched edges, laced up the side
+             ((216, 200, 170) if u % 4 == 1 and v in (1, 2) else mul(L, 1.04 - 0.05 * v - (0.05 if (u * 3 + v) % 5 == 0 else 0))))
+    G.wraps(g, tex, "g_shin_r", "rightLeg", (-3.9, 1.3, -2), (4, 3.4, 4), R["SHIN"], c["cloth"], c["cloth_d"], 0.15)
+    G.wraps(g, tex, "g_shin_l", "leftLeg", (-0.1, 1.3, -2), (4, 3.4, 4), R["SHIN"], c["cloth"], c["cloth_d"], 0.15)
+    return g, tex
+
+
+# --- the Leaf Genin -------------------------------------------------------------------------------------------------------
+GLR = dict(BAND=(0, 0, 32, 2), PLATE=(0, 2, 12, 7), TIES=(12, 2, 4, 8), HAIR=(16, 2, 8, 8), HAIR2=(24, 2, 8, 8),
+           COLLAR=(32, 2, 16, 3), COLLAR2=(48, 2, 16, 4), SKIRT=(0, 12, 16, 8), SKIRT_E=(16, 12, 4, 8), POUCH=(20, 12, 6, 4),
+           STRAP=(26, 12, 16, 2), HBOX=(42, 12, 6, 6), WRAPS=(0, 22, 16, 4), SHIN=(16, 22, 16, 4), TANTO=(32, 22, 12, 3),
+           TGRIP=(44, 22, 4, 3), BOB=(0, 28, 16, 8), BOBF=(16, 28, 16, 8), BOBT=(32, 28, 8, 8))
+GEN_LEAF = dict(PLATE_C, mark=(70, 74, 86), band=(36, 54, 124), eye=(250, 248, 244), cloth=(222, 216, 202), cloth_d=(186, 180, 166),
+                leather=(70, 56, 48), tape=(222, 216, 202))
+GO = dict(GEN_LEAF, skin=(240, 202, 168), skin_d=(208, 166, 134), hair=(246, 204, 70), hair_h=(255, 230, 132), iris=(50, 112, 208),
+          brow=(214, 170, 58), mouth=(150, 70, 60), jacket=(244, 126, 36), jacket_d=(206, 98, 24), jacket_h=(255, 156, 70),
+          navy=(38, 48, 90), navy_d=(26, 34, 68), zip=(232, 232, 238), white=(240, 238, 232), sandal=(36, 54, 124))
+GO_FACE = dict(FACE_M, front=["HhHHhHHh", "HHhHHHhH", "BBBBBBBB", "SKKSSKKS", "SEISSIES", "SSSssSXS", "SSQEEQSS", "sSSSSSSs"])
+GB_ = dict(GEN_LEAF, skin=(238, 210, 186), skin_d=(206, 176, 152), hair=(36, 40, 64), hair_h=(80, 90, 132), iris=(38, 36, 46),
+           brow=(30, 32, 48), mouth=(184, 136, 124), shirt=(44, 62, 140), shirt_d=(30, 44, 104), shirt_h=(70, 92, 172),
+           shorts=(228, 228, 232), shorts_d=(190, 190, 198), warmer=(234, 234, 240), warmer_d=(198, 198, 208), belt=(78, 60, 104),
+           sandal=(40, 40, 52), sheath=(26, 24, 30), cord=(176, 40, 46))
+GB_FACE = dict(FACE_M, front=["HHhHHhHH", "HSHHHHSH", "BBBBBBBB", "SKKSSKKS", "SEISSIES", "SSSssSSS", "SSSQQSSS", "sSSSSSSs"],
+               front1=["HHhHHhHH", "H......H", "........", "H......H", "H......H", "H......."],
+               side1=["HhHHhHHh", "HHHHHHH.", "........", "HHHH....", "HHH.....", "HH......"],
+               back1=["HhHHhHHh", "HHHHHHHH", "........", "HHHHHHHH", "HHhHHhHH", "HHHHHHHH", "HHHHHHHH"])
+GP = dict(GEN_LEAF, skin=(244, 212, 188), skin_d=(214, 178, 156), hair=(244, 152, 186), hair_h=(255, 198, 218), iris=(60, 158, 102),
+          brow=(226, 128, 160), lip=(212, 112, 116), cheek=(246, 180, 170), mouth=(196, 100, 104), band=(196, 40, 50),
+          top=(204, 40, 52), top_d=(160, 28, 40), top_h=(232, 72, 80), trim=(242, 238, 230), shorts=(54, 54, 68), shorts_d=(40, 40, 52),
+          glove=(40, 40, 50), sandal=(58, 46, 56))
+GP_FACE = dict(FACE_F, front=["HhHHhHHh", "HHhHHHhH", "HSSHHSSH", "SKKSSKKS", "SEISSIES", "SCSssSCS", "SSSLLSSS", "sSSSSSSs"],
+               side=["HHHHHHHH", "HHHHHHHH", "HHHHHHSS", "HHHHHSSS", "HHHHsSSS", "HHHHSSSS", "HHHHSSSS", "HHHSSSSS"],
+               back=["HHhHHhHH", "HHHHHHHH", "HHHHHHHH", "HhHHHHhH", "HHHHHHHH", "HHhHHhHH", "HHHHHHHH", "HHHHHHHH"],
+               front1=None, side1=None, back1=None)
+
+
+def genin_orange_skin():
+    c = GO
+    s = Skin(6)
+    paint_head(s, c, GO_FACE)
+    S, s_ = c["skin"], c["skin_d"]
+    J, Jd, Jh, N = c["jacket"], c["jacket_d"], c["jacket_h"], c["navy"]
+
+    def body(f, u, v, wd, ht):
+        if v == 11:
+            return s.cloth(J, f, u, v, wd, ht)                                    # the trousers' waist
+        if v == 10:
+            return Jd                                                              # the jacket's hem
+        if v <= 2 and f in ("front", "back", "right", "left"):
+            return s.cloth(N, f, u, v, wd, ht, 0.03)                               # the navy shoulders
+        if f == "front" and u == 4:
+            return c["zip"]
+        if f == "front" and u == 3:
+            return Jd
+        if f == "back" and leaf_swirl(u, v, 0, 4):
+            return N                                                               # the Leaf mark on the back
+        return s.cloth(J, f, u, v, wd, ht, 0.04)
+    s.paint("body", SIDES, body)
+    s.paint("body", ("top",), lambda f, u, v, wd, ht: N)
+    s.paint("body", ("bottom",), lambda f, u, v, wd, ht: Jd)
+    for arm in ("rarm", "larm"):
+        outer = "right" if arm == "rarm" else "left"
+
+        def paint(f, u, v, wd, ht, outer=outer):
+            if v >= 11:
+                return S
+            if v in (9, 10):
+                return s.cloth(N, f, u, v, wd, ht, 0.03)                           # the cuffs
+            if v <= 2:
+                return s.cloth(N, f, u, v, wd, ht, 0.03)
+            if f == outer and u == 1:
+                return c["white"]                                                  # the track stripe
+            return s.cloth(J, f, u, v, wd, ht, 0.04)
+        s.paint(arm, SIDES, paint)
+        s.paint(arm, ("top",), lambda f, u, v, wd, ht: N)
+        s.paint(arm, ("bottom",), lambda f, u, v, wd, ht: s_)
+    for leg in ("rleg", "lleg"):
+        s.paint(leg, SIDES, lambda f, u, v, wd, ht: s.cloth(J, f, u, v, wd, ht) if v < 8 else
+                ((c["tape"] if v % 2 == 0 else c["cloth_d"]) if v < 11 else c["sandal"]))
+        s.paint(leg, ("top",), lambda f, u, v, wd, ht: J)
+        s.paint(leg, ("bottom",), lambda f, u, v, wd, ht: c["sandal"])
+        s.put(leg, "front", 1, 11, S)
+        s.put(leg, "front", 2, 11, s_)
+        s.paint(leg, SIDES, lambda f, u, v, wd, ht: s.cloth(Jd, f, u, v, wd, ht, 0.03) if v == 7 else None, layer=1)  # rolled up
+    return s.img
+
+
+def genin_blue_skin():
+    c = GB_
+    s = Skin(7)
+    paint_head(s, c, GB_FACE)
+    S, s_ = c["skin"], c["skin_d"]
+    SH, SHd = c["shirt"], c["shirt_d"]
+
+    def body(f, u, v, wd, ht):
+        if v == 10:
+            return c["belt"]
+        if v == 11:
+            return s.cloth(c["shorts"], f, u, v, wd, ht)
+        if f == "front" and v <= 1 and 3 <= u <= 4:
+            return S                                                               # the open neck
+        if f == "back" and u in (3, 4):
+            return mul(SH, 0.92)                                                   # the back seam
+        return s.cloth(SH, f, u, v, wd, ht, 0.04)
+    s.paint("body", SIDES, body)
+    s.paint("body", ("top",), lambda f, u, v, wd, ht: SH)
+    s.paint("body", ("bottom",), lambda f, u, v, wd, ht: c["shorts"])
+    for arm in ("rarm", "larm"):
+        s.paint(arm, SIDES, lambda f, u, v, wd, ht: s.cloth(SH, f, u, v, wd, ht) if v < 4 else
+                (SHd if v == 4 else (S if v >= 11 or v < 7 else (c["warmer"] if (u + v) % 3 else c["warmer_d"]))))
+        s.paint(arm, ("top",), lambda f, u, v, wd, ht: SH)
+        s.paint(arm, ("bottom",), lambda f, u, v, wd, ht: s_)
+    for leg in ("rleg", "lleg"):
+        s.paint(leg, SIDES, lambda f, u, v, wd, ht: s.cloth(c["shorts"], f, u, v, wd, ht) if v < 6 else
+                (S if v == 6 else ((c["cloth"] if (u + v * 2) % 4 < 2 else c["cloth_d"]) if v < 11 else c["sandal"])))
+        s.paint(leg, ("top",), lambda f, u, v, wd, ht: c["shorts"])
+        s.paint(leg, ("bottom",), lambda f, u, v, wd, ht: c["sandal"])
+        s.put(leg, "front", 1, 11, S)
+        s.paint(leg, SIDES, lambda f, u, v, wd, ht: s.cloth(c["shorts_d"], f, u, v, wd, ht, 0.03) if v in (4, 5) else None, layer=1)
+    return s.img
+
+
+def genin_pink_skin():
+    c = GP
+    s = Skin(8)
+    paint_head(s, c, GP_FACE)
+    S, s_ = c["skin"], c["skin_d"]
+    T, Td, TR = c["top"], c["top_d"], c["trim"]
+
+    def body(f, u, v, wd, ht):
+        if f == "front" and v <= 3 and u == 4 + v:
+            return TR                                                              # the qipao opening, collar to armpit
+        if f == "front" and v == 0 and u in (3, 4):
+            return TR
+        if v == 9:
+            return Td                                                              # the waist
+        return s.cloth(T, f, u, v, wd, ht, 0.04)
+    s.paint("body", SIDES, body)
+    s.paint("body", ("top",), lambda f, u, v, wd, ht: T)
+    s.paint("body", ("bottom",), lambda f, u, v, wd, ht: c["shorts"])
+    for arm in ("rarm", "larm"):
+        s.paint(arm, SIDES, lambda f, u, v, wd, ht: s.cloth(T, f, u, v, wd, ht) if v < 2 else
+                (TR if v == 2 else (c["glove"] if v >= 10 else s.cloth(S, f, u, v, wd, ht, 0.02))))
+        s.paint(arm, ("top",), lambda f, u, v, wd, ht: T)
+        s.paint(arm, ("bottom",), lambda f, u, v, wd, ht: c["glove"])
+    for leg in ("rleg", "lleg"):
+        s.paint(leg, SIDES, lambda f, u, v, wd, ht: s.cloth(c["shorts"], f, u, v, wd, ht) if v < 4 else
+                (s.cloth(S, f, u, v, wd, ht, 0.02) if v < 7 else ((c["tape"] if v % 2 == 0 else c["cloth_d"]) if v < 11 else c["sandal"])))
+        s.paint(leg, ("top",), lambda f, u, v, wd, ht: c["shorts"])
+        s.paint(leg, ("bottom",), lambda f, u, v, wd, ht: c["sandal"])
+        s.put(leg, "front", 1, 11, S)
+    return s.img
+
+
+def genin_band(g, tex, c, R, length=3.2):
+    band_plate(g, tex, R["BAND"], R["PLATE"], c["band"], c["plate"], c["plate_d"], symbol(LEAF, c["mark"]))
+    G.ties(g, tex, R["TIES"], c["band"], length)
+
+
+def shin_tape(g, tex, c, R):
+    G.wraps(g, tex, "g_shin_r", "rightLeg", (-3.9, 1.3, -2), (4, 3.4, 4), R["SHIN"], c["tape"], c["cloth_d"], 0.15)
+    G.wraps(g, tex, "g_shin_l", "leftLeg", (-0.1, 1.3, -2), (4, 3.4, 4), R["SHIN"], c["tape"], c["cloth_d"], 0.15)
+
+
+GO_SPIKES = SPIKY + [((-3.3, 30.4, -3.9), (2.0, 2.3, 2.0), (40, 0, 18)), ((-1.0, 30.8, -4.1), (2.0, 2.5, 2.0), (44, 0, -4)),
+                     ((1.3, 30.4, -3.9), (2.0, 2.3, 2.0), (40, 0, -20)), ((-4.4, 29.0, -1.2), (1.9, 2.3, 1.9), (0, 0, 66)),
+                     ((2.5, 29.0, -1.2), (1.9, 2.3, 1.9), (0, 0, -66)), ((-4.3, 29.2, 1.6), (1.9, 2.2, 1.9), (-30, 0, 58)),
+                     ((2.4, 29.2, 1.6), (1.9, 2.2, 1.9), (-30, 0, -58))]
+
+
+def genin_orange_gear():
+    c, R = GO, GLR
+    g = G.Gear("geometry.aegis.gear_genin_orange")
+    tex = Image.new("RGBA", (GW, GW), (0, 0, 0, 0))
+    genin_band(g, tex, c, R, 3.8)
+    spikes(g, tex, R["HAIR"], c["hair"], "head", GO_SPIKES)
+    # the track jacket's white collar with its zip pull
+    tex_fill(tex, R["COLLAR"], lambda u, v, wd, ht: mul(c["white"], 1.04 - 0.06 * v) if v < 2 else c["navy"])
+    co = g.bone("g_collar", "body", (0, 24, 0))
+    g.cube(co, (-4, 22.9, -2), (8, 1.6, 4), ring(R["COLLAR"]), inflate=0.5)
+    g.cube(co, (-0.35, 21.2, -2.85), (0.7, 1.2, 0.35), uv(rest=(R["COLLAR"][0], R["COLLAR"][1], 2, 1)))
+    G.holster(g, tex, R["STRAP"], R["HBOX"], c["tape"], c["leather"])
+    G.pouch(g, tex, "g_pouch", "body", (-1.6, 11.7, 2.25), (3.2, 2.1, 1.3), R["POUCH"], (196, 176, 136))
+    shin_tape(g, tex, c, R)
+    return g, tex
+
+
+GB_SPIKES = [((-3.4, 30.6, 0.2), (2.0, 2.6, 2.0), (-56, 0, 26)), ((-1.0, 31.0, 0.6), (2.0, 3.1, 2.0), (-62, 0, 0)),
+             ((1.4, 30.6, 0.2), (2.0, 2.6, 2.0), (-56, 0, -26)), ((-2.6, 29.6, 2.7), (1.9, 2.9, 1.9), (-90, 0, 18)),
+             ((0.7, 29.6, 2.7), (1.9, 2.9, 1.9), (-90, 0, -18)), ((-0.95, 28.2, 3.5), (1.9, 2.5, 1.9), (-110, 0, 0)),
+             ((-1.0, 31.4, -2.4), (2.0, 1.3, 2.0), (-20, 0, 0))]
+
+
+def genin_blue_gear():
+    c, R = GB_, GLR
+    g = G.Gear("geometry.aegis.gear_genin_blue")
+    tex = Image.new("RGBA", (GW, GW), (0, 0, 0, 0))
+    genin_band(g, tex, c, R, 3.0)
+    spikes(g, tex, R["HAIR"], c["hair"], "head", GB_SPIKES)
+    # long side locks framing the face
+    tex_fill(tex, R["HAIR2"], lambda u, v, wd, ht: mul(c["hair"], 1.2 - 0.35 * v / ht))
+    lk = g.bone("g_locks", "head", (0, 28, 0))
+    for x in (-4.65, 3.85):
+        g.cube(lk, (x, 24.6, -4.45), (0.8, 4.8, 2.0), uv(rest=R["HAIR2"]))
+    # the tall collar, open at the front
+    tex_fill(tex, R["COLLAR2"], lambda u, v, wd, ht: mul(c["shirt_d"], 1.1 - 0.08 * v) if v else c["shirt_h"])
+    co = g.bone("g_collar", "body", (0, 24, 0))
+    col = uv(rest=R["COLLAR2"])
+    g.cube(co, (-4.45, 22.6, 1.9), (8.9, 3.4, 0.6), col)
+    for x, rz in ((-4.45, 10), (3.85, -10)):
+        g.cube(co, (x, 22.6, -2.4), (0.6, 3.4, 4.3), col, rotation=(0, 0, rz), pivot=(x + 0.3, 22.6, 0))
+    # arm warmers, wrapped shins, a tantō at the small of the back, a pouch
+    G.wraps(g, tex, "g_wrap_r", "rightArm", (-8, 12.8, -2), (4, 4.2, 4), R["WRAPS"], c["warmer"], c["warmer_d"], 0.2)
+    G.wraps(g, tex, "g_wrap_l", "leftArm", (4, 12.8, -2), (4, 4.2, 4), R["WRAPS"], c["warmer"], c["warmer_d"], 0.2)
+    tex_fill(tex, R["WRAPS"], lambda u, v, wd, ht: c["warmer_d"] if v == ht - 1 else mul(c["warmer"], 1.0 if u % 2 else 0.93))  # knitted ribs
+    shin_tape(g, tex, c, R)
+    tex_fill(tex, R["TANTO"], lambda u, v, wd, ht: c["cord"] if u in (3, 4) else (mul(c["sheath"], 2.2) if v == 0 else c["sheath"]))
+    tex_fill(tex, R["TGRIP"], lambda u, v, wd, ht: (226, 222, 212) if (u + v) % 2 else (40, 36, 44))
+    tt = g.bone("g_tanto", "body", (0, 13, 3), (0, 0, 8))
+    g.cube(tt, (-1.2, 12.5, 2.4), (6.6, 1.1, 0.8), uv(rest=R["TANTO"]))
+    g.cube(tt, (-1.55, 12.2, 2.3), (0.4, 1.7, 1.0), uv(rest=(R["TANTO"][0] + 3, R["TANTO"][1], 1, 1)))
+    g.cube(tt, (-3.9, 12.6, 2.5), (2.4, 0.9, 0.6), uv(rest=R["TGRIP"]))
+    G.pouch(g, tex, "g_pouch", "body", (-3.6, 13.6, 2.2), (2.4, 2.0, 1.2), R["POUCH"], (200, 186, 150))
+    return g, tex
+
+
+def genin_pink_gear():
+    c, R = GP, GLR
+    g = G.Gear("geometry.aegis.gear_genin_pink")
+    tex = Image.new("RGBA", (GW, GW), (0, 0, 0, 0))
+    H, Hh = c["hair"], c["hair_h"]
+    # the bob: a volume of hair over the head, bangs cut straight over the brows, down to the chin at the sides
+    tex_fill(tex, R["BOB"], lambda u, v, wd, ht: mul(H, 1.14 - 0.3 * v / ht - (0.06 if u % 3 == 0 else 0)))
+    tex_fill(tex, R["BOBF"], lambda u, v, wd, ht: (None if v == ht - 1 and u % 4 == 1 else
+                                                    mul(H, 1.18 - 0.26 * v / ht - (0.07 if u % 4 == 0 else 0))) if v < 4 else None)
+    tex_fill(tex, R["BOBT"], lambda u, v, wd, ht: mul(Hh if (u * 3 + v) % 5 == 0 else H, 1.06))
+    bob = g.bone("g_bob", "head", (0, 28, 0))
+    g.cube(bob, (-4.55, 29.4, -4.55), (9.1, 3.1, 9.1), uv(north=R["BOBF"], up=R["BOBT"], rest=R["BOB"]))
+    for x in (-4.55, 3.7):                                                        # the sides, down to the chin
+        g.cube(bob, (x, 24.2, -3.8), (0.85, 5.3, 7.6), uv(rest=R["BOB"]))
+    g.cube(bob, (-4.55, 26.4, 3.7), (9.1, 3.1, 0.85), uv(rest=R["BOB"]))       # the back, in two steps to the nape
+    g.cube(bob, (-4.3, 23.8, 3.5), (8.6, 2.7, 0.85), uv(rest=R["BOB"]))
+    # the red-cloth headband worn as a hairband over the crown, the plate on top
+    tex_fill(tex, R["BAND"], lambda u, v, wd, ht: mul(c["band"], 1.08 if v == 0 else 0.92))
+    tex_fill(tex, R["PLATE"], lambda u, v, wd, ht: c["plate_d"] if (u in (0, wd - 1) or v in (0, ht - 1)) else mul(c["plate"], 1.08 - 0.16 * v / ht))
+    symbol(LEAF, c["mark"])(ImageDraw.Draw(tex), R["PLATE"])
+    hb = g.bone("g_hairband", "head", (0, 31, 0))
+    band = uv(rest=(R["BAND"][0], R["BAND"][1], 32, 2))
+    g.cube(hb, (-4.85, 32.45, -3.1), (9.7, 0.7, 2.0), band)                       # over the crown, ear to ear
+    for x in (-4.95, 4.25):
+        g.cube(hb, (x, 28.2, -3.1), (0.7, 4.95, 2.0), band)
+    g.cube(hb, (-2.5, 31.2, -5.05), (5.0, 2.3, 0.55), uv(north=R["PLATE"], rest=(R["PLATE"][0], R["PLATE"][1], 2, 2)),
+           rotation=(-22, 0, 0), pivot=(0, 31.2, -4.8))                            # the plate, at the front of the crown
+    # the mandarin collar, the skirt over her shorts (open at the sides), a holster and a medic pouch
+    tex_fill(tex, R["COLLAR"], lambda u, v, wd, ht: c["trim"] if v == 0 else mul(c["top"], 1.0 - 0.08 * v))
+    co = g.bone("g_collar", "body", (0, 24, 0))
+    g.cube(co, (-4, 23.0, -2), (8, 1.6, 4), ring(R["COLLAR"]), inflate=0.45)
+    tex_fill(tex, R["SKIRT"], lambda u, v, wd, ht: c["trim"] if v == ht - 1 else mul(c["top_d"] if u % 4 == 3 else c["top"], 1.04 - 0.1 * v / ht))
+    tex_fill(tex, R["SKIRT_E"], lambda u, v, wd, ht: mul(c["top_d"], 0.9))
+    sk = g.bone("g_skirt", "body", (0, 12, 0))
+    side = (R["SKIRT_E"][0], R["SKIRT_E"][1], 1, 8)
+    # (flared like an A-line skirt, so the legs don't poke through it as she walks)
+    g.cube(sk, (-4.1, 8.3, -2.75), (8.2, 4.3, 0.4), uv(north=R["SKIRT"], south=R["SKIRT"], rest=side), rotation=(-13, 0, 0), pivot=(0, 12.6, -2.55))
+    g.cube(sk, (-4.1, 8.3, 2.35), (8.2, 4.3, 0.4), uv(north=R["SKIRT"], south=R["SKIRT"], rest=side), rotation=(13, 0, 0), pivot=(0, 12.6, 2.55))
+    G.holster(g, tex, R["STRAP"], R["HBOX"], c["tape"], c["leather"])
+    G.pouch(g, tex, "g_pouch", "body", (1.2, 11.8, 2.3), (2.6, 2.0, 1.2), R["POUCH"], (236, 232, 222))
+    shin_tape(g, tex, c, R)
+    return g, tex
+
+
 HAND_MODELS = {
     "itachi": (ak_collar, ponytail((28, 26, 32))),
     "kisame": (ak_collar, spiky((54, 65, 90), SHORT_SPIKY), samehada_back),
@@ -2385,6 +2831,11 @@ MODELS = {
     "orochimaru": (lambda: ninja_skin(OR, OROCHIMARU, 73), orochimaru_gear),
     "obito": (lambda: ninja_skin(OB, OBITO, 74), obito_gear),
     "kaguya": (lambda: kage_skin(KG, KAGUYA, 75), kaguya_gear),
+    # v1.57: the Leaf Weaponsmith (skin 2) and the Leaf Genin (skins 6-8)
+    "weaponsmith": (leaf_smith_skin, leaf_smith_gear),
+    "genin_orange": (genin_orange_skin, genin_orange_gear),
+    "genin_blue": (genin_blue_skin, genin_blue_gear),
+    "genin_pink": (genin_pink_skin, genin_pink_gear),
     # v1.56: the hand-painted bosses get 3D gear (their skins are kept)
     **{n: (hand_skin(n), (lambda n=n: gear_only(f"geometry.aegis.gear_{n}", *HAND_MODELS[n]))) for n in HAND_MODELS},
 }

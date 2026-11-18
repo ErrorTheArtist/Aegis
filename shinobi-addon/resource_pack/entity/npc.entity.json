@@ -83,7 +83,11 @@
         "s73": "textures/entity/aegis/npc/orochimaru",
         "s74": "textures/entity/aegis/npc/obito",
         "s75": "textures/entity/aegis/npc/kaguya",
+        "gear_weaponsmith": "textures/entity/aegis/npc/gear_weaponsmith",
         "gear_hokage": "textures/entity/aegis/npc/gear_hokage",
+        "gear_genin_orange": "textures/entity/aegis/npc/gear_genin_orange",
+        "gear_genin_blue": "textures/entity/aegis/npc/gear_genin_blue",
+        "gear_genin_pink": "textures/entity/aegis/npc/gear_genin_pink",
         "gear_rogue": "textures/entity/aegis/npc/gear_rogue",
         "gear_sound": "textures/entity/aegis/npc/gear_sound",
         "gear_itachi": "textures/entity/aegis/npc/gear_itachi",
@@ -148,7 +152,11 @@
       },
       "geometry": {
         "default": "geometry.humanoid.custom",
+        "gear_weaponsmith": "geometry.aegis.gear_weaponsmith",
         "gear_hokage": "geometry.aegis.gear_hokage",
+        "gear_genin_orange": "geometry.aegis.gear_genin_orange",
+        "gear_genin_blue": "geometry.aegis.gear_genin_blue",
+        "gear_genin_pink": "geometry.aegis.gear_genin_pink",
         "gear_rogue": "geometry.aegis.gear_rogue",
         "gear_sound": "geometry.aegis.gear_sound",
         "gear_itachi": "geometry.aegis.gear_itachi",
@@ -235,7 +243,19 @@
       "render_controllers": [
         "controller.render.aegis.npc",
         {
+          "controller.render.aegis.npc_gear_weaponsmith": "q.property('aegis:skin') == 2"
+        },
+        {
           "controller.render.aegis.npc_gear_hokage": "q.property('aegis:skin') == 4"
+        },
+        {
+          "controller.render.aegis.npc_gear_genin_orange": "q.property('aegis:skin') == 6"
+        },
+        {
+          "controller.render.aegis.npc_gear_genin_blue": "q.property('aegis:skin') == 7"
+        },
+        {
+          "controller.render.aegis.npc_gear_genin_pink": "q.property('aegis:skin') == 8"
         },
         {
           "controller.render.aegis.npc_gear_rogue": "q.property('aegis:skin') == 9"

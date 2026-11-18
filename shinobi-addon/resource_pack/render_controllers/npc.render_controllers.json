@@ -94,6 +94,17 @@
         "Array.skins[q.property('aegis:skin')]"
       ]
     },
+    "controller.render.aegis.npc_gear_weaponsmith": {
+      "geometry": "Geometry.gear_weaponsmith",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_weaponsmith"
+      ]
+    },
     "controller.render.aegis.npc_gear_hokage": {
       "geometry": "Geometry.gear_hokage",
       "materials": [
@@ -103,6 +114,39 @@
       ],
       "textures": [
         "Texture.gear_hokage"
+      ]
+    },
+    "controller.render.aegis.npc_gear_genin_orange": {
+      "geometry": "Geometry.gear_genin_orange",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_genin_orange"
+      ]
+    },
+    "controller.render.aegis.npc_gear_genin_blue": {
+      "geometry": "Geometry.gear_genin_blue",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_genin_blue"
+      ]
+    },
+    "controller.render.aegis.npc_gear_genin_pink": {
+      "geometry": "Geometry.gear_genin_pink",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_genin_pink"
       ]
     },
     "controller.render.aegis.npc_gear_rogue": {

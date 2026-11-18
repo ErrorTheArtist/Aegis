@@ -23,8 +23,8 @@ import { travelMenu, initTravel, postName } from "./travel.js";
 
 const SPAWNER = "aegis:npc_spawner";
 const INDEX_PROP = "aegis:spawners";
-const SKIN_NAMES = ["Sensei", "Elder", "Weaponsmith", "Ramen chef", "Hokage", "Proctor", "Genin (orange)", "Genin (blue)",
-  "Genin (pink)", "Rogue ninja", "Sound ninja", "Anbu", "Itachi", "Kisame", "Deidara", "Leaf chūnin",
+const SKIN_NAMES = ["Sensei", "Elder", "Leaf weaponsmith", "Ramen chef", "Hokage", "Proctor", "Leaf genin (orange)", "Leaf genin (blue)",
+  "Leaf genin (pink)", "Rogue ninja", "Sound ninja", "Anbu", "Itachi", "Kisame", "Deidara", "Leaf chūnin",
   "Naruto", "Sasuke", "Tsunade", "Hiruzen Sarutobi", "Minato",
   "Pain", "Konan", "Hidan", "Hidan (Jashin form)", "Kakuzu", "Sasori", "Zetsu", "Tobi",
   "Madara (Edo)", "Hashirama (Edo)", "Tobirama (Edo)", "Travelling merchant", "Leaf kunoichi",

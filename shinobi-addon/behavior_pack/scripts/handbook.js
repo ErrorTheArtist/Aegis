@@ -56,6 +56,7 @@ export const TOPICS = [
     "• Earn Ryō from enemies (notes go straight to your wallet), missions, quests, daily missions, the story, events and bounties.",
     "• §fJutsu Sensei§r (scrolls, nature & clan training, Sage Mode) · §fWeaponsmith§r (gear, swords, ninja tools) · §fRamen Shop§r (food) · §fTravelling Merchant§r (random deals) · §fKage§r (missions) · §fProctor§r (rank exams) · §fQuest Giver§r · §fTravel Master§r (fast travel).",
     "• Pay other players from Shinobi Record → Ryō Wallet.",
+    "• How expensive things are, and how much Ryō quests pay, is set by the server's admins — save up for the big buys.",
   ]],
   ["§cBingo Book & PvP", [
     "• Put a §fbounty§r on any player (Shinobi Record → Bingo Book) — whoever defeats them collects it.",

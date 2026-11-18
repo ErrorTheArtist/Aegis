@@ -10,7 +10,7 @@
 import { world, system, ItemStack } from "@minecraft/server";
 import { ActionFormData } from "@minecraft/server-ui";
 import { showTitle } from "./hud.js";
-import { addRyo, fmtRyo } from "./currency.js";
+import { addRyo, fmtRyo, questRyo } from "./currency.js";
 import { getLevel } from "./levels.js";
 import { getHonor } from "./villages.js";
 import { missionsDone } from "./titles.js";
@@ -79,11 +79,14 @@ export function rollDailies(p) {
   return st;
 }
 
-function pay(p, reward) {
+// (the missions and their bonus follow the economy's quest-reward setting; the login streak doesn't)
+const ryoOf = (reward, quest = true) => (quest ? questRyo(reward.ryo) : reward.ryo ?? 0);
+function pay(p, reward, quest = true) {
   const bits = [];
-  if (reward.ryo) {
-    addRyo(p, reward.ryo, true);
-    bits.push(fmtRyo(reward.ryo));
+  const ryo = ryoOf(reward, quest);
+  if (ryo) {
+    addRyo(p, ryo, true);
+    bits.push(fmtRyo(ryo));
   }
   if (reward.shards) {
     giveShards(p, reward.shards);
@@ -159,7 +162,7 @@ export function checkStreak(p) {
   p.setDynamicProperty(STREAK_PROP, streak);
   p.setDynamicProperty(STREAK_DAY_PROP, day);
   const slot = (streak - 1) % 7;
-  const got = pay(p, { ryo: STREAK_PAY[slot], shards: slot === 6 ? 2 : 0 });
+  const got = pay(p, { ryo: STREAK_PAY[slot], shards: slot === 6 ? 2 : 0 }, false);
   p.sendMessage(`§e☀ Login streak: day ${streak}§7 — §f${got}${slot === 6 ? " §6(a full week!)" : `§8 (day 7 pays ${fmtRyo(STREAK_PAY[6])} + 2 XP Shards)`}`);
   const best = achStats(p).streak_best ?? 0;
   if (streak > best) bumpAch(p, "streak_best", streak - best);
@@ -171,7 +174,7 @@ export async function dailyMenu(p, back) {
   const streak = Number(p.getDynamicProperty(STREAK_PROP) ?? 1);
   const lines = st.list.map((m) => {
     const [text, goal, reward] = DAILY[m.id];
-    return `${m.done ? "§a✔" : "§8✘"} §f${text}§7 — ${m.done ? "done" : `${m.have}/${goal}`} §8(${[reward.ryo ? fmtRyo(reward.ryo) : "", reward.shards ? `${reward.shards} XP Shard` : ""].filter(Boolean).join(", ")})`;
+    return `${m.done ? "§a✔" : "§8✘"} §f${text}§7 — ${m.done ? "done" : `${m.have}/${goal}`} §8(${[ryoOf(reward) ? fmtRyo(ryoOf(reward)) : "", reward.shards ? `${reward.shards} XP Shard` : ""].filter(Boolean).join(", ")})`;
   });
   const now = new Date();
   const left = Math.max(0, Math.ceil((Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1) - now.getTime()) / 3600000));
@@ -180,7 +183,7 @@ export async function dailyMenu(p, back) {
     .body([
       "§a§lToday's missions§r",
       ...lines,
-      st.bonus ? "§6★ All done — bonus paid!" : `§7Finish all three for a bonus: §f${fmtRyo(ALL_DONE.ryo)} + an XP Shard`,
+      st.bonus ? "§6★ All done — bonus paid!" : `§7Finish all three for a bonus: §f${fmtRyo(ryoOf(ALL_DONE))} + an XP Shard`,
       `§8New missions in about ${left} hour${left === 1 ? "" : "s"}.`,
       "",
       `§e☀ Login streak: §fday ${streak}§7 — tomorrow pays §f${fmtRyo(STREAK_PAY[streak % 7])}${streak % 7 === 6 ? " + 2 XP Shards" : ""}`,

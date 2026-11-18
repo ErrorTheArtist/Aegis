@@ -6,7 +6,7 @@
 
 import { world, system, ItemStack } from "@minecraft/server";
 import { showTitle } from "./hud.js";
-import { addRyo, fmtRyo } from "./currency.js";
+import { addRyo, fmtRyo, questRyo } from "./currency.js";
 import { getLevel, gainXp, getRank } from "./levels.js";
 import { getVillage, VILLAGES, gearOf } from "./villages.js";
 import { JUTSU_NATURE } from "./natures.js";
@@ -97,7 +97,7 @@ const itemsOf = (q, player) => (typeof q.items === "function" ? q.items(player) 
 
 function rewardText(q, player) {
   const r = [];
-  if (q.ryo) r.push(`§6${fmtRyo(q.ryo)}`);
+  if (questRyo(q.ryo)) r.push(`§6${fmtRyo(questRyo(q.ryo))}`);
   if (q.xp) r.push(`§b${q.xp} XP`);
   for (const [id, n] of itemsOf(q, player)) r.push(`§f${n}× ${id.split(":")[1].replace(/_/g, " ")}`);
   return r.length ? `§7Reward: ${r.join("§7, ")}` : "";
@@ -116,7 +116,7 @@ function advance(player, amount = 1, absolute, key = "starter") {
     return;
   }
   // complete: pay out and move on
-  if (q.ryo) addRyo(player, q.ryo, true);
+  if (questRyo(q.ryo)) addRyo(player, questRyo(q.ryo), true);
   if (q.xp) gainXp(player, q.xp);
   const inv = player.getComponent("minecraft:inventory")?.container;
   for (const [id, n] of itemsOf(q, player)) {

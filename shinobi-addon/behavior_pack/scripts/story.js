@@ -9,7 +9,7 @@
 import { world, system, ItemStack } from "@minecraft/server";
 import { ActionFormData } from "@minecraft/server-ui";
 import { showTitle } from "./hud.js";
-import { addRyo, fmtRyo } from "./currency.js";
+import { addRyo, fmtRyo, questRyo } from "./currency.js";
 import { getLevel, getRank } from "./levels.js";
 import { VILLAGES, getVillage, isRogue } from "./villages.js";
 import { hasSageTraining } from "./sage.js";
@@ -76,9 +76,10 @@ const save = (p, st) => p.setDynamicProperty(PROP, JSON.stringify(st));
 
 function payout(p, reward) {
   const bits = [];
-  if (reward.ryo) {
-    addRyo(p, reward.ryo, true);
-    bits.push(fmtRyo(reward.ryo));
+  const ryo = questRyo(reward.ryo); // (the economy's quest-reward setting)
+  if (ryo) {
+    addRyo(p, ryo, true);
+    bits.push(fmtRyo(ryo));
   }
   if (reward.shards) {
     giveShards(p, reward.shards);
@@ -184,7 +185,7 @@ export async function storyMenu(p, back) {
 }
 
 function payoutText(r) {
-  return [r.ryo ? fmtRyo(r.ryo) : "", r.shards ? `${r.shards} XP Shard${r.shards > 1 ? "s" : ""}` : "",
+  return [questRyo(r.ryo) ? fmtRyo(questRyo(r.ryo)) : "", r.shards ? `${r.shards} XP Shard${r.shards > 1 ? "s" : ""}` : "",
     ...(r.items ?? []).map(([id, n]) => `${n > 1 ? `${n}× ` : ""}${id.replace("aegis:", "").replace(/_scroll$/, " scroll").replace(/_/g, " ")}`)]
     .filter(Boolean).join("§7, §f");
 }

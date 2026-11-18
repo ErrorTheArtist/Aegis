@@ -15,7 +15,7 @@ import { getLevel, gainXp, getRank, setRank, addPoints, RANKS } from "./levels.j
 import { hasSageTraining, grantSage } from "./sage.js";
 import { hasEternalMangekyo, awakenEternal } from "./clans.js";
 import { natureTraining } from "./natures.js";
-import { getRyo, spendRyo, addRyo, fmtRyo, exchangeEmeralds, EMERALD_RATE, PRICE_MULTIPLIER } from "./currency.js";
+import { getRyo, spendRyo, addRyo, fmtRyo, exchangeEmeralds, EMERALD_RATE, priceMultiplier, questRyo } from "./currency.js";
 import { RELEASE_SCROLLS } from "./releases.js";
 import { questGiver, questSetup } from "./quests.js";
 import { VILLAGE_GEAR, getVillage } from "./villages.js";
@@ -285,10 +285,11 @@ const isCreative = (p) => {
   }
 };
 
-// Prices are written in "units" of 100 Ryō (the old emerald prices); a spawner's price % scales them, and since v1.52
-// every price is 20% higher (PRICE_MULTIPLIER). Mission rewards use the same units without the markup (rewardOf).
-const priceOf = (base, cfg) => Math.max(1, Math.round(base * 100 * PRICE_MULTIPLIER * ((cfg?.price ?? 100) / 100)));
-const rewardOf = (base, cfg) => Math.max(1, Math.round(base * 100 * ((cfg?.price ?? 100) / 100)));
+// Prices are written in "units" of 100 Ryō (the old emerald prices); a spawner's price % scales them, and so does the
+// server's economy setting (currency.js: v1.52's +20%, and since v1.58 twice that by default). Mission rewards use the
+// same units, scaled by the economy's quest-reward setting instead (rewardOf).
+const priceOf = (base, cfg) => Math.max(1, Math.round(base * 100 * priceMultiplier() * ((cfg?.price ?? 100) / 100)));
+const rewardOf = (base, cfg) => questRyo(base * 100 * ((cfg?.price ?? 100) / 100));
 
 // The default greeting of this NPC's own type (a Sand sensei greets differently from a Leaf one).
 function greetingOf(npc, fallback) {

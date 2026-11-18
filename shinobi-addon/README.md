@@ -11,8 +11,8 @@ Uses the real Naruto names (Rasengan, Shadow Clone Jutsu, etc.) — personal use
 - **Your shinobi** — [Chakra](#chakra) · [Levels & Stats](#levels--stats) · [Clans](#clans) · [Jutsu](#jutsu-right-click-the-scroll-to-cast) · [Titles](#titles-v154) · [Armor](#armor--clothing) · [Swords](#legendary-swords) · [Ninja tools](#ninja-tools)
 - **Things to do** — [Story](#story-the-path-of-the-shinobi-v156) · [Factions](#factions-akatsuki--anbu-v156) · [Bingo Book](#bingo-book-v155) · [Achievements](#achievements-v155) · [Daily missions](#daily-missions--login-streak-v155) · [World events](#world-events-v155)
 - **The world** — [Tailed Beasts](#tailed-beasts-bosses) · [NPCs](#npcs) · [Legendary bosses](#legendary-bosses-npc-spawner-only) · [Enemies](#enemies) · [Fast Travel](#fast-travel)
-- **For admins** — [Admin Panel](#admin-panel-v156) · [Grace period](#grace-period-no-fighting) · [Lag clear](#lag-clear) · [Vanilla items](#vanilla-items-v154)
-- **What's new** — [v1.57](#the-leaf-weaponsmith-and-the-leaf-genin-remodelled-v157) · [v1.56](#story-factions-the-kaguya-clan-and-an-admin-panel-v156) and every version before it, at the end
+- **For admins** — [Admin Panel](#admin-panel-v156) · [Economy](#economy-v158) · [Grace period](#grace-period-no-fighting) · [Lag clear](#lag-clear) · [Vanilla items](#vanilla-items-v154)
+- **What's new** — [v1.58](#everything-costs-more-quests-pay-less-v158) · [v1.57](#the-leaf-weaponsmith-and-the-leaf-genin-remodelled-v157) · [v1.56](#story-factions-the-kaguya-clan-and-an-admin-panel-v156) and every version before it, at the end
 
 ## Install
 
@@ -64,12 +64,12 @@ An automatic chain — progress on the action bar, rewards paid instantly, shown
 
 | # | Quest | Goal | Reward |
 |---|---|---|---|
-| 1 | First Blood | defeat 5 hostile mobs | 1,000 Ryō, 300 XP |
+| 1 | First Blood | defeat 5 hostile mobs | 500 Ryō, 300 XP |
 | 2 | Chakra Control | cast 3 jutsu / clan abilities | Body Flicker scroll, 500 XP |
-| 3 | Rogue Hunter | defeat 3 enemy ninja | 2,500 Ryō, 3 Soldier Pills, 800 XP |
-| 4 | Growing Stronger | reach level 10 | 3,000 Ryō, Shadow Clone scroll |
-| 5 | The Chūnin Exam | pass the Chūnin exam | 5,000 Ryō, **your village's flak jacket** (the Rain Cloak for the Rain) |
-| 6 | Akatsuki Sighting | defeat any Akatsuki member | 10,000 Ryō, 5,000 XP, Rasengan scroll |
+| 3 | Rogue Hunter | defeat 3 enemy ninja | 1,250 Ryō, 3 Soldier Pills, 800 XP |
+| 4 | Growing Stronger | reach level 10 | 1,500 Ryō, Shadow Clone scroll |
+| 5 | The Chūnin Exam | pass the Chūnin exam | 2,500 Ryō, **your village's flak jacket** (the Rain Cloak for the Rain) |
+| 6 | Akatsuki Sighting | defeat any Akatsuki member | 5,000 Ryō, 5,000 XP, Rasengan scroll |
 
 `/scriptevent aegis:starter` shows your current quests.
 
@@ -88,7 +88,7 @@ reach level 25 for its **signature reward**:
 | Stone | Quarry Patrol · Solid as Rock · Border Skirmish · The Unmovable Stone | Earth Wall | 5 enemy ninja | **Earth Spikes** scroll |
 | Rain | Rain Patrol · Endless Rain · Orphans of War · The God of Rain | Water Prison | 5 Rogue Ninja | **Akatsuki cloak** |
 
-Quest 2 is "cast 5 jutsu of your village's release". Rewards along the way: 1,000 / 2,000 / 3,000 / 5,000 Ryō, XP and pills.
+Quest 2 is "cast 5 jutsu of your village's release". Rewards along the way: 500 / 1,000 / 1,500 / 2,500 Ryō, XP and pills.
 
 **Sand Gourd** — right-click: **Sand Coffin** (sand wraps the enemy you look at, holds them and crushes them for 14;
 30 chakra, 10s). Sneak + right-click: **Sand Shield** (sand swirls around you, damage reduced for 4s; 20 chakra, 20s).
@@ -174,6 +174,7 @@ Panel or `/execute as <player> run scriptevent …`.
 | `aegis:clash <test / destruction on·off>` | Jutsu Clash |
 | `aegis:story [reset]` · `aegis:faction [leave]` · `aegis:daily [reroll]` · `aegis:achievements [reset]` · `aegis:starter [reset]` · `aegis:quest [abandon]` | your progress |
 | `aegis:m1 on·off` · `aegis:sheath on·off` | your combo animations / swords on your back (also in *Settings*) |
+| `aegis:economy [prices <25-1000> / quests <0-200> / reset]` | prices and quest rewards (see *Economy*) |
 | `aegis:spawner` | the settings of the NPC Spawner you're looking at |
 
 ## Chakra
@@ -325,8 +326,8 @@ group with your progress. `/scriptevent aegis:achievements` shows your count.
 
 - **Three random daily missions** every day (UTC): defeat 15 hostile ninja, defeat 30 monsters, cast 25 jutsu, cast 5
   different jutsu, eat 3 bowls of ramen, defeat a legend or an Akatsuki member, defeat a Tailed Beast, earn 50 honor,
-  complete a mission or quest, use ninja tools 10 times, gain 2 levels, summon an animal. Each pays 1,000–10,000 Ryō
-  (the hard ones an XP Shard too) the moment it's done; finishing all three pays a bonus (5,000 Ryō and an XP Shard,
+  complete a mission or quest, use ninja tools 10 times, gain 2 levels, summon an animal. Each pays 500–5,000 Ryō
+  (the hard ones an XP Shard too) the moment it's done; finishing all three pays a bonus (2,500 Ryō and an XP Shard,
   sometimes a Bloodline Reroll Scroll).
 - **Login streak**: log in on consecutive days — day 1 pays 500 Ryō, day 7 pays **10,000 Ryō and 2 XP Shards**, then the
   week starts again. Miss a day and it starts over.
@@ -365,18 +366,18 @@ chapter's and its reward is paid at once and the next chapter begins. **Shinobi 
 
 | # | Chapter | Objectives | Reward |
 |---|---|---|---|
-| 1 | The Academy | cast 3 jutsu · defeat 5 monsters | 1,000 Ryō, 2 Soldier Pills |
-| 2 | Mission to the Land of Waves | defeat 10 hostile ninja · reach level 10 | 2,000 Ryō, 16 kunai |
-| 3 | The Chūnin Exams | pass the Chūnin exam · defeat 5 Sound ninja | 4,000 Ryō, an XP Shard |
-| 4 | Konoha Crush | defeat 20 hostile ninja · visit another great village | 5,000 Ryō, 4 dango |
-| 5 | The Search for a Legend | defeat a legendary shinobi · reach level 30 | 8,000 Ryō, Mystical Palm scroll |
-| 6 | The Retrieval Mission | defeat 10 Sound ninja · reach level 50 | 12,000 Ryō, Ninja Hounds scroll |
-| 7 | The Akatsuki Strike | defeat 2 Akatsuki members | 15,000 Ryō, 2 XP Shards |
-| 8 | Sage Training | learn Sage Mode | 20,000 Ryō, Toad Oil Flame Bomb scroll |
-| 9 | Pain's Assault | defeat 3 more Akatsuki members · 50 hostile ninja | 25,000 Ryō, 3 XP Shards |
-| 10 | The Tailed Beasts | defeat a Tailed Beast (or become a Jinchūriki) | 30,000 Ryō, Tailed Beast Summoning Scroll |
-| 11 | The Fourth Great Ninja War | defeat 5 legends · reach level 150 | 50,000 Ryō, 5 XP Shards, a Bloodline Reroll Scroll |
-| 12 | The Rabbit Goddess | defeat Kaguya or the Ten-Tails | 100,000 Ryō, 10 XP Shards, 2 Bloodline Reroll Scrolls |
+| 1 | The Academy | cast 3 jutsu · defeat 5 monsters | 500 Ryō, 2 Soldier Pills |
+| 2 | Mission to the Land of Waves | defeat 10 hostile ninja · reach level 10 | 1,000 Ryō, 16 kunai |
+| 3 | The Chūnin Exams | pass the Chūnin exam · defeat 5 Sound ninja | 2,000 Ryō, an XP Shard |
+| 4 | Konoha Crush | defeat 20 hostile ninja · visit another great village | 2,500 Ryō, 4 dango |
+| 5 | The Search for a Legend | defeat a legendary shinobi · reach level 30 | 4,000 Ryō, Mystical Palm scroll |
+| 6 | The Retrieval Mission | defeat 10 Sound ninja · reach level 50 | 6,000 Ryō, Ninja Hounds scroll |
+| 7 | The Akatsuki Strike | defeat 2 Akatsuki members | 7,500 Ryō, 2 XP Shards |
+| 8 | Sage Training | learn Sage Mode | 10,000 Ryō, Toad Oil Flame Bomb scroll |
+| 9 | Pain's Assault | defeat 3 more Akatsuki members · 50 hostile ninja | 12,500 Ryō, 3 XP Shards |
+| 10 | The Tailed Beasts | defeat a Tailed Beast (or become a Jinchūriki) | 15,000 Ryō, Tailed Beast Summoning Scroll |
+| 11 | The Fourth Great Ninja War | defeat 5 legends · reach level 150 | 25,000 Ryō, 5 XP Shards, a Bloodline Reroll Scroll |
+| 12 | The Rabbit Goddess | defeat Kaguya or the Ten-Tails | 50,000 Ryō, 10 XP Shards, 2 Bloodline Reroll Scrolls |
 
 Finishing the last chapter is announced to the server and unlocks the **Hero of the Shinobi World** achievement. Kills by
 your companions and summons count for you (shadow clones' victims don't count). Players from before v1.56 start at
@@ -395,7 +396,7 @@ once you qualify. One faction at a time; leave whenever you like.
 | You get | the Akatsuki cloak and hat · **[Akatsuki]** over your name | the Anbu mask and armour · **[Anbu]** over your name |
 | Perks | +10% damage against Tailed Beasts and Jinchūriki · the Akatsuki NPCs leave you alone (and you them) | +10% damage against rogue ninja (enemy ninja and rogue players) · +50% on bounties you claim on rogues |
 | Ranks | Member → Partner → Leader's Right Hand | Operative → Squad Leader → Captain |
-| Contracts | capture a Tailed Beast · defeat 3 legends · hunt a Jinchūriki · collect a bounty · silence an Anbu player (15,000–30,000 Ryō) | eliminate 15 rogue ninja · wipe out 10 Sound ninja · eliminate 2 Akatsuki · bring a rogue player to justice · defend a village in a world event (8,000–25,000 Ryō) |
+| Contracts | capture a Tailed Beast · defeat 3 legends · hunt a Jinchūriki · collect a bounty · silence an Anbu player (7,500–15,000 Ryō) | eliminate 15 rogue ninja · wipe out 10 Sound ninja · eliminate 2 Akatsuki · bring a rogue player to justice · defend a village in a world event (4,000–12,500 Ryō) |
 
 You work one **contract** at a time; finishing it pays Ryō and **standing**, and you rank up at 5 and 15 contracts.
 Don't like your contract? Swap it on the Faction page. An Akatsuki member who rejoins a village, or an Anbu who leaves
@@ -419,6 +420,7 @@ vanilla bans, friendly fire, lag clear, the Tailed Beast that's loose and who ho
 | **Grace Periods** | grace for everyone or for one player · end them all · end one |
 | **Players** | pick an online player to see their level, rank, Ryō, honor, village, clan, faction, bounty, titles, Kage/Sannin, grace and position — then **give or take Ryō** · **set their level** (stat points refunded) · **give XP Shards** · **heal & refill chakra** · **teleport** (go to them, bring them to you, send them to any village) · **set their clan** · **grant or take titles of legend** (it shows how many requirements they meet) · **Kage & Sannin** (appoint, with or without the set, or remove) · **set or clear a bounty** · **remove them from a faction** · **let them choose a village again** (how a rogue gets back in) · **give or end their grace** |
 | **Server Settings** | vanilla weapon & armour bans · automatic lag clear · friendly fire · automatic world events |
+| **Economy** | how expensive everything is (25–1000%) and how much Ryō quests pay (0–200%) — see *Economy* |
 | **Clear Lag Now** | dropped items, or every hostile mob |
 | **Admin Log** | the last 30 admin actions — who did what, and when (kept in the world) |
 
@@ -464,8 +466,8 @@ basic jutsu — affinity just makes them better.
 | Earth | Earth Wall, Earth Spikes, Earth Dragon Bullet, Headhunter Jutsu, Swamp of the Underworld |
 | Water | Water Dragon Bullet, Water Prison, Water Shark Bomb, Hiding in Mist, Exploding Water Shockwave |
 
-Learn more releases at the **Jutsu Sensei** (*Chakra Nature Training*): 2nd release Lv 25 / 2,880 Ryō, 3rd Lv 50 / 4,800,
-4th Lv 90 / 6,720, 5th Lv 140 / 7,680. `/scriptevent aegis:nature info|reroll|add <nature>|set <nature>` for testing.
+Learn more releases at the **Jutsu Sensei** (*Chakra Nature Training*): 2nd release Lv 25 / 5,760 Ryō, 3rd Lv 50 / 9,600,
+4th Lv 90 / 13,440, 5th Lv 140 / 15,360. `/scriptevent aegis:nature info|reroll|add <nature>|set <nature>` for testing.
 
 ### Kekkei genkai releases (clan-bound)
 
@@ -497,7 +499,7 @@ Check your progress with `/scriptevent aegis:clan info`.
 
 ### Eternal Mangekyō Sharingan (Uchiha)
 
-Uchiha with the Mangekyō can awaken the **Eternal Mangekyō** at the **Jutsu Sensei → Clan Training** (Lv 100, 7,680 Ryō).
+Uchiha with the Mangekyō can awaken the **Eternal Mangekyō** at the **Jutsu Sensei → Clan Training** (Lv 100, 15,360 Ryō).
 It replaces your Mangekyō item:
 
 - half the chakra drain (1.5/sec), **50% dodge**, Strength II + Speed while active
@@ -508,7 +510,7 @@ It replaces your Mangekyō item:
 
 ### Sage Mode
 
-Learn it from a **Jutsu Sensei** (Sage Training: Lv 60, 5,760 Ryō). Then **hold sneak and stand still for 5 seconds**
+Learn it from a **Jutsu Sensei** (Sage Training: Lv 60, 11,520 Ryō). Then **hold sneak and stand still for 5 seconds**
 to gather natural energy (a green bar fills on the action bar) and enter **Sage Mode** for 60 seconds:
 
 - **full chakra** on entering
@@ -532,7 +534,7 @@ to gather natural energy (a green bar fills on the action bar) and enter **Sage 
 
 ### Bloodline Reroll Scroll
 
-Where to get one: the **Travelling Merchant** (3,600 Ryō — one turns up in about 2 of every 5 restocks), Tailed
+Where to get one: the **Travelling Merchant** (7,200 Ryō — one turns up in about 2 of every 5 restocks), Tailed
 Beasts and Akatsuki (a chance in their drops), or a Quest Giver's reward. There is no crafting recipe.
 Right-click, then right-click again within 5s to confirm. Rolls a **different** clan
 (Mangekyō progress is lost).
@@ -637,7 +639,7 @@ v1.52 +20%.
 
 ### Forbidden: Reanimation Jutsu (Edo Tensei)
 
-Sold by the Jutsu Sensei (Lv 60, 10,800 Ryō; using it needs Lv 40, 100 chakra, 5 min cooldown). Choose a fallen shinobi —
+Sold by the Jutsu Sensei (Lv 60, 21,600 Ryō; using it needs Lv 40, 100 chakra, 5 min cooldown). Choose a fallen shinobi —
 **Hiruzen Sarutobi, Minato Namikaze, Itachi Uchiha, Nagato, Deidara, Sasori, Kakuzu, Hashirama Senju or Tobirama Senju**
 — a coffin rises from the earth and they fight beside you for **60 seconds** with their own jutsu (Fire Dragon, Flying
 Raijin + Rasengan, Amaterasu, Shinra Tensei + Banshō Ten'in, clay bombs, poison senbon, fire & wind masks, Wood Release
@@ -711,7 +713,7 @@ Attacks come every ~2–4.5 seconds (faster with more tails, ~40% faster when en
 Bring good armor, Soldier Pills and friends.
 
 **Summon:** use a **Tailed Beast Summoning Scroll** (the S-rank mission reward, a rare Akatsuki drop, or — very rarely —
-the Travelling Merchant's, Lv 50, 5,400 Ryō). A random beast is released 8 blocks in front of you after a short ritual
+the Travelling Merchant's, Lv 50, 10,800 Ryō). A random beast is released 8 blocks in front of you after a short ritual
 (fewer tails = more common). Spawn eggs are in the creative inventory too.
 
 **One rampage at a time** (v1.54): only **one Tailed Beast can be loose in the whole world** (the Ten-Tails included).
@@ -864,8 +866,8 @@ caped shoulders that hangs to the knees.
 
 No armour is crafted. **Every village's Weaponsmith forges its own headband and flak jacket** — and, for a customer from
 another village, that village's too — plus the Anbu and Samurai pieces; the **Travelling Merchant** sometimes has a
-headband (any village's) or a jacket 30% off, and sells the **Akatsuki Cloak** (1,920 Ryō, Lv 20) and **Straw Hat**
-(720 Ryō, Lv 10) when he has them; Akatsuki members drop their gear, and each village's legend can drop its headband.
+headband (any village's) or a jacket 30% off, and sells the **Akatsuki Cloak** (3,840 Ryō, Lv 20) and **Straw Hat**
+(1,440 Ryō, Lv 10) when he has them; Akatsuki members drop their gear, and each village's legend can drop its headband.
 
 ### The Five Kage sets
 
@@ -1034,6 +1036,20 @@ Friendly NPCs are leashed to their spawner; breaking the spawner removes its NPC
   each** (also at the Jutsu Sensei, the Weaponsmith and the Travelling Merchant).
 - Admin: `/scriptevent aegis:ryo give 5000` · `take 5000` · `set 0` (the player who runs it).
 
+### Economy (v1.58)
+
+Two server-wide settings decide how hard Ryō is to come by — **Admin Panel → Economy** (two sliders), or
+`/scriptevent aegis:economy prices <25-1000>` · `quests <0-200>` · `reset`:
+
+| Setting | Default | What it scales |
+|---|---|---|
+| **Prices** | **200%** of the v1.57 prices — everything costs twice as much | every shop (Jutsu Sensei, Weaponsmith, Ramen Shop), the Travelling Merchant, clan / nature / Sage training, repairs, hiring genin, fast travel |
+| **Quest Ryō** | **50%** of the v1.57 rewards — quests pay half | Quest Board quests, starter and village quests, Kage missions, daily missions, story chapters, faction contracts |
+
+Not affected: achievements, world events, bounties, Ryō notes from enemies, the login streak, the emerald exchange, what
+the merchant pays you, and quests an admin wrote by hand for a Quest Giver (they pay exactly what was set). **Every price
+and quest reward in this README is at the default settings.** An NPC Spawner's own *prices %* still applies on top.
+
 ### Quest Givers (premade quests, or design your own)
 
 Place an **NPC Spawner** and choose **Quest Giver**. Its name, outfit, greeting and count come from the normal spawner
@@ -1056,14 +1072,14 @@ one asks to abandon the current one. `/scriptevent aegis:quest` shows your quest
 
 | Lv | Quest | Defeat | Reward |
 |---|---|---|---|
-| 1 | Pest Control · Bone Collectors · Eight Legs | 8 zombies · 8 skeletons · 6 spiders | 250 XP, 300 Ryō, a ramen |
-| 5 | Creeper Clearance · Night Watch | 5 creepers · 15 hostile mobs anywhere | 450–500 XP, 500–600 Ryō, 2 Soldier Pills |
-| 10 · 15 | Rogue Patrol · Road Bandits | 5 · 8 rogue ninja | 700 · 1,000 XP, 1,000 · 1,500 Ryō, pills · 16 kunai |
-| 20 · 25 | Sound Infiltrators · Traitors of the Village | 5 Sound ninja · 4 Rogue Anbu | 1,500 · 2,000 XP, 2,000 · 2,500 Ryō, pills · XP Shard |
-| 30–40 | Border Defence · Anbu Hunt · Sound Ambush | 10 enemy ninja · 6 Anbu · 10 Sound ninja | 3,000–4,500 XP, 3,000–4,000 Ryō, 1–2 XP Shards |
-| 50–65 | Akatsuki Bounty · The Uchiha Prodigy · The Tailless Tailed Beast · Art is an Explosion · The Six Paths | any Akatsuki · Itachi · Kisame · Deidara · Pain | 7,000–10,000 XP, 6,000–8,000 Ryō, 3–4 XP Shards |
-| 70 · 80 · 90 | Tailed Beast Subjugation · A Legend's Challenge · The Nine-Tailed Fox | a Tailed Beast · a legend · Kurama | 12,000–20,000 XP, 10,000–15,000 Ryō, 4–6 XP Shards |
-| 100 · 120 · 150 | Akatsuki Purge · Clash of Legends · The Reanimated Uchiha | 3 Akatsuki · 3 legends · Edo Madara | 25,000–60,000 XP, 20,000–50,000 Ryō, 6–10 XP Shards |
+| 1 | Pest Control · Bone Collectors · Eight Legs | 8 zombies · 8 skeletons · 6 spiders | 250 XP, 150 Ryō, a ramen |
+| 5 | Creeper Clearance · Night Watch | 5 creepers · 15 hostile mobs anywhere | 450–500 XP, 250–300 Ryō, 2 Soldier Pills |
+| 10 · 15 | Rogue Patrol · Road Bandits | 5 · 8 rogue ninja | 700 · 1,000 XP, 500 · 750 Ryō, pills · 16 kunai |
+| 20 · 25 | Sound Infiltrators · Traitors of the Village | 5 Sound ninja · 4 Rogue Anbu | 1,500 · 2,000 XP, 1,000 · 1,250 Ryō, pills · XP Shard |
+| 30–40 | Border Defence · Anbu Hunt · Sound Ambush | 10 enemy ninja · 6 Anbu · 10 Sound ninja | 3,000–4,500 XP, 1,500–2,000 Ryō, 1–2 XP Shards |
+| 50–65 | Akatsuki Bounty · The Uchiha Prodigy · The Tailless Tailed Beast · Art is an Explosion · The Six Paths | any Akatsuki · Itachi · Kisame · Deidara · Pain | 7,000–10,000 XP, 3,000–4,000 Ryō, 3–4 XP Shards |
+| 70 · 80 · 90 | Tailed Beast Subjugation · A Legend's Challenge · The Nine-Tailed Fox | a Tailed Beast · a legend · Kurama | 12,000–20,000 XP, 5,000–7,500 Ryō, 4–6 XP Shards |
+| 100 · 120 · 150 | Akatsuki Purge · Clash of Legends · The Reanimated Uchiha | 3 Akatsuki · 3 legends · Edo Madara | 25,000–60,000 XP, 10,000–25,000 Ryō, 6–10 XP Shards |
 
 Your own quest's settings:
 
@@ -1094,7 +1110,7 @@ Players talk to the Quest Giver to accept, see their progress, claim the reward 
 | **Village Shinobi** | Chatter and tips. In the Leaf each one is a shinobi or a kunoichi at random: the 3D chūnin flak jacket (a thick rolled collar, four raised scroll pouches, the vest over the shoulders, the red swirl crest on the back) over the navy uniform, the Leaf headband with its ties, a taped thigh holster; spiky black hair and a nose bandage, or auburn bangs and a swinging ponytail (the Quest Giver is the shinobi) |
 | **Quest Giver** | A **Quest Board** of every premade quest (the default), one premade quest, or a quest you design — see *Quest Givers* |
 | **Travel Master** (Fast Travel) | Flies you to any of the six villages or any other Travel Master for a fee — see *Fast Travel* |
-| **Genin** | Recruit for 1,800 Ryō — follows you, fights, levels up to 10 (Strength, Resistance, hearts). Talk to toggle follow/stay or dismiss |
+| **Genin** | Recruit for 3,600 Ryō — follows you, fights, levels up to 10 (Strength, Resistance, hearts). Talk to toggle follow/stay or dismiss |
 
 ### Village NPCs
 
@@ -1154,7 +1170,8 @@ save. Every Travel Master you place becomes a stop on the network, in any dimens
 **Use it:** talk to a Travel Master → pick a destination: **the six villages** (your home village is marked) and **every
 other Travel Master** (nearest first), each with its distance and fee → you're flown there in a moment.
 
-- **Fee:** 150 Ryō + a quarter Ryō per block, +20% (Leaf → Cloud ≈ 710 Ryō); another dimension is 1,800 Ryō. The
+- **Fee:** 150 Ryō + a quarter Ryō per block, scaled like every price (×2.4 by default: Leaf → Cloud ≈ 1,420 Ryō); another
+  dimension is 3,600 Ryō. The
   spawner's *prices %* setting scales it (set it to 50% for cheap travel).
 - Not while you're in a fight (hit by an enemy in the last 10 seconds), and the hawks rest 10 seconds between trips.
 - A stop whose spawner block is buried puts you on the first free space above it.
@@ -1313,7 +1330,7 @@ enemies or given out by quests (and everything is still in the creative inventor
 | Kekkei genkai release scrolls | the **Jutsu Sensei → Clan Training**, for that clan's members |
 | Kunai, shuriken, village headbands | **Weaponsmith** (its village's headband, and yours) · Travelling Merchant · starter kit · legend drops · enemy ninja drop kunai and shuriken |
 | Soldier Pills | **Ramen Shop** · Travelling Merchant · enemy ninja · C-rank missions |
-| Ichiraku / Miso Ramen | **Ramen Shop** (360 / 240 Ryō) · **Travelling Merchant** (60 / 36 Ryō, while stocks last) |
+| Ichiraku / Miso Ramen | **Ramen Shop** (720 / 480 Ryō) · **Travelling Merchant** (120 / 72 Ryō, while stocks last) |
 | Legendary swords | **Weaponsmith** · Travelling Merchant bargains · Legend / Akatsuki drops · Samehada: its quest chain only |
 | Armour (every village's flak jacket, Anbu, Samurai) | **Weaponsmith** · Travelling Merchant bargains · the Chūnin exam quest (your village's jacket) |
 | Akatsuki Cloak & Straw Hat | **Travelling Merchant** · Akatsuki drops |
@@ -1483,6 +1500,15 @@ hoes, food, farming, building, crafting.
 ```
 
 The timers start when the server starts. The times are the constants at the top of `behavior_pack/scripts/lagclear.js`.
+
+## Everything costs more, quests pay less (v1.58)
+
+- **Everything is twice as expensive**: every shop, the Travelling Merchant, training, repairs, hiring genin and fast
+  travel (a Kusanagi 9,600 Ryō, a bowl of Ichiraku Ramen 720, a genin 3,600).
+- **Quests pay half the Ryō**: Quest Board quests, starter and village quests, Kage missions, daily missions, story
+  chapters and faction contracts. Their XP and items are unchanged.
+- Both are **settings now** — Admin Panel → **Economy** (two sliders) or `/scriptevent aegis:economy` — so you can make
+  things dearer or cheaper, or quests pay more or less, without a new version. See *Economy*.
 
 ## The Leaf Weaponsmith and the Leaf Genin, remodelled (v1.57)
 

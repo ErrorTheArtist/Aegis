@@ -15,7 +15,7 @@
 import { world, system, ItemStack } from "@minecraft/server";
 import { ActionFormData, MessageFormData } from "@minecraft/server-ui";
 import { showTitle } from "./hud.js";
-import { addRyo, fmtRyo } from "./currency.js";
+import { addRyo, fmtRyo, questRyo } from "./currency.js";
 import { getLevel, getRank } from "./levels.js";
 import { getVillage, isRogue, getHonor } from "./villages.js";
 import { bountyOf } from "./bounty.js";
@@ -164,7 +164,8 @@ export function factionProgress(p, id, by = 1) {
   if (!f) return;
   const st = state(p);
   if (!st.contract || st.contract.id !== id) return;
-  const [text, goal, pay] = FACTIONS[f].contracts[id];
+  const [text, goal, base] = FACTIONS[f].contracts[id];
+  const pay = questRyo(base); // (the economy's quest-reward setting)
   st.contract.have = Math.min(goal, st.contract.have + by);
   if (st.contract.have < goal) {
     saveState(p, st);
@@ -195,7 +196,7 @@ export async function factionMenu(p, back) {
         `§7${F.pitch}`, "",
         `§7Rank: §f${F.ranks[rankOf(st)]}§7 · standing §f${st.standing ?? 0}§7 · contracts done §f${st.done ?? 0}`,
         `§7Perks: §f${F.perks}`, "",
-        c ? `§7Contract: §f${c[0]}§7 — ${st.contract.have}/${c[1]} §8(pays ${fmtRyo(c[2])})` : "§7No contract.",
+        c ? `§7Contract: §f${c[0]}§7 — ${st.contract.have}/${c[1]} §8(pays ${fmtRyo(questRyo(c[2]))})` : "§7No contract.",
         "§8Rank up at 5 and 15 contracts.",
       ].join("\n"))
       .button("§eNew contract\n§r§8give up this one for another")

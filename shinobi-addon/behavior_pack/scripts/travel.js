@@ -16,8 +16,8 @@ const HERE = 24; // a stop this close is where you already are
 const DIMS = { "minecraft:overworld": "Overworld", "minecraft:nether": "the Nether", "minecraft:the_end": "the End" };
 const OVERWORLD = "minecraft:overworld";
 
-// Ryō for a trip: 150 + a quarter per block (most trips 300–700 Ryō), +20% like every price; another dimension is a
-// flat 1,500. A spawner's price % scales it.
+// Ryō for a trip: 150 + a quarter per block, another dimension a flat 1,500 — then scaled like every price (the
+// economy setting; ×2.4 by default since v1.58, so most trips cost 700–1,700 Ryō). A spawner's price % scales it too.
 export function travelFee(from, to, cfg) {
   const scale = (cfg?.price ?? 100) / 100;
   const base = from.dim !== to.dim ? 1500 : Math.min(3000, 150 + Math.hypot(to.x - from.x, to.z - from.z) * 0.25);

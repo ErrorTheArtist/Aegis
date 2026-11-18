@@ -16,7 +16,8 @@ import { bountyOf, setBounty } from "./bounty.js";
 import { FACTIONS, factionOf, factionRank, leaveFaction } from "./factions.js";
 import { TITLES, TITLE_IDS, hasTitle } from "./titles.js";
 import { getLevel, setLevel, MAX_LEVEL, RANKS, getRank } from "./levels.js";
-import { addRyo, getRyo, fmtRyo } from "./currency.js";
+import { addRyo, getRyo, fmtRyo, price, questRyo, pricePercent, questPercent, setEconomy, PRICE_RANGE, QUEST_RANGE, DEFAULT_PRICES,
+  DEFAULT_QUESTS } from "./currency.js";
 import { giveShards } from "./xpshards.js";
 import { KAGE_VILLAGES, SANNIN_SETS, getKage, setKage, appointKage, isSannin, sanninOf, nameSannin, clearSannin } from "./armor.js";
 import { rampageHolder } from "./rampage.js";
@@ -86,6 +87,7 @@ function statusText() {
       (grace.length > 1 ? `§7 · §f${grace.length - 1}§7 player${grace.length === 2 ? "" : "s"} with their own` : ""),
     `§7Vanilla weapons & armour: ${vanillaBanned() ? "§cbanned" : "§aallowed"}§7 · friendly fire: ${friendlyFire() ? "§con" : "§aoff"}`,
     `§7Lag clear: ${lagClearOn() ? `§aon§7 (next item clear in ${nextItemClear()})` : "§coff"}`,
+    `§7Economy: prices §f${pricePercent()}%§7 · quests pay §f${questPercent()}%§7 of their usual Ryō`,
     `§7Tailed Beast loose: ${beast ? `§c${beast.name}${beast.x !== undefined ? `§7 near ${beast.x}, ${beast.z}` : ""}` : "§8none"}`,
     `§7Kamui holder: ${kamui ? `§f${kamui.name}` : "§8nobody"}`,
   ].join("\n");
@@ -97,6 +99,7 @@ export async function adminMenu(p) {
     ["§aGrace Periods\n§r§8no fighting for a while", graceMenu],
     ["§bPlayers\n§r§8Ryō · level · titles · teleport…", playersMenu],
     ["§eServer Settings\n§r§8bans · lag clear · friendly fire · events", serverSettings],
+    ["§6Economy\n§r§8prices · quest rewards", economyPage],
     ["§cClear Lag Now\n§r§8dropped items · hostile mobs", lagMenu],
     ["§7Admin Log\n§r§8the last 30 admin actions", logPage],
   ];
@@ -609,6 +612,32 @@ async function serverSettings(p) {
       set(on, p);
       adminLog(p, `switched "${strip(label).replace(/ \(.*\)$/, "")}" ${on ? "on" : "off"}`);
     });
+  }
+  return adminMenu(p);
+}
+
+// The economy: how expensive everything is, and how much Ryō quests pay (currency.js).
+async function economyPage(p) {
+  const r = await showForm(p, new ModalFormData().title("§lEconomy")
+    .slider(`§fPrices§7 — % of the v1.57 prices (100 = as they were, 200 = twice as expensive). Shops, the merchant, training,
+` +
+      `repairs, hiring genin, fast travel.
+§8Now: Kusanagi ${fmtRyo(price(4000))} · Ichiraku Ramen ${fmtRyo(price(300))} · a genin ${fmtRyo(price(1500))}`,
+      PRICE_RANGE[0], PRICE_RANGE[1], 25, pricePercent())
+    .slider(`§fQuest Ryō§7 — % of what quests paid in v1.57 (50 = half). Quest Board quests, starter and village quests, Kage
+` +
+      `missions, daily missions, story chapters, faction contracts.
+§8Now: Rogue Patrol ${fmtRyo(questRyo(1000))} · story chapter 12 ${fmtRyo(questRyo(100000))}`,
+      QUEST_RANGE[0], QUEST_RANGE[1], 10, questPercent())
+    .toggle(`Back to the defaults (prices ${DEFAULT_PRICES}%, quests ${DEFAULT_QUESTS}%)`, false));
+  if (r.canceled || !r.formValues) return adminMenu(p);
+  const [prices, quests, reset] = r.formValues;
+  if (reset) {
+    setEconomy({ prices: DEFAULT_PRICES, quests: DEFAULT_QUESTS });
+    adminLog(p, `reset the economy to prices ${DEFAULT_PRICES}%, quests ${DEFAULT_QUESTS}%`);
+  } else if (Math.round(prices) !== pricePercent() || Math.round(quests) !== questPercent()) {
+    setEconomy({ prices, quests });
+    adminLog(p, `set the economy to prices ${pricePercent()}%, quests ${questPercent()}%`);
   }
   return adminMenu(p);
 }

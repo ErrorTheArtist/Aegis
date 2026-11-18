@@ -10,7 +10,7 @@ import { ActionFormData, ModalFormData, MessageFormData } from "@minecraft/serve
 import { showTitle } from "./hud.js";
 import { NPC_TYPES, setupNpc, defaultsFor, giveItem, listQuests } from "./npcs.js";
 import { getLevel, gainXp } from "./levels.js";
-import { addRyo, fmtRyo } from "./currency.js";
+import { addRyo, fmtRyo, questRyo } from "./currency.js";
 import { rampageHolder, rampageText } from "./rampage.js";
 
 let api;
@@ -270,9 +270,13 @@ export async function questEditor(player, cfg, save) {
   player.sendMessage(`§aQuest saved: §e${out.title}§a — defeat ${out.count} × ${QUEST_TARGETS[out.target].label}. ${rewardText(out)}`);
 }
 
+// What a quest pays in Ryō: the premade quests follow the economy's quest-reward setting; a quest an admin gave a
+// Quest Giver by hand pays exactly what they set.
+const payOf = (q) => (q.premade ? questRyo(q.ryo) : q.ryo);
+
 function rewardText(q) {
   const parts = [];
-  if (q.ryo) parts.push(`§6${fmtRyo(q.ryo)}`);
+  if (payOf(q)) parts.push(`§6${fmtRyo(payOf(q))}`);
   if (q.xp) parts.push(`§b${q.xp} XP`);
   if (q.item) parts.push(`§f${q.itemCount}× ${itemLabel(q.item)}`);
   return parts.length ? `§7Reward: ${parts.join("§7, ")}` : "§7No reward";
@@ -300,7 +304,7 @@ export async function questGiver(player, npc, cfg) {
     if (r.selection === 1) return abandon(player, cur, "§7Quest abandoned.");
     if (!done) return;
     setQuest(player, null);
-    if (q.ryo) addRyo(player, q.ryo, true);
+    if (payOf(q)) addRyo(player, payOf(q), true);
     if (q.xp) gainXp(player, q.xp);
     if (q.item) giveItem(player, q.item, q.itemCount);
     player.setDynamicProperty(DONE_PROP, JSON.stringify([...new Set([...getDone(player), q.id])].slice(-200)));

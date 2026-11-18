@@ -124,6 +124,10 @@ export const rogueTag = "§c[Rogue]§r ";
 // Friendly fire
 // ---------------------------------------------------------------------------
 export const friendlyFire = () => !!world.getDynamicProperty(FF_PROP);
+export function setFriendlyFire(on) {
+  world.setDynamicProperty(FF_PROP, on ? true : undefined);
+  world.sendMessage(on ? "§cFriendly fire is ON — village-mates can hurt each other." : "§aFriendly fire is OFF — village-mates are safe from each other again.");
+}
 export function sameVillage(a, b) {
   if (a?.typeId !== "minecraft:player" || b?.typeId !== "minecraft:player" || a.id === b.id || friendlyFire()) return false;
   const v = getVillage(a);
@@ -606,10 +610,7 @@ export function initVillages(helpers, onChosen) {
     if (id !== "aegis:village" || p?.typeId !== "minecraft:player") return;
     const cmd = String(message ?? "").trim().toLowerCase();
     if (cmd === "choose") return void askVillage(p, true);
-    if (cmd === "friendlyfire on" || cmd === "friendlyfire off") {
-      world.setDynamicProperty(FF_PROP, cmd.endsWith("on") ? true : undefined);
-      return world.sendMessage(cmd.endsWith("on") ? "§cFriendly fire is ON — village-mates can hurt each other." : "§aFriendly fire is OFF — village-mates are safe from each other again.");
-    }
+    if (cmd === "friendlyfire on" || cmd === "friendlyfire off") return setFriendlyFire(cmd.endsWith("on"));
     if (cmd === "honor") return p.sendMessage(`§lVillage Honor§r\n${leaderboardText()}`);
     if (cmd === "menu") return void villageMenu(p);
     if (cmd === "home") {

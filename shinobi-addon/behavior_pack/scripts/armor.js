@@ -244,11 +244,37 @@ export function giveKageSet(player, village) {
   return true;
 }
 
-function setKage(player, village) {
+export function setKage(player, village) {
   if (village) player.setDynamicProperty(KAGE_PROP, village);
   else player.setDynamicProperty(KAGE_PROP, undefined);
   recordKage(player, village);
   api.refreshName?.(player);
+}
+
+// Names a player one of the Legendary Sannin — with one Sannin's full set, or (no `which`) the title only.
+export function nameSannin(player, which) {
+  if (which && !SANNIN_SETS[which]) return false;
+  player.setDynamicProperty(SANNIN_PROP, true);
+  if (which) {
+    player.setDynamicProperty("aegis:sannin_of", which);
+    giveSet(player, which);
+  }
+  api.refreshName?.(player);
+  world.sendMessage(`§e${player.name} has been named one of the §aLegendary Sannin§e${which ? ` §7(${SANNIN_SETS[which]}§7's legacy)` : ""}§e!`);
+  return true;
+}
+export function clearSannin(player) {
+  player.setDynamicProperty(SANNIN_PROP, undefined);
+  player.setDynamicProperty("aegis:sannin_of", undefined);
+  api.refreshName?.(player);
+}
+// Appoints a Kage (with the full set) — shared by the command and the Admin Panel.
+export function appointKage(player, title) {
+  if (!KAGE_VILLAGES[title]) return false;
+  giveKageSet(player, title);
+  setKage(player, title);
+  world.sendMessage(`§e${player.name} has been named the ${KAGE_VILLAGES[title].title}§e of the ${KAGE_VILLAGES[title].village}!`);
+  return true;
 }
 
 function floatTick() {
@@ -338,19 +364,13 @@ export function initArmor(helpers) {
     if (id !== "aegis:sannin" || sourceEntity?.typeId !== "minecraft:player") return;
     const arg = String(message ?? "").trim().toLowerCase();
     if (arg === "clear") {
-      sourceEntity.setDynamicProperty(SANNIN_PROP, undefined);
-      sourceEntity.setDynamicProperty("aegis:sannin_of", undefined);
-      api.refreshName?.(sourceEntity);
+      clearSannin(sourceEntity);
       return sourceEntity.sendMessage("§7Sannin title removed.");
     }
     if (arg && !SANNIN_SETS[arg]) {
       return sourceEntity.sendMessage("§7Usage: /scriptevent aegis:sannin [jiraiya|tsunade|orochimaru|clear]");
     }
-    sourceEntity.setDynamicProperty(SANNIN_PROP, true);
-    if (arg) sourceEntity.setDynamicProperty("aegis:sannin_of", arg);
-    if (arg) giveSet(sourceEntity, arg);
-    api.refreshName?.(sourceEntity);
-    world.sendMessage(`§e${sourceEntity.name} has been named one of the §aLegendary Sannin§e${arg ? ` §7(${SANNIN_SETS[arg]}§7's legacy)` : ""}§e!`);
+    nameSannin(sourceEntity, arg);
   });
 
   // /scriptevent aegis:kage <hokage|kazekage|mizukage|raikage|tsuchikage> — appoint the player who runs it
@@ -368,12 +388,7 @@ export function initArmor(helpers) {
       setKage(sourceEntity, b);
       return sourceEntity.sendMessage(`§7You are now the ${KAGE_VILLAGES[b].title}§7.`);
     }
-    if (KAGE_VILLAGES[a]) {
-      giveKageSet(sourceEntity, a);
-      setKage(sourceEntity, a);
-      world.sendMessage(`§e${sourceEntity.name} has been named the ${KAGE_VILLAGES[a].title}§e of the ${KAGE_VILLAGES[a].village}!`);
-      return;
-    }
+    if (KAGE_VILLAGES[a]) return void appointKage(sourceEntity, a);
     sourceEntity.sendMessage("§7Usage: /scriptevent aegis:kage <hokage|kazekage|mizukage|raikage|tsuchikage|title <village>|clear>");
   });
 }

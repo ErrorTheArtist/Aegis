@@ -86,7 +86,21 @@
         "gear_hokage": "textures/entity/aegis/npc/gear_hokage",
         "gear_rogue": "textures/entity/aegis/npc/gear_rogue",
         "gear_sound": "textures/entity/aegis/npc/gear_sound",
+        "gear_itachi": "textures/entity/aegis/npc/gear_itachi",
+        "gear_kisame": "textures/entity/aegis/npc/gear_kisame",
+        "gear_deidara": "textures/entity/aegis/npc/gear_deidara",
         "gear_chunin": "textures/entity/aegis/npc/gear_chunin",
+        "gear_pain": "textures/entity/aegis/npc/gear_pain",
+        "gear_konan": "textures/entity/aegis/npc/gear_konan",
+        "gear_hidan": "textures/entity/aegis/npc/gear_hidan",
+        "gear_hidan_jashin": "textures/entity/aegis/npc/gear_hidan_jashin",
+        "gear_kakuzu": "textures/entity/aegis/npc/gear_kakuzu",
+        "gear_sasori": "textures/entity/aegis/npc/gear_sasori",
+        "gear_zetsu": "textures/entity/aegis/npc/gear_zetsu",
+        "gear_tobi": "textures/entity/aegis/npc/gear_tobi",
+        "gear_madara": "textures/entity/aegis/npc/gear_madara",
+        "gear_hashirama": "textures/entity/aegis/npc/gear_hashirama",
+        "gear_tobirama": "textures/entity/aegis/npc/gear_tobirama",
         "gear_merchant": "textures/entity/aegis/npc/gear_merchant",
         "gear_chunin_f": "textures/entity/aegis/npc/gear_chunin_f",
         "gear_kazekage": "textures/entity/aegis/npc/gear_kazekage",
@@ -137,7 +151,21 @@
         "gear_hokage": "geometry.aegis.gear_hokage",
         "gear_rogue": "geometry.aegis.gear_rogue",
         "gear_sound": "geometry.aegis.gear_sound",
+        "gear_itachi": "geometry.aegis.gear_itachi",
+        "gear_kisame": "geometry.aegis.gear_kisame",
+        "gear_deidara": "geometry.aegis.gear_deidara",
         "gear_chunin": "geometry.aegis.gear_chunin",
+        "gear_pain": "geometry.aegis.gear_pain",
+        "gear_konan": "geometry.aegis.gear_konan",
+        "gear_hidan": "geometry.aegis.gear_hidan",
+        "gear_hidan_jashin": "geometry.aegis.gear_hidan_jashin",
+        "gear_kakuzu": "geometry.aegis.gear_kakuzu",
+        "gear_sasori": "geometry.aegis.gear_sasori",
+        "gear_zetsu": "geometry.aegis.gear_zetsu",
+        "gear_tobi": "geometry.aegis.gear_tobi",
+        "gear_madara": "geometry.aegis.gear_madara",
+        "gear_hashirama": "geometry.aegis.gear_hashirama",
+        "gear_tobirama": "geometry.aegis.gear_tobirama",
         "gear_merchant": "geometry.aegis.gear_merchant",
         "gear_chunin_f": "geometry.aegis.gear_chunin_f",
         "gear_kazekage": "geometry.aegis.gear_kazekage",
@@ -216,7 +244,49 @@
           "controller.render.aegis.npc_gear_sound": "q.property('aegis:skin') == 10"
         },
         {
+          "controller.render.aegis.npc_gear_itachi": "q.property('aegis:skin') == 12"
+        },
+        {
+          "controller.render.aegis.npc_gear_kisame": "q.property('aegis:skin') == 13"
+        },
+        {
+          "controller.render.aegis.npc_gear_deidara": "q.property('aegis:skin') == 14"
+        },
+        {
           "controller.render.aegis.npc_gear_chunin": "q.property('aegis:skin') == 15"
+        },
+        {
+          "controller.render.aegis.npc_gear_pain": "q.property('aegis:skin') == 21"
+        },
+        {
+          "controller.render.aegis.npc_gear_konan": "q.property('aegis:skin') == 22"
+        },
+        {
+          "controller.render.aegis.npc_gear_hidan": "q.property('aegis:skin') == 23"
+        },
+        {
+          "controller.render.aegis.npc_gear_hidan_jashin": "q.property('aegis:skin') == 24"
+        },
+        {
+          "controller.render.aegis.npc_gear_kakuzu": "q.property('aegis:skin') == 25"
+        },
+        {
+          "controller.render.aegis.npc_gear_sasori": "q.property('aegis:skin') == 26"
+        },
+        {
+          "controller.render.aegis.npc_gear_zetsu": "q.property('aegis:skin') == 27"
+        },
+        {
+          "controller.render.aegis.npc_gear_tobi": "q.property('aegis:skin') == 28"
+        },
+        {
+          "controller.render.aegis.npc_gear_madara": "q.property('aegis:skin') == 29"
+        },
+        {
+          "controller.render.aegis.npc_gear_hashirama": "q.property('aegis:skin') == 30"
+        },
+        {
+          "controller.render.aegis.npc_gear_tobirama": "q.property('aegis:skin') == 31"
         },
         {
           "controller.render.aegis.npc_gear_merchant": "q.property('aegis:skin') == 32"

@@ -427,5 +427,19 @@ if __name__ == "__main__" or True:
     ImageDraw.Draw(hs).line([(52, 64), (76, 64)], fill=(160, 40, 30, 255), width=4)
     G.finish(hs, "hidden_scroll")
     item("hidden_scroll", "§eHidden Scroll§r\n§7Right-click to break the seal", stack=16, glint=True)
+    # v1.56: the Kaguya clan's Shikotsumyaku — a scroll with a sword of bone on it
+    def bone_sword(img):
+        def draw(l, d):
+            pts = [(40, 96), (46, 90), (84, 30), (90, 26), (92, 34), (52, 98)]
+            d.polygon(pts, fill=(246, 242, 228, 255))
+            for k in range(4):                                             # the knuckles of bone along the blade
+                x, y = 56 + k * 8, 78 - k * 12
+                d.ellipse([x - 4, y - 4, x + 4, y + 4], fill=(232, 226, 206, 255))
+            d.line([(36, 102), (48, 90)], fill=(206, 196, 170, 255), width=6)
+        G.glow(img, layer(draw), (240, 236, 220), 4, 1.2)
+    sk = G.scroll("purple")
+    bone_sword(sk)
+    G.finish(sk, "shikotsumyaku")
+    item("shikotsumyaku", "Shikotsumyaku (Kaguya)", glint=True)
     w(atlas_p, atlas)
-    print(f"v1.55 content: {len(SCROLLS)} scrolls, {len(TOOLS)} tools, {len(FOOD)} foods, the Hidden Scroll.")
+    print(f"v1.55 content: {len(SCROLLS)} scrolls, {len(TOOLS)} tools, {len(FOOD)} foods, the Hidden Scroll; v1.56: Shikotsumyaku.")

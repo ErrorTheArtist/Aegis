@@ -19,6 +19,7 @@ import { getRyo, addRyo, spendRyo, fmtRyo } from "./currency.js";
 import { getLevel, getRank } from "./levels.js";
 import { isRogue, getHonor } from "./villages.js";
 import { getKage, sanninOf } from "./armor.js";
+import { anbuBountyBonus, factionProgress } from "./factions.js";
 
 const BOOK = "aegis:bingo"; // world: { [player id]: { n: name, b: bounty } }
 const RECORD = "aegis:pvp"; // player: { kills, claimed, kage, toad, jonin }
@@ -54,7 +55,7 @@ export function addBounty(p, n) {
   return e.b;
 }
 
-function setBounty(p, n) {
+export function setBounty(p, n) {
   const book = readBook();
   book[p.id] = { n: p.name, b: Math.max(0, Math.round(n)) };
   writeBook(book);
@@ -102,7 +103,13 @@ export function onPlayerKill(killer, victim) {
     addRyo(killer, wanted, true);
     world.sendMessage(`§6${killer.name}§e claimed the §6${fmtRyo(wanted)}§e bounty on §c${victim.name}§e!`);
     killer.onScreenDisplay?.setActionBar(`§6Bounty claimed: +${fmtRyo(wanted)}`);
-    return { claimed: wanted };
+    const extra = anbuBountyBonus(killer, victim, wanted); // (v1.56) the village pays its Anbu half again for a rogue
+    if (extra) {
+      addRyo(killer, extra, true);
+      killer.sendMessage(`§8[Anbu]§7 The village adds §6${fmtRyo(extra)}§7 for bringing a missing-nin to justice.`);
+    }
+    factionProgress(killer, "bounty");
+    return { claimed: wanted + extra };
   }
   killer.setDynamicProperty(RECORD, JSON.stringify(rec));
   const add = (MIN_BOUNTY + 50 * getLevel(victim)) * (isRogue(killer) ? 3 : 1);

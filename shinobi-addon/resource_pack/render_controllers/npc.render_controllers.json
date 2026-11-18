@@ -127,6 +127,39 @@
         "Texture.gear_sound"
       ]
     },
+    "controller.render.aegis.npc_gear_itachi": {
+      "geometry": "Geometry.gear_itachi",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_itachi"
+      ]
+    },
+    "controller.render.aegis.npc_gear_kisame": {
+      "geometry": "Geometry.gear_kisame",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_kisame"
+      ]
+    },
+    "controller.render.aegis.npc_gear_deidara": {
+      "geometry": "Geometry.gear_deidara",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_deidara"
+      ]
+    },
     "controller.render.aegis.npc_gear_chunin": {
       "geometry": "Geometry.gear_chunin",
       "materials": [
@@ -136,6 +169,127 @@
       ],
       "textures": [
         "Texture.gear_chunin"
+      ]
+    },
+    "controller.render.aegis.npc_gear_pain": {
+      "geometry": "Geometry.gear_pain",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_pain"
+      ]
+    },
+    "controller.render.aegis.npc_gear_konan": {
+      "geometry": "Geometry.gear_konan",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_konan"
+      ]
+    },
+    "controller.render.aegis.npc_gear_hidan": {
+      "geometry": "Geometry.gear_hidan",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_hidan"
+      ]
+    },
+    "controller.render.aegis.npc_gear_hidan_jashin": {
+      "geometry": "Geometry.gear_hidan_jashin",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_hidan_jashin"
+      ]
+    },
+    "controller.render.aegis.npc_gear_kakuzu": {
+      "geometry": "Geometry.gear_kakuzu",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_kakuzu"
+      ]
+    },
+    "controller.render.aegis.npc_gear_sasori": {
+      "geometry": "Geometry.gear_sasori",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_sasori"
+      ]
+    },
+    "controller.render.aegis.npc_gear_zetsu": {
+      "geometry": "Geometry.gear_zetsu",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_zetsu"
+      ]
+    },
+    "controller.render.aegis.npc_gear_tobi": {
+      "geometry": "Geometry.gear_tobi",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_tobi"
+      ]
+    },
+    "controller.render.aegis.npc_gear_madara": {
+      "geometry": "Geometry.gear_madara",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_madara"
+      ]
+    },
+    "controller.render.aegis.npc_gear_hashirama": {
+      "geometry": "Geometry.gear_hashirama",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_hashirama"
+      ]
+    },
+    "controller.render.aegis.npc_gear_tobirama": {
+      "geometry": "Geometry.gear_tobirama",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_tobirama"
       ]
     },
     "controller.render.aegis.npc_gear_merchant": {

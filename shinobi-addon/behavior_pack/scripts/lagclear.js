@@ -120,6 +120,14 @@ const left = (ticks) => {
   return s >= 60 ? `${Math.floor(s / 60)}m ${s % 60}s` : `${s}s`;
 };
 
+export const lagClearOn = () => !world.getDynamicProperty(OFF);
+export const nextItemClear = () => (lagClearOn() ? left(nextItems - system.currentTick) : "off");
+export function setLagClear(on) {
+  world.setDynamicProperty(OFF, on ? undefined : true);
+  if (on) nextItems = system.currentTick + ITEMS_EVERY;
+  say(on ? "Automatic clears are §aon§7 (items every 5 min, hostile mobs after 20 min alive)." : "Automatic clears are §coff§7.");
+}
+
 export function initLagClear() {
   nextItems = system.currentTick + ITEMS_EVERY;
   world.afterEvents.entityHurt.subscribe(({ hurtEntity }) => {
@@ -149,11 +157,7 @@ export function initLagClear() {
     const tell = (t) => (p?.typeId === "minecraft:player" ? p.sendMessage(t) : say(t));
     if (cmd === "items") return void clearItems();
     if (cmd === "mobs") return void clearMobs(true);
-    if (cmd === "off" || cmd === "on") {
-      world.setDynamicProperty(OFF, cmd === "off" ? true : undefined);
-      if (cmd === "on") nextItems = system.currentTick + ITEMS_EVERY;
-      return say(cmd === "off" ? "Automatic clears are §coff§7." : "Automatic clears are §aon§7 (items every 5 min, hostile mobs after 20 min alive).");
-    }
+    if (cmd === "off" || cmd === "on") return setLagClear(cmd === "on");
     tell(world.getDynamicProperty(OFF) ? "§7Lag clear is §coff§7. /scriptevent aegis:lag on" :
       `§7Next item clear in §f${left(nextItems - system.currentTick)}§7. Hostile mobs and bosses are cleared after 20 minutes alive (not mid-fight).`);
   });

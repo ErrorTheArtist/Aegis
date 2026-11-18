@@ -13,18 +13,25 @@
 //   /scriptevent aegis:level set 50       — set your level (points are recalculated)
 //   /scriptevent aegis:level xp 5000      — add XP
 
-import { bingoBook } from "./bounty.js";
-import { achievementsMenu } from "./achievements.js";
-import { dailyMenu } from "./dailies.js";
+import { bingoBook, bountyOf } from "./bounty.js";
+import { CLANS, getClanId } from "./clans.js";
+import { FACTIONS, factionOf, factionRank, factionMenu } from "./factions.js";
+import { storyMenu, storyLine } from "./story.js";
+import { handbookMenu } from "./handbook.js";
+import { settingsMenu } from "./settings.js";
+import { achievementsMenu, unlocked, ACH } from "./achievements.js";
+import { dailyMenu, dailyState } from "./dailies.js";
 import { eventXpMultiplier } from "./events.js";
 import { world, system, ItemStack, ItemLockMode } from "@minecraft/server";
 import { showTitle } from "./hud.js";
 import { ActionFormData, ModalFormData, MessageFormData } from "@minecraft/server-ui";
 import { applyNameTag, refreshClanEffects } from "./clans.js";
 import { getRyo, fmtRyo, walletMenu } from "./currency.js";
-import { getVillage, villageLabel, villageMenu, villageCooldownMultiplier, isRogue, rogueOf } from "./villages.js";
+import { getVillage, villageLabel, villageMenu, villageCooldownMultiplier, isRogue, rogueOf, getHonor } from "./villages.js";
 import { starterLine } from "./starter.js";
 import { titleHpLevels, titlesMenu, titlesOf, TITLES } from "./titles.js";
+import { adminMenu, ADMIN_TAG } from "./admin.js";
+import { showForm } from "./ui.js";
 
 export const MAX_LEVEL = 300;
 const POINTS_PER_LEVEL = 3;
@@ -161,7 +168,7 @@ function levelUpFx(player) {
   applyNameTag(player);
 }
 
-function setLevel(player, level) {
+export function setLevel(player, level) {
   level = Math.max(1, Math.min(MAX_LEVEL, level));
   set(player, P.level, level);
   set(player, P.xp, 0);
@@ -179,49 +186,71 @@ function bar(cur, max, n = 20) {
   return "§a" + "|".repeat(f) + "§8" + "|".repeat(n - f);
 }
 
+// The Shinobi Record (v1.56 redesign): a summary of your shinobi at the top, every page one tap away.
 export async function openStats(player) {
   const level = getLevel(player);
   const xp = num(player, P.xp, 0);
   const need = xpToNext(level);
   const points = getPoints(player);
-  const ids = Object.keys(STATS);
+  const clan = CLANS[getClanId(player)];
+  const faction = FACTIONS[factionOf(player)];
+  const bounty = bountyOf(player);
+  const daily = dailyState(player);
+  const streak = Number(player.getDynamicProperty("aegis:streak") ?? 0);
+  const village = isRogue(player) ? `§cRogue ninja §7(left the ${villageLabel(rogueOf(player))}§7)` : villageLabel(getVillage(player));
+  const body = [
+    level >= MAX_LEVEL ? "§6MAX LEVEL" : `§7XP ${bar(xp, need)} §f${xp.toLocaleString("en-US")}/${need.toLocaleString("en-US")}`,
+    `§7Rank: §f${RANKS[getRank(player)]}§7 · Ryō: §6${fmtRyo(getRyo(player))}§7 · Honor: §e${getHonor(player).toLocaleString("en-US")}`,
+    `§7Village: ${village}§7 · Clan: ${clan ? `${clan.color}${clan.name}` : "§8none"}`,
+    faction ? `§7Faction: ${faction.name}§7 (${factionRank(player)})` : "",
+    `§7Bounty: ${bounty ? `§6${fmtRyo(bounty)}` : "§anone"}§7 · Achievements: §f${unlocked(player).size}/${ACH.length}`,
+    `§7Daily: §f${daily.list.filter((m) => m.done).length}/${daily.list.length}${streak ? `§7 · streak §f${streak}` : ""}`,
+    storyLine(player),
+    starterLine(player),
+  ].filter(Boolean).join("\n");
+  const pages = [
+    [`§eStats\n§r§7${points ? `§a${points} point${points === 1 ? "" : "s"} to spend` : "your six stats"}`, () => statsPage(player)],
+    ["§6Story\n§r§7the Path of the Shinobi", () => storyMenu(player, back)],
+    ["§aDaily\n§r§7missions · login streak", () => dailyMenu(player, back)],
+    [`§6Achievements\n§r§7${unlocked(player).size}/${ACH.length} unlocked`, () => achievementsMenu(player, back)],
+    ["§aVillage\n§r§7chat · leaderboard · return home · leave", () => villageMenu(player)],
+    [`§8Faction\n§r§7${faction ? faction.name.replace(/§./g, "") : "Akatsuki · Anbu"}`, () => factionMenu(player, back)],
+    ["§cBingo Book\n§r§7bounties · most wanted · PvP record", () => bingoBook(player, back)],
+    ["§5Titles\n§r§7Pain · Itachi · Tobi · Sasuke · Naruto", () => titlesMenu(player, back)],
+    ["§6Ryō Wallet\n§r§7pay players · exchange emeralds", () => walletMenu(player)],
+    ["§bHandbook\n§r§7how everything works", () => handbookMenu(player, back)],
+    ["§7Settings", () => settingsMenu(player, back)],
+  ];
+  if (player.hasTag?.(ADMIN_TAG)) pages.push(["§4Admin Panel\n§r§7events · grace · players · server", () => adminMenu(player)]);
+  function back() {
+    return openStats(player);
+  }
+  const form = new ActionFormData().title(`§lShinobi Record — Lv. ${level}`).body(body);
+  for (const [label] of pages) form.button(label);
+  const res = await showForm(player, form);
+  if (res.canceled || res.selection === undefined) return;
+  return pages[res.selection]?.[1]();
+}
 
+// Shinobi Record → Stats: spend your points.
+async function statsPage(player) {
+  const points = getPoints(player);
+  const ids = Object.keys(STATS);
   const form = new ActionFormData()
-    .title(`§lShinobi Record — Lv. ${level}`)
-    .body(
-      [
-        level >= MAX_LEVEL ? "§6MAX LEVEL" : `§7XP ${bar(xp, need)} §f${xp}/${need}`,
-        `§7Unspent points: §e${points}`,
-        `§7Ryō: §6${fmtRyo(getRyo(player))}`,
-        `§7Village: ${isRogue(player) ? "§cRogue ninja §7(left the " + villageLabel(rogueOf(player)) + "§7)" : villageLabel(getVillage(player))}`,
-        starterLine(player),
-        "",
-        ...ids.map((id) => `${STATS[id].color}${STATS[id].name}§r §f${getStat(player, id)}§7/${STAT_CAP} §8— ${STATS[id].desc}`),
-      ].join("\n")
-    );
+    .title("§lStats")
+    .body([`§7Unspent points: §e${points}`, "", ...ids.map((id) => `${STATS[id].color}${STATS[id].name}§r §f${getStat(player, id)}§7/${STAT_CAP} §8— ${STATS[id].desc}`)].join("\n"));
   for (const id of ids) form.button(`${STATS[id].color}${STATS[id].name}  §r§8${getStat(player, id)}/${STAT_CAP}`);
   form.button("§cReset stats");
-  form.button("§6Ryō Wallet\n§r§7pay players · exchange emeralds");
-  form.button("§aVillage\n§r§7chat · leaderboard · return home · leave");
-  form.button("§5Titles\n§r§7Pain · Itachi · Tobi · Sasuke · Naruto");
-  form.button("§cBingo Book\n§r§7bounties · most wanted · PvP record");
-  form.button("§6Achievements\n§r§750 to unlock");
-  form.button("§aDaily\n§r§7missions · login streak");
-
+  form.button("§l« Back");
   const res = await form.show(player);
   if (res.canceled || res.selection === undefined) return;
   if (res.selection === ids.length) return confirmReset(player);
-  if (res.selection === ids.length + 1) return walletMenu(player);
-  if (res.selection === ids.length + 2) return villageMenu(player);
-  if (res.selection === ids.length + 3) return titlesMenu(player, () => openStats(player));
-  if (res.selection === ids.length + 4) return bingoBook(player, () => openStats(player));
-  if (res.selection === ids.length + 5) return achievementsMenu(player, () => openStats(player));
-  if (res.selection === ids.length + 6) return dailyMenu(player, () => openStats(player));
+  if (res.selection === ids.length + 1) return openStats(player);
   const id = ids[res.selection];
   const room = Math.min(getPoints(player), STAT_CAP - getStat(player, id));
   if (room <= 0) {
     player.sendMessage(getPoints(player) <= 0 ? "§7No stat points to spend — level up first." : `§7${STATS[id].name} is maxed.`);
-    return openStats(player);
+    return statsPage(player);
   }
   const m = await new ModalFormData()
     .title(`${STATS[id].name}`)
@@ -236,7 +265,7 @@ export async function openStats(player) {
       api.sound(player.dimension, "random.orb", player.location, 1, 1.4);
     }
   }
-  return openStats(player);
+  return statsPage(player);
 }
 
 async function confirmReset(player) {
@@ -252,7 +281,7 @@ async function confirmReset(player) {
     clearStatEffects(player);
     player.sendMessage("§7Stats reset — your points are back.");
   }
-  return openStats(player);
+  return statsPage(player);
 }
 
 function clearStatEffects(player) {
@@ -403,7 +432,7 @@ export function initLevels(helpers) {
         setLevel(player, Math.floor(n));
         player.sendMessage(`§7Level set to §e${getLevel(player)}§7 with §e${getPoints(player)}§7 stat points.`);
       } else if (cmd === "xp" && n > 0) gainXp(player, n);
-      else player.sendMessage("§7Usage: /scriptevent aegis:level <set <1-200> | xp <amount>>");
+      else player.sendMessage("§7Usage: /scriptevent aegis:level <set <1-300> | xp <amount>>");
     }
   });
 }

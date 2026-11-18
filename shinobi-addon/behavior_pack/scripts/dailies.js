@@ -17,6 +17,7 @@ import { missionsDone } from "./titles.js";
 import { giveShards } from "./xpshards.js";
 import { bumpAch, achStats } from "./achievements.js";
 import { TOOL_IDS } from "./tools.js";
+import { quiet } from "./settings.js";
 
 const DAY_PROP = "aegis:daily_day";
 const STATE_PROP = "aegis:daily"; // { list: [{ id, have, done }], base: { honor, missions, level }, bonus }
@@ -121,7 +122,7 @@ export function dailyProgress(p, id, by = 1, set) {
     if (m.have >= goal) {
       m.done = true;
       const got = pay(p, DAILY[id][2]);
-      p.sendMessage(`§a✔ Daily mission done: §f${DAILY[id][0]}§a — §f${got}`);
+      if (!quiet(p)) p.sendMessage(`§a✔ Daily mission done: §f${DAILY[id][0]}§a — §f${got}`);
       showTitle(p, "§aDaily mission complete!", { subtitle: `§f${DAILY[id][0]}`, fadeInDuration: 4, stayDuration: 40, fadeOutDuration: 10 });
       api?.sound(p.dimension, "random.levelup", p.location, 0.6, 1.4);
       bumpAch(p, "dailies");
@@ -130,7 +131,8 @@ export function dailyProgress(p, id, by = 1, set) {
   if (!changed) return;
   if (!st.bonus && st.list.every((m) => m.done)) {
     st.bonus = true;
-    p.sendMessage(`§6★ All three daily missions done! §fBonus: ${pay(p, ALL_DONE)}${Math.random() < 0.1 ? ` §7and §f${pay(p, { item: ["aegis:reroll_scroll", 1] })}` : ""}`);
+    const bonus = `${pay(p, ALL_DONE)}${Math.random() < 0.1 ? ` §7and §f${pay(p, { item: ["aegis:reroll_scroll", 1] })}` : ""}`;
+    if (!quiet(p)) p.sendMessage(`§6★ All three daily missions done! §fBonus: ${bonus}`);
   }
   saveState(p, st);
 }

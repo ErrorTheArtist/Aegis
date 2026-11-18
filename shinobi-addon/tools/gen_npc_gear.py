@@ -647,13 +647,22 @@ def build():
     NPC.mkdir(parents=True, exist_ok=True)
     HAND.mkdir(parents=True, exist_ok=True)
     models = all_models()
+    def save(img, path):
+        # (the hand-painted skins are read and written back: leave a file alone when its pixels haven't changed)
+        try:
+            old = Image.open(path).convert("RGBA")
+            if old.size == img.size and old.tobytes() == img.convert("RGBA").tobytes():
+                return
+        except (FileNotFoundError, OSError):
+            pass
+        img.save(path)
     for name, (skin_fn, gear_fn) in models.items():
         img = skin_fn()
-        img.save(HAND / f"{name}.png")
-        img.save(NPC / f"{name}.png")
+        save(img, HAND / f"{name}.png")
+        save(img, NPC / f"{name}.png")
         g, tex = gear_fn()
         tex.paste(Image.new("RGBA", NONE[2:], (0, 0, 0, 0)), NONE[:2])
-        tex.save(NPC / f"gear_{name}.png")
+        save(tex, NPC / f"gear_{name}.png")
         w(RP / "models" / "entity" / f"gear_{name}.geo.json", g.json())
     flutter = {**FLUTTER, "bones": {**FLUTTER["bones"], **M.FLUTTER}}
     w(RP / "animations" / "npc_gear.animation.json", {"format_version": "1.8.0", "animations": {"animation.aegis.npc_gear.flutter": flutter}})

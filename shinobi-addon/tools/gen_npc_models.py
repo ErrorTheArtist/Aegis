@@ -2103,6 +2103,232 @@ def kaguya_gear():
     return kage_gear(KG, BLANK, "geometry.aegis.gear_kaguya", extra, with_hat=False)
 
 
+
+# ===========================================================================
+# v1.56: the Akatsuki, Edo Madara and the Senju brothers in 3D. Their hand-painted skins stay as they are; the gear adds
+# the depth — the Akatsuki's high collars, everyone's hair, Samehada, Hidan's scythe, Kakuzu's hood, Zetsu's flytrap,
+# Tobi's mask, the Edo shinobi's armour, Madara's war fan.
+# ===========================================================================
+def hand_skin(name):
+    return lambda: Image.open(G.HAND / f"{name}.png").convert("RGBA")
+
+
+def gear_only(ident, *parts):
+    g = G.Gear(ident)
+    tex = Image.new("RGBA", (GW, GW), (0, 0, 0, 0))
+    for part in parts:
+        part(g, tex)
+    return g, tex
+
+
+CLOAK, CLOAK_RED, CLOUD_W = (26, 24, 30), (190, 32, 40), (236, 236, 236)
+
+
+def ak_collar(g, tex, high=2.8):
+    """The Akatsuki cloak's high collar, red lining at its rim and red clouds round it."""
+    r = NR["SCARF"]
+
+    def paint(u, v, wd, ht):
+        if v == 0:
+            return mul(CLOAK_RED, 0.9)
+        for cx in (7, 23):
+            dx, dy = (u - cx) / 3.4, (v - 4.4) / 2.3
+            d = dx * dx + dy * dy
+            if d < 0.55:
+                return CLOAK_RED
+            if d < 1.0:
+                return CLOUD_W
+        return mul(CLOAK, 1.08 - 0.14 * v / ht)
+    tex_fill(tex, r, paint)
+    co = g.bone("g_collar", "body", (0, 24, 0))
+    g.cube(co, (-4.4, 23.2, -4.4), (8.8, high, 8.8), ring(r))
+
+
+def hair_fill(tex, r, col):
+    tex_fill(tex, r, lambda u, v, wd, ht: mul(col, 1.15 - 0.3 * v / ht - (0.05 if u % 3 == 0 else 0)))
+
+
+def ponytail(col, low=True, length=6.0):
+    def part(g, tex):
+        r = NR["HAIR2"]
+        hair_fill(tex, r, col)
+        y = 26.8 if low else 31.2
+        pt = g.bone("g_ponytail", "head", (0, y, 4.0), (12 if low else 22, 0, 0))
+        g.cube(pt, (-0.9, y - 0.6, 3.9), (1.8, 1.2, 1.0), uv(rest=r))
+        g.cube(pt, (-1.1, y - length, 4.3), (2.2, length - 0.4, 1.4), uv(rest=r))
+    return part
+
+
+def spiky(col, items=None):
+    return lambda g, tex: spikes(g, tex, NR["HAIR"], col, "head", items or SPIKY)
+
+
+def samehada_back(g, tex):
+    r = NR["X2"]
+    tex_fill(tex, (r[0], r[1], 8, 12), lambda u, v, wd, ht: (214, 218, 226) if (u + v) % 4 < 2 else (120, 146, 190))   # bandages
+    tex_fill(tex, (r[0] + 8, r[1], 4, 6), lambda u, v, wd, ht: (40, 44, 60) if (u + v) % 2 else (90, 70, 50))           # the hilt
+    sw = g.bone("g_samehada", "body", (0, 18.5, 3.4), (0, 0, -28))
+    g.cube(sw, (-2.4, 4.0, 2.7), (4.8, 20.5, 2.2), uv(rest=(r[0], r[1], 8, 12)))
+    g.cube(sw, (-0.7, 24.5, 3.1), (1.4, 5.0, 1.4), uv(rest=(r[0] + 8, r[1], 4, 6)))
+
+
+def deidara_hair(g, tex):
+    col = (206, 186, 60)
+    r = NR["HAIR2"]
+    hair_fill(tex, r, col)
+    pt = g.bone("g_ponytail", "head", (0, 31.6, 2.6), (24, 0, 0))           # the top-knot ponytail
+    g.cube(pt, (-1.0, 31.0, 2.2), (2.0, 1.4, 1.4), uv(rest=r))
+    g.cube(pt, (-1.3, 24.0, 2.8), (2.6, 7.2, 1.6), uv(rest=r))
+    bang = g.bone("g_bang", "head", (0, 30, -4))
+    g.cube(bang, (0.6, 25.2, -4.7), (3.6, 6.2, 0.6), uv(rest=r))         # the long bang over his left eye
+
+
+def piercings(g, tex):
+    r = (NR["X4"][0], NR["X4"][1], 2, 2)
+    tex_fill(tex, r, lambda u, v, wd, ht: (180, 184, 196) if (u + v) % 2 else (120, 124, 136))
+    pc = g.bone("g_piercings", "head", (0, 28, -4))
+    for x, y in ((-0.3, 27.6), (-0.3, 26.8), (-1.7, 24.5), (1.1, 24.5)):  # the nose bridge, below the lip
+        g.cube(pc, (x, y, -4.35), (0.6, 0.5, 0.4), uv(rest=r))
+    for x in (-4.35, 3.95):                                                # his ears
+        for y in (27.6, 26.6):
+            g.cube(pc, (x, y, 0.4), (0.4, 0.5, 0.6), uv(rest=r))
+
+
+def konan_hair(g, tex):
+    r = NR["HAIR2"]
+    hair_fill(tex, r, (117, 124, 176))
+    bun = g.bone("g_bun", "head", (0, 31, 1.5))
+    g.cube(bun, (-1.6, 30.6, 0.4), (3.2, 2.8, 3.2), uv(rest=r))
+    fr = (NR["X4"][0], NR["X4"][1] + 2, 4, 4)
+    tex_fill(tex, fr, lambda u, v, wd, ht: (250, 246, 236) if (u + v) % 3 else (232, 200, 206))
+    fl = g.bone("g_flower", "head", (-4, 29, 0))                            # the paper flower
+    g.cube(fl, (-4.9, 28.0, -1.6), (1.2, 2.6, 2.6), uv(rest=fr))
+    g.cube(fl, (-5.3, 28.6, -1.0), (0.6, 1.4, 1.4), uv(rest=fr))
+
+
+def slicked_hair(col):
+    def part(g, tex):
+        r = NR["HAIR2"]
+        hair_fill(tex, r, col)
+        hc = g.bone("g_slick", "head", (0, 30, 0))
+        g.cube(hc, (-4.2, 29.6, -3.4), (8.4, 2.6, 7.6), uv(rest=r), inflate=0.3)
+        g.cube(hc, (-4.2, 26.4, 3.2), (8.4, 3.4, 1.0), uv(rest=r), inflate=0.3)
+    return part
+
+
+def scythe_back(g, tex):
+    r = NR["X2"]
+    tex_fill(tex, (r[0], r[1], 2, 12), lambda u, v, wd, ht: (70, 58, 56) if u else (44, 36, 36))                     # the pole
+    tex_fill(tex, (r[0] + 2, r[1], 6, 4), lambda u, v, wd, ht: (214, 40, 40) if v < 3 else (140, 20, 24))             # the blades
+    sc = g.bone("g_scythe", "body", (0, 18, 3.2), (0, 0, 32))
+    g.cube(sc, (-0.5, 3.0, 2.9), (1.0, 26.0, 1.0), uv(rest=(r[0], r[1], 2, 12)))
+    for k, (y, ln) in enumerate(((28.0, 7.0), (25.6, 6.0), (23.2, 5.0))):
+        g.cube(sc, (0.5, y, 2.8), (ln, 1.4, 0.8), uv(rest=(r[0] + 2, r[1], 6, 4)), rotation=(0, 0, -12 - k * 6), pivot=(0.5, y, 3.2))
+
+
+def kakuzu_hood(g, tex):
+    col = (44, 42, 48)
+    hood(g, tex, {}, NR, col)
+    lower_wrap(g, tex, {}, NR, mul(col, 0.9), height=3.2)
+
+
+def flytrap(g, tex):
+    r = (NR["X3"][0], NR["X3"][1], 16, 12)
+    tex_fill(tex, r, lambda u, v, wd, ht: mul((70, 150, 60), 1.1 - 0.25 * v / ht) if u % 5 else (50, 110, 44))
+    tr = (NR["X4"][0], NR["X4"][1], 4, 2)
+    tex_fill(tex, tr, lambda u, v, wd, ht: (236, 236, 220))
+    for side, x, rz in (("l", 4.2, -14), ("r", -5.4, 14)):
+        b = g.bone(f"g_trap_{side}", "head", (x + 0.6, 24, 0), (0, 0, rz))
+        g.cube(b, (x, 22.0, -4.8), (1.2, 14.0, 9.6), uv(rest=r))
+        for z in (-4.0, -1.6, 0.8, 3.2):                                    # the teeth along its edge
+            g.cube(b, (x + (-0.4 if side == "l" else 0.6), 35.6, z), (1.0, 1.6, 0.8), uv(rest=tr))
+
+
+def tobi_mask_3d(g, tex):
+    r = (NR["X1"][0], NR["X1"][1], 16, 12)
+    ex, ey = 4.5, 5.0                                                       # the single eye hole (his right eye)
+
+    def paint(u, v, wd, ht):
+        dx, dy = u - ex, (v - ey) * 1.2
+        rr = math.hypot(dx, dy)
+        if rr < 1.4:
+            return (20, 14, 14)
+        a = math.atan2(dy, dx)
+        if (rr - a * 0.95) % 3.0 < 0.9:
+            return (178, 74, 18)
+        return mul((246, 140, 40), 1.05 - 0.1 * v / ht)
+    tex_fill(tex, r, paint)
+    mk = g.bone("g_mask", "head", (0, 28, -4))
+    g.cube(mk, (-4.25, 24.2, -4.65), (8.5, 7.6, 0.6), uv(north=r, rest=(r[0], r[1], 1, 1)))
+
+
+def samurai_armor(armor, armor_d, trim):
+    def part(g, tex):
+        R = NR
+        c = dict(vest=armor)
+
+        def front(u, v, wd, ht):
+            if v % 4 == 3:
+                return mul(armor_d, 0.9)                                    # the edge of each plate
+            return mul(armor, 1.06 - 0.12 * v / ht - (0.05 if u in (0, wd - 1) else 0))
+        vest = g.bone("g_armor", "body", (0, 24, 0))
+        shell(g, tex, c, R, vest, y0=13.0, h=10.6, inflate=0.6, front=front)
+        pr = R["GUARD"]
+        tex_fill(tex, pr, lambda u, v, wd, ht: trim if v == ht - 1 else mul(armor, 1.08 - 0.06 * v))
+        for arm, x in (("rightArm", -9.0), ("leftArm", 3.6)):               # three layered plates on each shoulder
+            b = g.bone(f"g_pauldron_{arm[0]}", arm, G.BONE_PIVOT[arm])
+            for k in range(3):
+                g.cube(b, (x, 22.6 - k * 1.7, -2.8), (5.4, 1.6, 5.6), uv(rest=pr), inflate=0.05)
+        sk = R["X3"]
+        tex_fill(tex, sk, lambda u, v, wd, ht: mul(armor_d, 0.9) if v % 4 == 3 else mul(armor, 1.04 - 0.1 * v / ht))
+        for leg, x in (("rightLeg", -4.1), ("leftLeg", -0.1)):            # the tassets over the thighs
+            b = g.bone(f"g_tasset_{leg[0]}", leg, G.BONE_PIVOT[leg])
+            g.cube(b, (x, 6.5, -2.3), (4.2, 6.0, 4.6), uv(north=sk, south=sk, east=sk, west=sk), inflate=0.15)
+    return part
+
+
+def mane(col, length=14.0, spiky_top=True):
+    def part(g, tex):
+        long_hair(g, tex, {"hair": col}, NR, length=length)
+        if spiky_top:
+            spikes(g, tex, NR["HAIR"], col, "head", SPIKY)
+    return part
+
+
+def gunbai_back(g, tex):
+    r = NR["X2"]
+    tex_fill(tex, (r[0], r[1], 2, 12), lambda u, v, wd, ht: (110, 72, 40))
+    tex_fill(tex, (r[0] + 2, r[1], 10, 10), lambda u, v, wd, ht: (236, 222, 180) if (u - 4.5) ** 2 + (v - 4.5) ** 2 > 6 else (180, 34, 34))
+    gb = g.bone("g_gunbai", "body", (0, 18, 3.4), (0, 0, -22))
+    g.cube(gb, (-0.5, 6.0, 3.0), (1.0, 16.0, 1.0), uv(rest=(r[0], r[1], 2, 12)))
+    fan = (r[0] + 2, r[1], 10, 10)
+    g.cube(gb, (-4.5, 22.0, 3.2), (9.0, 9.0, 0.8), uv(north=fan, south=fan, rest=(r[0] + 2, r[1], 1, 1)))
+
+
+def fur_collar(g, tex):
+    r = NR["SCARF"]
+    tex_fill(tex, r, lambda u, v, wd, ht: mul((236, 234, 228), 1.06 - (0.12 if (u * 3 + v * 5) % 7 == 0 else 0) - 0.06 * v / ht))
+    fc = g.bone("g_fur", "body", (0, 24, 0))
+    g.cube(fc, (-4.8, 21.6, -2.8), (9.6, 2.8, 5.6), ring(r), inflate=0.3)
+
+
+HAND_MODELS = {
+    "itachi": (ak_collar, ponytail((28, 26, 32))),
+    "kisame": (ak_collar, spiky((54, 65, 90), SHORT_SPIKY), samehada_back),
+    "deidara": (ak_collar, deidara_hair),
+    "pain": (ak_collar, spiky((176, 70, 24)), piercings),
+    "konan": (ak_collar, konan_hair),
+    "hidan": (ak_collar, slicked_hair((206, 210, 206)), scythe_back),
+    "hidan_jashin": (slicked_hair((206, 210, 206)), scythe_back),
+    "kakuzu": (ak_collar, kakuzu_hood),
+    "sasori": (ak_collar, spiky((200, 30, 34), SHORT_SPIKY)),
+    "zetsu": (ak_collar, flytrap),
+    "tobi": (ak_collar, spiky((30, 28, 32)), tobi_mask_3d),
+    "madara": (samurai_armor((176, 44, 30), (120, 28, 18), (60, 40, 30)), mane((30, 30, 44)), gunbai_back),
+    "hashirama": (samurai_armor((150, 40, 36), (100, 24, 22), (60, 40, 30)), mane((40, 30, 26), 15.0, spiky_top=False)),
+    "tobirama": (samurai_armor((40, 80, 120), (24, 50, 80), (210, 210, 214)), fur_collar, spiky((228, 228, 226), SHORT_SPIKY)),
+}
+
 MODELS = {
     "sound": (sound_skin, sound_gear),
     "chunin": (leaf_skin_v3, leaf_gear_v3),
@@ -2159,6 +2385,8 @@ MODELS = {
     "orochimaru": (lambda: ninja_skin(OR, OROCHIMARU, 73), orochimaru_gear),
     "obito": (lambda: ninja_skin(OB, OBITO, 74), obito_gear),
     "kaguya": (lambda: kage_skin(KG, KAGUYA, 75), kaguya_gear),
+    # v1.56: the hand-painted bosses get 3D gear (their skins are kept)
+    **{n: (hand_skin(n), (lambda n=n: gear_only(f"geometry.aegis.gear_{n}", *HAND_MODELS[n]))) for n in HAND_MODELS},
 }
 
 FLUTTER = {

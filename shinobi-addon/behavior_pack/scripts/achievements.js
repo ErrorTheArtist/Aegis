@@ -15,6 +15,7 @@ import { hasSageTraining } from "./sage.js";
 import { titlesOf, missionsDone } from "./titles.js";
 import { bountyOf, pvpRecord } from "./bounty.js";
 import { giveShards } from "./xpshards.js";
+import { quiet } from "./settings.js";
 
 const STATS_PROP = "aegis:ach_stats"; // player: counters and sets
 const DONE_PROP = "aegis:ach"; // player: unlocked ids
@@ -112,6 +113,8 @@ export const ACH = [
   ["chunin", "Path", "Chūnin", "Pass the Chūnin exam", 1, (p) => (getRank(p) >= 1 ? 1 : 0), { ryo: 5000 }],
   ["jonin", "Path", "Jōnin", "Pass the Jōnin exam", 1, (p) => (getRank(p) >= 2 ? 1 : 0), { ryo: 15000, shards: 1 }],
   ["perfect_body", "Path", "Perfect Body", "Max out a stat (150)", 1, (p) => (Object.keys(STATS).some((id) => getStat(p, id) >= STAT_CAP) ? 1 : 0), { ryo: 10000 }],
+  ["hero", "Path", "Hero of the Shinobi World", "Finish the Path of the Shinobi (all 12 story chapters)", 1, (p, s) => n(s, "story_done"),
+    { ryo: 50000, shards: 5, rare: true }],
   ["title_of_legend", "Path", "A Title of Legend", "Hold a title (Pain, Itachi, Tobi, Sasuke or Naruto)", 1, (p) => (titlesOf(p).length ? 1 : 0), { ryo: 50000, rare: true }],
   // Wealth & Village
   ["well_off", "Wealth", "Well Off", "Hold 100,000 Ryō", 100000, (p) => getRyo(p), { shards: 1 }],
@@ -155,7 +158,7 @@ function grant(p, a) {
     bits.push(`${k > 1 ? `${k}× ` : ""}${id.replace("aegis:", "").replace(/_/g, " ")}`);
   }
   showTitle(p, "§6Achievement unlocked!", { subtitle: `§f${name}`, fadeInDuration: 5, stayDuration: 50, fadeOutDuration: 15 });
-  p.sendMessage(`§6★ Achievement: §f${name}§7 — ${desc}.${bits.length ? ` §6Reward: §f${bits.join("§7, §f")}` : ""}`);
+  if (!quiet(p)) p.sendMessage(`§6★ Achievement: §f${name}§7 — ${desc}.${bits.length ? ` §6Reward: §f${bits.join("§7, §f")}` : ""}`);
   api?.sound(p.dimension, "random.levelup", p.location, 0.8, 1.2);
   if (reward.rare) world.sendMessage(`§6★ ${p.name}§e unlocked the achievement §f${name}§e!`);
 }

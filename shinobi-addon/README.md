@@ -5,6 +5,15 @@
 A Naruto add-on: chakra, jutsu scrolls, kunai, shuriken, clones and more.
 Uses the real Naruto names (Rasengan, Shadow Clone Jutsu, etc.) — personal use only.
 
+## Contents
+
+- **Start here** — [Install](#install) · [Choose your village](#joining-choose-your-village) · [The Shinobi Record](#the-shinobi-record-v156) · [Commands cheat sheet](#commands-cheat-sheet)
+- **Your shinobi** — [Chakra](#chakra) · [Levels & Stats](#levels--stats) · [Clans](#clans) · [Jutsu](#jutsu-right-click-the-scroll-to-cast) · [Titles](#titles-v154) · [Armor](#armor--clothing) · [Swords](#legendary-swords) · [Ninja tools](#ninja-tools)
+- **Things to do** — [Story](#story-the-path-of-the-shinobi-v156) · [Factions](#factions-akatsuki--anbu-v156) · [Bingo Book](#bingo-book-v155) · [Achievements](#achievements-v155) · [Daily missions](#daily-missions--login-streak-v155) · [World events](#world-events-v155)
+- **The world** — [Tailed Beasts](#tailed-beasts-bosses) · [NPCs](#npcs) · [Legendary bosses](#legendary-bosses-npc-spawner-only) · [Enemies](#enemies) · [Fast Travel](#fast-travel)
+- **For admins** — [Admin Panel](#admin-panel-v156) · [Grace period](#grace-period-no-fighting) · [Lag clear](#lag-clear) · [Vanilla items](#vanilla-items-v154)
+- **What's new** — [v1.56](#story-factions-the-kaguya-clan-and-an-admin-panel-v156) and every version before it, at the end
+
 ## Install
 
 1. Get `dist/WayOfTheShinobi.mcaddon` (or run `./build.sh` to rebuild it).
@@ -92,8 +101,8 @@ Quest 2 is "cast 5 jutsu of your village's release". Rewards along the way: 1,00
 
 ### Grace period (no fighting)
 
-A no-fighting window an admin can give everyone — when the server opens, before an event — or one player
-(commands need cheats / operator, like every `/scriptevent`):
+A no-fighting window an admin can give everyone — when the server opens, before an event — or one player, from the
+**Admin Panel** or with a command (commands need cheats / operator, like every `/scriptevent`):
 
 | Command | What it does |
 |---|---|
@@ -134,14 +143,72 @@ Shinobi Record → *Village* → **Leave the village** (it asks you to confirm).
   safe from you, nor you from them;
 - the whole server is told.
 
-Only an admin can put a rogue back in a village: `/execute as <player> run scriptevent aegis:village choose` (choosing a
-village clears the rogue status). Several *Titles* need you to have left your village.
+Only an admin can put a rogue back in a village: **Admin Panel → Players → *Choose a village again*** (or
+`/execute as <player> run scriptevent aegis:village choose`) — choosing a village clears the rogue status. Several *Titles* need you to have left your village.
+
+## Commands cheat sheet
+
+Every command is a `/scriptevent`, so it needs cheats / operator. Most admin jobs are quicker in the
+[Admin Panel](#admin-panel-v156). Commands that change *you* act on whoever runs them — for someone else, use the Admin
+Panel or `/execute as <player> run scriptevent …`.
+
+| Command | What it does |
+|---|---|
+| `aegis:admin` | open the **Admin Panel** |
+| `aegis:event [raid / wanted / scrolls / doublexp / stop / auto on·off] …` | world events (see *World events*) |
+| `aegis:grace <minutes> [player]` · `… off [player]` · `…` alone | grace periods |
+| `aegis:lag [items / mobs / on / off]` | lag clear |
+| `aegis:vanilla [on / off]` | ban (on) or allow (off) vanilla weapons, armour, redstone and bundles |
+| `aegis:village [home / choose / honor / menu / friendlyfire on·off]` | villages |
+| `aegis:kage <hokage / kazekage / mizukage / raikage / tsuchikage / title <title> / clear>` | Kage titles |
+| `aegis:sannin [jiraiya / tsunade / orochimaru / clear]` | the Legendary Sannin |
+| `aegis:bounty [set <player> <ryo> / clear <player>]` | the Bingo Book |
+| `aegis:ryo [give <n> / take <n> / set <n>]` | Ryō |
+| `aegis:level set <1-300>` · `aegis:level xp <n>` · `aegis:stats` | levels and stats |
+| `aegis:xpshard [n]` | XP Shards |
+| `aegis:clan <reroll / info / mangekyo / eternal / set <clan>>` | clans |
+| `aegis:nature <info / reroll / add <nature> / set <nature> / clear>` | chakra natures |
+| `aegis:sage learn` | Sage Mode |
+| `aegis:bijuu <summon / seal / release / info / master / holders / free> [beast]` | Tailed Beasts and Jinchūriki |
+| `aegis:kamui <info / free>` | Kamui |
+| `aegis:clash <test / destruction on·off>` | Jutsu Clash |
+| `aegis:story [reset]` · `aegis:faction [leave]` · `aegis:daily [reroll]` · `aegis:achievements [reset]` · `aegis:starter [reset]` · `aegis:quest [abandon]` | your progress |
+| `aegis:m1 on·off` · `aegis:sheath on·off` | your combo animations / swords on your back (also in *Settings*) |
+| `aegis:spawner` | the settings of the NPC Spawner you're looking at |
 
 ## Chakra
 
 - You have **100 chakra** (more depending on your clan, Tailed Beast and stats), shown on the chakra bar in the top-left.
 - Regenerates 4/sec. **Sneak and stand still** to *focus* (3× regen).
 - Wearing **any village's headband** gives 1.5× regen (the Leaf's *Will of Fire* adds another 10%). **Soldier Pills** restore 50 instantly.
+
+## The Shinobi Record (v1.56)
+
+The **Shinobi Record** lives in the last slot of your hotbar (it can't be moved, dropped or lost) — right-click it. Its
+first page is a **summary of your shinobi**: XP bar, rank, Ryō, honor, village, clan, faction, bounty, achievements,
+today's daily missions and streak, your story chapter and starter quest. Every page is one tap away:
+
+| Page | What's there |
+|---|---|
+| **Stats** | spend your stat points, or reset them |
+| **Story** | your chapter, your mentor's words, the objectives and the reward |
+| **Daily** | today's three missions and your login streak |
+| **Achievements** | all 51, by group, with your progress |
+| **Village** | village chat, the leaderboard, Return Home, leave the village |
+| **Faction** | the Akatsuki and the Anbu — what each asks, Join, your contract |
+| **Bingo Book** | bounties, the most wanted, your PvP record |
+| **Titles** | the five titles of legend and their requirements |
+| **Ryō Wallet** | pay players, exchange emeralds |
+| **Handbook** | how everything works, in 12 short topics |
+| **Settings** | your own options |
+| **Admin Panel** | only for admins — see *Admin Panel* |
+
+**Handbook** — Getting started, Chakra & jutsu, Levels & stats, Clans, Villages & honor, Bosses, Jinchūriki, Ryō &
+shops, Bingo Book & PvP, Factions, Daily/achievements/events and Titles: everything a new player asks, in game.
+
+**Settings** — each player's own: **M1 combo animations** (the damage bonus stays either way), **swords on your back**
+when you switch away, and **chat messages for achievements and daily missions** (switch them off for a quiet chat —
+the titles on screen stay).
 
 ## Levels & Stats
 
@@ -199,7 +266,8 @@ The menu shows your XP bar, unspent points and every stat; tap a stat and use th
 
 ## Titles (v1.54)
 
-Five legendary titles a server admin grants by hand once a player has earned them:
+Five legendary titles a server admin grants by hand once a player has earned them — in the **Admin Panel** (Players →
+*Titles of legend*, which shows how many requirements they meet) or with a tag:
 
 ```
 /tag <player> add pain          (or itachi, tobi, sasuke, naruto)
@@ -246,10 +314,10 @@ Mission turn-ins and hostile ninja kills are counted from v1.54 on.
 
 ## Achievements (v1.55)
 
-**50 achievements** in seven groups — Combat, Bosses, Jutsu, Path of the Shinobi, Wealth & Village, Daily & Events and
+**51 achievements** in seven groups — Combat, Bosses, Jutsu, Path of the Shinobi, Wealth & Village, Daily & Events and
 Just for Fun — from *First Blood* (defeat a hostile ninja) to *Hall of Legends* (defeat all 19 legends), *Sealing the
 Rabbit Goddess*, *Walking Library* (cast 40 different jutsu), *Millionaire*, *Ichiraku Regular* (50 bowls of ramen) and
-*Peak of the Shinobi World* (level 300). Each pays its reward the moment it's unlocked — Ryō, XP Shards, sometimes a
+*Peak of the Shinobi World* (level 300) — and, since v1.56, *Hero of the Shinobi World* (finish the story). Each pays its reward the moment it's unlocked — Ryō, XP Shards, sometimes a
 Bloodline Reroll Scroll — and the rare ones are announced to the server. **Shinobi Record → Achievements** shows every
 group with your progress. `/scriptevent aegis:achievements` shows your count.
 
@@ -288,6 +356,74 @@ Waiting legends guard their village against raiders (the villains don't).
 /scriptevent aegis:event auto on | off
 ```
 
+## Story: the Path of the Shinobi (v1.56)
+
+A story campaign in **12 chapters** that walks you through the whole add-on, from the Academy to the battle against
+Kaguya. Your **mentor** depends on your village — Kakashi (Leaf), Gaara (Sand), Mei Terumī (Mist), Killer B (Cloud),
+Ōnoki (Stone), Konan (Rain) — and a rogue ninja hears from *the Masked Man*. Objectives track themselves; finish a
+chapter's and its reward is paid at once and the next chapter begins. **Shinobi Record → Story** shows where you are.
+
+| # | Chapter | Objectives | Reward |
+|---|---|---|---|
+| 1 | The Academy | cast 3 jutsu · defeat 5 monsters | 1,000 Ryō, 2 Soldier Pills |
+| 2 | Mission to the Land of Waves | defeat 10 hostile ninja · reach level 10 | 2,000 Ryō, 16 kunai |
+| 3 | The Chūnin Exams | pass the Chūnin exam · defeat 5 Sound ninja | 4,000 Ryō, an XP Shard |
+| 4 | Konoha Crush | defeat 20 hostile ninja · visit another great village | 5,000 Ryō, 4 dango |
+| 5 | The Search for a Legend | defeat a legendary shinobi · reach level 30 | 8,000 Ryō, Mystical Palm scroll |
+| 6 | The Retrieval Mission | defeat 10 Sound ninja · reach level 50 | 12,000 Ryō, Ninja Hounds scroll |
+| 7 | The Akatsuki Strike | defeat 2 Akatsuki members | 15,000 Ryō, 2 XP Shards |
+| 8 | Sage Training | learn Sage Mode | 20,000 Ryō, Toad Oil Flame Bomb scroll |
+| 9 | Pain's Assault | defeat 3 more Akatsuki members · 50 hostile ninja | 25,000 Ryō, 3 XP Shards |
+| 10 | The Tailed Beasts | defeat a Tailed Beast (or become a Jinchūriki) | 30,000 Ryō, Tailed Beast Summoning Scroll |
+| 11 | The Fourth Great Ninja War | defeat 5 legends · reach level 150 | 50,000 Ryō, 5 XP Shards, a Bloodline Reroll Scroll |
+| 12 | The Rabbit Goddess | defeat Kaguya or the Ten-Tails | 100,000 Ryō, 10 XP Shards, 2 Bloodline Reroll Scrolls |
+
+Finishing the last chapter is announced to the server and unlocks the **Hero of the Shinobi World** achievement. Kills by
+your companions and summons count for you (shadow clones' victims don't count). Players from before v1.56 start at
+chapter 1, and level, rank and Sage Mode objectives tick at once if they already have them.
+`/scriptevent aegis:story` shows your chapter · `… reset` starts it again.
+
+## Factions: Akatsuki & Anbu (v1.56)
+
+**Shinobi Record → Faction** shows both factions, what each asks of you (ticked as you meet it) and a **Join** button
+once you qualify. One faction at a time; leave whenever you like.
+
+| | **Akatsuki** | **Anbu** |
+|---|---|---|
+| For | rogue ninja | a village's most trusted shinobi |
+| Requirements | a rogue ninja · level 60 · a bounty of 25,000+ Ryō | in a village · level 60 · Jōnin rank (or level 80) · 2,000 honor |
+| You get | the Akatsuki cloak and hat · **[Akatsuki]** over your name | the Anbu mask and armour · **[Anbu]** over your name |
+| Perks | +10% damage against Tailed Beasts and Jinchūriki · the Akatsuki NPCs leave you alone (and you them) | +10% damage against rogue ninja (enemy ninja and rogue players) · +50% on bounties you claim on rogues |
+| Ranks | Member → Partner → Leader's Right Hand | Operative → Squad Leader → Captain |
+| Contracts | capture a Tailed Beast · defeat 3 legends · hunt a Jinchūriki · collect a bounty · silence an Anbu player (15,000–30,000 Ryō) | eliminate 15 rogue ninja · wipe out 10 Sound ninja · eliminate 2 Akatsuki · bring a rogue player to justice · defend a village in a world event (8,000–25,000 Ryō) |
+
+You work one **contract** at a time; finishing it pays Ryō and **standing**, and you rank up at 5 and 15 contracts.
+Don't like your contract? Swap it on the Faction page. An Akatsuki member who rejoins a village, or an Anbu who leaves
+theirs, is dropped from the faction automatically. `/scriptevent aegis:faction` (yours) · `… leave`.
+
+## Admin Panel (v1.56)
+
+Every admin tool in one menu — nothing to remember:
+
+```
+/scriptevent aegis:admin        open it (like every /scriptevent, it needs operator)
+/tag <you> add aegis_admin      also puts an "Admin Panel" button in your Shinobi Record
+```
+
+The first page shows the server at a glance: players online, the world event running, Double XP, grace periods,
+vanilla bans, friendly fire, lag clear, the Tailed Beast that's loose and who holds Kamui.
+
+| Section | What you can do |
+|---|---|
+| **World Events** | start a **Village Raid** or **Hidden Scrolls** (pick the village), a **Wanted** legend (pick one or random, near any player) or **Double XP** (5–240 minutes) · stop the event · end Double XP · switch the hourly automatic events on or off |
+| **Grace Periods** | grace for everyone or for one player · end them all · end one |
+| **Players** | pick an online player to see their level, rank, Ryō, honor, village, clan, faction, bounty, titles, Kage/Sannin, grace and position — then **give or take Ryō** · **set their level** (stat points refunded) · **give XP Shards** · **heal & refill chakra** · **teleport** (go to them, bring them to you, send them to any village) · **set their clan** · **grant or take titles of legend** (it shows how many requirements they meet) · **Kage & Sannin** (appoint, with or without the set, or remove) · **set or clear a bounty** · **remove them from a faction** · **let them choose a village again** (how a rogue gets back in) · **give or end their grace** |
+| **Server Settings** | vanilla weapon & armour bans · automatic lag clear · friendly fire · automatic world events |
+| **Clear Lag Now** | dropped items, or every hostile mob |
+| **Admin Log** | the last 30 admin actions — who did what, and when (kept in the world) |
+
+Opened from the chat, the panel waits until you close the chat, then appears.
+
 ## Clans
 
 The first time a player joins, they **roll a clan** (slot-machine animation, then a big reveal).
@@ -304,13 +440,14 @@ Your clan shows above your head, e.g. `[Uchiha] Steve`.
 | Hyuga | Epic | 8% | 130 | — | **Byakugan**: toggle (see all life within 40 blocks, Gentle Fist bonus damage) / **Palm Rotation** |
 | Yuki | Epic | 5% | 150 | Resistance | **Ice Release**: Demonic Mirroring Ice Crystals / **Ice Dome** (freeze everything nearby) |
 | Terumi | Epic | 4% | 160 | Fire Resistance | **Lava Release**: Melting Apparition (lava cone) / **Boil Release: Skilled Mist** (acid cloud) |
+| Kaguya *(v1.56)* | Epic | 5% | 140 | Resistance | **Shikotsumyaku**: Dance of the Camellia (a bone-sword lunge: 14 damage + slowness) / **Dance of the Larch** (bone spikes burst out all around you: 12 damage + knockback, Resistance III for 3 s) |
 | Hōzuki | Rare | 6% | 120 | Water breathing, fast swimming | Water Gun / **Hydrification** (attacks pass through you for 6s) |
 | Sarutobi | Rare | 7% | 120 | Fire Resistance | Fire Style: Flame Bullet (3 fireballs) |
 | Nara | Rare | 9% | 110 | — | Shadow Possession Jutsu (freeze a target for 6s) |
-| Akimichi | Rare | 9% | 120 | +2 hearts | Expansion Jutsu (Strength II, Resistance II, extra hearts) |
+| Akimichi | Rare | 8% | 120 | +2 hearts | Expansion Jutsu (Strength II, Resistance II, extra hearts) |
 | Aburame | Rare | 9% | 110 | — | Parasitic Insect Swarm (poison, steals chakra) |
-| Inuzuka | Common | 13% | 100 | Speed, Night Vision | Fang Over Fang dash / **Summon Ninja Hound** (tamed wolf) |
-| Yamanaka | Common | 13% | 100 | — | Mind Body Disturbance (nausea, blindness, slow) |
+| Inuzuka | Common | 11% | 100 | Speed, Night Vision | Fang Over Fang dash / **Summon Ninja Hound** (tamed wolf) |
+| Yamanaka | Common | 11% | 100 | — | Mind Body Disturbance (nausea, blindness, slow) |
 
 ### Chakra natures (basic releases)
 
@@ -386,9 +523,12 @@ to gather natural energy (a green bar fills on the action bar) and enter **Sage 
 
 | Clan | Cheaper jutsu |
 |---|---|
-| Uchiha | Fireball −40%, Chidori −30% |
-| Uzumaki | Rasengan −30%, Shadow Clone −40% |
-| Sarutobi | Fireball −30% |
+| Uchiha | Fireball −40%, Chidori −30%, Phoenix Sage Fire −30%, Great Fire Annihilation −30%, Kirin −25%, Chidori Sharp Spear −25%, Chidori Current −20% |
+| Uzumaki | Rasengan −30%, Shadow Clone −40%, Rasenshuriken −25% |
+| Sarutobi | Fireball −30%, Phoenix Sage Fire −30%, Great Fire Annihilation −20% |
+| Senju | Mystical Palm −40%, Water Dragon Bullet −20%, Earth Spikes −25% |
+| Hyūga | Vacuum Bullets −30% |
+| Kaguya | Leaf Hurricane −30%, Front Lotus −25%, Morning Peacock −20% |
 
 ### Bloodline Reroll Scroll
 
@@ -1335,6 +1475,29 @@ hoes, food, farming, building, crafting.
 
 The timers start when the server starts. The times are the constants at the top of `behavior_pack/scripts/lagclear.js`.
 
+## Story, factions, the Kaguya clan and an Admin Panel (v1.56)
+
+- **The Path of the Shinobi** — a 12-chapter story campaign with a mentor from your village, objectives that track
+  themselves and a reward for every chapter (100,000 Ryō for the last). See *Story*.
+- **Factions** — join the **Akatsuki** (rogue ninja) or the **Anbu** (a village's best): gear, a name tag, perks, ranks
+  and contracts. See *Factions*.
+- **New clan: Kaguya** (epic, 5%) — the Shikotsumyaku: *Dance of the Camellia* and *Dance of the Larch*, 140 chakra,
+  Resistance, cheaper taijutsu. Akimichi is now 8%, Inuzuka and Yamanaka 11%.
+- **Admin Panel** (`/scriptevent aegis:admin`, or a Record button with the `aegis_admin` tag) — events, grace, players
+  (Ryō, level, shards, heal, teleport, clan, titles, Kage/Sannin, bounty, faction, village, grace), server settings,
+  clearing lag and an admin log. See *Admin Panel*.
+- **The Shinobi Record, redesigned** — a summary of your shinobi on the first page, a **Handbook** (12 topics) and
+  **Settings** (combo animations, swords on your back, quiet chat).
+- **The Akatsuki, Madara, Hashirama and Tobirama remodelled in 3D** — their hand-painted skins keep their faces, now with
+  real 3D gear on top: high Akatsuki collars with red clouds; Itachi's ponytail; Kisame's spiky hair and Samehada on his
+  back; Deidara's long hair; Pain's spiky orange hair and piercings; Konan's hair and paper flower; Hidan's slicked-back
+  hair and triple-bladed scythe; Kakuzu's hood; Sasori's red hair; Zetsu's flytrap; Tobi's 3D spiral mask; Madara's
+  samurai armour, long mane and Gunbai; Hashirama's armour and long hair; Tobirama's armour, fur collar and white hair.
+- **Achievements: 51** (*Hero of the Shinobi World* for finishing the story).
+- Menus opened from the chat (`/scriptevent aegis:admin`, `aegis:stats`) now wait until the chat closes instead of
+  failing silently.
+- This README now has a **table of contents** and a **commands cheat sheet**.
+
 ## Much more content (v1.55)
 
 - **8 new legendary bosses**: Kakashi, Might Guy, Jiraiya, Orochimaru, Edo Hashirama, Edo Tobirama, Obito (the Ten-Tails'
@@ -1538,9 +1701,12 @@ Travelling Merchant's too).
 ## Project layout
 
 ```
-behavior_pack/   items, entities, loot tables, scripts/main.js (jutsu) + scripts/clans.js (clans) — no recipes
-resource_pack/   textures, client entities, headband attachable
-tools/gen_textures.py   regenerates the placeholder pixel art (needs Pillow)
+behavior_pack/   items, entities, loot tables, scripts — no recipes
+  scripts/main.js        jutsu, the hit pipeline, every module's setup
+  scripts/clans.js       clans · levels.js the Shinobi Record · villages.js · npcs.js · legends.js · bijuu.js …
+  scripts/story.js       the Path of the Shinobi · factions.js · handbook.js · settings.js · admin.js · ui.js (v1.56)
+resource_pack/   textures, client entities, models, render controllers
+tools/           Python generators for the pixel art, items, NPC models and gear (need Pillow)
 build.sh         packages dist/WayOfTheShinobi.mcaddon
 ```
 

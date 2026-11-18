@@ -164,14 +164,23 @@ function stop(target, by) {
   tick();
 }
 
-function status(by) {
+export const startGrace = (minutes, target, by) => start(minutes, target, by);
+export const stopGrace = (target, by) => stop(target, by);
+
+export function graceLines() {
   const w = worldUntil() > Date.now() ? worldUntil() : 0;
   const lines = [w ? `§aEveryone has grace: §f${left(w)} left` : "§7No grace period for everyone."];
   for (const p of world.getAllPlayers()) {
     const own = Math.max(playerUntil(p), playLeft(p) > 0 ? Date.now() + playLeft(p) * 1000 : 0);
     if (own > Date.now() && own > w) lines.push(`§a${p.name}§7: §f${left(own)} left${playLeft(p) > 0 ? " §8(new-player grace, play time)" : ""}`);
   }
-  by.sendMessage(lines.join("\n"));
+  return lines;
+}
+export const graceLeftText = (p) => (graceUntil(p) ? left(graceUntil(p)) : "");
+export const GRACE_MAX_MINUTES = MAX_MINUTES;
+
+function status(by) {
+  by.sendMessage(graceLines().join("\n"));
 }
 
 // A brand-new shinobi (never been on this server): 1 hour of play-time grace.

@@ -39,6 +39,12 @@ const BLOCK_USE = [/lever$/, /_button$/, /repeater$/, /comparator$/, /daylight_d
 export const CREATIVE_ONLY = new Set(["aegis:juubi_spawn_egg"]);
 export const isBanned = (id) => !!id && id.startsWith("minecraft:") && (BANNED.has(id) || BANNED_PATTERNS.some((r) => r.test(id)));
 const allowed = () => !!world.getDynamicProperty(OFF);
+export const vanillaBanned = () => !allowed();
+// on = vanilla weapons, armour, redstone and bundles are banned (the default)
+export function setVanillaBan(on) {
+  world.setDynamicProperty(OFF, on ? undefined : true);
+  world.sendMessage(on ? "§cVanilla weapons, armour, redstone and bundles are disabled again." : "§eVanilla weapons, armour, redstone and bundles are allowed again.");
+}
 const lastTold = new Map(); // player id -> tick
 const exempt = (p) => {
   try {
@@ -120,10 +126,7 @@ export function initBans() {
   system.afterEvents.scriptEventReceive.subscribe(({ id, message, sourceEntity: p }) => {
     if (id !== "aegis:vanilla") return;
     const cmd = String(message ?? "").trim().toLowerCase();
-    if (cmd === "off" || cmd === "on") {
-      world.setDynamicProperty(OFF, cmd === "off" ? true : undefined);
-      return world.sendMessage(cmd === "off" ? "§eVanilla weapons, armour, redstone and bundles are allowed again." : "§cVanilla weapons, armour, redstone and bundles are disabled again.");
-    }
+    if (cmd === "off" || cmd === "on") return setVanillaBan(cmd === "on");
     const msg = allowed() ? "§7Vanilla items are §aallowed§7. §f/scriptevent aegis:vanilla on§7 to ban them." :
       "§7Vanilla weapons, armour, redstone and bundles are §cbanned§7. §f/scriptevent aegis:vanilla off§7 to allow them.";
     if (p?.typeId === "minecraft:player") p.sendMessage(msg);

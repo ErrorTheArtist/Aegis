@@ -661,6 +661,9 @@
     },
     "aegis_hidden_scroll": {
       "textures": "textures/items/aegis/hidden_scroll"
+    },
+    "aegis_shikotsumyaku": {
+      "textures": "textures/items/aegis/shikotsumyaku"
     }
   }
 }

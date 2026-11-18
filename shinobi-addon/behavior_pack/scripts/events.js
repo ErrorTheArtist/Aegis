@@ -24,6 +24,7 @@ import { QUEST_TARGETS } from "./quests.js";
 import { LEGENDS } from "./legends.js";
 import { giveShards } from "./xpshards.js";
 import { bumpAch } from "./achievements.js";
+import { factionProgress } from "./factions.js";
 
 export const HIDDEN_SCROLL = "aegis:hidden_scroll";
 const XP_PROP = "aegis:xp_event_until";
@@ -47,11 +48,24 @@ let current; // { kind, label, dim, center, until, participants: Set, ... }
 
 export const eventXpMultiplier = () => ((world.getDynamicProperty(XP_PROP) ?? 0) > Date.now() ? 2 : 1);
 export const currentEvent = () => current;
+export const doubleXpLeft = () => Math.max(0, (world.getDynamicProperty(XP_PROP) ?? 0) - Date.now()); // ms
+export const autoEvents = () => !!world.getDynamicProperty(AUTO_PROP);
+export const wantedPool = () => RAID_LEGENDS();
+export function setAutoEvents(on) {
+  world.setDynamicProperty(AUTO_PROP, on ? true : undefined);
+  return on ? "§7Automatic events: §aon§7 (a random event every hour while 2+ players are online)." : "§7Automatic events: §coff§7.";
+}
+export function endDoubleXp() {
+  if (!doubleXpLeft()) return false;
+  world.setDynamicProperty(XP_PROP, undefined);
+  say("§7Double XP is over.");
+  return true;
+}
 
 const say = (t) => world.sendMessage(`§8[§6Event§8] ${t}`);
 const mins = (ms) => Math.max(0, Math.ceil(ms / 60000));
 
-function nearestVillage(pos) {
+export function nearestVillage(pos) {
   let best;
   let bd = Infinity;
   for (const [id, v] of Object.entries(VILLAGES)) {
@@ -89,6 +103,7 @@ function reward(p, ryo, shards, honor) {
   if (shards) giveShards(p, shards);
   if (honor) addHonor(p, honor);
   bumpAch(p, "events");
+  factionProgress(p, "raid"); // (an Anbu contract)
 }
 
 function cleanup() {
@@ -400,10 +415,8 @@ export function initEvents(helpers) {
     else if (cmd === "wanted") err = by?.typeId === "minecraft:player" ? startWanted(by, arg) : "§7Run it as a player (the legend appears near you).";
     else if (cmd === "doublexp") startDoubleXp(Number(arg) || 30);
     else if (cmd === "stop") err = stopEvent() ? undefined : "§7No event is running.";
-    else if (cmd === "auto") {
-      world.setDynamicProperty(AUTO_PROP, arg === "on" ? true : undefined);
-      err = arg === "on" ? "§7Automatic events: §aon§7 (a random event every hour while 2+ players are online)." : "§7Automatic events: §coff§7.";
-    } else {
+    else if (cmd === "auto") err = setAutoEvents(arg === "on");
+    else {
       const xp = (world.getDynamicProperty(XP_PROP) ?? 0) - Date.now();
       err = `§7Event: ${current ? `§f${current.label}§7 (${mins(current.until - Date.now())} min left)` : "§8none"}§7 · Double XP: ${xp > 0 ? `§b${mins(xp)} min left` : "§8off"}§7 · automatic: ${world.getDynamicProperty(AUTO_PROP) ? "§aon" : "§coff"}`;
     }

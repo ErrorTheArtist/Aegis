@@ -9,6 +9,7 @@
 //   /scriptevent aegis:clan eternal         — instantly awaken the Eternal Mangekyō (Uchiha only)
 
 import { wantedTag } from "./bounty.js";
+import { factionTag } from "./factions.js";
 import { world, system, ItemStack, ItemLockMode } from "@minecraft/server";
 import { showTitle } from "./hud.js";
 import { uzumakiSealMenu } from "./bijuu.js";
@@ -99,7 +100,7 @@ export const CLANS = {
     perks: "Shadow Possession Jutsu (freeze a target), 110 chakra",
   },
   akimichi: {
-    name: "Akimichi", color: "§e", rarity: "rare", weight: 9,
+    name: "Akimichi", color: "§e", rarity: "rare", weight: 8,
     maxChakra: 120, regen: 1.0, effects: [["health_boost", 0]],
     item: "aegis:expansion",
     perks: "Expansion Jutsu (Strength + Resistance + hearts), 120 chakra, +2 hearts",
@@ -111,20 +112,28 @@ export const CLANS = {
     perks: "Parasitic Insect Swarm (poison + chakra drain), 110 chakra",
   },
   inuzuka: {
-    name: "Inuzuka", color: "§b", rarity: "common", weight: 13,
+    name: "Inuzuka", color: "§b", rarity: "common", weight: 11,
     maxChakra: 100, regen: 1.0, effects: [["speed", 0], ["night_vision", 0]],
     item: "aegis:fang_over_fang",
     perks: "Fang Over Fang (sneak: summon ninja hound), Speed, Night Vision",
   },
   yamanaka: {
-    name: "Yamanaka", color: "§3", rarity: "common", weight: 13,
+    name: "Yamanaka", color: "§3", rarity: "common", weight: 11,
     maxChakra: 100, regen: 1.1, effects: [],
     item: "aegis:mind_transfer",
     perks: "Mind Body Disturbance (confuse & stun a target)",
   },
+  // v1.56: Kimimaro's clan and its Shikotsumyaku — bones as hard as steel, grown at will
+  kaguya: {
+    name: "Kaguya", color: "§f", rarity: "epic", weight: 5,
+    maxChakra: 140, regen: 1.2, effects: [["resistance", 0]],
+    item: "aegis:shikotsumyaku",
+    perks: "Shikotsumyaku: Dance of the Camellia (a bone-sword lunge) / sneak: Dance of the Larch (bone spikes burst out all around you), cheaper taijutsu scrolls, 140 chakra, Resistance",
+  },
 };
 
 let api; // helpers from main.js
+const BONE = [0.96, 0.94, 0.86];
 
 // Clan discounts on the normal jutsu scrolls (multiplier on chakra cost).
 const JUTSU_DISCOUNTS = {
@@ -134,6 +143,7 @@ const JUTSU_DISCOUNTS = {
   sarutobi: { "aegis:fireball_scroll": 0.7, "aegis:phoenix_scroll": 0.7, "aegis:great_fire_scroll": 0.8 },
   senju: { "aegis:mystical_palm_scroll": 0.6, "aegis:water_dragon_scroll": 0.8, "aegis:earth_spikes_scroll": 0.75 },
   hyuga: { "aegis:vacuum_scroll": 0.7 },
+  kaguya: { "aegis:leaf_hurricane_scroll": 0.7, "aegis:front_lotus_scroll": 0.75, "aegis:morning_peacock_scroll": 0.8 },
 };
 
 export function clanJutsuCostMultiplier(player, itemId) {
@@ -206,7 +216,7 @@ export function applyNameTag(player) {
     const title = kage ? `${KAGE_VILLAGES[kage].title} ` : isSannin(player) ? "§aSannin " : rank ? `§7${RANKS[rank]} ` : "";
     const lv = `${title}§eLv.${getLevel(player)}§r`;
     const vt = isRogue(player) ? rogueTag : villageTag(getVillage(player));
-    const tt = titlePrefix(player) + wantedTag(player); // a title of legend (v1.54), [Wanted] (v1.55)
+    const tt = factionTag(player) + titlePrefix(player) + wantedTag(player); // [Akatsuki]/[Anbu] (v1.56), a title (v1.54), [Wanted] (v1.55)
     player.nameTag = clan ? `${vt}${tt}${clan.color}[${clan.name}]§r ${lv} ${player.name}` : `${vt}${tt}${lv} ${player.name}`;
   } catch {
     /* ignore */
@@ -252,7 +262,7 @@ function removeClanItems(player) {
 
 export const setClanPublic = (player, id) => setClan(player, id);
 
-function setClan(player, id) {
+export function setClan(player, id) {
   removeClanItems(player);
   deactivateDojutsu(player);
   if (getClanId(player) !== id) {
@@ -638,6 +648,49 @@ const ABILITIES = {
         chargeFx(p, [1, 0.85, 0.3], 9);
         api.particle(p.dimension, "aegis:smoke_puff", p.location);
         api.sound(p.dimension, "mob.irongolem.repair", p.location, 1, 0.6);
+        return true;
+      },
+    },
+  },
+  // ---- Kaguya (v1.56) ----
+  "aegis:shikotsumyaku": {
+    clan: "kaguya",
+    use: {
+      name: "Dance of the Camellia", cost: 20, cd: 60,
+      cast: (p) => {
+        // a sword of bone grows out of the palm, and the lunge drives it in
+        api.anim(p, "animation.aegis.sword_thrust");
+        api.sound(p.dimension, "mob.skeleton.hurt", p.location, 1, 0.6);
+        api.lungeStrike(p, {
+          power: 2.6, range: 2.6, ticks: 10,
+          trail: () => api.particle(p.dimension, "aegis:slash", api.add(p.location, { x: 0, y: 1.2, z: 0 }), BONE),
+          onHit: (t) => {
+            api.hurt(t, 14, p, "entityAttack", "fist");
+            eff(t, "slowness", 40, 1);
+            for (let i = 0; i < 4; i++) api.particle(t.dimension, "aegis:slash", api.add(t.location, { x: 0, y: 0.6 + i * 0.3, z: 0 }), BONE);
+            api.sound(t.dimension, "random.anvil_land", t.location, 0.5, 1.6);
+          },
+        });
+        return true;
+      },
+    },
+    sneak: {
+      name: "Dance of the Larch", cost: 35, cd: 240,
+      cast: (p) => {
+        // bone spikes burst out of the whole body — a shield and a weapon at once
+        api.anim(p, "animation.aegis.power_up");
+        eff(p, "resistance", 60, 2);
+        const hits = nearbyTargets(p, 4.2);
+        for (let k = 0; k < 16; k++) {
+          const a = (k / 16) * Math.PI * 2;
+          for (const r of [1, 1.8]) api.particle(p.dimension, "aegis:slash", api.add(p.location, { x: Math.cos(a) * r, y: 0.8 + (k % 3) * 0.4, z: Math.sin(a) * r }), BONE);
+        }
+        api.sound(p.dimension, "mob.skeleton.death", p.location, 1, 0.5);
+        for (const e of hits) {
+          api.hurt(e, 12, p, "entityAttack", "fist");
+          const away = api.norm({ x: e.location.x - p.location.x, y: 0, z: e.location.z - p.location.z });
+          api.knockback(e, away.x, away.z, 1.6, 0.4);
+        }
         return true;
       },
     },

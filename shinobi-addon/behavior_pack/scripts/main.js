@@ -40,6 +40,9 @@ import { initBounty } from "./bounty.js";
 import { initAchievements, noteAchCast } from "./achievements.js";
 import { initDailies, noteDailyCast } from "./dailies.js";
 import { initEvents } from "./events.js";
+import { initStory, noteStoryCast } from "./story.js";
+import { initFactions, factionDamageMultiplier, factionAllies } from "./factions.js";
+import { initAdmin } from "./admin.js";
 import { initBans } from "./bans.js";
 import { initTitles, makeTitleJutsu, titleDamageMultiplier, titleRegenMultiplier, noteTitleCast, hasTitle, TITLES } from "./titles.js";
 import { levelDamageFactor, bossDamageFactor } from "./levels.js";
@@ -132,6 +135,7 @@ function hurt(target, amount, attacker, cause = "entityAttack", kind = "tech") {
     amount *= (kind === "fist" ? taijutsuMultiplier(attacker) : ninjutsuMultiplier(attacker)) * sageMultiplier(attacker) * armorDamageMultiplier(attacker) * natureDamageMultiplier(attacker);
     amount *= levelDamageFactor(attacker); // v1.54: stronger as you level (×1 → ×10 at 300)
     amount *= titleDamageMultiplier(attacker, target); // Pain / Itachi / Tobi / Sasuke perks
+    amount *= factionDamageMultiplier(attacker, target); // Akatsuki / Anbu perks (v1.56)
   } else if (target?.typeId === "minecraft:player" && BOSS_TYPES.has(attacker?.typeId)) {
     amount *= bossDamageFactor(target); // bosses stay dangerous for high-level shinobi
   }
@@ -171,6 +175,8 @@ function canBeHit(e, caster) {
   if (sameVillage(e, caster)) return false;
   // grace period: players with grace can't be hit, and can't hit players or ninja / bosses
   if (graceBlocks(e, caster)) return false;
+  // an Akatsuki player and the Akatsuki's own members don't fight each other (v1.56)
+  if (factionAllies(e, caster)) return false;
   // a legend waiting for a challenger (v1.54) only fights enemy ninja — and players can't touch it until they accept
   if (caster?.typeId === "aegis:legend" && caster.hasTag?.("aegis_calm")) return e.typeId === "aegis:hostile_ninja" || e.typeId === "aegis:akatsuki";
   if (e.typeId === "aegis:legend" && e.hasTag?.("aegis_calm") && caster?.typeId !== "aegis:hostile_ninja" && caster?.typeId !== "aegis:akatsuki") return false;
@@ -404,6 +410,7 @@ world.afterEvents.itemUse.subscribe(({ source: player, itemStack }) => {
   noteCast(player, itemStack.typeId);
   noteAchCast(player, itemStack.typeId); // v1.55: achievements
   noteDailyCast(player, itemStack.typeId); // …and daily missions
+  noteStoryCast(player); // …and the story (v1.56)
   player.onScreenDisplay.setActionBar(`§6${jutsu.name}!${natureTag(player, itemStack.typeId)}`);
 });
 
@@ -1225,6 +1232,9 @@ initBounty({ ...npcApi, refreshName: applyNameTag }); // v1.55: the Bingo Book
 initAchievements(npcApi); // v1.55: achievements
 initDailies(npcApi); // v1.55: daily missions & login streak
 initEvents(npcApi); // v1.55: world events
+initStory(npcApi); // v1.56: the Path of the Shinobi
+initFactions({ ...npcApi, refreshName: applyNameTag }); // v1.56: the Akatsuki and the Anbu
+initAdmin(npcApi); // v1.56: the Admin Panel
 initBans();
 initTitles({ ...npcApi, refreshName: applyNameTag });
 initEdoTensei(npcApi);

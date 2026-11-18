@@ -11,7 +11,7 @@
 //   • Phase 2 at half health  — "The Ten-Tails awakens": tougher, faster, and a three-bomb barrage
 
 import { world, system } from "@minecraft/server";
-import { isGraced } from "./grace.js";
+import { mayFight } from "./grace.js";
 import { showTitle } from "./hud.js";
 import { beastAwakenFx, aura, sfx } from "./cinematic.js";
 import { npcSealed } from "./jutsu4.js";
@@ -35,8 +35,8 @@ function eff(entity, id, ticks, amp = 0, particles = true) {
   }
 }
 
-// Players it can fight: not creative / spectator, not in a grace period.
-export function juubiTargets(dim, loc, radius) {
+// Players it can fight: not creative / spectator — and a player with grace only once they've struck it.
+export function juubiTargets(dim, loc, radius, enemy) {
   let list = [];
   try {
     list = dim.getPlayers({ location: loc, maxDistance: radius });
@@ -46,7 +46,7 @@ export function juubiTargets(dim, loc, radius) {
   return list.filter((p) => {
     try {
       const gm = String(p.getGameMode()).toLowerCase();
-      return gm !== "creative" && gm !== "spectator" && !isGraced(p);
+      return gm !== "creative" && gm !== "spectator" && mayFight(p, enemy); // (a player with grace: only once they've struck this enemy — grace.js)
     } catch {
       return false;
     }
@@ -56,7 +56,7 @@ export function juubiTargets(dim, loc, radius) {
 function nearest(boss, radius = 48) {
   let best;
   let bestD = Infinity;
-  for (const p of juubiTargets(boss.dimension, boss.location, radius)) {
+  for (const p of juubiTargets(boss.dimension, boss.location, radius, boss)) {
     const d = api.sub(p.location, boss.location);
     const dist = d.x * d.x + d.y * d.y + d.z * d.z;
     if (dist < bestD) {
@@ -152,7 +152,7 @@ export function tailSlam(boss) {
 // Roots burst up under every target in range, after a short warning — a target who keeps moving dodges them.
 export function woodSpikes(boss, radius = 24) {
   const dim = boss.dimension;
-  const marks = juubiTargets(dim, boss.location, radius).slice(0, 6).map((p) => ({ ...p.location }));
+  const marks = juubiTargets(dim, boss.location, radius, boss).slice(0, 6).map((p) => ({ ...p.location }));
   if (!marks.length) return;
   roarAnim(boss);
   api.sound(dim, "mob.enderdragon.growl", boss.location, 2.5, 0.6);
@@ -203,7 +203,7 @@ function leap(boss, t) {
 
 // Phase 2: three bombs, one after another, at up to three targets.
 function barrage(boss) {
-  const targets = juubiTargets(boss.dimension, boss.location, 40).slice(0, 3);
+  const targets = juubiTargets(boss.dimension, boss.location, 40, boss).slice(0, 3);
   if (!targets.length) return;
   for (let k = 0; k < 3; k++) {
     system.runTimeout(() => {

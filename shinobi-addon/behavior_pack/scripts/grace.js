@@ -1,9 +1,13 @@
-// Grace period (v1.53) — a no-fighting window an admin can give everyone (when the server opens, before an event…) or
-// a single player. While a player has grace:
-//   • nothing can hurt them — players, enemy ninja, bosses, mobs (they get an invisible Resistance V);
-//   • enemy ninja, Akatsuki, legends and Tailed Beasts ignore them — no chasing, no jutsu;
-//   • they can't hurt other players, nor the add-on's ninja and bosses (no free boss kills while untouchable).
-// Gathering, building, travelling, quests, shops — everything else works as usual.
+// Grace period (v1.53; reworked in v1.59) — a window an admin can give everyone (when the server opens, before an
+// event…) or a single player. While a player has grace:
+//   • no player can hurt them, and they can't hurt any player — weapons, arrows, jutsu, clones, companions and summons
+//     alike (a player's blow is undone at once, and a jutsu never lands);
+//   • enemies leave them alone — ninja, the Akatsuki, legends, Tailed Beasts and monsters don't attack them, and nothing
+//     can hurt them (an invisible Resistance V) …
+//   • … until they attack: an enemy they strike fights back (for 30 s after their last blow), but weaker — while they're
+//     fighting, every hit they take is 60% softer (Resistance III), and hits from enemies they didn't attack are undone.
+//     They can still be defeated, so fight carefully;
+//   • legends accept their challenge (and wait for the first blow); quests, missions, shops work as usual.
 //   /scriptevent aegis:grace 10           — 10 minutes for everyone (players who join meanwhile get it too)
 //   /scriptevent aegis:grace 5 Steve      — 5 minutes for one player
 //   /scriptevent aegis:grace off          — end every grace period now
@@ -20,11 +24,12 @@ const PLAYER_PROP = "aegis:grace_until"; // player: their own grace ends at this
 const LEFT_PROP = "aegis:grace_left"; // player: seconds of play-time grace left (a new player's first hour)
 const JOINED_PROP = "aegis:joined";
 export const NEW_PLAYER_GRACE = 3600; // seconds
-export const GRACE_TAG = "aegis_grace"; // the add-on's mobs won't target a player with this tag
+export const GRACE_TAG = "aegis_grace"; // (every player with grace carries it — for commands and other add-ons)
 const MAX_MINUTES = 24 * 60;
-// what a player with grace may not hurt (besides other players)
-const ENEMIES = new Set(["aegis:hostile_ninja", "aegis:akatsuki", "aegis:legend",
-  ...["shukaku", "matatabi", "isobu", "son_goku", "kokuo", "saiken", "chomei", "gyuki", "kurama", "juubi"].map((b) => `aegis:${b}`)]);
+const SAFE_AMP = 4; // Resistance V: nothing hurts them while they're not fighting
+const FIGHT_AMP = 2; // Resistance III: the enemies they've attacked hit 60% softer
+export const GRACE_SOFTER = "60%";
+const PROVOKE_TICKS = 600; // an enemy fights back for 30 s after a player with grace last struck it
 
 const num = (v) => (typeof v === "number" && Number.isFinite(v) ? v : 0);
 const worldUntil = () => num(world.getDynamicProperty(WORLD_PROP));
@@ -68,12 +73,53 @@ function playerBehind(e) {
   }
 }
 
+// Gives back a hit that shouldn't have landed (and puts out any fire it lit).
+function undo(p, damage) {
+  try {
+    const h = p.getComponent("minecraft:health");
+    if (h.currentValue > 0) h.setCurrentValue(Math.min(h.effectiveMax, h.currentValue + damage));
+    p.extinguishFire?.();
+  } catch {
+    /* ignore */
+  }
+}
+
+// Who started it: enemy id -> Map(player id -> the tick of that player's last blow on it). Only players with grace.
+const provoked = new Map();
+const lastBlow = new Map(); // player id -> the tick they last struck an enemy
+export function provokedBy(enemy, p) {
+  const t = provoked.get(enemy?.id)?.get(p?.id);
+  return t !== undefined && system.currentTick - t < PROVOKE_TICKS;
+}
+// Is this player (with grace) in a fight they started?
+export const isFighting = (p) => system.currentTick - (lastBlow.get(p?.id) ?? -1e9) < PROVOKE_TICKS;
+// May `enemy` attack player `p`? Anyone without grace: yes. A player with grace: only an enemy they've struck — or,
+// where the script doesn't say which enemy is asking, only while they're fighting.
+export function mayFight(p, enemy) {
+  if (!isGraced(p)) return true;
+  return enemy ? provokedBy(enemy, p) : isFighting(p);
+}
+function noteBlow(enemy, p) {
+  const now = system.currentTick;
+  let m = provoked.get(enemy.id);
+  if (!m) provoked.set(enemy.id, (m = new Map()));
+  m.set(p.id, now);
+  const wasFighting = isFighting(p);
+  lastBlow.set(p.id, now);
+  if (!wasFighting) {
+    protect(p, graceUntil(p)); // drop to Resistance III at once, so the fight is real
+    p.onScreenDisplay?.setActionBar(`§eYou attacked — it fights back! §7(your grace still stops players, and its hits are ${GRACE_SOFTER} softer)`);
+  }
+}
+
 // Does grace stop `attacker` from hurting `target`? (used by every scripted attack in the add-on)
+//   • player against player: never while either has grace (a player's clones, companions and summons count as them);
+//   • an enemy against a player with grace: only one that player has attacked may hurt them.
 export function graceBlocks(target, attacker) {
-  if (isGraced(target)) return true;
-  const p = playerBehind(attacker);
-  if (!p || !isGraced(p) || p.id === target?.id) return false;
-  return target?.typeId === "minecraft:player" || ENEMIES.has(target?.typeId);
+  if (target?.typeId !== "minecraft:player") return false;
+  const a = playerBehind(attacker);
+  if (a) return a.id !== target.id && (isGraced(target) || isGraced(a));
+  return !!attacker && isGraced(target) && !provokedBy(attacker, target);
 }
 
 let api;
@@ -83,7 +129,10 @@ const warned = new Map(); // player id -> last warning given (60 / 10 s)
 function protect(p, until) {
   try {
     if (!p.hasTag(GRACE_TAG)) p.addTag(GRACE_TAG);
-    p.addEffect("resistance", 50, { amplifier: 4, showParticles: false }); // Resistance V: no damage at all
+    const amp = isFighting(p) ? FIGHT_AMP : SAFE_AMP;
+    const r = p.getEffect("resistance");
+    if (r && r.amplifier === SAFE_AMP && amp !== SAFE_AMP) p.removeEffect("resistance"); // (a weaker effect can't replace a stronger one)
+    p.addEffect("resistance", 50, { amplifier: amp, showParticles: false });
   } catch {
     /* ignore */
   }
@@ -99,13 +148,13 @@ function unprotect(p, announce) {
   try {
     p.removeTag(GRACE_TAG);
     const r = p.getEffect("resistance");
-    if (r && r.amplifier >= 4) p.removeEffect("resistance");
+    if (r && (r.amplifier === FIGHT_AMP || r.amplifier === SAFE_AMP)) p.removeEffect("resistance");
   } catch {
     /* ignore */
   }
   warned.delete(p.id);
   if (announce) {
-    showTitle(p, "§cGrace period over", { subtitle: "§7Fighting is back on — stay sharp!", fadeInDuration: 5, stayDuration: 40, fadeOutDuration: 10 });
+    showTitle(p, "§cGrace period over", { subtitle: "§7Players and enemies can attack you again — stay sharp!", fadeInDuration: 5, stayDuration: 40, fadeOutDuration: 10 });
     api?.sound(p.dimension, "mob.wither.ambient", p.location, 0.4, 1.4);
   }
 }
@@ -136,13 +185,13 @@ function start(minutes, target, by) {
   const len = minutes === 1 ? "1 minute" : `${minutes} minutes`;
   if (target) {
     target.setDynamicProperty(PLAYER_PROP, until);
-    showTitle(target, "§aGrace period", { subtitle: `§7No fighting for ${len}`, fadeInDuration: 5, stayDuration: 50, fadeOutDuration: 10 });
-    target.sendMessage(`§aYou have a grace period of ${len}: nothing can hurt you, and you can't fight other players or bosses.`);
+    showTitle(target, "§aGrace period", { subtitle: `§7No PvP for ${len}`, fadeInDuration: 5, stayDuration: 50, fadeOutDuration: 10 });
+    target.sendMessage(`§aYou have a grace period of ${len}: no player can hurt you, and you can't hurt players. Enemies leave you alone — unless you attack them: then they fight back, ${GRACE_SOFTER} softer.`);
     if (by && by.id !== target.id) by.sendMessage(`§a${target.name} has grace for ${len}.`);
   } else {
     world.setDynamicProperty(WORLD_PROP, until);
-    world.sendMessage(`§a§lGrace period: ${len}.§r §7Nobody can be hurt and nobody can fight — players, ninja and bosses alike. Gather, build and get ready!`);
-    for (const p of world.getAllPlayers()) showTitle(p, "§aGrace period", { subtitle: `§7No fighting for ${len}`, fadeInDuration: 5, stayDuration: 50, fadeOutDuration: 10 });
+    world.sendMessage(`§a§lGrace period: ${len}.§r §7Players can't hurt each other, and enemies leave everyone alone — unless attacked: then they fight back, ${GRACE_SOFTER} softer. Train, hunt and get ready!`);
+    for (const p of world.getAllPlayers()) showTitle(p, "§aGrace period", { subtitle: `§7No PvP for ${len}`, fadeInDuration: 5, stayDuration: 50, fadeOutDuration: 10 });
   }
   tick();
 }
@@ -194,7 +243,7 @@ function welcome(p) {
   p.setDynamicProperty(LEFT_PROP, NEW_PLAYER_GRACE);
   system.runTimeout(() => {
     if (!api.isValid(p)) return;
-    p.sendMessage("§aWelcome, shinobi! You have a §l1-hour grace period§r§a (counted while you play): nothing can hurt you — not players, not ninja, not bosses — and you can't fight either. Explore, train and get ready!");
+    p.sendMessage(`§aWelcome, shinobi! You have a §l1-hour grace period§r§a (counted while you play): no player can hurt you, and you can't hurt players. Ninja, bosses and monsters leave you alone — unless you attack them: then they fight back, ${GRACE_SOFTER} softer. Explore, train and get ready!`);
   }, 100);
 }
 
@@ -205,20 +254,40 @@ export function initGrace(helpers) {
     if (initialSpawn) welcome(player);
   });
 
-  // what Resistance can't catch: a player with grace landing a blow on another player or on a ninja / boss
+  // Every hurt event: (Scripted attacks — jutsu, sword arts, combo bonuses — are stopped before they land: graceBlocks.)
   world.afterEvents.entityHurt.subscribe(({ hurtEntity, damage, damageSource }) => {
-    if (damage <= 0) return;
-    const p = playerBehind(damageSource?.damagingEntity);
-    if (!p || !isGraced(p) || p.id === hurtEntity.id) return;
-    if (hurtEntity.typeId !== "minecraft:player" && !ENEMIES.has(hurtEntity.typeId)) return;
-    try {
-      const h = hurtEntity.getComponent("minecraft:health");
-      if (h.currentValue > 0) h.setCurrentValue(Math.min(h.effectiveMax, h.currentValue + damage));
-    } catch {
-      /* ignore */
+    if (damage <= 0 || !hurtEntity) return;
+    const by = damageSource?.damagingEntity;
+    const a = playerBehind(by);
+    // a player with grace strikes an enemy (or any creature that isn't a player's): from now on it may fight back
+    if (hurtEntity.typeId !== "minecraft:player") {
+      if (a && isGraced(a) && !playerBehind(hurtEntity)) noteBlow(hurtEntity, a);
+      return;
     }
-    p.onScreenDisplay?.setActionBar(`§aGrace period §7— no fighting for another §f${left(graceUntil(p))}`);
+    if (!isGraced(hurtEntity) && !(a && isGraced(a))) return;
+    if (a) {
+      // a blow from a player on a player (a sword, an arrow, a clone's or a summon's hit) when either has grace: undone
+      if (a.id === hurtEntity.id) return;
+      undo(hurtEntity, damage);
+      a.onScreenDisplay?.setActionBar(isGraced(a)
+        ? `§aYou have a grace period §7— you can't hurt players for another §f${left(graceUntil(a))}`
+        : `§a${hurtEntity.name} has a grace period §7— players can't hurt them for another §f${left(graceUntil(hurtEntity))}`);
+      return;
+    }
+    // an enemy's (or a monster's) hit on a player with grace who never attacked it: undone too
+    if (by && !provokedBy(by, hurtEntity)) undo(hurtEntity, damage);
   });
+  world.afterEvents.entityDie.subscribe(({ deadEntity }) => {
+    provoked.delete(deadEntity?.id);
+  });
+  system.runInterval(() => {
+    const now = system.currentTick;
+    for (const [id, m] of provoked) {
+      for (const [pid, t] of m) if (now - t >= PROVOKE_TICKS) m.delete(pid);
+      if (!m.size) provoked.delete(id);
+    }
+    for (const [pid, t] of lastBlow) if (now - t >= PROVOKE_TICKS) lastBlow.delete(pid);
+  }, 1200);
 
   system.afterEvents.scriptEventReceive.subscribe(({ id, message, sourceEntity }) => {
     if (id !== "aegis:grace") return;

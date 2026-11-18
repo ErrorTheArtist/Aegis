@@ -5,8 +5,8 @@
 // second phase at half health. Called from enemies.js for entities of type aegis:legend.
 
 import { world, system, ItemStack } from "@minecraft/server";
+import { mayFight } from "./grace.js";
 import { MessageFormData } from "@minecraft/server-ui";
-import { isGraced } from "./grace.js";
 import { showTitle } from "./hud.js";
 import { impactFx, sfx, shake, aura, chargeFx } from "./cinematic.js";
 
@@ -111,11 +111,11 @@ function behind(t, dist = 2) {
   return { x: t.location.x - h.x * dist, y: t.location.y, z: t.location.z - h.z * dist };
 }
 
-function playersAround(dim, pos, r) {
+function playersAround(dim, pos, r, enemy) {
   try {
     return dim.getPlayers({ location: pos, maxDistance: r }).filter((p) => {
       const gm = String(p.getGameMode()).toLowerCase();
-      return gm !== "creative" && gm !== "spectator" && !isGraced(p);
+      return gm !== "creative" && gm !== "spectator" && mayFight(p, enemy); // (a player with grace: only once they've struck this enemy — grace.js)
     });
   } catch {
     return [];
@@ -261,7 +261,7 @@ function clones(boss, skin, name, max, puff = "aegis:smoke_puff") {
 }
 
 function warnAll(boss, pos, r, title, subtitle) {
-  for (const p of playersAround(boss.dimension, pos, r)) showTitle(p, title, { subtitle, fadeInDuration: 0, stayDuration: 30, fadeOutDuration: 5 });
+  for (const p of playersAround(boss.dimension, pos, r, boss)) showTitle(p, title, { subtitle, fadeInDuration: 0, stayDuration: 30, fadeOutDuration: 5 });
 }
 
 // ---------------------------------------------------------------------------
@@ -769,7 +769,7 @@ function hiddenMist(boss, t, p2) {
   const c = { ...boss.location };
   api.anim(boss, "animation.aegis.hand_signs");
   sfx(dim, "aegis.water", c, 1.4, 0.6);
-  for (const p of playersAround(dim, c, 24)) {
+  for (const p of playersAround(dim, c, 24, boss)) {
     showTitle(p, "§bHidden Mist Jutsu", { subtitle: "§7You can't see a thing…", fadeInDuration: 2, stayDuration: 30, fadeOutDuration: 8 });
     eff(p, "blindness", 90, 0);
   }
@@ -866,7 +866,7 @@ const RAPS = [
 
 function rap(boss) {
   const line = RAPS[Math.floor(Math.random() * RAPS.length)];
-  for (const p of playersAround(boss.dimension, boss.location, 24)) p.onScreenDisplay?.setActionBar(`§eKiller B: §f${line}`);
+  for (const p of playersAround(boss.dimension, boss.location, 24, boss)) p.onScreenDisplay?.setActionBar(`§eKiller B: §f${line}`);
 }
 
 // Lightning Release: Lariat — a charging arm wrapped in lightning.
@@ -939,7 +939,7 @@ function backPain(boss, chance) {
     eff(boss, "slowness", 60, 10);
     eff(boss, "weakness", 60, 2);
     sfx(boss.dimension, "aegis.impact", boss.location, 0.6, 1.6);
-    for (const p of playersAround(boss.dimension, boss.location, 24)) p.onScreenDisplay?.setActionBar("§6Ōnoki: §fOw, ow — my back! §7(now's your chance)");
+    for (const p of playersAround(boss.dimension, boss.location, 24, boss)) p.onScreenDisplay?.setActionBar("§6Ōnoki: §fOw, ow — my back! §7(now's your chance)");
   }, 70);
 }
 
@@ -1133,7 +1133,7 @@ function venomRain(boss) {
 function fireAnnihilation(boss, t, p2) {
   api.anim(boss, "animation.aegis.phoenix_breath");
   chargeFx(boss, [1, 0.45, 0.1], 16, "aegis.charge");
-  for (const p of playersAround(boss.dimension, boss.location, 32)) showTitle(p, "§cGreat Fire Annihilation", { subtitle: "§7Get behind cover!", fadeInDuration: 0, stayDuration: 20, fadeOutDuration: 5 });
+  for (const p of playersAround(boss.dimension, boss.location, 32, boss)) showTitle(p, "§cGreat Fire Annihilation", { subtitle: "§7Get behind cover!", fadeInDuration: 0, stayDuration: 20, fadeOutDuration: 5 });
   system.runTimeout(() => {
     if (!api.isValid(boss) || !api.isValid(t)) return;
     sfx(boss.dimension, "aegis.fire", boss.location, 2.5, 0.5);
@@ -1178,7 +1178,7 @@ function meteor(boss, t) {
   const spot = { ...t.location };
   api.anim(boss, "animation.aegis.sword_raise");
   sfx(dim, "aegis.charge", boss.location, 2.5, 0.5);
-  for (const p of playersAround(dim, spot, 48)) showTitle(p, "§4Tengai Shinsei", { subtitle: "§7A meteor is falling — RUN!", fadeInDuration: 0, stayDuration: 40, fadeOutDuration: 10 });
+  for (const p of playersAround(dim, spot, 48, boss)) showTitle(p, "§4Tengai Shinsei", { subtitle: "§7A meteor is falling — RUN!", fadeInDuration: 0, stayDuration: 40, fadeOutDuration: 10 });
   const sky = add(spot, { x: 14, y: 34, z: 10 });
   for (let k = 0; k < 60; k += 3) {
     system.runTimeout(() => {
@@ -1240,7 +1240,7 @@ function edoReform(boss) {
     }, k);
   }
   sfx(dim, "aegis.seal", boss.location, 2, 0.6);
-  for (const p of playersAround(dim, boss.location, 48)) {
+  for (const p of playersAround(dim, boss.location, 48, boss)) {
     showTitle(p, "§8The body reforms…", { subtitle: "§7Ash and paper rebuild the reanimated Madara", fadeInDuration: 2, stayDuration: 40, fadeOutDuration: 10 });
   }
 }
@@ -1465,7 +1465,7 @@ function nightGuy(boss, t) {
       }
       eff(boss, "slowness", 400, 2);
       eff(boss, "weakness", 400, 2);
-      for (const p of playersAround(boss.dimension, boss.location, 40)) p.onScreenDisplay?.setActionBar("§7Might Guy is burnt out — now's your chance!");
+      for (const p of playersAround(boss.dimension, boss.location, 40, boss)) p.onScreenDisplay?.setActionBar("§7Might Guy is burnt out — now's your chance!");
     }, 20);
   }, 30);
 }
@@ -1531,7 +1531,7 @@ function frogSong(boss) {
   api.anim(boss, "animation.aegis.mind_seal");
   sfx(boss.dimension, "aegis.eye", boss.location, 1.6, 0.6);
   api.sound(boss.dimension, "mob.slime.big", boss.location, 2, 0.5);
-  for (const p of playersAround(boss.dimension, boss.location, 14)) {
+  for (const p of playersAround(boss.dimension, boss.location, 14, boss)) {
     showTitle(p, "§2Gamarinshō", { subtitle: "§7The toads' song fills your head…", fadeInDuration: 2, stayDuration: 40, fadeOutDuration: 10 });
     eff(p, "slowness", 50, 255);
     eff(p, "nausea", 120, 0);
@@ -1822,7 +1822,7 @@ function kaguyaAI(boss, t, dist, p2) {
   const r = Math.random();
   if (r < 0.15) {
     // Dimension Shift: she drags everyone near her into another world — up into the sky and down again
-    const players = playersAround(boss.dimension, boss.location, 30);
+    const players = playersAround(boss.dimension, boss.location, 30, boss);
     if (players.length) {
       api.anim(boss, "animation.aegis.both_palms");
       sfx(boss.dimension, "aegis.transform", boss.location, 2.5, 0.6);
@@ -1972,7 +1972,7 @@ export function makeCalm(boss, line) {
   } catch {
     /* ignore */
   }
-  if (line) for (const p of playersAround(boss.dimension, boss.location, 48)) p.sendMessage(line);
+  if (line) for (const p of playersAround(boss.dimension, boss.location, 48, boss)) p.sendMessage(line);
 }
 
 function startChallenge(boss, player) {
@@ -1988,7 +1988,7 @@ function startChallenge(boss, player) {
   fights.set(boss.id, { lastFoe: system.currentTick });
   impactFx(boss.dimension, boss.location, L.color, 2.5);
   sfx(boss.dimension, "aegis.transform", boss.location, 2, 1.1);
-  for (const p of playersAround(boss.dimension, boss.location, 48)) {
+  for (const p of playersAround(boss.dimension, boss.location, 48, boss)) {
     showTitle(p, L.name, { subtitle: `§7accepts ${player.name}'s challenge!`, fadeInDuration: 3, stayDuration: 40, fadeOutDuration: 10 });
   }
 }
@@ -1997,7 +1997,6 @@ async function challengeMenu(player, boss) {
   const id = memberOf(boss);
   const L = LEGENDS[id];
   if (!L || !isCalm(boss)) return;
-  if (isGraced(player)) return player.sendMessage(`${L.name}§f: You're under a grace period — come back when it's over.`);
   let hp = 800;
   try {
     hp = Math.round(boss.getComponent("minecraft:health").effectiveMax);
@@ -2087,7 +2086,7 @@ function enterPhase2(boss, id) {
   impactFx(boss.dimension, boss.location, L.color, 3);
   sfx(boss.dimension, "aegis.transform", boss.location, 2.5, 1);
   shake(boss.dimension, boss.location, 0.7, 1.2, 40);
-  for (const p of playersAround(boss.dimension, boss.location, 48)) {
+  for (const p of playersAround(boss.dimension, boss.location, 48, boss)) {
     showTitle(p, `${L.name}`, { subtitle: `§7${L.phase}!`, fadeInDuration: 2, stayDuration: 40, fadeOutDuration: 10 });
   }
   if (id === "tsunade") {
@@ -2114,7 +2113,7 @@ function enterPhase2(boss, id) {
     // he sheds his skin: a new body, healed
     heal(boss, (boss.getComponent("minecraft:health")?.effectiveMax ?? 1100) * 0.25);
     api.particle(boss.dimension, "aegis:smoke_puff", boss.location);
-    for (const p of playersAround(boss.dimension, boss.location, 48)) p.sendMessage("§5Orochimaru§7 sheds his skin — a fresh body!");
+    for (const p of playersAround(boss.dimension, boss.location, 48, boss)) p.sendMessage("§5Orochimaru§7 sheds his skin — a fresh body!");
   }
   if (id === "tobirama") clones(boss, L.skin, "§9Tobirama §7(Shadow Clone)", 2);
   if (id === "hashirama") eff(boss, "regeneration", 200, 1); // Sage Mode
@@ -2139,7 +2138,7 @@ export function legendTick(boss) {
   if (isCalm(boss)) return heal(boss, 4 + (boss.getComponent("minecraft:health")?.effectiveMax ?? 800) * 0.01); // waiting: always fresh
   const now = system.currentTick;
   const f = fights.get(boss.id) ?? { lastFoe: now };
-  if (playersAround(boss.dimension, boss.location, 40).length) f.lastFoe = now;
+  if (playersAround(boss.dimension, boss.location, 40, boss).length) f.lastFoe = now;
   fights.set(boss.id, f);
   if (now - f.lastFoe > 600 && fromSpawner(boss)) return makeCalm(boss, `${L.name}§7: Come back when you're ready.`);
   let hp = 1;
@@ -2205,7 +2204,7 @@ export function initLegends(helpers) {
       if (!L || entity.getDynamicProperty("aegis:state") !== "fighting") return; // a calm legend arrives quietly
       impactFx(entity.dimension, entity.location, L.color, 2.5);
       sfx(entity.dimension, "aegis.transform", entity.location, 2, 1.1);
-      for (const p of playersAround(entity.dimension, entity.location, 48)) {
+      for (const p of playersAround(entity.dimension, entity.location, 48, entity)) {
         showTitle(p, L.name, { subtitle: L.entrance ?? "§7has appeared!", fadeInDuration: 3, stayDuration: 40, fadeOutDuration: 10 });
       }
     }, 3);

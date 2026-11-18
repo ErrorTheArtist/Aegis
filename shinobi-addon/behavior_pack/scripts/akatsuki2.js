@@ -3,7 +3,7 @@
 // (Hidan's curse & immortality, Kakuzu's hearts, Tobi's Kamui intangibility).
 
 import { world, system } from "@minecraft/server";
-import { isGraced } from "./grace.js";
+import { mayFight } from "./grace.js";
 import { showTitle } from "./hud.js";
 import { impactFx, sfx, shake, chargeFx } from "./cinematic.js";
 import { onTobiDefeated, kamuiHolder } from "./kamui.js";
@@ -37,7 +37,7 @@ function solidWindow(e, ticks) {
   phase(e, false);
   api.particle(e.dimension, "aegis:cine_ring", e.location, [1, 0.55, 0.15]);
   sfx(e.dimension, "aegis.whoosh", e.location, 1.2, 1.8);
-  for (const p of playersNear(e.dimension, e.location, 24)) p.onScreenDisplay?.setActionBar("§6§lTobi is solid — strike NOW!");
+  for (const p of playersNear(e.dimension, e.location, 24, e)) p.onScreenDisplay?.setActionBar("§6§lTobi is solid — strike NOW!");
 }
 
 const member = (e) => {
@@ -60,11 +60,11 @@ function eff(e, id, ticks, amp = 0, show = true) {
   }
 }
 
-function playersNear(dim, loc, r) {
+function playersNear(dim, loc, r, enemy) {
   try {
     return dim.getPlayers({ location: loc, maxDistance: r }).filter((p) => {
       const gm = String(p.getGameMode()).toLowerCase();
-      return gm !== "creative" && gm !== "spectator" && !isGraced(p);
+      return gm !== "creative" && gm !== "spectator" && mayFight(p, enemy); // (a player with grace: only once they've struck this enemy — grace.js)
     });
   } catch {
     return [];
@@ -164,7 +164,7 @@ export const MORE_MEMBER_AI = {
         api.particle(e.dimension, "aegis:cine_ring", e.location, [0.85, 0.75, 1]);
         sfx(e.dimension, "aegis.boom", e.location, 2, 0.8);
         shake(e.dimension, e.location, 0.8, 1, 24);
-        for (const p of playersNear(e.dimension, e.location, 9)) {
+        for (const p of playersNear(e.dimension, e.location, 9, e)) {
           const d = flatDir(e, p);
           api.hurt(p, 12, e);
           api.knockback(p, d.x, d.z, 3.6, 0.9);
@@ -261,7 +261,7 @@ export const MORE_MEMBER_AI = {
       api.anim(e, "animation.aegis.sword_spin");
       system.runTimeout(() => {
         if (!api.isValid(e)) return;
-        for (const p of playersNear(e.dimension, e.location, 4.5)) {
+        for (const p of playersNear(e.dimension, e.location, 4.5, e)) {
           api.hurt(p, 9, e);
           api.particle(p.dimension, "aegis:slash", chest(p), [0.8, 0.05, 0.05]);
           curse.set(e.id, { target: p.id, until: system.currentTick + 400 });
@@ -294,7 +294,7 @@ export const MORE_MEMBER_AI = {
       const dir = flatDir(e, t);
       for (let d = 1; d <= 11; d++) api.particle(e.dimension, "aegis:wind_gust", add(up(e.location, 1.3), api.scale(dir, d)));
       sfx(e.dimension, "aegis.whoosh", e.location, 2, 0.6);
-      for (const p of playersNear(e.dimension, e.location, 12)) {
+      for (const p of playersNear(e.dimension, e.location, 12, e)) {
         const v = flatDir(e, p);
         if (v.x * dir.x + v.z * dir.z < 0.6) continue;
         api.hurt(p, 10, e);
@@ -338,7 +338,7 @@ export const MORE_MEMBER_AI = {
         for (let i = 0; i < 18; i++) api.particle(e.dimension, "aegis:slash", add(spot, { x: (Math.random() - 0.5) * 6, y: Math.random() * 3, z: (Math.random() - 0.5) * 6 }), [0.2, 0.2, 0.25]);
         api.particle(e.dimension, "aegis:dust", spot);
         sfx(e.dimension, "aegis.impact", spot, 1.5, 0.8);
-        for (const p of playersNear(e.dimension, spot, 3.5)) {
+        for (const p of playersNear(e.dimension, spot, 3.5, e)) {
           api.hurt(p, 12, e);
           eff(p, "slowness", 60, 2);
         }
@@ -489,7 +489,7 @@ function startRitual(e, t) {
   sfx(e.dimension, "aegis.transform", e.location, 2, 0.7);
   eff(e, "slowness", 220, 2, false);
   showTitle(t, "§4Jashin Ritual", { subtitle: "§7Every wound he takes, you take too!", fadeInDuration: 2, stayDuration: 50, fadeOutDuration: 10 });
-  for (const p of playersNear(e.dimension, e.location, 32)) p.sendMessage("§4Hidan has completed the ritual! §7Hurting him now hurts his cursed victim — break his focus or get away!");
+  for (const p of playersNear(e.dimension, e.location, 32, e)) p.sendMessage("§4Hidan has completed the ritual! §7Hurting him now hurts his cursed victim — break his focus or get away!");
   for (let k = 0; k < 220; k += 10) {
     system.runTimeout(() => {
       if (!api.isValid(e) || !ritual.has(e.id)) return;
@@ -536,7 +536,7 @@ export function initAkatsuki2(helpers) {
       if (hp(hurtEntity) < 0.12 && !immortalUsed.has(hurtEntity.id)) {
         immortalUsed.add(hurtEntity.id);
         heal(hurtEntity, 0.4);
-        for (const p of playersNear(hurtEntity.dimension, hurtEntity.location, 32)) p.sendMessage("§4Hidan: §f\"Hah! I'm immortal, you idiot!\"");
+        for (const p of playersNear(hurtEntity.dimension, hurtEntity.location, 32, hurtEntity)) p.sendMessage("§4Hidan: §f\"Hah! I'm immortal, you idiot!\"");
         impactFx(hurtEntity.dimension, hurtEntity.location, [0.8, 0.05, 0.05], 1.5);
       }
     } else if (who === "kakuzu") {
@@ -547,7 +547,7 @@ export function initAkatsuki2(helpers) {
         heal(hurtEntity, 0.55);
         impactFx(hurtEntity.dimension, hurtEntity.location, [0.3, 0.6, 0.3], 1.5);
         sfx(hurtEntity.dimension, "aegis.roar", hurtEntity.location, 1.5, 1.2);
-        for (const p of playersNear(hurtEntity.dimension, hurtEntity.location, 32)) {
+        for (const p of playersNear(hurtEntity.dimension, hurtEntity.location, 32, hurtEntity)) {
           showTitle(p, "§2Kakuzu", { subtitle: `§7consumes a heart… §f${left - 1}§7 left`, fadeInDuration: 0, stayDuration: 30, fadeOutDuration: 8 });
         }
       }

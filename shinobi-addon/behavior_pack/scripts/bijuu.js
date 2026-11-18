@@ -19,7 +19,7 @@
 // Mastering the beast turns the cloak into its golden Tailed Beast Chakra Mode form.
 
 import { world, system, ItemStack, ItemLockMode } from "@minecraft/server";
-import { isGraced } from "./grace.js";
+import { mayFight } from "./grace.js";
 import { rampageHolder, rampageText } from "./rampage.js";
 import { npcSealed } from "./jutsu4.js";
 import { ActionFormData, MessageFormData } from "@minecraft/server-ui";
@@ -163,7 +163,7 @@ function eff(entity, id, ticks, amp = 0, particles = true) {
   }
 }
 
-function playersNear(dim, loc, radius) {
+function playersNear(dim, loc, radius, enemy) {
   let list = [];
   try {
     list = dim.getPlayers({ location: loc, maxDistance: radius });
@@ -173,7 +173,7 @@ function playersNear(dim, loc, radius) {
   return list.filter((p) => {
     try {
       const gm = String(p.getGameMode()).toLowerCase();
-      return gm !== "creative" && gm !== "spectator" && !isGraced(p);
+      return gm !== "creative" && gm !== "spectator" && mayFight(p, enemy); // (a player with grace: only once they've struck this enemy — grace.js)
     } catch {
       return true;
     }
@@ -183,7 +183,7 @@ function playersNear(dim, loc, radius) {
 function nearestTarget(boss) {
   let best;
   let bestD = Infinity;
-  for (const p of playersNear(boss.dimension, boss.location, 40)) {
+  for (const p of playersNear(boss.dimension, boss.location, 40, boss)) {
     const d = api.sub(p.location, boss.location);
     const dist = d.x * d.x + d.y * d.y + d.z * d.z;
     if (dist < bestD) {
@@ -386,7 +386,7 @@ function scalePowder(boss, b) {
     for (let i = 0; i < 10; i++) {
       api.particle(dim, "aegis:beast_mist", api.add(boss.location, { x: (Math.random() - 0.5) * 16, y: -1 - Math.random() * 3, z: (Math.random() - 0.5) * 16 }), b.color);
     }
-    for (const p of playersNear(dim, boss.location, 14)) {
+    for (const p of playersNear(dim, boss.location, 14, boss)) {
       api.hurt(p, pw(b, 6), boss);
       eff(p, "blindness", 80, 0);
       eff(p, "nausea", 120, 0);
@@ -484,7 +484,7 @@ function updateBoss(boss, now) {
       roar(boss, b);
       beastAwakenFx(boss, b.color);
       st.next = now; // attacks right away
-      for (const p of playersNear(boss.dimension, boss.location, 48)) {
+      for (const p of playersNear(boss.dimension, boss.location, 48, boss)) {
         showTitle(p, `${b.text}${b.name}`, { subtitle: "§cis enraged!", fadeInDuration: 2, stayDuration: 40, fadeOutDuration: 10 });
       }
     }

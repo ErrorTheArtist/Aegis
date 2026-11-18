@@ -129,7 +129,7 @@ const BOSS_TYPES = new Set(["aegis:akatsuki", "aegis:legend", "aegis:juubi",
 
 function hurt(target, amount, attacker, cause = "entityAttack", kind = "tech") {
   if (sameVillage(target, attacker)) return; // no friendly fire between village-mates
-  if (graceBlocks(target, attacker)) return; // grace period: no fighting
+  if (graceBlocks(target, attacker)) return; // grace period: no player-against-player damage
   // Ninjutsu stat boosts every scripted technique a player lands (taijutsu scrolls use the Taijutsu stat instead).
   if (attacker?.typeId === "minecraft:player") {
     amount *= (kind === "fist" ? taijutsuMultiplier(attacker) : ninjutsuMultiplier(attacker)) * sageMultiplier(attacker) * armorDamageMultiplier(attacker) * natureDamageMultiplier(attacker);
@@ -173,7 +173,7 @@ function canBeHit(e, caster) {
   if (e.typeId === "aegis:npc" && caster.typeId === "minecraft:player") return false;
   // no friendly fire between village-mates
   if (sameVillage(e, caster)) return false;
-  // grace period: players with grace can't be hit, and can't hit players or ninja / bosses
+  // grace period: no player-against-player hits while either side has grace (ninja and bosses are fair game)
   if (graceBlocks(e, caster)) return false;
   // an Akatsuki player and the Akatsuki's own members don't fight each other (v1.56)
   if (factionAllies(e, caster)) return false;

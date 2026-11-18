@@ -96,7 +96,7 @@ function statusText() {
 export async function adminMenu(p) {
   const pages = [
     ["§6World Events\n§r§8raid · wanted · scrolls · Double XP", eventsMenu],
-    ["§aGrace Periods\n§r§8no fighting for a while", graceMenu],
+    ["§aGrace Periods\n§r§8no PvP for a while", graceMenu],
     ["§bPlayers\n§r§8Ryō · level · titles · teleport…", playersMenu],
     ["§eServer Settings\n§r§8bans · lag clear · friendly fire · events", serverSettings],
     ["§6Economy\n§r§8prices · quest rewards", economyPage],
@@ -209,7 +209,7 @@ async function doubleXpForm(p) {
 // ---------------------------------------------------------------------------
 async function graceMenu(p) {
   const f = new ActionFormData().title("§lGrace Periods")
-    .body(`${graceLines().join("\n")}\n\n§7While a player has grace nothing can hurt them and they can't fight — players, ninja and bosses alike. Building, gathering, quests and shops all work as usual.`)
+    .body(`${graceLines().join("\n")}\n\n§7While a player has grace no player can hurt them, and they can't hurt players. Enemies leave them alone — unless attacked: then they fight back, 60% softer. Everything else works as usual.`)
     .button("§aGrace for everyone\n§r§8players who join meanwhile get it too")
     .button("§aGrace for one player")
     .button("§cEnd every grace period")
@@ -221,7 +221,7 @@ async function graceMenu(p) {
   if (r.selection === 1) return graceForm(p, true);
   if (r.selection === 2) {
     const c = await showForm(p, new MessageFormData().title("End every grace period?")
-      .body("§7Everyone's grace ends now — new players' first hour included. Fighting is back on at once.").button1("§cEnd them all").button2("Cancel"));
+      .body("§7Everyone's grace ends now — new players' first hour included. PvP is back on at once.").button1("§cEnd them all").button2("Cancel"));
     if (c.selection === 0) {
       stopGrace(undefined, p);
       adminLog(p, "ended every grace period");

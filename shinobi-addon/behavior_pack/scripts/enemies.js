@@ -2,8 +2,8 @@
 // Natural rogue ninja spawn at night; Akatsuki hunt players who carry a Tailed Beast.
 
 import { world, system } from "@minecraft/server";
+import { mayFight } from "./grace.js";
 import { npcSealed } from "./jutsu4.js";
-import { isGraced } from "./grace.js";
 import { VILLAGES } from "./villages.js";
 import { bossDamageFactor } from "./levels.js";
 import { boostHit, isEcho, scriptedHit } from "./dmgutil.js";
@@ -25,11 +25,11 @@ function eff(e, id, ticks, amp = 0) {
   }
 }
 
-function survivalPlayersNear(dim, loc, r) {
+function survivalPlayersNear(dim, loc, r, enemy) {
   try {
     return dim.getPlayers({ location: loc, maxDistance: r }).filter((p) => {
       const gm = String(p.getGameMode()).toLowerCase();
-      return gm !== "creative" && gm !== "spectator" && !isGraced(p);
+      return gm !== "creative" && gm !== "spectator" && mayFight(p, enemy); // (a player with grace: only once they've struck this enemy — grace.js)
     });
   } catch {
     return [];
@@ -114,7 +114,7 @@ const ROLE_AI = {
     const dir = e.getViewDirection();
     for (let d = 1; d <= 8; d++) api.particle(e.dimension, "aegis:wind_gust", api.add(e.getHeadLocation(), api.scale(dir, d)));
     api.sound(e.dimension, "mob.warden.sonic_boom", e.location, 0.5, 1.6);
-    for (const p of survivalPlayersNear(e.dimension, e.location, 9)) {
+    for (const p of survivalPlayersNear(e.dimension, e.location, 9, e)) {
       if (api.dot(api.norm(api.sub(p.location, e.location)), dir) < 0.5) continue;
       api.hurt(p, 2, e);
       const h = api.norm({ x: p.location.x - e.location.x, y: 0, z: p.location.z - e.location.z });
@@ -226,7 +226,7 @@ const MEMBER_AI = {
       api.particle(e.dimension, "aegis:fire_burst", api.add(spot, { x: 0, y: 1, z: 0 }));
       api.particle(e.dimension, "minecraft:huge_explosion_emitter", spot);
       api.sound(e.dimension, "random.explode", spot, 2, 0.6);
-      for (const p of survivalPlayersNear(e.dimension, spot, 5)) api.hurt(p, 16, e, "entityExplosion");
+      for (const p of survivalPlayersNear(e.dimension, spot, 5, e)) api.hurt(p, 16, e, "entityExplosion");
     }, 32);
     return 160;
   },
@@ -269,7 +269,7 @@ function update(e, now) {
     st.next = now + 20;
     return;
   }
-  const found = nearest(e, survivalPlayersNear(e.dimension, e.location, isBoss ? 32 : 20));
+  const found = nearest(e, survivalPlayersNear(e.dimension, e.location, isBoss ? 32 : 20, e));
   if (!found) return;
   let cd = 60;
   try {

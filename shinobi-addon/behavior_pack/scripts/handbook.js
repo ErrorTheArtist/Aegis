@@ -9,7 +9,7 @@ export const TOPICS = [
     "• Your §fclan§r and §fchakra nature§r are rolled for you. Your clan's ability item is yours for good: it can't be dropped or lost.",
     "• The §fstarter quests§r and the §fStory§r (Shinobi Record → Story) take you step by step through everything.",
     "• This §fShinobi Record§r lives in the last slot of your hotbar — it's your menu for everything.",
-    "• For your first hour of play you have a §agrace period§r: nothing can hurt you, and you can't fight.",
+    "• For your first hour of play you have a §agrace period§r: no player can hurt you (and you can't hurt players), and enemies leave you alone — unless you attack them: then they fight back, 60% softer.",
   ]],
   ["§bChakra & jutsu", [
     "• §fRight-click a jutsu scroll§r to cast it. Each costs chakra (the bar in the top-left) and has a cooldown.",
@@ -62,7 +62,7 @@ export const TOPICS = [
     "• Put a §fbounty§r on any player (Shinobi Record → Bingo Book) — whoever defeats them collects it.",
     "• Killing players earns you a bounty of your own (three times as much for rogues). 100,000 Ryō shows [Wanted] over your name.",
     "• Your PvP record counts who you've defeated; the titles check it.",
-    "• Players in a grace period can't fight or be hurt.",
+    "• Players in a grace period can't hurt players or be hurt by them (they can still fight ninja and bosses).",
   ]],
   ["§8Factions", [
     "• §cAkatsuki§r — for rogue ninja (level 60, a 25,000 Ryō bounty): the cloak, +10% damage to Tailed Beasts and Jinchūriki, and the Akatsuki leave you alone.",

@@ -12,7 +12,7 @@ Uses the real Naruto names (Rasengan, Shadow Clone Jutsu, etc.) — personal use
 - **Things to do** — [Story](#story-the-path-of-the-shinobi-v156) · [Factions](#factions-akatsuki--anbu-v156) · [Bingo Book](#bingo-book-v155) · [Achievements](#achievements-v155) · [Daily missions](#daily-missions--login-streak-v155) · [World events](#world-events-v155)
 - **The world** — [Tailed Beasts](#tailed-beasts-bosses) · [NPCs](#npcs) · [Legendary bosses](#legendary-bosses-npc-spawner-only) · [Enemies](#enemies) · [Fast Travel](#fast-travel)
 - **For admins** — [Admin Panel](#admin-panel-v156) · [Economy](#economy-v158) · [Grace period](#grace-period-no-pvp) · [Lag clear](#lag-clear) · [Vanilla items](#vanilla-items-v154)
-- **What's new** — [v1.59](#grace-period-no-pvp-enemies-only-fight-back-v159) · [v1.58](#everything-costs-more-quests-pay-less-v158) · [v1.57](#the-leaf-weaponsmith-and-the-leaf-genin-remodelled-v157) · [v1.56](#story-factions-the-kaguya-clan-and-an-admin-panel-v156) and every version before it, at the end
+- **What's new** — [v1.60](#melee-damage-nerfed-v160) · [v1.59](#grace-period-no-pvp-enemies-only-fight-back-v159) · [v1.58](#everything-costs-more-quests-pay-less-v158) · [v1.57](#the-leaf-weaponsmith-and-the-leaf-genin-remodelled-v157) · [v1.56](#story-factions-the-kaguya-clan-and-an-admin-panel-v156) and every version before it, at the end
 
 ## Install
 
@@ -179,6 +179,7 @@ Panel or `/execute as <player> run scriptevent …`.
 | `aegis:story [reset]` · `aegis:faction [leave]` · `aegis:daily [reroll]` · `aegis:achievements [reset]` · `aegis:starter [reset]` · `aegis:quest [abandon]` | your progress |
 | `aegis:m1 on·off` · `aegis:sheath on·off` | your combo animations / swords on your back (also in *Settings*) |
 | `aegis:economy [prices <25-1000> / quests <0-200> / reset]` | prices and quest rewards (see *Economy*) |
+| `aegis:melee [<25-200>]` | players' melee damage, in % (100 = normal) |
 | `aegis:spawner` | the settings of the NPC Spawner you're looking at |
 
 ## Chakra
@@ -224,8 +225,10 @@ You start at **Level 1**; the max is **Level 300** (v1.54). Each level gives **3
 - **HP**: every level adds health, and so does Vitality — from **20 HP** at level 1 to **1,044 HP** at level 300 with
   150 Vitality. That's Bedrock's limit: Health Boost can't go higher, so the ~1,100 HP that was asked for would need
   replacing Minecraft's own player file (which breaks with game updates) — 1,044 is the most an add-on can give.
-- **Your damage**: **+3% per level** for jutsu, clan abilities and punches/blades (×9.97 at level 300), so your hits
-  keep up with the big health pools.
+- **Your damage**: jutsu, clan abilities and sword specials hit **+3% harder per level** (×9.97 at level 300);
+  **melee** — punches, blades and what rides on them (Gentle Fist, Lightning Armour, Tailed Beast Mode punches) — grows
+  **half as fast, +1.5% per level** (×5.49 at level 300) since v1.60, so your hits keep up with the big health pools
+  without one sword swing deleting them.
 - **Bosses** (Akatsuki, legends, Tailed Beasts, the Ten-Tails) hit **+2% harder per level of the player they hit**
   (×6.98 at level 300), so they stay dangerous.
 - **Out of a fight** (not hit for 8 seconds) you heal **1% of your max HP every second**.
@@ -255,7 +258,7 @@ there: it can't be moved, dropped or lost), or `/scriptevent aegis:stats`:
 |---|---|
 | Vitality | +4 max HP every 3 points (+200 HP at 150), on top of the HP your level gives |
 | Chakra | +2 max chakra and +0.5% chakra regen per point (+300 chakra, +75% regen at 150) |
-| Taijutsu | a level of Strength every 25 points (stacks with clan Strength), and +1% damage for punch combos and taijutsu scrolls per point |
+| Taijutsu | a level of Strength every **50** points — Strength III at most (v1.60; stacks with clan Strength) — and +1% damage for punch combos and taijutsu scrolls per point |
 | Ninjutsu | +1% damage for jutsu, clan abilities and sword specials per point (+150% at 150) |
 | Agility | Speed I–IV at 25/50/75/100 and −0.25% jutsu cooldowns per point (−37.5% at 150) |
 | Endurance | Shrug off 0.2% of all damage taken per point (30% at 150) |
@@ -423,7 +426,7 @@ vanilla bans, friendly fire, lag clear, the Tailed Beast that's loose and who ho
 | **World Events** | start a **Village Raid** or **Hidden Scrolls** (pick the village), a **Wanted** legend (pick one or random, near any player) or **Double XP** (5–240 minutes) · stop the event · end Double XP · switch the hourly automatic events on or off |
 | **Grace Periods** | grace (no PvP; enemies only fight back when attacked, 60% softer) for everyone or one player · end them all · end one |
 | **Players** | pick an online player to see their level, rank, Ryō, honor, village, clan, faction, bounty, titles, Kage/Sannin, grace and position — then **give or take Ryō** · **set their level** (stat points refunded) · **give XP Shards** · **heal & refill chakra** · **teleport** (go to them, bring them to you, send them to any village) · **set their clan** · **grant or take titles of legend** (it shows how many requirements they meet) · **Kage & Sannin** (appoint, with or without the set, or remove) · **set or clear a bounty** · **remove them from a faction** · **let them choose a village again** (how a rogue gets back in) · **give or end their grace** |
-| **Server Settings** | vanilla weapon & armour bans · automatic lag clear · friendly fire · automatic world events |
+| **Server Settings** | vanilla weapon & armour bans · automatic lag clear · friendly fire · automatic world events · **players' melee damage** (25–200%) |
 | **Economy** | how expensive everything is (25–1000%) and how much Ryō quests pay (0–200%) — see *Economy* |
 | **Clear Lag Now** | dropped items, or every hostile mob |
 | **Admin Log** | the last 30 admin actions — who did what, and when (kept in the world) |
@@ -1357,6 +1360,10 @@ toward the target so the next one connects.
 
 `/scriptevent aegis:m1 off` turns your own combo animations off (the bonus stays).
 
+**Melee damage** (v1.60): a melee hit is multiplied by **+1.5% per level** (×5.49 at level 300 — half the jutsu growth).
+Admins can scale every player's melee further: **Admin Panel → Server Settings → Players' melee damage** (25–200%), or
+`/scriptevent aegis:melee <percent>`.
+
 ## Jutsu Clash
 
 When two fighters throw jutsu **at each other at the same moment** (within ~0.7 s, each aiming at the other), or two
@@ -1505,6 +1512,18 @@ hoes, food, farming, building, crafting.
 ```
 
 The timers start when the server starts. The times are the constants at the top of `behavior_pack/scripts/lagclear.js`.
+
+## Melee damage nerfed (v1.60)
+
+- **Melee grows half as fast with level**: +1.5% per level instead of +3% — ×5.49 at level 300 instead of ×9.97. That's
+  punches, blades and the M1 combo, plus what rides on a melee hit: Gentle Fist, Lightning Armour's sparks, Unrivalled
+  Strength and Tailed Beast Mode punches. Jutsu, clan abilities and sword specials are unchanged.
+- **Taijutsu gives Strength every 50 points** instead of 25 — Strength III at most (was VI), and Strength adds +3 to
+  every hit *before* the level multiplier. Spent points aren't lost: reset your stats (free) to re-spend them.
+- Example — a level-300 shinobi with 150 Taijutsu and a 13-damage blade: about **121** per hit instead of **309**.
+  Level 100 with 50 Taijutsu: about **40** instead of **75**. Level 1: unchanged.
+- **Admins can tune it**: Admin Panel → Server Settings → *Players' melee damage* (25–200%), or
+  `/scriptevent aegis:melee <percent>`.
 
 ## Grace period: no PvP, enemies only fight back (v1.59)
 

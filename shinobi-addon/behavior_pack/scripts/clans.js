@@ -956,7 +956,7 @@ export function initClans(helpers) {
     if (damagingEntity.typeId !== "minecraft:player") return;
     if (activeDojutsu.get(damagingEntity.id) !== "byakugan") return;
     if (!api.canBeHit(hitEntity, damagingEntity)) return;
-    api.hurt(hitEntity, 4, damagingEntity, "magic");
+    api.hurt(hitEntity, 4, damagingEntity, "magic", "onhit"); // (melee: v1.60)
     eff(hitEntity, "weakness", 60, 0);
     api.particle(hitEntity.dimension, "aegis:chakra_burst", api.add(hitEntity.location, { x: 0, y: 1, z: 0 }));
   });

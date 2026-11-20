@@ -15,7 +15,7 @@ import { vanillaBanned, setVanillaBan } from "./bans.js";
 import { bountyOf, setBounty } from "./bounty.js";
 import { FACTIONS, factionOf, factionRank, leaveFaction } from "./factions.js";
 import { TITLES, TITLE_IDS, hasTitle } from "./titles.js";
-import { getLevel, setLevel, MAX_LEVEL, RANKS, getRank } from "./levels.js";
+import { getLevel, setLevel, MAX_LEVEL, RANKS, getRank, meleePercent, setMeleePercent, MELEE_RANGE } from "./levels.js";
 import { addRyo, getRyo, fmtRyo, price, questRyo, pricePercent, questPercent, setEconomy, PRICE_RANGE, QUEST_RANGE, DEFAULT_PRICES,
   DEFAULT_QUESTS } from "./currency.js";
 import { giveShards } from "./xpshards.js";
@@ -87,7 +87,7 @@ function statusText() {
       (grace.length > 1 ? `§7 · §f${grace.length - 1}§7 player${grace.length === 2 ? "" : "s"} with their own` : ""),
     `§7Vanilla weapons & armour: ${vanillaBanned() ? "§cbanned" : "§aallowed"}§7 · friendly fire: ${friendlyFire() ? "§con" : "§aoff"}`,
     `§7Lag clear: ${lagClearOn() ? `§aon§7 (next item clear in ${nextItemClear()})` : "§coff"}`,
-    `§7Economy: prices §f${pricePercent()}%§7 · quests pay §f${questPercent()}%§7 of their usual Ryō`,
+    `§7Economy: prices §f${pricePercent()}%§7 · quests pay §f${questPercent()}%§7 of their usual Ryō · melee damage §f${meleePercent()}%`,
     `§7Tailed Beast loose: ${beast ? `§c${beast.name}${beast.x !== undefined ? `§7 near ${beast.x}, ${beast.z}` : ""}` : "§8none"}`,
     `§7Kamui holder: ${kamui ? `§f${kamui.name}` : "§8nobody"}`,
   ].join("\n");
@@ -604,6 +604,8 @@ async function serverSettings(p) {
   const f = new ModalFormData().title("§lServer Settings");
   const rows = SETTINGS();
   for (const [label, get] of rows) f.toggle(label, !!get());
+  f.slider("§fPlayers' melee damage§7 — % (100 = normal: since v1.60 it grows +1.5% per level, ×5.5 at level 300). Punches, blades\n" +
+    "and what rides on them; jutsu aren't affected.", MELEE_RANGE[0], MELEE_RANGE[1], 5, meleePercent());
   const r = await showForm(p, f);
   if (!r.canceled && r.formValues) {
     rows.forEach(([label, get, set], i) => {
@@ -612,6 +614,8 @@ async function serverSettings(p) {
       set(on, p);
       adminLog(p, `switched "${strip(label).replace(/ \(.*\)$/, "")}" ${on ? "on" : "off"}`);
     });
+    const melee = Math.round(Number(r.formValues[rows.length]));
+    if (Number.isFinite(melee) && melee !== meleePercent()) adminLog(p, `set players' melee damage to ${setMeleePercent(melee)}%`);
   }
   return adminMenu(p);
 }

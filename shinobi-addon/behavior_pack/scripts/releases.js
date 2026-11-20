@@ -456,7 +456,7 @@ export function makeReleases(helpers) {
     if (damagingEntity?.typeId !== "minecraft:player" || !boilStrength.has(damagingEntity.id) || !api.isValid(hitEntity)) return;
     const d = flat(api.sub(hitEntity.location, damagingEntity.location));
     api.knockback(hitEntity, d.x, d.z, 2.5, 0.5);
-    api.hurt(hitEntity, 3, damagingEntity, "fire");
+    api.hurt(hitEntity, 3, damagingEntity, "fire", "onhit"); // (melee: v1.60)
     api.particle(hitEntity.dimension, "aegis:beast_mist", api.add(hitEntity.location, { x: 0, y: 1, z: 0 }), STEAM);
     api.sound(hitEntity.dimension, "random.fizz", hitEntity.location, 0.8, 0.8);
   });

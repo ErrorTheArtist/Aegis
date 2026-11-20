@@ -45,7 +45,7 @@ import { initFactions, factionDamageMultiplier, factionAllies } from "./factions
 import { initAdmin } from "./admin.js";
 import { initBans } from "./bans.js";
 import { initTitles, makeTitleJutsu, titleDamageMultiplier, titleRegenMultiplier, noteTitleCast, hasTitle, TITLES } from "./titles.js";
-import { levelDamageFactor, bossDamageFactor } from "./levels.js";
+import { levelDamageFactor, bossDamageFactor, meleeDamageFactor } from "./levels.js";
 import { chakraSealed } from "./clans.js";
 import { initLevels, handleRecordUse, levelChakraBonus, levelRegenMultiplier, ninjutsuMultiplier, taijutsuMultiplier, cooldownMultiplier, gainJutsuXp, getLevel, xpInfo } from "./levels.js";
 
@@ -132,8 +132,10 @@ function hurt(target, amount, attacker, cause = "entityAttack", kind = "tech") {
   if (graceBlocks(target, attacker)) return; // grace period: no player-against-player damage
   // Ninjutsu stat boosts every scripted technique a player lands (taijutsu scrolls use the Taijutsu stat instead).
   if (attacker?.typeId === "minecraft:player") {
-    amount *= (kind === "fist" ? taijutsuMultiplier(attacker) : ninjutsuMultiplier(attacker)) * sageMultiplier(attacker) * armorDamageMultiplier(attacker) * natureDamageMultiplier(attacker);
-    amount *= levelDamageFactor(attacker); // v1.54: stronger as you level (×1 → ×10 at 300)
+    // ("onhit": damage that rides on a melee hit — Gentle Fist, Lightning Armour's sparks — counts as melee since v1.60)
+    const melee = kind === "onhit";
+    amount *= (kind === "fist" || melee ? taijutsuMultiplier(attacker) : ninjutsuMultiplier(attacker)) * sageMultiplier(attacker) * armorDamageMultiplier(attacker) * natureDamageMultiplier(attacker);
+    amount *= melee ? meleeDamageFactor(attacker) : levelDamageFactor(attacker); // stronger as you level (jutsu ×10, melee ×5.5 at 300)
     amount *= titleDamageMultiplier(attacker, target); // Pain / Itachi / Tobi / Sasuke perks
     amount *= factionDamageMultiplier(attacker, target); // Akatsuki / Anbu perks (v1.56)
   } else if (target?.typeId === "minecraft:player" && BOSS_TYPES.has(attacker?.typeId)) {

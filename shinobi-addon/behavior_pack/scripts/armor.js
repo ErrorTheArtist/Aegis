@@ -325,7 +325,7 @@ export function initArmor(helpers) {
     if (damagingEntity?.typeId !== "minecraft:player" || !api.isValid(hitEntity)) return;
     const chance = has(damagingEntity, "lightningFists")[0];
     if (!chance || Math.random() > chance || !api.canBeHit(hitEntity, damagingEntity)) return;
-    api.hurt(hitEntity, 4, damagingEntity, "lightning");
+    api.hurt(hitEntity, 4, damagingEntity, "lightning", "onhit"); // (melee: v1.60)
     api.particle(hitEntity.dimension, "aegis:chidori", { x: hitEntity.location.x, y: hitEntity.location.y + 1, z: hitEntity.location.z });
     api.sound(hitEntity.dimension, "ambient.weather.lightning.impact", hitEntity.location, 0.4, 1.8);
     try {

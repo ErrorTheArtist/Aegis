@@ -47,7 +47,7 @@ const P = { level: "aegis:level", xp: "aegis:xp", points: "aegis:points", slot: 
 export const STATS = {
   vitality: { name: "Vitality", color: "§c", desc: "+4 max HP every 3 points (on top of the HP your level gives)" },
   chakra: { name: "Chakra", color: "§b", desc: "+2 max chakra and +0.5% chakra regen per point" },
-  taijutsu: { name: "Taijutsu", color: "§6", desc: "Strength (+3 melee damage) every 25 points, and +1% damage for punch combos and taijutsu scrolls per point" },
+  taijutsu: { name: "Taijutsu", color: "§6", desc: "Strength (+3 melee damage) every 50 points (up to Strength III), and +1% damage for punch combos and taijutsu scrolls per point" },
   ninjutsu: { name: "Ninjutsu", color: "§d", desc: "+1% damage for jutsu, clan abilities and sword specials per point" },
   agility: { name: "Agility", color: "§a", desc: "Speed every 25 points (up to Speed IV), and -0.25% jutsu cooldowns per point" },
   endurance: { name: "Endurance", color: "§7", desc: "Shrug off 0.2% of all damage taken per point (up to 30%)" },
@@ -96,6 +96,28 @@ export const HP_LEVEL_CAP = 256;
 export const hpLevels = (player) => Math.floor((getLevel(player) - 1) * 0.69) + Math.floor(getStat(player, "vitality") / 3);
 // Everything a shinobi does hits harder as they level: ×1 at level 1 → ×9.97 at level 300.
 export const levelDamageFactor = (player) => (player?.typeId === "minecraft:player" ? 1 + (getLevel(player) - 1) * 0.03 : 1);
+// v1.60: melee — punches, blades and what rides on them (Gentle Fist, Lightning Armour, Tailed Beast Mode's punches) —
+// grows half as fast as jutsu: +1.5% per level (×5.49 at 300 instead of ×9.97). The server's admins can scale it further
+// (Admin Panel → Server Settings, or /scriptevent aegis:melee <percent>).
+export const MELEE_PER_LEVEL = 0.015;
+const MELEE_PROP = "aegis:melee_pct";
+export const MELEE_RANGE = [25, 200];
+export function meleePercent() {
+  try {
+    const v = world.getDynamicProperty(MELEE_PROP);
+    return typeof v === "number" && Number.isFinite(v) ? Math.max(MELEE_RANGE[0], Math.min(MELEE_RANGE[1], v)) : 100;
+  } catch {
+    return 100;
+  }
+}
+export function setMeleePercent(n) {
+  const v = Math.max(MELEE_RANGE[0], Math.min(MELEE_RANGE[1], Math.round(Number(n) || 100)));
+  world.setDynamicProperty(MELEE_PROP, v === 100 ? undefined : v);
+  world.sendMessage(`§6Combat:§7 players' melee damage is now §f${v}%§7 of normal.`);
+  return v;
+}
+export const meleeDamageFactor = (player) =>
+  player?.typeId === "minecraft:player" ? ((1 + (getLevel(player) - 1) * MELEE_PER_LEVEL) * meleePercent()) / 100 : 1;
 // …and the bosses hit higher-level shinobi harder (×1 → ×6.98 at level 300), though HP grows faster.
 export const bossDamageFactor = (target) => (target?.typeId === "minecraft:player" ? 1 + (getLevel(target) - 1) * 0.02 : 1);
 
@@ -126,7 +148,7 @@ export const cooldownMultiplier = (player) => (1 - getStat(player, "agility") * 
 export function statEffectLevels(player) {
   return {
     health_boost: Math.min(HP_LEVEL_CAP, hpLevels(player) + titleHpLevels(player, hpLevels(player))), // 1 level = +4 HP (Naruto's title: +10%)
-    strength: Math.floor(getStat(player, "taijutsu") / 25),
+    strength: Math.floor(getStat(player, "taijutsu") / 50), // v1.60: every 50 points (was 25), so Strength III at most
     speed: Math.floor(Math.min(100, getStat(player, "agility")) / 25),
   };
 }
@@ -419,6 +441,16 @@ export function initLevels(helpers) {
   system.runInterval(() => {
     for (const p of world.getAllPlayers()) ensureRecord(p);
   }, 40);
+
+  // /scriptevent aegis:melee [percent]   — players' melee damage (25-200%, 100 = normal); no number shows it
+  system.afterEvents.scriptEventReceive.subscribe(({ id, message, sourceEntity }) => {
+    if (id !== "aegis:melee") return;
+    const n = Number(String(message ?? "").trim());
+    if (String(message ?? "").trim() && Number.isFinite(n)) return void setMeleePercent(n);
+    const t = `§6Combat:§7 players' melee damage is §f${meleePercent()}%§7 of normal. Change it: §f/scriptevent aegis:melee <${MELEE_RANGE.join("-")}>`;
+    if (sourceEntity?.typeId === "minecraft:player") sourceEntity.sendMessage(t);
+    else world.sendMessage(t);
+  });
 
   system.afterEvents.scriptEventReceive.subscribe(({ id, message, sourceEntity }) => {
     if (sourceEntity?.typeId !== "minecraft:player") return;

@@ -21,7 +21,7 @@ export const TOPICS = [
   ]],
   ["§eLevels & stats", [
     "• Levels go to §f300§r. Every level gives 3 stat points to spend in Shinobi Record → Stats (each stat goes to 150).",
-    "• Your §fhealth§r grows with your level and Vitality — up to 1,044 HP. Your §fdamage§r grows with your level too (×10 at 300).",
+    "• Your §fhealth§r grows with your level and Vitality — up to 1,044 HP. Your §fdamage§r grows with your level too — jutsu ×10 at level 300, melee (punches and blades) ×5.5.",
     "• Out of a fight you heal 1% of your health every second.",
     "• §fXP Shards§r (dropped by bosses, paid by quests) give a third of a level each — sneak + right-click to absorb a whole stack.",
     "• XP comes from kills, jutsu, quests, missions, daily missions and the story.",

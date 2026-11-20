@@ -19,6 +19,7 @@
 // Mastering the beast turns the cloak into its golden Tailed Beast Chakra Mode form.
 
 import { world, system, ItemStack, ItemLockMode } from "@minecraft/server";
+import { beastXp } from "./dmgutil.js";
 import { mayFight } from "./grace.js";
 import { rampageHolder, rampageText } from "./rampage.js";
 import { npcSealed } from "./jutsu4.js";
@@ -64,7 +65,7 @@ const CLOAK_PERKS = {
 const SHROUD_HEARTS = { normal: 2, mastered: 4 };
 
 // Boss damage scales with tail count.
-const pw = (b, base) => Math.round(base * (1.3 + b.tails * 0.09));
+const pw = (b, base) => Math.round(base * (1.3 + b.tails * 0.09) * 1.5); // (v1.61: ×1.5 — the beasts hit much harder)
 
 let api;
 const bossState = new Map(); // entity id -> { next, enraged }
@@ -1282,7 +1283,7 @@ function sealRitual(sealer, beast, target) {
       beast.remove();
       api.particle(target.dimension, "aegis:beast_burst", api.add(target.location, { x: 0, y: 1, z: 0 }), GOLD);
       sealInto(target, id, sealer);
-      gainXp(sealer, maxHp * 3);
+      gainXp(sealer, beastXp(maxHp)); // (v1.61: twice the old XP, not four times)
     }, t);
   }
 }
@@ -1322,7 +1323,7 @@ function startTrial(player, id) {
     e.setDynamicProperty("aegis:trial_of", player.id);
     try {
       const hc = e.getComponent("minecraft:health");
-      hc.setCurrentValue(Math.round(hc.effectiveMax * 0.6));
+      hc.setCurrentValue(Math.round(hc.effectiveMax * 0.15)); // (60% of its pre-v1.61 health: the trial stays as hard as it was)
     } catch {
       /* ignore */
     }

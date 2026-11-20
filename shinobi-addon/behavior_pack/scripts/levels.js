@@ -23,6 +23,7 @@ import { achievementsMenu, unlocked, ACH } from "./achievements.js";
 import { dailyMenu, dailyState } from "./dailies.js";
 import { eventXpMultiplier } from "./events.js";
 import { world, system, ItemStack, ItemLockMode } from "@minecraft/server";
+import { TAILED_BEAST_IDS, beastXp } from "./dmgutil.js";
 import { showTitle } from "./hud.js";
 import { ActionFormData, ModalFormData, MessageFormData } from "@minecraft/server-ui";
 import { applyNameTag, refreshClanEffects } from "./clans.js";
@@ -377,6 +378,7 @@ function killXp(dead) {
   if (dead.typeId === "minecraft:player") return 60 + getLevel(dead) * 6;
   try {
     const h = dead.getComponent("minecraft:health");
+    if (TAILED_BEAST_IDS.has(dead.typeId)) return beastXp(h.effectiveMax); // (v1.61: they're 4× tougher, worth 2× the XP)
     return Math.max(2, Math.round(h.effectiveMax * 3));
   } catch {
     return 5;

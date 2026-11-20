@@ -25,7 +25,7 @@ import { animSfx } from "./sfx.js";
 import { initM1 } from "./m1.js";
 import { spawnLayered } from "./particles.js";
 import { initLagClear } from "./lagclear.js";
-import { markScripted } from "./dmgutil.js";
+import { markScripted, capBeastHit } from "./dmgutil.js";
 import { initStarter, startStarterQuests, noteCast } from "./starter.js";
 import { initEdoTensei, handleEdoUse } from "./edotensei.js";
 import { beginNatureRoll } from "./natures.js";
@@ -141,6 +141,7 @@ function hurt(target, amount, attacker, cause = "entityAttack", kind = "tech") {
   } else if (target?.typeId === "minecraft:player" && BOSS_TYPES.has(attacker?.typeId)) {
     amount *= bossDamageFactor(target); // bosses stay dangerous for high-level shinobi
   }
+  amount = capBeastHit(target, amount); // v1.61: Tailed Beasts can't be one-shot (at most 4% of their health a hit)
   markScripted(target, attacker, cause, kind); // so the M1 combo doesn't mistake this for a punch
   try {
     target.applyDamage(amount, { cause, damagingEntity: attacker });

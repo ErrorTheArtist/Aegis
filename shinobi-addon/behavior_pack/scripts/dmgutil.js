@@ -12,6 +12,24 @@
 import { system } from "@minecraft/server";
 
 const echoes = new Map(); // entity id -> { tick, bonus, total } of the last boosted hit
+
+// v1.61: no single hit can take more than 4% of a Tailed Beast's (or the Ten-Tails') health — they can't be one-shot:
+// at least 25 hits, however strong the shinobi. (main.js hurt() and the M1 combo apply it before the hit lands.)
+export const TAILED_BEAST_IDS = new Set(["shukaku", "matatabi", "isobu", "son_goku", "kokuo", "saiken", "chomei", "gyuki", "kurama", "juubi"]
+  .map((b) => `aegis:${b}`));
+export const BEAST_HIT_CAP = 0.04;
+export function capBeastHit(target, amount) {
+  if (!TAILED_BEAST_IDS.has(target?.typeId)) return amount;
+  try {
+    const max = target.getComponent("minecraft:health")?.effectiveMax;
+    return max > 0 ? Math.min(amount, max * BEAST_HIT_CAP) : amount;
+  } catch {
+    return amount;
+  }
+}
+// XP for defeating (or sealing) a Tailed Beast: 1.5 per point of health — twice what it gave before v1.61 quadrupled
+// their health (everything else gives 3 per point).
+export const beastXp = (maxHp) => Math.max(2, Math.round(maxHp * 1.5));
 const scripted = new Map(); // entity id -> { tick, by, cause, kind } of the last scripted hit
 
 export function markScripted(target, attacker, cause, kind) {

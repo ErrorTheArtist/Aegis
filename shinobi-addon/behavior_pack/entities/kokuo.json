@@ -16,8 +16,8 @@
         ]
       },
       "minecraft:health": {
-        "value": 1750,
-        "max": 1750
+        "value": 7000,
+        "max": 7000
       },
       "minecraft:boss": {
         "hud_range": 60,
@@ -48,7 +48,7 @@
         "value": 1.0
       },
       "minecraft:attack": {
-        "damage": 20
+        "damage": 30
       },
       "minecraft:follow_range": {
         "value": 64,

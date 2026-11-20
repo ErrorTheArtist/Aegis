@@ -678,7 +678,7 @@ for bid, b in BEASTS.items():
 
     tails = b["tails"] if bid != "chomei" else 7
     juubi = bid == "juubi"
-    hp = 5000 if juubi else 500 + tails * 250
+    hp = 20000 if juubi else (500 + tails * 250) * 4   # v1.61: four times as tough (Shukaku 3,000 … Kurama 11,000)
     width = round(max(b["W"], 24) / 16 + 0.6, 2)
     height = round((b["legH"] + b["H"]) / 16 + 0.6, 2)
     comps = {
@@ -694,7 +694,7 @@ for bid, b in BEASTS.items():
         "minecraft:physics": {},
         "minecraft:pushable": {"is_pushable": False, "is_pushable_by_piston": False},
         "minecraft:knockback_resistance": {"value": 1.0},
-        "minecraft:attack": {"damage": 26 if juubi else int(10 + tails * 2)},
+        "minecraft:attack": {"damage": 39 if juubi else int((10 + tails * 2) * 1.5)},   # v1.61: ×1.5
         "minecraft:follow_range": {"value": 64, "max": 64},
         "minecraft:persistent": {},
         "minecraft:nameable": {},

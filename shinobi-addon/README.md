@@ -12,7 +12,7 @@ Uses the real Naruto names (Rasengan, Shadow Clone Jutsu, etc.) — personal use
 - **Things to do** — [Story](#story-the-path-of-the-shinobi-v156) · [Factions](#factions-akatsuki--anbu-v156) · [Bingo Book](#bingo-book-v155) · [Achievements](#achievements-v155) · [Daily missions](#daily-missions--login-streak-v155) · [World events](#world-events-v155)
 - **The world** — [Tailed Beasts](#tailed-beasts-bosses) · [NPCs](#npcs) · [Legendary bosses](#legendary-bosses-npc-spawner-only) · [Enemies](#enemies) · [Fast Travel](#fast-travel)
 - **For admins** — [Admin Panel](#admin-panel-v156) · [Economy](#economy-v158) · [Grace period](#grace-period-no-pvp) · [Lag clear](#lag-clear) · [Vanilla items](#vanilla-items-v154)
-- **What's new** — [v1.60](#melee-damage-nerfed-v160) · [v1.59](#grace-period-no-pvp-enemies-only-fight-back-v159) · [v1.58](#everything-costs-more-quests-pay-less-v158) · [v1.57](#the-leaf-weaponsmith-and-the-leaf-genin-remodelled-v157) · [v1.56](#story-factions-the-kaguya-clan-and-an-admin-panel-v156) and every version before it, at the end
+- **What's new** — [v1.61](#the-tailed-beasts-are-strong-v161) · [v1.60](#melee-damage-nerfed-v160) · [v1.59](#grace-period-no-pvp-enemies-only-fight-back-v159) · [v1.58](#everything-costs-more-quests-pay-less-v158) · [v1.57](#the-leaf-weaponsmith-and-the-leaf-genin-remodelled-v157) · [v1.56](#story-factions-the-kaguya-clan-and-an-admin-panel-v156) and every version before it, at the end
 
 ## Install
 
@@ -234,7 +234,8 @@ You start at **Level 1**; the max is **Level 300** (v1.54). Each level gives **3
 - **Out of a fight** (not hit for 8 seconds) you heal **1% of your max HP every second**.
 
 **XP sources**
-- Kills: 3 XP per point of the victim's max health (zombie ≈ 60, Kurama ≈ 8,250)
+- Kills: 3 XP per point of the victim's max health (zombie ≈ 60); Tailed Beasts 1.5 per point (Kurama 16,500, the
+  Ten-Tails 30,000)
 - Player kills: 60 + 6 × their level
 - Casting any jutsu, clan ability or sword special: 3 + half its chakra cost
 - **XP Shards** (see below) and **quests** — the Quest Board's premade quests are worth several levels each
@@ -705,19 +706,24 @@ tails built from chained segments so a wave travels down each one instead of the
 
 Attacks come every ~2–4.5 seconds (faster with more tails, ~40% faster when enraged), and damage scales with tails.
 
+**They're tough (v1.61):** four times the health they had, and their melee and jutsu hit **1.5× harder**. And **no single
+hit can take more than 4% of a beast's health** — a jutsu, a sword special or a sword swing, however strong the shinobi —
+so none of them can be one-shot: it takes at least 25 hits (more through their Resistance). Defeating one is worth
+twice the XP it used to be.
+
 | Beast | Health | Melee | Special |
 |---|---|---|---|
-| Shukaku (1) | 750 | 12 | Sand Coffin: traps you in sand, then crushes |
-| Matatabi (2) | 1000 | 14 | Blue fire breath (cone) |
-| Isobu (3) | 1250 | 16 | Coral shockwave rings, slows |
-| Son Goku (4) | 1500 | 18 | Lava rain around you |
-| Kokuo (5) | 1750 | 20 | Steam-powered charge |
-| Saiken (6) | 2000 | 22 | Acid mist: poison + weakness |
-| Chomei (7) | 2250 | 24 | Flies up and showers blinding scale powder |
-| Gyuki (8) | 2500 | 26 | Ink spray: blindness + slowness |
-| Kurama (9) | 2750 | 28 | Chakra roar: huge knockback, fire, weakness |
+| Shukaku (1) | 3,000 | 18 | Sand Coffin: traps you in sand, then crushes |
+| Matatabi (2) | 4,000 | 21 | Blue fire breath (cone) |
+| Isobu (3) | 5,000 | 24 | Coral shockwave rings, slows |
+| Son Goku (4) | 6,000 | 27 | Lava rain around you |
+| Kokuo (5) | 7,000 | 30 | Steam-powered charge |
+| Saiken (6) | 8,000 | 33 | Acid mist: poison + weakness |
+| Chomei (7) | 9,000 | 36 | Flies up and showers blinding scale powder |
+| Gyuki (8) | 10,000 | 39 | Ink spray: blindness + slowness |
+| Kurama (9) | 11,000 | 42 | Chakra roar: huge knockback, fire, weakness |
 
-Bring good armor, Soldier Pills and friends.
+Bring good armor, Soldier Pills and friends — really.
 
 **Summon:** use a **Tailed Beast Summoning Scroll** (the S-rank mission reward, a rare Akatsuki drop, or — very rarely —
 the Travelling Merchant's, Lv 50, 10,800 Ryō). A random beast is released 8 blocks in front of you after a short ritual
@@ -734,7 +740,7 @@ the seal doesn't count.
 ### The Ten-Tails (v1.54)
 
 The strongest beast of all: a hulking grey beast on long clawed arms, a crown of horns around **one huge
-Rinne-Sharingan eye**, a fanged maw, spikes down its spine and ten great tails. **5,000 HP**, boss bar, its own moves:
+Rinne-Sharingan eye**, a fanged maw, spikes down its spine and ten great tails. **20,000 HP** (v1.61; no hit takes more than 4% of it), boss bar, its own moves:
 
 - **Giant Tailed Beast Bomb** — a long charge at its mouth, then a bomb with a 9-block blast
 - **Tail Slam** — it rears up and slams; a shockwave through everything within 9 blocks (get away when it rears!)
@@ -1512,6 +1518,16 @@ hoes, food, farming, building, crafting.
 ```
 
 The timers start when the server starts. The times are the constants at the top of `behavior_pack/scripts/lagclear.js`.
+
+## The Tailed Beasts are strong (v1.61)
+
+- **Four times the health**: Shukaku 3,000 … Kurama 11,000; the Ten-Tails 20,000.
+- **They hit 1.5× harder** — melee, Tailed Beast Bombs, their specials and the Ten-Tails' attacks (and, as before, harder
+  still against high-level shinobi).
+- **No more one-shots**: no single hit — jutsu, sword special or sword swing — can take more than **4%** of a beast's
+  health, so every beast takes at least 25 hits.
+- Defeating (or sealing) one is worth **twice** the XP it was. A Jinchūriki's mastery trial is as hard as before (the dark
+  half starts at the same health).
 
 ## Melee damage nerfed (v1.60)
 

@@ -8,7 +8,7 @@
 
 import { world, system } from "@minecraft/server";
 import { getStat, meleeDamageFactor } from "./levels.js";
-import { boostHit, isEcho, healBack, scriptedHit } from "./dmgutil.js";
+import { boostHit, isEcho, healBack, scriptedHit, capBeastHit } from "./dmgutil.js";
 import { bijuuMeleeBonus } from "./bijuu.js";
 
 const WINDOW = 28; // ticks between hits to keep the combo going
@@ -55,7 +55,7 @@ function onHit(player, target, damage) {
   // A bigger hit is applied as (this hit + bonus) so it lands inside the hurt cooldown; a weaker one is healed back.
   const bonus = Math.round(move.bonus * (blade ? 1 : 1 + getStat(player, "taijutsu") / 100));
   // …and in Tailed Beast Mode every hit carries the beast's chakra
-  const total = (damage + bonus + bijuuMeleeBonus(player, target)) * meleeDamageFactor(player); // (v1.60: half the jutsu growth)
+  const total = capBeastHit(target, (damage + bonus + bijuuMeleeBonus(player, target)) * meleeDamageFactor(player)); // (v1.60: half the jutsu growth; v1.61: beasts capped)
   if (total > damage) boostHit(target, damage, total, player);
   else healBack(target, damage - total);
 

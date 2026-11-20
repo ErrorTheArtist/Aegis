@@ -21,7 +21,7 @@ const NAME = "§4The Ten-Tails§r";
 const COLOR = [0.8, 0.12, 0.18];
 const WOOD = [0.45, 0.32, 0.18];
 const DIMENSIONS = ["overworld", "nether", "the_end"];
-const POWER = 2.4; // its hits next to a nine-tails' (Kurama hits ×2.11)
+const POWER = 3.6; // its hits next to a nine-tails' (Kurama hits ×3.17) — v1.61: ×1.5
 const pw = (base) => Math.round(base * POWER);
 
 let api;

@@ -42,7 +42,7 @@ export const TOPICS = [
   ["§cBosses", [
     "• §fLegendary shinobi§r (19 of them) stand by their spawners and wait. §fTalk to one§r to accept its challenge — it shows the reward first.",
     "• The §fAkatsuki§r roam the world now and then and hunt Jinchūriki.",
-    "• §fTailed Beasts§r: only one can rampage at a time. The §fTen-Tails§r only comes from its spawn egg.",
+    "• §fTailed Beasts§r are the toughest fights in the world — thousands of HP, and no hit takes more than 4% of it. Only one can rampage at a time; the §fTen-Tails§r only comes from its spawn egg.",
     "• Bosses hit harder the higher your level, so they stay a challenge. They drop scrolls, swords, Ryō and XP Shards.",
     "• The raid bosses (Edo Madara, Hashirama, Obito, Kaguya) are meant for groups.",
   ]],

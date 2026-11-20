@@ -203,6 +203,13 @@ function kageHolders() {
   }
 }
 
+// The most honored shinobi of every village together (from each village's top five).
+export function topHonor(n = 5) {
+  const s = readStats();
+  return Object.keys(VILLAGES).flatMap((v) => s[v].top.map(([name, honor]) => ({ name, honor, village: v })))
+    .sort((a, b) => b.honor - a.honor).slice(0, n);
+}
+
 export function leaderboardText() {
   const s = readStats();
   const kages = kageHolders();

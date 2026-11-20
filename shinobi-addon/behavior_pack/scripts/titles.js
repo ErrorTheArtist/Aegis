@@ -1,4 +1,6 @@
-// Titles (v1.54) — Pain, Itachi of the Sharingan, Tobi, Sasuke and Naruto.
+// Titles (v1.54) — Pain, Itachi of the Sharingan, Tobi, Sasuke and Naruto; v1.62: the Toad Sage, the Slug Princess, the
+// White Snake, the Yellow Flash, the Green Beast, the Copy Ninja, the Sage of Six Paths and Madara's Heir. A player
+// holds ONE title of legend at a time (v1.62): granting another replaces it.
 // A server admin grants one with the tag command once a player has earned it:
 //   /tag <player> add pain        (or itachi, tobi, sasuke, naruto)
 // The holder gets the title's reward gear — creative-only items nobody can get any other way, kept on death — its
@@ -11,7 +13,11 @@ import { world, system, ItemStack } from "@minecraft/server";
 import { ActionFormData } from "@minecraft/server-ui";
 import { showTitle } from "./hud.js";
 import { impactFx, chargeFx, shake, sfx } from "./cinematic.js";
-import { getLevel } from "./levels.js";
+import { getLevel, getStat } from "./levels.js";
+import { getKage, sanninOf } from "./armor.js";
+import { achStats, unlocked, ACH } from "./achievements.js";
+import { storyState } from "./story.js";
+import { makeLegendJutsu, makeLegendSpecials } from "./legend_titles.js";
 import { getVillage, everLeft, rogueOf, getHonor } from "./villages.js";
 import { hasSageTraining } from "./sage.js";
 import { kamuiHolder } from "./kamui.js";
@@ -55,6 +61,27 @@ const clanOf = (p) => {
   }
 };
 
+const prop = (p, k) => {
+  try {
+    return p.getDynamicProperty(k);
+  } catch {
+    return undefined;
+  }
+};
+const beaten = (p, key, id) => (achStats(p)[key] ?? []).includes(id); // a legend / Akatsuki member this player has defeated
+const jutsuKnown = (p) => (achStats(p).jutsu ?? []).length; // different jutsu cast
+const knows = (p, id) => (achStats(p).jutsu ?? []).includes(id);
+const wasKage = (p) => prop(p, "aegis:was_kage") === true || !!getKage(p);
+const COUNTS = "aegis:jutsu_counts"; // jutsu id -> times cast (since v1.62)
+function counts(p) {
+  try {
+    return JSON.parse(p.getDynamicProperty(COUNTS) ?? "{}");
+  } catch {
+    return {};
+  }
+}
+export const castCount = (p, id) => counts(p)[id] ?? 0;
+
 // requirement: [text, check(player) → bool, or null when an admin has to judge it]
 const R = {
   lvl300: ["Reach Level 300", (p) => getLevel(p) >= 300],
@@ -64,6 +91,7 @@ const R = {
   kage: ["Defeat a Kage-rank player", (p) => !!pvpRecord(p).kage],
   bounty2: ["Have a bounty of at least 2 Million Ryō", (p) => bountyOf(p) >= 2000000],
 };
+const STAY = ["Stay in your village (never leave it)", (p) => !everLeft(p) && !!getVillage(p)];
 export const TITLES = {
   pain: {
     name: "§5Pain", short: "§5Pain",
@@ -72,6 +100,7 @@ export const TITLES = {
       ["Must have the Ōtsutsuki Clan", (p) => clanOf(p) === "otsutsuki"]],
     rewards: ["aegis:advanced_rinnegan", "aegis:adv_shinra_tensei_scroll", "aegis:adv_chibaku_tensei_scroll", "aegis:chakra_rod"],
     perks: "+15% damage vs groups (2 or more enemies near your target)",
+    goal: ["bounty", 5000000],
   },
   itachi: {
     name: "§cItachi of the Sharingan", short: "§cItachi",
@@ -79,6 +108,7 @@ export const TITLES = {
       ["Must be a part of the Hidden Leaf before leaving it", (p) => rogueOf(p) === "leaf"], R.kage, R.bounty2],
     rewards: ["aegis:tsukuyomi_scroll", "aegis:amaterasu_scroll", "aegis:susanoo_scroll", "aegis:totsuka_blade"],
     perks: "+15% genjutsu strength · immune to one debuff every 45 seconds",
+    goal: ["bounty", 2000000],
   },
   tobi: {
     name: "§6Tobi", short: "§6Tobi",
@@ -86,12 +116,14 @@ export const TITLES = {
       ["Defeat a Jōnin-rank feared and respected player", (p) => !!pvpRecord(p).jonin], R.bounty2],
     rewards: ["aegis:tobi_mask", "aegis:gunbai", "aegis:kamui_shuriken_scroll"],
     perks: "Kamui cooldown −30% · +10% jutsu damage",
+    goal: ["bounty", 2000000],
   },
   sasuke: {
     name: "§9Sasuke", short: "§9Sasuke",
     reqs: [R.lvl300, R.ms, R.left, R.kills, R.kage, R.bounty2],
     rewards: ["aegis:kusanagi_v2", "aegis:indra_arrow_scroll", "aegis:chidori_nagashi_scroll", "aegis:perfect_susanoo_scroll"],
     perks: "+15% lightning jutsu damage · +10% movement speed",
+    goal: ["bounty", 2000000],
   },
   naruto: {
     name: "§6Naruto", short: "§6Naruto",
@@ -107,6 +139,75 @@ export const TITLES = {
       R.kills, ["Have 3 Million Honor", (p) => getHonor(p) >= 3000000]],
     rewards: ["aegis:orange_sage_coat", "aegis:rasenshuriken_v2_scroll", "aegis:tailed_beast_bomb_scroll", "aegis:six_paths_sage_scroll"],
     perks: "+15% chakra regen · +10% max HP",
+    goal: ["honor", 3000000],
+  },
+  // ---- v1.62 ----------------------------------------------------------------------------------------------------------
+  toad_sage: {
+    name: "§aThe Toad Sage", short: "§aToad Sage",
+    reqs: [R.lvl300, ["Master Sage Mode", (p) => hasSageTraining(p)], ["Carry Jiraiya's legacy (a Sannin named with his set)", (p) => sanninOf(p) === "jiraiya"],
+      STAY, ["Defeat Jiraiya and Pain", (p) => beaten(p, "legends", "jiraiya") && beaten(p, "akatsuki", "pain")],
+      ["Complete 1,000 missions", (p) => missionsDone(p) >= 1000], ["Have 3 Million Honor", (p) => getHonor(p) >= 3000000]],
+    rewards: ["aegis:gamabunta_scroll", "aegis:goemon_scroll", "aegis:toad_contract"],
+    perks: "Sage Mode lasts twice as long · +20% fire and wind jutsu damage · +25% chakra regen",
+    goal: ["honor", 3000000],
+  },
+  slug_princess: {
+    name: "§2The Slug Princess", short: "§2Slug Princess",
+    reqs: [R.lvl300, ["Must have the Senju Clan", (p) => clanOf(p) === "senju"], ["Carry Tsunade's legacy (a Sannin named with her set)", (p) => sanninOf(p) === "tsunade"],
+      ["Learn Mystical Palm and Hundred Healings", (p) => knows(p, "aegis:mystical_palm_scroll") && knows(p, "aegis:hundred_healings_scroll")],
+      ["Cast healing jutsu 300 times (since v1.62)", (p) => castCount(p, "aegis:mystical_palm_scroll") + castCount(p, "aegis:hundred_healings_scroll") >= 300],
+      STAY, ["Have 1 Million Honor", (p) => getHonor(p) >= 1000000]],
+    rewards: ["aegis:hundred_seal_scroll", "aegis:katsuyu_scroll", "aegis:tsunade_necklace"],
+    perks: "Creation Rebirth — when your health drops below 25% it's restored to 60% (every 5 minutes) · out-of-fight healing ×2 · +20% melee damage",
+    goal: ["honor", 1000000],
+  },
+  white_snake: {
+    name: "§5The White Snake", short: "§5White Snake",
+    reqs: [R.lvl300, R.left, ["Carry Orochimaru's legacy (a Sannin named with his set)", (p) => sanninOf(p) === "orochimaru"],
+      ["Defeat Orochimaru", (p) => beaten(p, "legends", "orochimaru")], ["Learn 50 different jutsu", (p) => jutsuKnown(p) >= 50],
+      ["Have a bounty of at least 3 Million Ryō", (p) => bountyOf(p) >= 3000000]],
+    rewards: ["aegis:eight_branches_scroll", "aegis:snake_rebirth_scroll", "aegis:long_kusanagi"],
+    perks: "Every melee hit poisons · immune to poison · Shed Skin — when your health drops below 15% you're healed to full (every 30 minutes)",
+    goal: ["bounty", 3000000],
+  },
+  yellow_flash: {
+    name: "§eThe Yellow Flash", short: "§eYellow Flash",
+    reqs: [R.lvl300, ["Have been a Kage", (p) => wasKage(p)], STAY, ["Cast Flying Thunder God 300 times (since v1.62)", (p) => castCount(p, "aegis:flying_raijin_scroll") >= 300],
+      ["Defeat Obito", (p) => beaten(p, "legends", "obito")], ["Have 2 Million Honor", (p) => getHonor(p) >= 2000000]],
+    rewards: ["aegis:raijin_strike_scroll", "aegis:rasengan_barrage_scroll", "aegis:minato_kunai", "aegis:hokage_haori"],
+    perks: "+30% movement speed · teleports and dashes recharge twice as fast · your first hit after a teleport deals double damage",
+    goal: ["honor", 2000000],
+  },
+  green_beast: {
+    name: "§aThe Green Beast", short: "§aGreen Beast",
+    reqs: [R.lvl300, ["Reach 150 Taijutsu", (p) => getStat(p, "taijutsu") >= 150], ["Defeat Might Guy and Madara", (p) => beaten(p, "legends", "guy") && beaten(p, "legends", "madara")],
+      R.kills, ["Open the Eight Gates 100 times (since v1.62)", (p) => castCount(p, "aegis:eight_gates_scroll") >= 100], ["Complete 500 missions", (p) => missionsDone(p) >= 500]],
+    rewards: ["aegis:night_guy_scroll", "aegis:evening_elephant_scroll", "aegis:guy_nunchaku", "aegis:green_jumpsuit"],
+    perks: "+35% melee damage · the combo finisher hits 50% harder · +1 level of Strength and Speed",
+  },
+  copy_ninja: {
+    name: "§7The Copy Ninja", short: "§7Copy Ninja",
+    reqs: [R.lvl300, ["Learn 60 different jutsu", (p) => jutsuKnown(p) >= 60], ["Defeat Kakashi and Obito", (p) => beaten(p, "legends", "kakashi") && beaten(p, "legends", "obito")],
+      ["Cast Raikiri 300 times (since v1.62)", (p) => castCount(p, "aegis:raikiri_scroll") >= 300], ["Complete 2,000 missions", (p) => missionsDone(p) >= 2000], STAY],
+    rewards: ["aegis:kamui_raikiri_scroll", "aegis:lightning_hound_v2_scroll", "aegis:icha_icha", "aegis:kakashi_mask"],
+    perks: "Every jutsu costs 20% less chakra · your three most-used jutsu hit 20% harder",
+  },
+  six_paths: {
+    name: "§6The Sage of Six Paths", short: "§6Six Paths",
+    reqs: [R.lvl300, ["Master a Tailed Beast sealed inside you", (p) => prop(p, "aegis:bijuu_mastered") === true],
+      ["Defeat Kaguya and the Ten-Tails", (p) => beaten(p, "legends", "kaguya") && (achStats(p).juubi ?? 0) >= 1], ["Master Sage Mode", (p) => hasSageTraining(p)],
+      ["Unlock every achievement", (p) => unlocked(p).size >= ACH.length], ["Finish the Path of the Shinobi", (p) => storyState(p).done === true],
+      ["Have held two other titles of legend", (p) => list(p, REWARDED).filter((id) => id !== "six_paths").length >= 2]],
+    rewards: ["aegis:truth_seeking_scroll", "aegis:six_paths_mode_scroll", "aegis:six_paths_staff"],
+    perks: "+25% damage · the Truth-Seeking Orbs block one hit every 10 seconds · Jump Boost and slow falling · immune to every debuff",
+  },
+  madara_heir: {
+    name: "§4Madara's Heir", short: "§4Madara's Heir",
+    reqs: [R.lvl300, ["Own the Eternal Mangekyō Sharingan", (p) => prop(p, "aegis:eternal_mangekyo") === true], R.left,
+      ["Defeat Madara", (p) => beaten(p, "legends", "madara")], ["Have a bounty of at least 5 Million Ryō", (p) => bountyOf(p) >= 5000000], R.kage],
+    rewards: ["aegis:susanoo_v2_scroll", "aegis:tengai_shinsei_scroll", "aegis:gunbai_v2"],
+    perks: "Susanoo costs half the chakra · +20% fire jutsu damage · enemies near you take 10% more damage from everyone",
+    goal: ["bounty", 5000000],
   },
 };
 export const TITLE_IDS = Object.keys(TITLES);
@@ -120,6 +221,19 @@ const ITEM_NAMES = {
   "aegis:orange_sage_coat": "Orange Sage Coat", "aegis:rasenshuriken_v2_scroll": "Rasenshuriken V2 Scroll",
   "aegis:tailed_beast_bomb_scroll": "Tailed Beast Bomb V2 Scroll", "aegis:six_paths_sage_scroll": "Six Paths Sage Mode Scroll (half)",
 };
+Object.assign(ITEM_NAMES, {
+  "aegis:gamabunta_scroll": "Summoning: Gamabunta Scroll", "aegis:goemon_scroll": "Sage Art: Goemon Scroll", "aegis:toad_contract": "Toad Summoning Contract",
+  "aegis:hundred_seal_scroll": "Strength of a Hundred Seal Scroll", "aegis:katsuyu_scroll": "Summoning: Katsuyu Scroll", "aegis:tsunade_necklace": "Tsunade's Necklace",
+  "aegis:eight_branches_scroll": "Eight Branches Technique Scroll", "aegis:snake_rebirth_scroll": "White Snake Rebirth Scroll", "aegis:long_kusanagi": "Kusanagi Long Sword",
+  "aegis:raijin_strike_scroll": "Flying Thunder God: Strike Scroll", "aegis:rasengan_barrage_scroll": "Rasengan Barrage Scroll", "aegis:minato_kunai": "Minato's Tri-Pronged Kunai",
+  "aegis:hokage_haori": "Fourth Hokage's Haori",
+  "aegis:night_guy_scroll": "Eight Gates: Night Guy Scroll", "aegis:evening_elephant_scroll": "Evening Elephant Scroll", "aegis:guy_nunchaku": "Guy's Nunchaku",
+  "aegis:green_jumpsuit": "Green Beast Jumpsuit",
+  "aegis:kamui_raikiri_scroll": "Kamui Raikiri Scroll", "aegis:lightning_hound_v2_scroll": "Lightning Hound V2 Scroll", "aegis:icha_icha": "Icha Icha Tactics",
+  "aegis:kakashi_mask": "Kakashi's Mask",
+  "aegis:truth_seeking_scroll": "Truth-Seeking Orbs Scroll", "aegis:six_paths_mode_scroll": "Six Paths Sage Mode Scroll", "aegis:six_paths_staff": "Shakujō of the Six Paths",
+  "aegis:susanoo_v2_scroll": "Perfect Susanoo V2 Scroll", "aegis:tengai_shinsei_scroll": "Tengai Shinsei Scroll", "aegis:gunbai_v2": "Madara's Gunbai",
+});
 export const itemName = (id) => ITEM_NAMES[id] ?? id;
 // which title each reward belongs to (only that title's holder can use it)
 export const ITEM_TITLE = Object.fromEntries(TITLE_IDS.flatMap((t) => TITLES[t].rewards.map((it) => [it, t])));
@@ -143,21 +257,81 @@ const GENJUTSU = new Set(["aegis:hell_viewing_scroll", "aegis:tsukuyomi_scroll",
 const castWindow = new Map(); // player id -> { genjutsu: tick, lightning: tick }
 const rinnegan = new Map(); // player id -> tick the Advanced Rinnegan ends
 const sixPaths = new Map(); // player id -> tick Six Paths Sage Mode ends
+const sixPathsFull = new Map(); // player id -> tick the full Six Paths Sage Mode (+25% damage) ends
+const insight = new Map(); // player id -> tick the Copy Ninja's Icha Icha insight ends
+const TELEPORTS = new Set(["aegis:flying_raijin_scroll", "aegis:flash_scroll", "aegis:raijin_strike_scroll", "aegis:minato_kunai"]);
+const SUSANOO = new Set(["aegis:susanoo_scroll", "aegis:perfect_susanoo_scroll", "aegis:susanoo_v2_scroll"]);
 
 // Called by main.js whenever a jutsu is cast.
 export function noteTitleCast(player, itemId) {
   const w = castWindow.get(player.id) ?? {};
   if (GENJUTSU.has(itemId)) w.genjutsu = system.currentTick + 100;
   if (JUTSU_NATURE[itemId] === "lightning" || itemId === "aegis:indra_arrow_scroll" || itemId === "aegis:chidori_nagashi_scroll") w.lightning = system.currentTick + 100;
+  // v1.62: fire / wind (the Toad Sage, Madara's Heir), the last jutsu (the Copy Ninja), a teleport (the Yellow Flash)
+  if (JUTSU_NATURE[itemId] === "fire" || itemId === "aegis:goemon_scroll" || itemId === "aegis:tengai_shinsei_scroll") w.fire = system.currentTick + 100;
+  if (JUTSU_NATURE[itemId] === "wind" || itemId === "aegis:goemon_scroll") w.wind = system.currentTick + 100;
+  w.last = itemId;
+  w.lastTick = system.currentTick;
+  if (TELEPORTS.has(itemId)) w.teleport = system.currentTick + 100;
   castWindow.set(player.id, w);
+  try {
+    const c = counts(player);
+    c[itemId] = (c[itemId] ?? 0) + 1;
+    player.setDynamicProperty(COUNTS, JSON.stringify(c));
+  } catch {
+    /* ignore */
+  }
+}
+
+// A teleport just happened (the Minato kunai — the scrolls are noted by noteTitleCast).
+function noteTeleport(p) {
+  const w = castWindow.get(p.id) ?? {};
+  w.teleport = system.currentTick + 100;
+  castWindow.set(p.id, w);
+}
+// Madara's Heir: enemies within 8 blocks of the heir take 10% more damage (the heirs are listed every half second).
+let heirs = [];
+function heirAura(target) {
+  if (!heirs.length) return 1;
+  try {
+    for (const p of heirs) {
+      if (!api.isValid(p) || p.id === target.id || p.dimension.id !== target.dimension.id) continue;
+      if (target.typeId === "minecraft:player" && getVillage(target) && getVillage(target) === getVillage(p)) continue; // not their own people
+      if (Math.hypot(p.location.x - target.location.x, p.location.z - target.location.z) <= 8) return 1.1;
+    }
+  } catch {
+    /* ignore */
+  }
+  return 1;
+}
+// The Copy Ninja's three most-used jutsu.
+function topThree(p) {
+  return Object.entries(counts(p)).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([id]) => id);
+}
+
+// What every blow of a title holder gets — jutsu (through titleDamageMultiplier) and the M1 combo (m1.js) alike:
+// the Sage of Six Paths' +25%, Six Paths Sage Mode's +25%, the Yellow Flash's strike after a teleport (×2, once),
+// and Madara's Heir's aura on the target.
+export function titleStrikeMultiplier(attacker, target) {
+  let m = target ? heirAura(target) : 1;
+  if (attacker?.typeId !== "minecraft:player") return m;
+  const now = system.currentTick;
+  if (hasTitle(attacker, "six_paths")) m *= 1.25;
+  if ((sixPathsFull.get(attacker.id) ?? 0) > now) m *= 1.25;
+  const w = castWindow.get(attacker.id);
+  if (w && (w.teleport ?? 0) > now && hasTitle(attacker, "yellow_flash")) {
+    m *= 2;
+    w.teleport = 0;
+  }
+  return m;
 }
 
 // Extra damage from the attacker's titles (main.js hurt()).
-export function titleDamageMultiplier(attacker, target) {
-  if (attacker?.typeId !== "minecraft:player" || !titlesOf(attacker).length) return 1;
+export function titleDamageMultiplier(attacker, target, cause) {
+  let m = titleStrikeMultiplier(attacker, target);
+  if (attacker?.typeId !== "minecraft:player" || !titlesOf(attacker).length) return m;
   const now = system.currentTick;
   const w = castWindow.get(attacker.id) ?? {};
-  let m = 1;
   if (hasTitle(attacker, "pain")) {
     try {
       const crowd = target.dimension.getEntities({ location: target.location, maxDistance: 8 })
@@ -171,9 +345,28 @@ export function titleDamageMultiplier(attacker, target) {
   if (hasTitle(attacker, "tobi")) m *= 1.1;
   if (hasTitle(attacker, "itachi") && (w.genjutsu ?? 0) > now) m *= 1.15;
   if (hasTitle(attacker, "sasuke") && (w.lightning ?? 0) > now) m *= 1.15;
+  // v1.62
+  if (hasTitle(attacker, "toad_sage") && ((w.fire ?? 0) > now || (w.wind ?? 0) > now)) m *= 1.2;
+  if (hasTitle(attacker, "madara_heir") && ((w.fire ?? 0) > now || cause === "fire")) m *= 1.2;
+  if (hasTitle(attacker, "copy_ninja") && now - (w.lastTick ?? -1e9) < 100 && topThree(attacker).includes(w.last)) m *= 1.2;
   return m;
 }
-export const titleRegenMultiplier = (p) => (hasTitle(p, "naruto") ? 1.15 : 1) * ((sixPaths.get(p.id) ?? 0) > system.currentTick ? 2 : 1);
+// Melee only (the M1 combo, taijutsu and what rides on a hit): the Green Beast, the Slug Princess.
+export const titleMeleeMultiplier = (p) => (hasTitle(p, "green_beast") ? 1.35 : 1) * (hasTitle(p, "slug_princess") ? 1.2 : 1);
+export const titleFinisherMultiplier = (p) => (hasTitle(p, "green_beast") ? 1.5 : 1);
+// Chakra cost of a jutsu: the Copy Ninja (−20%), Madara's Heir (Susanoo −50%), the Icha Icha insight (−50%).
+export function titleCostMultiplier(p, itemId) {
+  return (hasTitle(p, "copy_ninja") ? 0.8 : 1) * (hasTitle(p, "madara_heir") && SUSANOO.has(itemId) ? 0.5 : 1) *
+    ((insight.get(p.id) ?? 0) > system.currentTick ? 0.5 : 1);
+}
+// Cooldown of a jutsu: the Yellow Flash (teleports and dashes ×0.5), the Icha Icha insight (×0.7).
+export function titleCooldownMultiplier(p, itemId) {
+  return (hasTitle(p, "yellow_flash") && TELEPORTS.has(itemId) ? 0.5 : 1) * ((insight.get(p.id) ?? 0) > system.currentTick ? 0.7 : 1);
+}
+export const titleHealMultiplier = (p) => (hasTitle(p, "slug_princess") ? 2 : 1); // out-of-fight healing
+export const sageDurationMultiplier = (p) => (hasTitle(p, "toad_sage") ? 2 : 1);
+export const titleEffectBonus = (p) => (hasTitle(p, "green_beast") ? { strength: 1, speed: 1 } : { strength: 0, speed: 0 });
+export const titleRegenMultiplier = (p) => (hasTitle(p, "naruto") ? 1.15 : 1) * (hasTitle(p, "toad_sage") ? 1.25 : 1) * ((sixPaths.get(p.id) ?? 0) > system.currentTick ? 2 : 1);
 export const titleKamuiCdMultiplier = (p) => (hasTitle(p, "tobi") ? 0.7 : 1);
 // Naruto: +10% max HP (health boost levels on top of `levels`)
 export const titleHpLevels = (p, levels) => (hasTitle(p, "naruto") ? Math.round((20 + 4 * levels) * 0.1 / 4) : 0);
@@ -183,6 +376,7 @@ const immuneReady = new Map(); // player id -> tick
 
 function perkTick() {
   const now = system.currentTick;
+  heirs = world.getAllPlayers().filter((p) => hasTitle(p, "madara_heir"));
   for (const p of world.getAllPlayers()) {
     // Itachi: shrugs off one debuff every 45 seconds
     if (hasTitle(p, "itachi") && now >= (immuneReady.get(p.id) ?? 0)) {
@@ -199,11 +393,35 @@ function perkTick() {
         break;
       }
     }
-    // Sasuke: +10% movement speed
+    // v1.62: the White Snake shrugs off poison; the Sage of Six Paths every debuff, and floats
+    if (hasTitle(p, "white_snake")) {
+      try {
+        if (p.getEffect("poison")) p.removeEffect("poison");
+      } catch {
+        /* ignore */
+      }
+    }
+    if (hasTitle(p, "six_paths")) {
+      for (const id of DEBUFFS) {
+        try {
+          if (p.getEffect(id)) p.removeEffect(id);
+        } catch {
+          /* ignore */
+        }
+      }
+      eff(p, "jump_boost", 40, 1);
+      // the Sage floats down instead of falling (sneak to drop)
+      try {
+        if (!p.isOnGround && !p.isSneaking && p.getVelocity().y < -0.45) eff(p, "slow_falling", 20, 0);
+      } catch {
+        /* ignore */
+      }
+    }
+    // Sasuke: +10% movement speed; the Yellow Flash: +30%
     try {
       const mv = p.getComponent("minecraft:movement");
       if (mv) {
-        const want = hasTitle(p, "sasuke") ? mv.defaultValue * 1.1 : mv.defaultValue;
+        const want = mv.defaultValue * (hasTitle(p, "sasuke") ? 1.1 : 1) * (hasTitle(p, "yellow_flash") ? 1.3 : 1);
         if (Math.abs(mv.currentValue - want) > 0.001 && !p.getEffect("speed") && !p.getEffect("slowness")) mv.setCurrentValue(want);
       }
     } catch {
@@ -238,7 +456,22 @@ function giveReward(p, id) {
 function checkTitles(p) {
   const rewarded = list(p, REWARDED);
   const before = list(p, ACTIVE);
-  const now = titlesOf(p);
+  let now = titlesOf(p);
+  // v1.62: one title of legend at a time — a newly granted title replaces the one held before
+  if (now.length > 1) {
+    const fresh = now.filter((id) => !before.includes(id));
+    const keep = fresh[0] ?? before.find((id) => now.includes(id)) ?? now[0];
+    for (const id of now) {
+      if (id === keep) continue;
+      try {
+        p.removeTag(id);
+      } catch {
+        /* ignore */
+      }
+      p.sendMessage(`§7A shinobi can hold only one title of legend — ${TITLES[keep].name}§7 replaces ${TITLES[id].name}§7.`);
+    }
+    now = [keep];
+  }
   for (const id of now) {
     if (before.includes(id)) continue;
     const T = TITLES[id];
@@ -263,7 +496,8 @@ function checkTitles(p) {
 export async function titlesMenu(player, back) {
   const f = new ActionFormData().title("§lTitles")
     .body("§7Legendary titles are granted by the server's admins once you've earned them (§f/tag <player> add <title>§7). " +
-      "Each gives creative-only gear and perks. §a✔§7 = done, §c✘§7 = not yet, §8•§7 = the admins judge it.");
+      "Each gives creative-only gear and perks. §fA shinobi holds only one title of legend at a time§7 — a new one replaces the old " +
+      "(the gear stays, but only the holder can use it). §a✔§7 = done, §c✘§7 = not yet, §8•§7 = the admins judge it.");
   for (const id of TITLE_IDS) f.button(`${TITLES[id].name}${hasTitle(player, id) ? " §a(yours)" : ""}\n§r§8tag: ${id}`);
   f.button("§l« Back");
   const r = await f.show(player);
@@ -426,8 +660,21 @@ function susanooFor(p, seconds, perfect) {
   }
 }
 
+// What legend_titles.js needs from here.
+const H = () => ({
+  foesNear, eff, ready, targetInView, lookPoint, noTarget, susanooFor, noteTeleport,
+  setSixPaths: (p, ticks) => {
+    sixPaths.set(p.id, system.currentTick + ticks);
+    sixPathsFull.set(p.id, system.currentTick + ticks);
+  },
+  setInsight: (p, ticks) => insight.set(p.id, system.currentTick + ticks),
+});
+
 export function makeTitleJutsu(helpers) {
   api = helpers;
+  return { ...makeLegendJutsu(helpers, H()), ...makeTitleJutsuV1() };
+}
+function makeTitleJutsuV1() {
   return {
     "aegis:adv_shinra_tensei_scroll": { title: "pain", name: "Advanced Shinra Tensei", cost: 80, cooldown: 300, cast(p) {
       const dim = p.dimension;
@@ -640,8 +887,58 @@ export function makeTitleJutsu(helpers) {
   };
 }
 
+const orbBlock = new Map(); // player id -> tick the Six Paths orbs can block again
+const rebirthReady = new Map(); // the Slug Princess's Creation Rebirth
+const shedReady = new Map(); // the White Snake's Shed Skin
+
 export function initTitles(helpers) {
   api = helpers;
+  Object.assign(SPECIALS, makeLegendSpecials(helpers, H()));
+  // v1.62: the Six Paths orbs, Creation Rebirth, Shed Skin
+  world.afterEvents.entityHurt.subscribe(({ hurtEntity: p, damage }) => {
+    if (p?.typeId !== "minecraft:player" || damage <= 0) return;
+    const now = system.currentTick;
+    let h;
+    try {
+      h = p.getComponent("minecraft:health");
+    } catch {
+      return;
+    }
+    if (!h || h.currentValue <= 0) return;
+    if (hasTitle(p, "six_paths") && now >= (orbBlock.get(p.id) ?? 0)) {
+      orbBlock.set(p.id, now + 200);
+      h.setCurrentValue(Math.min(h.effectiveMax, h.currentValue + damage));
+      api.particle(p.dimension, "aegis:cine_ring", p.location, [0.1, 0.08, 0.1]);
+      p.onScreenDisplay?.setActionBar("§6A Truth-Seeking Orb blocks the blow");
+      return;
+    }
+    const frac = h.currentValue / h.effectiveMax;
+    if (hasTitle(p, "slug_princess") && frac < 0.25 && now >= (rebirthReady.get(p.id) ?? 0)) {
+      rebirthReady.set(p.id, now + 6000);
+      h.setCurrentValue(h.effectiveMax * 0.6);
+      api.particle(p.dimension, "aegis:heal", api.add(p.location, { x: 0, y: 1, z: 0 }));
+      api.sound(p.dimension, "random.totem", p.location, 0.6, 1.4);
+      showTitle(p, "§2Creation Rebirth", { subtitle: "§7your cells renew themselves", fadeInDuration: 0, stayDuration: 25, fadeOutDuration: 8 });
+    } else if (hasTitle(p, "white_snake") && frac < 0.15 && now >= (shedReady.get(p.id) ?? 0)) {
+      shedReady.set(p.id, now + 36000);
+      h.setCurrentValue(h.effectiveMax);
+      for (const id of DEBUFFS) {
+        try {
+          p.removeEffect(id);
+        } catch {
+          /* ignore */
+        }
+      }
+      api.particle(p.dimension, "aegis:smoke_puff", p.location);
+      api.sound(p.dimension, "mob.silverfish.say", p.location, 1, 0.5);
+      showTitle(p, "§5Shed Skin", { subtitle: "§7a new body, whole again", fadeInDuration: 0, stayDuration: 25, fadeOutDuration: 8 });
+    }
+  });
+  // the White Snake's every melee hit poisons
+  world.afterEvents.entityHitEntity.subscribe(({ damagingEntity: p, hitEntity: e }) => {
+    if (p?.typeId !== "minecraft:player" || !hasTitle(p, "white_snake") || !api.isValid(e) || !api.canBeHit(e, p)) return;
+    eff(e, "poison", 60, 1);
+  });
   system.runInterval(() => {
     for (const p of world.getAllPlayers()) {
       try {

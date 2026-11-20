@@ -1,0 +1,23 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:item": {
+    "description": {
+      "identifier": "aegis:lightning_hound_v2_scroll",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "aegis_lightning_hound_v2_scroll"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "§7Title Scroll: Lightning Hound V2§r\n§7The Copy Ninja title"
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:glint": true
+    }
+  }
+}

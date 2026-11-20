@@ -672,12 +672,15 @@ ANIMALS = {
     "summon_hawk": dict(name="Summoned Hawk", build=hawk, tex=((120, 80, 50), (240, 238, 230), (60, 40, 25), (250, 200, 50)), stripes=None,
                         hp=50, dmg=6, speed=0.45, box=(0.8, 0.9), egg=("#785032", "#f0eee6")),
 }
+# v1.62: the boss summons of the Toad Sage and the Slug Princess (legend_titles.js) — the same animal, grown huge
+GIANT = {"summon_toad": dict(scale=3.2, hp=600, dmg=30), "summon_slug": dict(scale=3.0, hp=500, dmg=10)}
 anim_all = {}
 for aid, a in ANIMALS.items():
     bones, legs, segs = a["build"]()
     w(RP / "models" / "entity" / f"{aid}.geo.json", {"format_version": "1.12.0", "minecraft:geometry": [{
         "description": {"identifier": f"geometry.aegis.{aid}", "texture_width": 128, "texture_height": 128,
-                        "visible_bounds_width": 5, "visible_bounds_height": 4, "visible_bounds_offset": [0, 1, 0]},
+                        "visible_bounds_width": 16 if aid in GIANT else 5, "visible_bounds_height": 14 if aid in GIANT else 4,
+                        "visible_bounds_offset": [0, 5 if aid in GIANT else 1, 0]},
         "bones": bones}]})
     animal_texture(*a["tex"], stripes=a["stripes"]).save(RP / "textures" / "entity" / "aegis" / f"{aid}.png")
     walk = "math.cos(q.modified_distance_moved * 30) * 30 * math.min(1, q.modified_move_speed * 2)"
@@ -718,12 +721,24 @@ for aid, a in ANIMALS.items():
         "minecraft:behavior.nearest_attackable_target": {"priority": 5, "must_see": False, "within_radius": 20,
             "entity_types": [{"filters": {"test": "is_family", "subject": "other", "value": "monster"}, "max_dist": 20}]},
         "minecraft:behavior.random_stroll": {"priority": 8}}
+    groups = {"aegis:tamed": COMPANION_TAMED, "aegis:expire": {"minecraft:instant_despawn": {}}}
+    events = {"aegis:tamed": {"add": {"component_groups": ["aegis:tamed"]}},
+              "aegis:expire": {"add": {"component_groups": ["aegis:expire"]}}}
+    if aid in GIANT:
+        g = GIANT[aid]
+        groups["aegis:giant"] = {
+            "minecraft:scale": {"value": g["scale"]},
+            "minecraft:health": {"value": g["hp"], "max": g["hp"]},
+            "minecraft:attack": {"damage": g["dmg"]},
+            "minecraft:collision_box": {"width": round(min(3.6, a["box"][0] * g["scale"]), 2), "height": round(min(5.0, a["box"][1] * g["scale"]), 2)},
+            "minecraft:knockback_resistance": {"value": 1.0},
+            "minecraft:timer": {"time": 40, "looping": False, "time_down_event": {"event": "aegis:expire", "target": "self"}}}
+        events["aegis:giant"] = {"add": {"component_groups": ["aegis:giant"]}}
     w(BP / "entities" / f"{aid}.json", {"format_version": "1.21.0", "minecraft:entity": {
         "description": {"identifier": f"aegis:{aid}", "is_spawnable": True, "is_summonable": True, "is_experimental": False},
-        "component_groups": {"aegis:tamed": COMPANION_TAMED, "aegis:expire": {"minecraft:instant_despawn": {}}},
+        "component_groups": groups,
         "components": comps,
-        "events": {"aegis:tamed": {"add": {"component_groups": ["aegis:tamed"]}},
-                   "aegis:expire": {"add": {"component_groups": ["aegis:expire"]}}}}})
+        "events": events}})
 w(RP / "animations" / "summons.animation.json", {"format_version": "1.8.0", "animations": anim_all})
 
 # ---------------------------------------------------------------------------

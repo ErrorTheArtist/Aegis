@@ -54,7 +54,9 @@ function encode(player) {
   const xpCode = need > 0 ? bucket(xp, need) : code(BUCKETS);
   return {
     title: "AEG" + bucket(hp, hpMax) + xpCode + "§f" + `HP ${hp}/${hpMax}`,
-    subtitle: "AEC" + bucket(ck, ckMax) + "§f" + `CK ${ck}/${ckMax}\n§eLevel ${api.getLevel(player)}\n§f${need > 0 ? `${xp}/${need} XP` : "MAX"}\n§6Points ${points}\n§6Ryō ${getRyo(player).toLocaleString("en-US")}`,
+    subtitle: "AEC" + bucket(ck, ckMax) + "§f" + `CK ${ck}/${ckMax}\n§eLevel ${api.getLevel(player)}\n§f${need > 0 ? `${xp}/${need} XP` : "MAX"}\n§6Points ${points}\n§6Ryō ${getRyo(player).toLocaleString("en-US")}` +
+      // v1.62: the bounty & honor tracker
+      `\n§cBounty ${Math.floor(api.getBounty?.(player) ?? 0).toLocaleString("en-US")}\n§eHonor ${Math.floor(api.getHonor?.(player) ?? 0).toLocaleString("en-US")}`,
   };
 }
 

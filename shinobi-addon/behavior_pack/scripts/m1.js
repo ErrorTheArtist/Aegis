@@ -10,6 +10,7 @@ import { world, system } from "@minecraft/server";
 import { getStat, meleeDamageFactor } from "./levels.js";
 import { boostHit, isEcho, healBack, scriptedHit, capBeastHit } from "./dmgutil.js";
 import { bijuuMeleeBonus } from "./bijuu.js";
+import { titleMeleeMultiplier, titleStrikeMultiplier, titleFinisherMultiplier } from "./titles.js";
 
 const WINDOW = 28; // ticks between hits to keep the combo going
 const FISTS = [
@@ -23,7 +24,7 @@ const BLADE = [
   { anim: "m1_slash2", bonus: 0 },
   { anim: "m1_slash3", bonus: 2, finisher: true },
 ];
-const BLADES = /sword|kunai|kusanagi|samehada|kubikiribocho|hiramekarei|kiba|nuibari|shibuki|chakra_blades|totsuka|gunbai|chakra_rod|kabutowari|adamantine_staff|_axe$|trident|mace/;
+const BLADES = /sword|kunai|kusanagi|samehada|kubikiribocho|hiramekarei|kiba|nuibari|shibuki|chakra_blades|totsuka|gunbai|chakra_rod|kabutowari|adamantine_staff|six_paths_staff|nunchaku|_axe$|trident|mace/;
 
 let api;
 const combo = new Map(); // player id -> { step, tick, target }
@@ -55,7 +56,9 @@ function onHit(player, target, damage) {
   // A bigger hit is applied as (this hit + bonus) so it lands inside the hurt cooldown; a weaker one is healed back.
   const bonus = Math.round(move.bonus * (blade ? 1 : 1 + getStat(player, "taijutsu") / 100));
   // …and in Tailed Beast Mode every hit carries the beast's chakra
-  const total = capBeastHit(target, (damage + bonus + bijuuMeleeBonus(player, target)) * meleeDamageFactor(player)); // (v1.60: half the jutsu growth; v1.61: beasts capped)
+  // (v1.60: half the jutsu growth; v1.61: beasts capped; v1.62: the titles of legend)
+  const titles = titleMeleeMultiplier(player) * titleStrikeMultiplier(player, target) * (move.finisher ? titleFinisherMultiplier(player) : 1);
+  const total = capBeastHit(target, (damage + bonus + bijuuMeleeBonus(player, target)) * meleeDamageFactor(player) * titles);
   if (total > damage) boostHit(target, damage, total, player);
   else healBack(target, damage - total);
 

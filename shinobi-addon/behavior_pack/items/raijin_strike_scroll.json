@@ -1,0 +1,23 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:item": {
+    "description": {
+      "identifier": "aegis:raijin_strike_scroll",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "aegis_raijin_strike_scroll"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "§eTitle Scroll: Flying Thunder God: Strike§r\n§7The Yellow Flash title"
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:glint": true
+    }
+  }
+}

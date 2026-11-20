@@ -8,11 +8,11 @@ Uses the real Naruto names (Rasengan, Shadow Clone Jutsu, etc.) — personal use
 ## Contents
 
 - **Start here** — [Install](#install) · [Choose your village](#joining-choose-your-village) · [The Shinobi Record](#the-shinobi-record-v156) · [Commands cheat sheet](#commands-cheat-sheet)
-- **Your shinobi** — [Chakra](#chakra) · [Levels & Stats](#levels--stats) · [Clans](#clans) · [Jutsu](#jutsu-right-click-the-scroll-to-cast) · [Titles](#titles-v154) · [Armor](#armor--clothing) · [Swords](#legendary-swords) · [Ninja tools](#ninja-tools)
-- **Things to do** — [Story](#story-the-path-of-the-shinobi-v156) · [Factions](#factions-akatsuki--anbu-v156) · [Bingo Book](#bingo-book-v155) · [Achievements](#achievements-v155) · [Daily missions](#daily-missions--login-streak-v155) · [World events](#world-events-v155)
+- **Your shinobi** — [Chakra](#chakra) · [Levels & Stats](#levels--stats) · [Clans](#clans) · [Jutsu](#jutsu-right-click-the-scroll-to-cast) · [Titles](#titles-of-legend-v154-v162) · [Armor](#armor--clothing) · [Swords](#legendary-swords) · [Ninja tools](#ninja-tools)
+- **Things to do** — [Story](#story-the-path-of-the-shinobi-v156) · [Factions](#factions-akatsuki--anbu-v156) · [Bingo Book](#bingo-book-v155) · [Bounty & Honor](#bounty--honor-tracker-v162) · [Achievements](#achievements-v155) · [Daily missions](#daily-missions--login-streak-v155) · [World events](#world-events-v155)
 - **The world** — [Tailed Beasts](#tailed-beasts-bosses) · [NPCs](#npcs) · [Legendary bosses](#legendary-bosses-npc-spawner-only) · [Enemies](#enemies) · [Fast Travel](#fast-travel)
 - **For admins** — [Admin Panel](#admin-panel-v156) · [Economy](#economy-v158) · [Grace period](#grace-period-no-pvp) · [Lag clear](#lag-clear) · [Vanilla items](#vanilla-items-v154)
-- **What's new** — [v1.61](#the-tailed-beasts-are-strong-v161) · [v1.60](#melee-damage-nerfed-v160) · [v1.59](#grace-period-no-pvp-enemies-only-fight-back-v159) · [v1.58](#everything-costs-more-quests-pay-less-v158) · [v1.57](#the-leaf-weaponsmith-and-the-leaf-genin-remodelled-v157) · [v1.56](#story-factions-the-kaguya-clan-and-an-admin-panel-v156) and every version before it, at the end
+- **What's new** — [v1.62](#titles-of-legend-one-at-a-time-and-the-bounty--honor-tracker-v162) · [v1.61](#the-tailed-beasts-are-strong-v161) · [v1.60](#melee-damage-nerfed-v160) · [v1.59](#grace-period-no-pvp-enemies-only-fight-back-v159) · [v1.58](#everything-costs-more-quests-pay-less-v158) · [v1.57](#the-leaf-weaponsmith-and-the-leaf-genin-remodelled-v157) · [v1.56](#story-factions-the-kaguya-clan-and-an-admin-panel-v156) and every version before it, at the end
 
 ## Install
 
@@ -167,6 +167,7 @@ Panel or `/execute as <player> run scriptevent …`.
 | `aegis:kage <hokage / kazekage / mizukage / raikage / tsuchikage / title <title> / clear>` | Kage titles |
 | `aegis:sannin [jiraiya / tsunade / orochimaru / clear]` | the Legendary Sannin |
 | `aegis:bounty [set <player> <ryo> / clear <player>]` | the Bingo Book |
+| `aegis:bounty reward [<0-500000>]` | what every player kill is worth in honor or bounty (default 50,000; 0 = off) |
 | `aegis:ryo [give <n> / take <n> / set <n>]` | Ryō |
 | `aegis:level set <1-300>` · `aegis:level xp <n>` · `aegis:stats` | levels and stats |
 | `aegis:xpshard [n]` | XP Shards |
@@ -203,7 +204,8 @@ today's daily missions and streak, your story chapter and starter quest. Every p
 | **Village** | village chat, the leaderboard, Return Home, leave the village |
 | **Faction** | the Akatsuki and the Anbu — what each asks, Join, your contract |
 | **Bingo Book** | bounties, the most wanted, your PvP record |
-| **Titles** | the five titles of legend and their requirements |
+| **Bounty & Honor** | your bounty and honor, what a kill is worth, the most wanted and most honored, the titles' goals (v1.62) |
+| **Titles** | the 13 titles of legend and their requirements (you hold one at a time) |
 | **Ryō Wallet** | pay players, exchange emeralds |
 | **Handbook** | how everything works, in 12 short topics |
 | **Settings** | your own options |
@@ -273,15 +275,21 @@ The menu shows your XP bar, unspent points and every stat; tap a stat and use th
 /scriptevent aegis:level xp 5000
 ```
 
-## Titles (v1.54)
+## Titles of legend (v1.54, v1.62)
 
-Five legendary titles a server admin grants by hand once a player has earned them — in the **Admin Panel** (Players →
-*Titles of legend*, which shows how many requirements they meet) or with a tag:
+Thirteen legendary titles a server admin grants by hand once a player has earned them — in the **Admin Panel**
+(Players → *Title of legend*, a list that shows how many requirements each one meets) or with a tag:
 
 ```
-/tag <player> add pain          (or itachi, tobi, sasuke, naruto)
-/tag <player> remove pain       takes the title and its perks away
+/tag <player> add toad_sage     (pain, itachi, tobi, sasuke, naruto, toad_sage, slug_princess, white_snake,
+                                 yellow_flash, green_beast, copy_ninja, six_paths, madara_heir)
+/tag <player> remove toad_sage  takes the title and its perks away
 ```
+
+**One title at a time (v1.62).** A shinobi holds only **one** title of legend: granting a new one replaces the one they
+had, and they're told. (Granted two at once, the first in the list above stays.) They keep the old title's gear, but
+only a title's holder can use it. Anyone who held several before v1.62 keeps the first of theirs in that list — the
+Admin Panel switches it.
 
 The moment the tag is added the player gets the title **over their name**, its **perks**, and its **reward gear** —
 once per title, kept on death. The gear is **creative-only**: no shop, quest, mission or drop gives it, and only the
@@ -298,8 +306,52 @@ left for the admin to judge.
 | **Tobi** | Level 300 · the world's Kamui holder · Mangekyō Sharingan · leave your village · defeat a feared and respected Jōnin-rank player · a 2 million bounty | Tobi's Spiral Mask · Uchiha War Fan (Gunbai) · Kamui Shuriken | Kamui cooldown −30% · +10% jutsu damage |
 | **Sasuke** | Level 300 · Mangekyō Sharingan · leave your village · defeat 3,000 hostile ninja · defeat a Kage-rank player · a 2 million bounty | Kusanagi Sword V2 · Indra's Arrow · Chidori Nagashi V2 · Perfect Susanoo | +15% lightning jutsu damage · +10% movement speed |
 | **Naruto** | Level 300 · Sage Mode · Kurama sealed inside you · never leave your village · 500 missions · 3,000 hostile ninja · 3 million honor | Orange Sage Coat · Rasenshuriken V2 · Tailed Beast Bomb V2 · Six Paths Sage Mode (half) | +15% chakra regen · +10% max HP |
+| **The Toad Sage** (v1.62) | Level 300 · Sage Mode · a Sannin with Jiraiya's legacy · never leave your village · defeat Jiraiya and Pain · 1,000 missions · 3 million honor | Summoning: Gamabunta · Sage Art: Goemon · Toad Summoning Contract | Sage Mode lasts twice as long · +20% fire and wind jutsu damage · +25% chakra regen |
+| **The Slug Princess** (v1.62) | Level 300 · the Senju clan · a Sannin with Tsunade's legacy · learn Mystical Palm and Hundred Healings · cast healing jutsu 300 times · never leave your village · 1 million honor | Strength of a Hundred Seal · Summoning: Katsuyu · Tsunade's Necklace | **Creation Rebirth**: below 25% health you're restored to 60% (every 5 min) · healing out of a fight ×2 · +20% melee |
+| **The White Snake** (v1.62) | Level 300 · leave your village · a Sannin with Orochimaru's legacy · defeat Orochimaru · learn 50 different jutsu · a 3 million bounty | Eight Branches Technique · White Snake Rebirth · Kusanagi Long Sword | every melee hit poisons · immune to poison · **Shed Skin**: below 15% health you're healed to full (every 30 min) |
+| **The Yellow Flash** (v1.62) | Level 300 · have been a Kage · never leave your village · cast Flying Thunder God 300 times · defeat Obito · 2 million honor | Flying Thunder God: Strike · Rasengan Barrage · Minato's Tri-Pronged Kunai · Fourth Hokage's Haori | +30% movement speed · Body Flicker and the Flying Thunder God techniques recharge twice as fast · the first blow after a teleport deals double damage |
+| **The Green Beast** (v1.62) | Level 300 · 150 Taijutsu · defeat Might Guy and Madara · 3,000 hostile ninja · open the Eight Gates 100 times · 500 missions | Eight Gates: Night Guy · Eight Gates: Evening Elephant · Guy's Nunchaku · Green Beast Jumpsuit | +35% melee damage · combo finishers hit 50% harder · +1 Strength and Speed |
+| **The Copy Ninja** (v1.62) | Level 300 · learn 60 different jutsu · defeat Kakashi and Obito · cast Raikiri 300 times · 2,000 missions · never leave your village | Kamui Raikiri · Lightning Hound V2 · Icha Icha Tactics · Kakashi's Mask | every jutsu costs 20% less chakra · your three most-used jutsu hit 20% harder |
+| **The Sage of Six Paths** (v1.62) | Level 300 · master the Tailed Beast sealed inside you · defeat Kaguya and the Ten-Tails · Sage Mode · every achievement · finish the Path of the Shinobi · have held two other titles of legend | Truth-Seeking Orbs · Six Paths Sage Mode · Shakujō of the Six Paths | +25% damage · a Truth-Seeking Orb blocks one hit every 10 s · Jump Boost and a slow fall (sneak to drop) · immune to every debuff |
+| **Madara's Heir** (v1.62) | Level 300 · the Eternal Mangekyō Sharingan · leave your village · defeat Madara · a 5 million bounty · defeat a Kage-rank player | Perfect Susanoo V2 · Tengai Shinsei · Madara's Gunbai | Susanoo costs half the chakra · +20% fire damage · enemies within 8 blocks of you take 10% more damage |
 
-Mission turn-ins and hostile ninja kills are counted from v1.54 on.
+Mission turn-ins and hostile ninja kills are counted from v1.54 on; jutsu casts (300 Flying Thunder Gods…) from v1.62
+on. "Defeat Jiraiya / Madara / …" means the legendary boss (see *Legendary bosses*). A Kage who steps down still counts
+as "have been a Kage" (from v1.62 on).
+
+### The new titles' gear (v1.62)
+
+Chakra cost and cooldown (before Agility) in brackets; the tools and weapons work on right-click.
+
+| Gear | What it does |
+|---|---|
+| **Summoning: Gamabunta** (140 · 60 s) | Gamabunta lands where you look — a 30-damage shockwave — and fights beside you for 40 s, sweeping his blade at every enemy near him every 2 seconds |
+| **Sage Art: Goemon** (110 · 30 s) | a 15-block stream of burning toad oil and wind: ten bursts of fire damage that set enemies alight |
+| **Toad Summoning Contract** (15 s) | Frog Call: a croak that hurts, slows and stuns everything within 10 blocks and throws it back |
+| **Strength of a Hundred Seal** (120 · 60 s) | heals half your health, clears debuffs, then Strength II, Resistance II and Regeneration II for 30 s |
+| **Summoning: Katsuyu** (130 · 60 s) | the giant slug: for 40 s she heals you and your allies (6% every 2 s, ailments washed away) and spits acid at enemies |
+| **Tsunade's Necklace** (10 s) | Heavenly Foot of Pain: leap, then crash down heel-first — 26 damage around you |
+| **Eight Branches Technique** (110 · 30 s) | eight serpents bite the enemies in front of you, poisoning them |
+| **White Snake Rebirth** (90 · 45 s) | heals 60% of your health, clears debuffs, Resistance II |
+| **Kusanagi Long Sword** (6 s) | the blade stretches 12 blocks and pierces everything in the line (poison) |
+| **Flying Thunder God: Strike** (70 · 5 s) | teleport behind the enemy you look at and cut — double damage, since it's right after a teleport |
+| **Rasengan Barrage** (100 · 20 s) | five Rasengan in a row, homing on your target |
+| **Minato's Tri-Pronged Kunai** (4 s) | throw it — and be where it lands, cutting everyone there |
+| **Eight Gates: Night Guy** (160 · 2 min) | a red-dragon kick charged for a second: 90 damage, then your body is spent for 10 s |
+| **Eight Gates: Evening Elephant** (120 · 30 s) | five punches of struck air down a cone in front of you |
+| **Guy's Nunchaku** (5 s) | Dynamic Entry: a flying kick into the first enemy in your way |
+| **Kamui Raikiri** (110 · 25 s) | a lightning dash; whatever it runs through is torn by Kamui (lifted and slowed) |
+| **Lightning Hound V2** (90 · 20 s) | three lightning hounds run along the ground and hunt your target |
+| **Icha Icha Tactics** (90 s) | 30 seconds of insight: jutsu cost half the chakra and recharge 30% faster |
+| **Truth-Seeking Orbs** (130 · 45 s) | six black orbs circle you for 20 s and fire at the nearest enemy every second |
+| **Six Paths Sage Mode** (150 · 2 min) | 60 s of +25% damage, double chakra regen, Speed II, Resistance and Jump Boost II |
+| **Shakujō of the Six Paths** (10 s) | drags every enemy within 12 blocks to a point in front of you, then detonates it |
+| **Perfect Susanoo V2** (160, 80 for Madara's Heir · 60 s) | a sweep of the great blade (30 damage all around), then 25 s of Perfect Susanoo |
+| **Tengai Shinsei** (180 · 2 min) | a meteor falls where you look: 60 fire damage within 9 blocks |
+| **Madara's Gunbai** (8 s) | Uchiha Flame Formation: a ring of fire bursts out around you |
+
+The Fourth Hokage's Haori (chest), the Green Beast Jumpsuit (chest) and Kakashi's Mask (head) are 3D wearables. All
+of it is creative-only, given once when the title is granted, and kept on death.
 
 ## Bingo Book (v1.55)
 
@@ -308,8 +360,15 @@ Mission turn-ins and hostile ninja kills are counted from v1.54 on.
 - **Place a bounty**: pick an online player and pay at least **1,000 Ryō** — it's added to the price on their head. The
   server hears that they're WANTED, but never who paid.
 - **Claim it**: defeat the wanted player (your clone, companion or summon counts) and the **whole bounty is yours**.
-- **Player killers get a bounty of their own**: 1,000 Ryō + 50 per level of the victim — **three times that for a rogue
-  ninja**. Defeating a wanted player is bounty hunting: it never raises yours.
+- **Every player kill is worth 50,000 (v1.62)** — as honor or as bounty, depending on who you defeated:
+  - a village shinobi who defeats a **wanted** player (any bounty) or a **rogue ninja** earns **+50,000 honor** (and
+    claims the bounty in Ryō);
+  - **any other kill** puts **+50,000 bounty** on the killer's own head — and so does **every kill by a rogue ninja**.
+  - Only **player** kills count. Enemy ninja, legendary bosses and Tailed Beasts never add bounty (they give the usual
+    village honor and XP, as before). Your clone, companion or summon's kills count as yours.
+  - The admins set the amount (0–500,000; 0 turns it off) in *Admin Panel → Server Settings* or with
+    `/scriptevent aegis:bounty reward <n>`. (Before v1.62 a killer's bounty was 1,000 Ryō + 50 per level of the
+    victim.)
 - A bounty of **100,000 Ryō** or more shows **[Wanted]** over your name.
 - Your **PvP record** counts the players you've defeated and the bounties you've claimed, and remembers if you've ever
   defeated a **Kage**, the **Toad Sage** (the Sannin title with Jiraiya's legacy) or a **feared and respected Jōnin**
@@ -319,7 +378,25 @@ Mission turn-ins and hostile ninja kills are counted from v1.54 on.
 /scriptevent aegis:bounty                    (the ten most wanted)
 /scriptevent aegis:bounty set <player> <ryo> (set a player's bounty — admins)
 /scriptevent aegis:bounty clear <player>     (clear it)
+/scriptevent aegis:bounty reward [<n>]       (what a player kill is worth — admins; alone, shows it)
 ```
+
+## Bounty & Honor tracker (v1.62)
+
+Everyone can see who's wanted and who's honored, all the time:
+
+- **The sidebar** (right of the screen): **Most Wanted** — the 15 biggest bounties, highest first, offline shinobi
+  included.
+- **The player list** (the pause screen): everyone's **honor** next to their name.
+- **Under players' names** (off by default): their bounty in Ryō.
+- **Your HUD** (top-left): your own **Bounty** and **Honor**, under your Ryō.
+- **Shinobi Record → Bounty & Honor**: your bounty and honor, what a kill earns *you* (as a village shinobi or as a
+  rogue), the five most wanted and the five most honored, and how close you are to the bounty or honor each title of
+  legend asks for.
+
+The boards refresh every 2 seconds. Admins switch each one on or off in *Admin Panel → Server Settings*. They use the
+scoreboard's display slots (sidebar, list, below name): while a board is on, it takes that slot over from anything else
+(another add-on, `/scoreboard objectives setdisplay`).
 
 ## Achievements (v1.55)
 
@@ -426,8 +503,8 @@ vanilla bans, friendly fire, lag clear, the Tailed Beast that's loose and who ho
 |---|---|
 | **World Events** | start a **Village Raid** or **Hidden Scrolls** (pick the village), a **Wanted** legend (pick one or random, near any player) or **Double XP** (5–240 minutes) · stop the event · end Double XP · switch the hourly automatic events on or off |
 | **Grace Periods** | grace (no PvP; enemies only fight back when attacked, 60% softer) for everyone or one player · end them all · end one |
-| **Players** | pick an online player to see their level, rank, Ryō, honor, village, clan, faction, bounty, titles, Kage/Sannin, grace and position — then **give or take Ryō** · **set their level** (stat points refunded) · **give XP Shards** · **heal & refill chakra** · **teleport** (go to them, bring them to you, send them to any village) · **set their clan** · **grant or take titles of legend** (it shows how many requirements they meet) · **Kage & Sannin** (appoint, with or without the set, or remove) · **set or clear a bounty** · **remove them from a faction** · **let them choose a village again** (how a rogue gets back in) · **give or end their grace** |
-| **Server Settings** | vanilla weapon & armour bans · automatic lag clear · friendly fire · automatic world events · **players' melee damage** (25–200%) |
+| **Players** | pick an online player to see their level, rank, Ryō, honor, village, clan, faction, bounty, titles, Kage/Sannin, grace and position — then **give or take Ryō** · **set their level** (stat points refunded) · **give XP Shards** · **heal & refill chakra** · **teleport** (go to them, bring them to you, send them to any village) · **set their clan** · **set their title of legend** (one at a time — a list that shows how many requirements each one meets) · **Kage & Sannin** (appoint, with or without the set, or remove) · **set or clear a bounty** · **remove them from a faction** · **let them choose a village again** (how a rogue gets back in) · **give or end their grace** |
+| **Server Settings** | vanilla weapon & armour bans · automatic lag clear · friendly fire · automatic world events · the **Bounty & Honor boards** (Most Wanted sidebar, honor in the player list, bounties under names) · **players' melee damage** (25–200%) · **honor / bounty per player kill** (0–500,000) |
 | **Economy** | how expensive everything is (25–1000%) and how much Ryō quests pay (0–200%) — see *Economy* |
 | **Clear Lag Now** | dropped items, or every hostile mob |
 | **Admin Log** | the last 30 admin actions — who did what, and when (kept in the world) |
@@ -985,7 +1062,7 @@ abilities live in `behavior_pack/scripts/swords.js`.
 
 The vanilla hearts are replaced by a custom HUD in the **top-left corner**, in a slanted-bar style:
 **HP bar** (red) and **Chakra bar** (blue) with their values, **Level**, the **XP bar** (yellow, `xp/needed XP`) and
-**Points** (unspent stat points). Levelling up is silent — no chat line, no title; the bars and your name tag just update. Big titles (clan reveal, Tailed Beasts…) show as normal Minecraft titles;
+**Points** (unspent stat points), your **Ryō**, and since v1.62 your **Bounty** and **Honor**. Levelling up is silent — no chat line, no title; the bars and your name tag just update. Big titles (clan reveal, Tailed Beasts…) show as normal Minecraft titles;
 the HUD steps aside for those few seconds.
 
 How it works: `behavior_pack/scripts/hud.js` sends the data in the title/subtitle text and
@@ -1275,7 +1352,8 @@ Their skins live in `tools/skins/<name>.png` (standard 64×64 Minecraft skins). 
 Summoning scrolls (Sensei): **Toad** (belly-slam AoE), **Slug** (heals you, restores chakra, acid), **Snake**
 (fast, poison bite), and since v1.55 **Ninja Hounds** (a pack of three hounds in headbands — their bites pin the enemy)
 and **Hawk** (it dives at enemies near you, and while it's out you get Slow Falling and Jump Boost II). 40 chakra, 60 s
-cooldown, the summon fights for 45 s; one summon at a time.
+cooldown, the summon fights for 45 s; one summon at a time. The Toad Sage's **Gamabunta** and the Slug Princess's
+**Katsuyu** (v1.62) are the toad and the slug grown three times bigger (600 / 500 HP), for 40 s.
 
 ```
 /scriptevent aegis:spawner           settings of the spawner you're looking at
@@ -1518,6 +1596,24 @@ hoes, food, farming, building, crafting.
 ```
 
 The timers start when the server starts. The times are the constants at the top of `behavior_pack/scripts/lagclear.js`.
+
+## Titles of legend, one at a time, and the bounty & honor tracker (v1.62)
+
+- **One title of legend per shinobi**: granting a new title replaces the one held (see *Titles of legend*). The Admin
+  Panel picks it from a list.
+- **Eight new titles**, each as hard to earn as Pain: **The Toad Sage**, **The Slug Princess**, **The White Snake**,
+  **The Yellow Flash**, **The Green Beast**, **The Copy Ninja**, **The Sage of Six Paths** and **Madara's Heir** — with
+  16 jutsu scrolls, five weapons (Kusanagi Long Sword, Minato's Tri-Pronged Kunai, Guy's Nunchaku, the Shakujō of the
+  Six Paths, Madara's Gunbai), three tools (Toad Summoning Contract, Tsunade's Necklace, Icha Icha Tactics), three
+  wearables (Fourth Hokage's Haori, Green Beast Jumpsuit, Kakashi's Mask), Gamabunta and Katsuyu as giant summons, and
+  strong perks.
+- **Every player kill is worth 50,000** — honor for a village shinobi who defeats a wanted player or a rogue, bounty
+  for any other kill and for every kill by a rogue. Only player kills count. It replaces the old "1,000 + 50 per level"
+  killer's bounty; admins set the amount.
+- **The Bounty & Honor tracker**: a Most Wanted sidebar, honor in the player list, optional bounties under names, your
+  bounty and honor on the HUD, and a *Bounty & Honor* page in the Shinobi Record.
+- The add-on now counts how many times you cast each jutsu (some titles ask for 300 casts), and remembers every Kage,
+  including ones who stepped down.
 
 ## The Tailed Beasts are strong (v1.61)
 

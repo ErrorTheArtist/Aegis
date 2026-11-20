@@ -9,6 +9,7 @@ import { world, system } from "@minecraft/server";
 import { showTitle } from "./hud.js";
 import { isTransformed } from "./bijuu.js";
 import { transformCinematic, aura } from "./cinematic.js";
+import { sageDurationMultiplier } from "./titles.js";
 
 const SAGE_PROP = "aegis:sage";
 const GATHER_TICKS = 100;
@@ -47,7 +48,7 @@ function eff(p, id, amp) {
 }
 
 function enter(player) {
-  active.set(player.id, system.currentTick + DURATION);
+  active.set(player.id, system.currentTick + Math.round(DURATION * sageDurationMultiplier(player))); // (the Toad Sage: twice as long — v1.62)
   gathering.delete(player.id);
   api.setChakra(player, api.getMaxChakra(player));
   transformCinematic(player, { color: [0.35, 0.95, 0.35], title: "§6Sage Mode", subtitle: "§7Natural energy flows through you" });

@@ -14,6 +14,7 @@
 //   /scriptevent aegis:level xp 5000      — add XP
 
 import { bingoBook, bountyOf } from "./bounty.js";
+import { trackerMenu } from "./tracker.js";
 import { CLANS, getClanId } from "./clans.js";
 import { FACTIONS, factionOf, factionRank, factionMenu } from "./factions.js";
 import { storyMenu, storyLine } from "./story.js";
@@ -30,7 +31,7 @@ import { applyNameTag, refreshClanEffects } from "./clans.js";
 import { getRyo, fmtRyo, walletMenu } from "./currency.js";
 import { getVillage, villageLabel, villageMenu, villageCooldownMultiplier, isRogue, rogueOf, getHonor } from "./villages.js";
 import { starterLine } from "./starter.js";
-import { titleHpLevels, titlesMenu, titlesOf, TITLES } from "./titles.js";
+import { titleHpLevels, titlesMenu, titlesOf, TITLES, titleEffectBonus, titleHealMultiplier } from "./titles.js";
 import { adminMenu, ADMIN_TAG } from "./admin.js";
 import { showForm } from "./ui.js";
 
@@ -149,8 +150,8 @@ export const cooldownMultiplier = (player) => (1 - getStat(player, "agility") * 
 export function statEffectLevels(player) {
   return {
     health_boost: Math.min(HP_LEVEL_CAP, hpLevels(player) + titleHpLevels(player, hpLevels(player))), // 1 level = +4 HP (Naruto's title: +10%)
-    strength: Math.floor(getStat(player, "taijutsu") / 50), // v1.60: every 50 points (was 25), so Strength III at most
-    speed: Math.floor(Math.min(100, getStat(player, "agility")) / 25),
+    strength: Math.floor(getStat(player, "taijutsu") / 50) + titleEffectBonus(player).strength, // v1.60: every 50 points (was 25); the Green Beast +1
+    speed: Math.floor(Math.min(100, getStat(player, "agility")) / 25) + titleEffectBonus(player).speed,
   };
 }
 
@@ -239,6 +240,7 @@ export async function openStats(player) {
     ["§aVillage\n§r§7chat · leaderboard · return home · leave", () => villageMenu(player)],
     [`§8Faction\n§r§7${faction ? faction.name.replace(/§./g, "") : "Akatsuki · Anbu"}`, () => factionMenu(player, back)],
     ["§cBingo Book\n§r§7bounties · most wanted · PvP record", () => bingoBook(player, back)],
+    [`§cBounty §8& §eHonor\n§r§7${bountyOf(player) ? fmtRyo(bountyOf(player)) : "no bounty"} · ${getHonor(player).toLocaleString("en-US")} honor`, () => trackerMenu(player, back)],
     ["§5Titles\n§r§7Pain · Itachi · Tobi · Sasuke · Naruto", () => titlesMenu(player, back)],
     ["§6Ryō Wallet\n§r§7pay players · exchange emeralds", () => walletMenu(player)],
     ["§bHandbook\n§r§7how everything works", () => handbookMenu(player, back)],
@@ -408,7 +410,8 @@ export function initLevels(helpers) {
       if (now - (lastHurt.get(p.id) ?? -1e9) < 160) continue;
       try {
         const h = p.getComponent("minecraft:health");
-        if (h.currentValue > 0 && h.currentValue < h.effectiveMax) h.setCurrentValue(Math.min(h.effectiveMax, h.currentValue + Math.max(0.5, h.effectiveMax * 0.01)));
+        // (the Slug Princess heals twice as fast — v1.62)
+        if (h.currentValue > 0 && h.currentValue < h.effectiveMax) h.setCurrentValue(Math.min(h.effectiveMax, h.currentValue + Math.max(0.5, h.effectiveMax * 0.01) * titleHealMultiplier(p)));
       } catch {
         /* ignore */
       }

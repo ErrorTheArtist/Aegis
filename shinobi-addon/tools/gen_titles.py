@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Title gear (v1.54): the creative-only scrolls and eyes of the Pain, Itachi, Tobi, Sasuke and Naruto titles
+"""Title gear (v1.54, v1.62): the creative-only scrolls, eyes and tools of the titles of legend
 (behavior_pack/scripts/titles.js) — items and hand-drawn icons. The weapons are made by gen_swords.py, Tobi's mask
 and the Orange Sage Coat by gen_armor.py (their icons are drawn here).  Run:  python3 tools/gen_titles.py
 """
@@ -184,6 +184,226 @@ def sage_coat():
     return img
 
 
+# ---- v1.62: the Toad Sage, the Slug Princess, the White Snake, the Yellow Flash, the Green Beast, the Copy Ninja,
+# the Sage of Six Paths and Madara's Heir ----
+G.RODS.setdefault("green", ((80, 170, 80), (30, 90, 40)))
+G.RODS.setdefault("white", ((230, 230, 238), (150, 150, 165)))
+
+
+def gamabunta(img):                            # Summoning: Gamabunta — the toad boss and his dosu
+    lay = layer(lambda l, d: (d.polygon([(90, 98), (104, 40), (108, 42), (96, 100)], fill=(210, 215, 225, 255)),
+                               d.rectangle([86, 96, 98, 104], fill=(60, 40, 30, 255))))
+    img.alpha_composite(lay)
+    G.emblem_toad(img)
+
+
+def goemon(img):                               # Sage Art: Goemon — toad oil, fire and wind in one burning stream
+    G.emblem_wind(img, color=(255, 150, 40))
+    flame(img, (255, 110, 20), (255, 230, 90), (255, 140, 40), s=26)
+
+
+def hundred_seal(img):                         # Strength of a Hundred Seal — the diamond on the brow and its spreading marks
+    def draw(l, d):
+        for k in range(8):
+            a = k * math.pi / 4
+            d.line([(64 + math.cos(a) * 20, 64 + math.sin(a) * 20), (64 + math.cos(a) * 38, 64 + math.sin(a) * 38)], fill=(150, 90, 220, 255), width=4)
+        d.polygon([(64, 40), (82, 64), (64, 88), (46, 64)], fill=(170, 100, 240, 255))
+        d.polygon([(64, 50), (74, 64), (64, 78), (54, 64)], fill=(232, 205, 255, 255))
+    G.glow(img, layer(draw), (160, 90, 240), 6, 1.6)
+
+
+def eight_heads(img):                          # Eight Branches — eight serpents fanning out
+    def draw(l, d):
+        for k in range(8):
+            a = math.pi + 0.35 + k / 7 * (math.pi - 0.7)
+            pts = [(64 + math.cos(a) * r + math.sin(r / 5) * 2.5, 96 + math.sin(a) * r) for r in range(0, 46, 3)]
+            d.line(pts, fill=(140, 80, 190, 255), width=6, joint="curve")
+            ex, ey = pts[-1]
+            d.ellipse([ex - 5, ey - 5, ex + 5, ey + 5], fill=(175, 115, 225, 255))
+            d.ellipse([ex - 1.5, ey - 1.5, ex + 1.5, ey + 1.5], fill=(250, 210, 40, 255))
+    G.glow(img, layer(draw), (140, 80, 200), 4, 1.3)
+
+
+def white_snake(img):                          # White Snake Rebirth — a coiled white serpent
+    G.emblem_spiral(img, color=(215, 215, 232), light=(255, 255, 255), turns=2.2, r0=28)
+    d = ImageDraw.Draw(img)
+    d.ellipse([84, 56, 98, 72], fill=(235, 235, 245, 255), outline=(150, 140, 180, 255), width=2)
+    d.ellipse([90, 60, 95, 65], fill=(250, 210, 40, 255))
+
+
+def three_prong(d, cx, cy, s, col):
+    d.rectangle([cx - 2 * s, cy, cx + 2 * s, cy + 22 * s], fill=col)
+    d.ellipse([cx - 5 * s, cy + 22 * s, cx + 5 * s, cy + 32 * s], outline=col, width=max(2, int(3 * s)))
+    d.polygon([(cx, cy - 30 * s), (cx - 6 * s, cy - 2 * s), (cx + 6 * s, cy - 2 * s)], fill=col)
+    for sg in (-1, 1):
+        d.polygon([(cx + sg * 15 * s, cy - 18 * s), (cx + sg * 10 * s, cy + 2 * s), (cx + sg * 4 * s, cy - 2 * s)], fill=col)
+
+
+def raijin_strike(img):                        # Flying Thunder God: Strike — the yellow flash and the marked kunai
+    def draw(l, d):
+        for i, y in enumerate((44, 58, 72, 86)):
+            d.line([28 + i * 3, y, 60 + i * 3, y], fill=(255, 230, 120, 255), width=4)
+        three_prong(d, 80, 60, 0.95, (250, 242, 205, 255))
+    G.glow(img, layer(draw), (255, 210, 80), 5, 1.8)
+
+
+def rasengan_barrage(img):                     # Rasengan Barrage — five spinning spheres
+    def draw(l, d):
+        for k in range(5):
+            a = k / 5 * math.pi * 2 - math.pi / 2
+            cx, cy = 64 + math.cos(a) * 23, 64 + math.sin(a) * 23
+            d.ellipse([cx - 11, cy - 11, cx + 11, cy + 11], fill=(110, 180, 255, 255))
+            d.arc([cx - 8, cy - 8, cx + 8, cy + 8], 20, 250, fill=(230, 245, 255, 255), width=3)
+            d.ellipse([cx - 3, cy - 3, cx + 3, cy + 3], fill=(240, 250, 255, 255))
+    G.glow(img, layer(draw), (110, 180, 255), 5, 1.6)
+
+
+def night_guy(img):                            # Night Guy — the red dragon of the Eighth Gate
+    flame(img, (230, 30, 30), (255, 140, 110), (255, 50, 40))
+    d = ImageDraw.Draw(img)
+    for sg in (-1, 1):
+        d.polygon([(64 + sg * 16, 44), (64 + sg * 10, 26), (64 + sg * 6, 46)], fill=(120, 10, 10, 255))
+        d.ellipse([64 + sg * 8 - 4, 54, 64 + sg * 8 + 4, 60], fill=(255, 240, 200, 255))
+
+
+def evening_elephant(img):                     # Evening Elephant — five pillars of struck air
+    def draw(l, d):
+        for k in range(5):
+            x = 32 + k * 16
+            d.rounded_rectangle([x - 5, 34 + (k % 2) * 6, x + 5, 92], radius=5, fill=(215, 240, 255, 235))
+            d.line([x, 40 + (k % 2) * 6, x, 88], fill=(255, 255, 255, 255), width=2)
+        d.ellipse([40, 84, 88, 100], outline=(140, 230, 160, 255), width=4)
+    G.glow(img, layer(draw), (150, 230, 170), 5, 1.4)
+
+
+def kamui_raikiri(img):                        # Kamui Raikiri — a bolt through a purple warp
+    G.emblem_spiral(img, color=(150, 80, 230), light=(230, 200, 255), turns=2.0, r0=30)
+    G.emblem_bolt(img, color=(140, 220, 255))
+
+
+def hounds(img):                               # Lightning Hound V2 — three hounds of lightning
+    def draw(l, d):
+        for y in (42, 64, 86):
+            pts = [(26, y), (44, y - 8), (56, y + 6), (70, y - 6), (84, y + 4), (98, y - 2)]
+            d.line(pts, fill=(150, 215, 255, 255), width=6, joint="curve")
+            d.line(pts, fill=(240, 250, 255, 255), width=2)
+            d.polygon([(96, y - 9), (106, y - 2), (96, y + 5)], fill=(200, 235, 255, 255))
+    G.glow(img, layer(draw), (120, 190, 255), 6, 1.8)
+
+
+def truth_orbs(img):                           # Truth-Seeking Orbs — six black orbs in a golden ring
+    def draw(l, d):
+        d.ellipse([30, 30, 98, 98], outline=(255, 210, 90, 255), width=3)
+        for k in range(6):
+            a = k / 6 * math.pi * 2 - math.pi / 2
+            cx, cy = 64 + math.cos(a) * 28, 64 + math.sin(a) * 28
+            d.ellipse([cx - 9, cy - 9, cx + 9, cy + 9], fill=(16, 12, 18, 255))
+            d.ellipse([cx - 5, cy - 6, cx - 1, cy - 2], fill=(110, 100, 120, 255))
+    G.glow(img, layer(draw), (200, 170, 255), 6, 1.2)
+
+
+def six_paths_full(img):                       # Six Paths Sage Mode — a golden aura and six magatama
+    def draw(l, d):
+        d.ellipse([28, 28, 100, 100], outline=(255, 210, 90, 255), width=5)
+        for k in range(6):
+            a = k / 6 * math.pi * 2 - math.pi / 2
+            cx, cy = 64 + math.cos(a) * 22, 64 + math.sin(a) * 22
+            d.ellipse([cx - 6, cy - 6, cx + 6, cy + 6], fill=(20, 16, 20, 255))
+            d.line([(cx, cy), (cx + math.cos(a + 1.6) * 9, cy + math.sin(a + 1.6) * 9)], fill=(20, 16, 20, 255), width=4)
+        d.ellipse([56, 56, 72, 72], fill=(255, 235, 150, 255))
+    G.glow(img, layer(draw), (255, 200, 80), 7, 1.6)
+
+
+def meteor(img):                               # Tengai Shinsei — a meteor falling out of the sky
+    def trail(l, d):
+        for k in range(5):
+            d.line([(26 + k * 3, 24 + k * 2), (72, 66)], fill=(255, 140 + k * 20, 40, 220), width=10 - k)
+    G.glow(img, layer(trail), (255, 120, 30), 6, 1.4)
+    G.shape(img, lambda d: d.ellipse([58, 54, 100, 96], fill=255), (160, 125, 100), (60, 45, 40), "radial", center=(72, 66), radius=34)
+    d = ImageDraw.Draw(img)
+    for x, y, s in ((68, 68, 5), (86, 80, 6), (76, 88, 4), (90, 64, 4)):
+        d.ellipse([x - s, y - s, x + s, y + s], fill=(84, 64, 54, 255))
+
+
+SCROLLS.update({
+    "gamabunta_scroll": ("Summoning: Gamabunta", "The Toad Sage", "red", gamabunta),
+    "goemon_scroll": ("Sage Art: Goemon", "The Toad Sage", "red", goemon),
+    "hundred_seal_scroll": ("Strength of a Hundred Seal", "The Slug Princess", "green", hundred_seal),
+    "katsuyu_scroll": ("Summoning: Katsuyu", "The Slug Princess", "green", G.emblem_slug),
+    "eight_branches_scroll": ("Eight Branches Technique", "The White Snake", "purple", eight_heads),
+    "snake_rebirth_scroll": ("White Snake Rebirth", "The White Snake", "purple", white_snake),
+    "raijin_strike_scroll": ("Flying Thunder God: Strike", "The Yellow Flash", "gold", raijin_strike),
+    "rasengan_barrage_scroll": ("Rasengan Barrage", "The Yellow Flash", "gold", rasengan_barrage),
+    "night_guy_scroll": ("Eight Gates: Night Guy", "The Green Beast", "green", night_guy),
+    "evening_elephant_scroll": ("Eight Gates: Evening Elephant", "The Green Beast", "green", evening_elephant),
+    "kamui_raikiri_scroll": ("Kamui Raikiri", "The Copy Ninja", "white", kamui_raikiri),
+    "lightning_hound_v2_scroll": ("Lightning Hound V2", "The Copy Ninja", "white", hounds),
+    "truth_seeking_scroll": ("Truth-Seeking Orbs", "The Sage of Six Paths", "gold", truth_orbs),
+    "six_paths_mode_scroll": ("Six Paths Sage Mode", "The Sage of Six Paths", "gold", six_paths_full),
+    "susanoo_v2_scroll": ("Perfect Susanoo V2", "Madara's Heir", "black", lambda i: chakra_flame(i, (60, 100, 240))),
+    "tengai_shinsei_scroll": ("Tengai Shinsei", "Madara's Heir", "black", meteor),
+})
+COLORS.update({"The Toad Sage": "§a", "The Slug Princess": "§2", "The White Snake": "§5", "The Yellow Flash": "§e",
+               "The Green Beast": "§a", "The Copy Ninja": "§7", "The Sage of Six Paths": "§6", "Madara's Heir": "§4"})
+
+
+def contract():                                # the Toad Summoning Contract, unrolled, signed in blood
+    img = G.new()
+    G.shape(img, lambda d: d.rectangle([14, 38, 114, 90], fill=255), (248, 236, 205), (210, 185, 140))
+    for x0 in (4, 110):
+        G.shape(img, lambda d, x0=x0: d.rounded_rectangle([x0, 30, x0 + 14, 98], radius=6, fill=255), (190, 60, 50), (100, 20, 20), "h")
+    d = ImageDraw.Draw(img)
+    d.rectangle([18, 40, 108, 43], fill=(175, 145, 105, 255))
+    for x in range(26, 104, 12):
+        d.line([x, 48, x, 70], fill=(30, 25, 25, 255), width=3)          # the names
+        d.ellipse([x - 4, 74, x + 4, 84], fill=(190, 30, 30, 255))       # the fingerprints in blood
+    return img
+
+
+def necklace():                                # Tsunade's necklace — the First Hokage's green crystal on its cord
+    img = G.new()
+    d = ImageDraw.Draw(img)
+    d.line([(18, 6), (34, 30), (54, 48), (62, 54)], fill=(70, 56, 44, 255), width=5, joint="curve")
+    d.line([(110, 6), (94, 30), (74, 48), (66, 54)], fill=(70, 56, 44, 255), width=5, joint="curve")
+    d.rounded_rectangle([56, 50, 72, 60], radius=3, fill=(220, 180, 70, 255))
+    G.shape(img, lambda d: d.polygon([(64, 58), (80, 72), (75, 112), (64, 124), (53, 112), (48, 72)], fill=255), (175, 255, 195), (25, 130, 65))
+    d = ImageDraw.Draw(img)
+    d.line([(64, 62), (64, 120)], fill=(225, 255, 235, 255), width=3)
+    d.line([(57, 72), (55, 108)], fill=(120, 225, 150, 255), width=2)
+    return img
+
+
+def icha_icha():                               # Icha Icha Tactics — Kakashi's green book
+    img = G.new()
+    G.shape(img, lambda d: d.polygon([(30, 20), (98, 14), (104, 106), (36, 112)], fill=255), (115, 205, 95), (40, 120, 40))
+    d = ImageDraw.Draw(img)
+    d.polygon([(36, 112), (104, 106), (106, 113), (38, 119)], fill=(245, 240, 225, 255))
+    d.line([(30, 20), (36, 112)], fill=(30, 80, 30, 255), width=6)
+    d.ellipse([50, 42, 86, 78], outline=(225, 40, 40, 255), width=5)
+    d.ellipse([60, 52, 76, 68], fill=(250, 230, 200, 255))
+    d.line([(55, 73), (81, 47)], fill=(225, 40, 40, 255), width=5)
+    d.rectangle([44, 86, 92, 92], fill=(250, 245, 230, 255))
+    return img
+
+
+def kakashi_mask_icon():                       # Kakashi's mask: the cloth over nose and mouth, the headband slanted over one eye
+    img = G.new()
+    G.shape(img, lambda d: d.polygon([(26, 60), (64, 52), (102, 60), (100, 96), (82, 116), (46, 116), (28, 96)], fill=255), (74, 84, 118), (34, 38, 58))
+    d = ImageDraw.Draw(img)
+    d.line([(64, 55), (64, 78)], fill=(98, 108, 142, 255), width=3)
+    G.shape(img, lambda d: d.polygon([(16, 20), (112, 33), (112, 52), (16, 39)], fill=255), (54, 60, 86), (30, 34, 50))
+    G.shape(img, lambda d: d.polygon([(44, 22), (84, 27), (84, 47), (44, 42)], fill=255), (228, 232, 240), (150, 156, 170))
+    d = ImageDraw.Draw(img)
+    d.arc([57, 28, 71, 42], 40, 330, fill=(40, 40, 52, 255), width=3)
+    d.line([(70, 31), (77, 27)], fill=(40, 40, 52, 255), width=3)
+    return img
+
+
+TOOLS = {"toad_contract": ("Toad Summoning Contract", "The Toad Sage", contract),
+         "tsunade_necklace": ("Tsunade's Necklace", "The Slug Princess", necklace),
+         "icha_icha": ("Icha Icha Tactics", "The Copy Ninja", icha_icha)}
+
+
 atlas_p = RP / "textures" / "item_texture.json"
 atlas = json.loads(atlas_p.read_text())
 for sid, (name, title, rod, emblem) in SCROLLS.items():
@@ -204,8 +424,17 @@ w(BP / "items" / "advanced_rinnegan.json", {"format_version": "1.21.60", "minecr
                    "minecraft:display_name": {"value": "§5Advanced Rinnegan Eyes§r\n§7Pain title"},
                    "minecraft:max_stack_size": 1, "minecraft:glint": True}}})
 atlas["texture_data"]["aegis_advanced_rinnegan"] = {"textures": "textures/items/aegis/advanced_rinnegan"}
+for tid, (name, title, draw) in TOOLS.items():
+    G.finish(draw(), tid)
+    w(BP / "items" / f"{tid}.json", {"format_version": "1.21.60", "minecraft:item": {
+        "description": {"identifier": f"aegis:{tid}", "menu_category": {"category": "equipment"}},
+        "components": {"minecraft:icon": {"textures": {"default": f"aegis_{tid}"}},
+                       "minecraft:display_name": {"value": f"{COLORS[title]}{name}§r\n§7{title} title"},
+                       "minecraft:max_stack_size": 1, "minecraft:glint": True}}})
+    atlas["texture_data"][f"aegis_{tid}"] = {"textures": f"textures/items/aegis/{tid}"}
 # icons for the armour pieces gen_armor.py makes
 G.finish(tobi_mask(), "tobi_mask")
+G.finish(kakashi_mask_icon(), "kakashi_mask")
 G.finish(sage_coat(), "orange_sage_coat")
 w(atlas_p, atlas)
-print(f"Title gear: {len(SCROLLS)} scrolls, the Advanced Rinnegan, and the mask & coat icons.")
+print(f"Title gear: {len(SCROLLS)} scrolls, {len(TOOLS)} tools, the Advanced Rinnegan, and the mask & coat icons.")

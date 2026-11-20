@@ -143,7 +143,7 @@ hud = {
         "bindings": [G_T, view(IS_OURS, "#visible")],
         "controls": [
             {"aegis_bars": {"type": "panel", "anchor_from": "top_left", "anchor_to": "top_left",
-                            "offset": [6, 6], "size": [200, 80], "controls": hud_controls}},
+                            "offset": [6, 6], "size": [200, 104], "controls": hud_controls}},  # (v1.62: + bounty & honor lines)
         ]},
     "root_panel": {"modifications": [
         {"array_name": "controls", "operation": "insert_back", "value": [{"aegis_hud@hud.aegis_hud": {}}]}]},

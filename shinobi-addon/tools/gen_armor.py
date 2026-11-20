@@ -447,8 +447,45 @@ TITLE_GEAR = {
                "leftLeg": [c([-0.5, 3.6, -2.6], [5.0, 8.4, 5.2], "base"), *[c([x, 3.6, -2.7], [1.0, 1.6 + (i % 2), 0.12], "black") for i, x in enumerate((0.0, 1.4, 2.8))]]},
         recipe=None),
 }
+# ---- v1.62: the Yellow Flash's haori, the Green Beast's jumpsuit, the Copy Ninja's mask (rendered icons) ----
+def flame_hem(x0, y, z, n, step=1.2):
+    """The Fourth Hokage's red flames licking up from a hem."""
+    return [c([x0 + i * step, y, z], [step, 1.3 + (i % 2) * 1.3, 0.12], "red" if i % 2 else "accent") for i in range(n)]
+
+
+TITLE_GEAR.update({
+    "hokage_haori": dict(name="Fourth Hokage's Haori", slot="chest", prot=8, dur=600,
+        colors=dict(base=(242, 240, 232), dark=(196, 192, 182), light=(255, 255, 250), red=(214, 52, 34), accent=(250, 150, 40)),
+        bones={"body": [BODY(0.75, "base"), c([-0.3, 12, -2.95], [0.6, 12, 0.15], "dark"),                         # open at the front
+                        c([-4.6, 22.2, -2.7], [9.2, 2.6, 5.4], "light", 0.3),                                       # the collar
+                        c([-0.9, 13.0, 2.78], [1.8, 8.6, 0.12], "red")],                                             # the kanji down the back
+               "rightArm": [c([-8.7, 16.8, -2.7], [5.4, 7.4, 5.4], "base"), *flame_hem(-8.7, 16.7, -2.82, 4, 1.35)],
+               "leftArm": [c([3.3, 16.8, -2.7], [5.4, 7.4, 5.4], "base"), *flame_hem(3.3, 16.7, -2.82, 4, 1.35)],
+               "rightLeg": [c([-4.6, 4.2, -2.7], [5.2, 7.9, 5.4], "base"), *flame_hem(-4.6, 4.1, -2.82, 4, 1.3), *flame_hem(-4.6, 4.1, 2.72, 4, 1.3)],
+               "leftLeg": [c([-0.6, 4.2, -2.7], [5.2, 7.9, 5.4], "base"), *flame_hem(-0.6, 4.1, -2.82, 4, 1.3), *flame_hem(-0.6, 4.1, 2.72, 4, 1.3)]},
+        recipe=None),
+    "green_jumpsuit": dict(name="Green Beast Jumpsuit", slot="chest", prot=6, dur=600,
+        colors=dict(base=(58, 150, 62), dark=(38, 108, 42), light=(92, 190, 92), accent=(240, 130, 40), metal=(186, 192, 202),
+                    black=(30, 30, 36), red=(178, 40, 32)),
+        bones={"body": [BODY(0.3, "base"), c([-0.25, 13.6, -2.42], [0.5, 9.4, 0.12], "dark"),                    # the zip
+                        c([-4.4, 12.0, -2.4], [8.8, 1.5, 4.8], "red", 0.3),                                          # the headband, worn as a belt
+                        c([-1.5, 11.9, -2.95], [3.0, 1.7, 0.22], "metal"), c([-0.5, 12.3, -3.05], [1.0, 0.8, 0.1], "black")],
+               "rightArm": [RARM(0.3, "base")], "leftArm": [LARM(0.3, "base")],
+               "rightLeg": [RLEG(0.3, "base", 4, 8), RLEG(0.55, "accent", 0, 4)],                                  # the orange leg warmers
+               "leftLeg": [LLEG(0.3, "base", 4, 8), LLEG(0.55, "accent", 0, 4)]},
+        recipe=None),
+    "kakashi_mask": dict(name="Kakashi's Mask", slot="head", prot=3, dur=400,
+        colors=dict(base=(46, 52, 76), dark=(32, 36, 54), metal=(192, 198, 208), black=(20, 20, 26), light=(70, 78, 106)),
+        bones={"head": [c([-4.25, 23.6, -4.25], [8.5, 3.4, 8.5], "base"), c([-4.3, 23.3, -4.3], [8.6, 0.6, 8.6], "dark"),   # the mask
+                        c([-0.4, 25.2, -4.33], [0.8, 1.8, 0.1], "light"),                                                       # the nose under it
+                        # the headband, slanted down over his left eye (stepped, so it reads the same in every viewer)
+                        c([-4.4, 28.6, -4.4], [3.0, 1.5, 8.8], "dark"), c([-1.4, 28.0, -4.4], [2.9, 1.6, 8.8], "dark"),
+                        c([1.5, 27.0, -4.4], [2.9, 1.9, 8.8], "dark"),
+                        c([-1.8, 27.9, -4.62], [3.6, 1.8, 0.24], "metal"), c([-0.5, 28.4, -4.7], [1.0, 0.8, 0.1], "black")]},
+        recipe=None),
+})
 ARMOR.update(TITLE_GEAR)
-DRAWN_ICONS = {f"{v}_headband" for v in ("sand", "mist", "cloud", "stone", "rain")} | set(ROGUE_GEAR) | {"tobi_mask", "orange_sage_coat"}  # (gen_titles.py)
+DRAWN_ICONS = {f"{v}_headband" for v in ("sand", "mist", "cloud", "stone", "rain")} | set(ROGUE_GEAR) | {"tobi_mask", "orange_sage_coat", "kakashi_mask"}  # (gen_titles.py)
 
 
 SLOT = {"head": ("slot.armor.head", "armor_head"), "chest": ("slot.armor.chest", "armor_torso"),

@@ -239,14 +239,17 @@ function recordKage(player, village) {
 export function giveKageSet(player, village) {
   if (!KAGE_VILLAGES[village]) return false;
   player.setDynamicProperty(KAGE_PROP, village);
+  player.setDynamicProperty("aegis:was_kage", true); // (v1.62: the Yellow Flash title asks for a Kage, past or present)
   recordKage(player, village);
   giveSet(player, village);
   return true;
 }
 
 export function setKage(player, village) {
-  if (village) player.setDynamicProperty(KAGE_PROP, village);
-  else player.setDynamicProperty(KAGE_PROP, undefined);
+  if (village) {
+    player.setDynamicProperty(KAGE_PROP, village);
+    player.setDynamicProperty("aegis:was_kage", true);
+  } else player.setDynamicProperty(KAGE_PROP, undefined);
   recordKage(player, village);
   api.refreshName?.(player);
 }

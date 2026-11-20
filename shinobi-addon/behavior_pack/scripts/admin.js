@@ -12,7 +12,8 @@ import { currentEvent, startRaid, startWanted, startScrolls, startDoubleXp, stop
 import { startGrace, stopGrace, graceLines, graceLeftText, GRACE_MAX_MINUTES } from "./grace.js";
 import { clearItems, clearMobs, lagClearOn, setLagClear, nextItemClear } from "./lagclear.js";
 import { vanillaBanned, setVanillaBan } from "./bans.js";
-import { bountyOf, setBounty } from "./bounty.js";
+import { bountyOf, setBounty, killReward, setKillReward, KILL_REWARD_RANGE } from "./bounty.js";
+import { TRACKERS, trackerOn, setTracker } from "./tracker.js";
 import { FACTIONS, factionOf, factionRank, leaveFaction } from "./factions.js";
 import { TITLES, TITLE_IDS, hasTitle } from "./titles.js";
 import { getLevel, setLevel, MAX_LEVEL, RANKS, getRank, meleePercent, setMeleePercent, MELEE_RANGE } from "./levels.js";
@@ -459,9 +460,9 @@ async function clanForm(p, t, back) {
   return back();
 }
 
+// A shinobi holds ONE title of legend at a time (v1.62): pick it, or None.
 async function titlesForm(p, t, back) {
-  const f = new ModalFormData().title(`§lTitles — ${t.name}`);
-  for (const id of TITLE_IDS) {
+  const label = (id) => {
     const reqs = TITLES[id].reqs;
     const checks = reqs.filter(([, c]) => c);
     let met = 0;
@@ -473,17 +474,23 @@ async function titlesForm(p, t, back) {
       }
     }
     const judged = reqs.length - checks.length;
-    f.toggle(`${TITLES[id].name}§r §8— ${met}/${checks.length} requirements met${judged ? ` (+${judged} for you to judge)` : ""}`, hasTitle(t, id));
-  }
+    return `${strip(TITLES[id].name)} (${met}/${checks.length} met${judged ? `, +${judged} to judge` : ""})`;
+  };
+  const held = TITLE_IDS.find((id) => hasTitle(t, id));
+  const f = new ModalFormData().title(`§lTitle of legend — ${t.name}`)
+    .dropdown("§7A shinobi holds one title of legend at a time.\n§fTitle", ["None", ...TITLE_IDS.map(label)], held ? 1 + TITLE_IDS.indexOf(held) : 0);
   const r = await showForm(p, f);
   if (r.canceled || !r.formValues || !alive(t)) return back();
-  TITLE_IDS.forEach((id, i) => {
-    const want = !!r.formValues[i];
-    if (want === hasTitle(t, id)) return;
-    if (want) t.addTag(id);
-    else t.removeTag(id);
-    adminLog(p, `${want ? "granted" : "took"} the ${strip(TITLES[id].name)} title ${want ? "to" : "from"} ${t.name}`);
-  });
+  const want = TITLE_IDS[Number(r.formValues[0]) - 1]; // undefined = None
+  for (const id of TITLE_IDS) {
+    if (id === want || !hasTitle(t, id)) continue;
+    t.removeTag(id);
+    adminLog(p, `took the ${strip(TITLES[id].name)} title from ${t.name}`);
+  }
+  if (want && !hasTitle(t, want)) {
+    t.addTag(want);
+    adminLog(p, `granted the ${strip(TITLES[want].name)} title to ${t.name}`);
+  }
   return back();
 }
 
@@ -598,6 +605,8 @@ const SETTINGS = () => [
   ["Automatic lag clear §8(dropped items every 5 min, hostile mobs after 20 min)", lagClearOn, (on) => setLagClear(on)],
   ["Friendly fire between village-mates", friendlyFire, (on) => setFriendlyFire(on)],
   ["Automatic world events §8(one every hour while 2+ players are online)", autoEvents, (on, p) => p.sendMessage(setAutoEvents(on))],
+  // v1.62: the bounty & honor tracker's boards
+  ...Object.entries(TRACKERS).map(([id, label]) => [label, () => trackerOn(id), (on) => setTracker(id, on)]),
 ];
 
 async function serverSettings(p) {
@@ -606,6 +615,8 @@ async function serverSettings(p) {
   for (const [label, get] of rows) f.toggle(label, !!get());
   f.slider("§fPlayers' melee damage§7 — % (100 = normal: since v1.60 it grows +1.5% per level, ×5.5 at level 300). Punches, blades\n" +
     "and what rides on them; jutsu aren't affected.", MELEE_RANGE[0], MELEE_RANGE[1], 5, meleePercent());
+  f.slider("§fHonor / bounty per player kill§7 — a village shinobi who defeats a wanted player or a rogue earns it as honor;\n" +
+    "every other kill puts it on the killer's head as a bounty.", KILL_REWARD_RANGE[0], KILL_REWARD_RANGE[1], 5000, killReward());
   const r = await showForm(p, f);
   if (!r.canceled && r.formValues) {
     rows.forEach(([label, get, set], i) => {
@@ -616,6 +627,8 @@ async function serverSettings(p) {
     });
     const melee = Math.round(Number(r.formValues[rows.length]));
     if (Number.isFinite(melee) && melee !== meleePercent()) adminLog(p, `set players' melee damage to ${setMeleePercent(melee)}%`);
+    const perKill = Math.round(Number(r.formValues[rows.length + 1]));
+    if (Number.isFinite(perKill) && perKill !== killReward()) adminLog(p, `set every player kill to be worth ${setKillReward(perKill).toLocaleString("en-US")} honor or bounty`);
   }
   return adminMenu(p);
 }

@@ -3,8 +3,10 @@
 //   • Place a bounty: pick an online player and pay at least 1,000 Ryō — it's added to the price on their head
 //     (anonymously, like a real bounty).
 //   • Claim it: defeat the wanted player (your clone, companion or summon counts) and the whole bounty is paid to you.
-//   • Player killers get a bounty of their own: 1,000 Ryō + 50 per level of the victim — three times that for a rogue
-//     ninja. Defeating a wanted player is bounty hunting: it never raises yours.
+//   • v1.62: every player kill is worth 50,000 (the admins can change it: Admin Panel → Server Settings) —
+//       HONOR for justice: a village shinobi who defeats a wanted player or a rogue ninja;
+//       BOUNTY for anything else: a rogue's kills, or a village shinobi cutting down someone who wasn't wanted.
+//     (Before v1.62 a killer's bounty grew by 1,000 Ryō + 50 per level of the victim.)
 //   • A bounty of 100,000 Ryō or more shows [Wanted] over your name.
 //   • Your PvP record counts the players you've defeated and the bounties you've claimed, and remembers if you've ever
 //     defeated a Kage, the Toad Sage, or a feared and respected Jōnin (Jōnin rank and 10,000+ honor) — the titles in the
@@ -16,8 +18,8 @@
 import { world, system } from "@minecraft/server";
 import { ActionFormData, ModalFormData } from "@minecraft/server-ui";
 import { getRyo, addRyo, spendRyo, fmtRyo } from "./currency.js";
-import { getLevel, getRank } from "./levels.js";
-import { isRogue, getHonor } from "./villages.js";
+import { getRank } from "./levels.js";
+import { isRogue, getHonor, getVillage, addHonor } from "./villages.js";
 import { getKage, sanninOf } from "./armor.js";
 import { anbuBountyBonus, factionProgress } from "./factions.js";
 
@@ -26,6 +28,26 @@ const RECORD = "aegis:pvp"; // player: { kills, claimed, kage, toad, jonin }
 export const MIN_BOUNTY = 1000;
 export const WANTED_AT = 100000;
 const FEARED_HONOR = 10000;
+// v1.62: what one player kill is worth, in honor or in bounty
+const KILL_PROP = "aegis:kill_reward";
+export const KILL_REWARD_DEFAULT = 50000;
+export const KILL_REWARD_RANGE = [0, 500000];
+export function killReward() {
+  try {
+    const v = world.getDynamicProperty(KILL_PROP);
+    return typeof v === "number" && Number.isFinite(v) ? Math.max(KILL_REWARD_RANGE[0], Math.min(KILL_REWARD_RANGE[1], v)) : KILL_REWARD_DEFAULT;
+  } catch {
+    return KILL_REWARD_DEFAULT;
+  }
+}
+export function setKillReward(n) {
+  const v = Math.max(KILL_REWARD_RANGE[0], Math.min(KILL_REWARD_RANGE[1], Math.round(Number(n) || 0)));
+  world.setDynamicProperty(KILL_PROP, v === KILL_REWARD_DEFAULT ? undefined : v);
+  world.sendMessage(`§6Bingo Book:§7 every player kill is now worth §f${v.toLocaleString("en-US")}§7 honor or bounty.`);
+  return v;
+}
+// Does defeating `victim` earn `killer` honor (justice) rather than a bounty?
+export const isJustice = (killer, victim) => !!getVillage(killer) && !isRogue(killer) && (bountyOf(victim) > 0 || isRogue(victim));
 
 let api;
 
@@ -87,13 +109,34 @@ function killerOf(damageSource) {
   return k?.typeId === "minecraft:player" ? k : undefined;
 }
 
-// A player defeated another: the record, then the bounty (claimed, or earned).
+// A player defeated another: the record, the bounty on the victim (claimed), and 50,000 honor or bounty for the killer.
 export function onPlayerKill(killer, victim) {
   const rec = pvpRecord(killer);
   rec.kills = (rec.kills ?? 0) + 1;
   if (getKage(victim)) rec.kage = true;
   if (sanninOf(victim) === "jiraiya") rec.toad = true;
   if (getRank(victim) >= 2 && getHonor(victim) >= FEARED_HONOR) rec.jonin = true;
+  const justice = isJustice(killer, victim); // (decided before the victim's bounty is claimed)
+  const out = claim(killer, victim, rec);
+  const reward = killReward();
+  if (reward > 0) {
+    if (justice) {
+      addHonor(killer, reward);
+      out.honor = reward;
+      killer.sendMessage(`§e+${reward.toLocaleString("en-US")} honor §7— you brought down ${isRogue(victim) ? "a rogue ninja" : "a wanted shinobi"}. §8(honor: ${getHonor(killer).toLocaleString("en-US")})`);
+      killer.onScreenDisplay?.setActionBar(`§e+${reward.toLocaleString("en-US")} honor`);
+    } else {
+      const now = addBounty(killer, reward);
+      out.earned = reward;
+      killer.sendMessage(`§c+${fmtRyo(reward)} on your head §7— the Bingo Book now lists you at §6${fmtRyo(now)}§7.`);
+      killer.onScreenDisplay?.setActionBar(`§c+${fmtRyo(reward)} bounty`);
+    }
+  }
+  return out;
+}
+
+// The victim's bounty, if any, goes to the killer.
+function claim(killer, victim, rec) {
   const wanted = bountyOf(victim);
   if (wanted > 0) {
     rec.claimed = (rec.claimed ?? 0) + 1;
@@ -112,10 +155,7 @@ export function onPlayerKill(killer, victim) {
     return { claimed: wanted + extra };
   }
   killer.setDynamicProperty(RECORD, JSON.stringify(rec));
-  const add = (MIN_BOUNTY + 50 * getLevel(victim)) * (isRogue(killer) ? 3 : 1);
-  const now = addBounty(killer, add);
-  killer.sendMessage(`§cThe Bingo Book now lists you: §6${fmtRyo(now)}§c on your head.`);
-  return { earned: add };
+  return {};
 }
 
 // ---------------------------------------------------------------------------
@@ -228,6 +268,11 @@ export function initBounty(helpers) {
     if (id !== "aegis:bounty") return;
     const tell = (t) => (by?.typeId === "minecraft:player" ? by.sendMessage(t) : world.sendMessage(t));
     const [cmd, name, amount] = String(message ?? "").trim().split(/\s+/);
+    // (v1.62) what every player kill is worth — also Admin Panel → Server Settings
+    if (cmd === "reward") {
+      if (name !== undefined && name !== "") setKillReward(name);
+      return tell(`§7Every player kill is worth §f${killReward().toLocaleString("en-US")}§7 honor or bounty §8(0 = off; default ${KILL_REWARD_DEFAULT.toLocaleString("en-US")})§7.`);
+    }
     if (cmd === "set" || cmd === "clear") {
       const p = findPlayer(name);
       if (!p) return tell(`§7No online player called "${name ?? ""}".`);

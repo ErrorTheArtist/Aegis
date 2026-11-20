@@ -1,0 +1,23 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:item": {
+    "description": {
+      "identifier": "aegis:evening_elephant_scroll",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "aegis_evening_elephant_scroll"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "§aTitle Scroll: Eight Gates: Evening Elephant§r\n§7The Green Beast title"
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:glint": true
+    }
+  }
+}

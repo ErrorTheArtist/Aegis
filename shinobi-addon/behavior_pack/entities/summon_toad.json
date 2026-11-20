@@ -25,6 +25,33 @@
       },
       "aegis:expire": {
         "minecraft:instant_despawn": {}
+      },
+      "aegis:giant": {
+        "minecraft:scale": {
+          "value": 3.2
+        },
+        "minecraft:health": {
+          "value": 600,
+          "max": 600
+        },
+        "minecraft:attack": {
+          "damage": 30
+        },
+        "minecraft:collision_box": {
+          "width": 3.6,
+          "height": 5.0
+        },
+        "minecraft:knockback_resistance": {
+          "value": 1.0
+        },
+        "minecraft:timer": {
+          "time": 40,
+          "looping": false,
+          "time_down_event": {
+            "event": "aegis:expire",
+            "target": "self"
+          }
+        }
       }
     },
     "components": {
@@ -131,6 +158,13 @@
         "add": {
           "component_groups": [
             "aegis:expire"
+          ]
+        }
+      },
+      "aegis:giant": {
+        "add": {
+          "component_groups": [
+            "aegis:giant"
           ]
         }
       }

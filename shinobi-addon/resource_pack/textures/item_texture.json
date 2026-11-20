@@ -664,6 +664,87 @@
     },
     "aegis_shikotsumyaku": {
       "textures": "textures/items/aegis/shikotsumyaku"
+    },
+    "aegis_gamabunta_scroll": {
+      "textures": "textures/items/aegis/gamabunta_scroll"
+    },
+    "aegis_goemon_scroll": {
+      "textures": "textures/items/aegis/goemon_scroll"
+    },
+    "aegis_hundred_seal_scroll": {
+      "textures": "textures/items/aegis/hundred_seal_scroll"
+    },
+    "aegis_katsuyu_scroll": {
+      "textures": "textures/items/aegis/katsuyu_scroll"
+    },
+    "aegis_eight_branches_scroll": {
+      "textures": "textures/items/aegis/eight_branches_scroll"
+    },
+    "aegis_snake_rebirth_scroll": {
+      "textures": "textures/items/aegis/snake_rebirth_scroll"
+    },
+    "aegis_raijin_strike_scroll": {
+      "textures": "textures/items/aegis/raijin_strike_scroll"
+    },
+    "aegis_rasengan_barrage_scroll": {
+      "textures": "textures/items/aegis/rasengan_barrage_scroll"
+    },
+    "aegis_night_guy_scroll": {
+      "textures": "textures/items/aegis/night_guy_scroll"
+    },
+    "aegis_evening_elephant_scroll": {
+      "textures": "textures/items/aegis/evening_elephant_scroll"
+    },
+    "aegis_kamui_raikiri_scroll": {
+      "textures": "textures/items/aegis/kamui_raikiri_scroll"
+    },
+    "aegis_lightning_hound_v2_scroll": {
+      "textures": "textures/items/aegis/lightning_hound_v2_scroll"
+    },
+    "aegis_truth_seeking_scroll": {
+      "textures": "textures/items/aegis/truth_seeking_scroll"
+    },
+    "aegis_six_paths_mode_scroll": {
+      "textures": "textures/items/aegis/six_paths_mode_scroll"
+    },
+    "aegis_susanoo_v2_scroll": {
+      "textures": "textures/items/aegis/susanoo_v2_scroll"
+    },
+    "aegis_tengai_shinsei_scroll": {
+      "textures": "textures/items/aegis/tengai_shinsei_scroll"
+    },
+    "aegis_toad_contract": {
+      "textures": "textures/items/aegis/toad_contract"
+    },
+    "aegis_tsunade_necklace": {
+      "textures": "textures/items/aegis/tsunade_necklace"
+    },
+    "aegis_icha_icha": {
+      "textures": "textures/items/aegis/icha_icha"
+    },
+    "aegis_long_kusanagi": {
+      "textures": "textures/items/aegis/long_kusanagi"
+    },
+    "aegis_minato_kunai": {
+      "textures": "textures/items/aegis/minato_kunai"
+    },
+    "aegis_guy_nunchaku": {
+      "textures": "textures/items/aegis/guy_nunchaku"
+    },
+    "aegis_six_paths_staff": {
+      "textures": "textures/items/aegis/six_paths_staff"
+    },
+    "aegis_gunbai_v2": {
+      "textures": "textures/items/aegis/gunbai_v2"
+    },
+    "aegis_hokage_haori": {
+      "textures": "textures/items/aegis/hokage_haori"
+    },
+    "aegis_green_jumpsuit": {
+      "textures": "textures/items/aegis/green_jumpsuit"
+    },
+    "aegis_kakashi_mask": {
+      "textures": "textures/items/aegis/kakashi_mask"
     }
   }
 }

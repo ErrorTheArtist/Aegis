@@ -60,7 +60,8 @@ export const TOPICS = [
   ]],
   ["§cBingo Book & PvP", [
     "• Put a §fbounty§r on any player (Shinobi Record → Bingo Book) — whoever defeats them collects it.",
-    "• Killing players earns you a bounty of your own (three times as much for rogues). 100,000 Ryō shows [Wanted] over your name.",
+    "• Every §fplayer§r you defeat is worth §e50,000§r: a village shinobi who defeats a wanted player or a rogue earns §e50,000 honor§r; any other kill — and every kill by a rogue — puts a §c50,000 bounty§r on your own head. Only player kills count: enemy ninja and bosses never add bounty.",
+    "• §fShinobi Record → Bounty & Honor§r shows your standing, the most wanted and the most honored. The Most Wanted board is on the right of the screen, everyone's honor is in the player list, and your own bounty and honor are on your HUD. 100,000 Ryō shows [Wanted] over your name.",
     "• Your PvP record counts who you've defeated; the titles check it.",
     "• Players in a grace period can't hurt players or be hurt by them (they can still fight ninja and bosses).",
   ]],
@@ -75,8 +76,9 @@ export const TOPICS = [
     "• §fWorld events§r — raids on villages, wanted legends, hidden scroll hunts, Double XP — are started by the server's admins.",
   ]],
   ["§5Titles", [
-    "• Five titles of legend: §5Pain§r, §cItachi§r, §6Tobi§r, §9Sasuke§r, §6Naruto§r. Each has hard requirements (Shinobi Record → Titles shows them ticked).",
-    "• An admin grants a title when you've earned it; it brings unique gear and perks.",
+    "• Thirteen titles of legend: §5Pain§r, §cItachi§r, §6Tobi§r, §9Sasuke§r, §6Naruto§r and, since v1.62, §aThe Toad Sage§r, §2The Slug Princess§r, §5The White Snake§r, §eThe Yellow Flash§r, §aThe Green Beast§r, §7The Copy Ninja§r, §6The Sage of Six Paths§r and §4Madara's Heir§r. Each has hard requirements (Shinobi Record → Titles shows them ticked).",
+    "• §fOne at a time§r: a new title replaces the one you held. You keep the old title's gear, but only a title's holder can use it.",
+    "• An admin grants a title when you've earned it; it brings unique gear — jutsu scrolls, weapons, tools — and strong perks.",
   ]],
 ];
 

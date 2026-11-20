@@ -1,0 +1,23 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:item": {
+    "description": {
+      "identifier": "aegis:susanoo_v2_scroll",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "aegis_susanoo_v2_scroll"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "§4Title Scroll: Perfect Susanoo V2§r\n§7Madara's Heir title"
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:glint": true
+    }
+  }
+}

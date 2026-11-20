@@ -1,0 +1,44 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:item": {
+    "description": {
+      "identifier": "aegis:green_jumpsuit",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "aegis_green_jumpsuit"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "Green Beast Jumpsuit"
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:wearable": {
+        "slot": "slot.armor.chest",
+        "protection": 6
+      },
+      "minecraft:durability": {
+        "max_durability": 600
+      },
+      "minecraft:enchantable": {
+        "slot": "armor_torso",
+        "value": 12
+      },
+      "minecraft:repairable": {
+        "repair_items": [
+          {
+            "items": [
+              "minecraft:iron_ingot",
+              "minecraft:leather"
+            ],
+            "repair_amount": 80
+          }
+        ]
+      }
+    }
+  }
+}

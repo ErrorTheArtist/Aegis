@@ -247,6 +247,61 @@ SWORDS["adamantine_staff"] = dict(
            box((-0.8, -0.8, -27.6), (1.6, 1.6, 0.6), "accent2"), box((-0.8, -0.8, 7.8), (1.6, 1.6, 0.6), "accent2"),
            box((-0.75, -0.75, -2), (1.5, 1.5, 5), "wrap")])
 
+# ---- v1.62: the weapons of the new titles of legend (titles.js / legend_titles.js) ----
+SWORDS["long_kusanagi"] = dict(
+    name="Kusanagi Long Sword", damage=13, durability=3000, owner="Orochimaru's sword — it stretches to pierce anything",
+    colors=dict(steel=(196, 198, 214), edge=(242, 244, 255), dark=(40, 30, 50), wrap=(64, 42, 84),
+                accent=(124, 80, 172), accent2=(204, 184, 232), light=(255, 255, 255), red=(120, 40, 140)),
+    slash=(0.65, 0.45, 0.9), recipe=None,
+    cubes=[box((-1, -1, -3), (2, 2, 7), "wrap"), box((-1.2, -1.2, 4), (2.4, 2.4, 1), "dark"),
+           box((-1.4, -1.4, -4), (2.8, 2.8, 1), "accent"),
+           box((-0.45, -0.9, -36), (0.9, 2.2, 32), "steel"), box((-0.3, -1.2, -35.5), (0.6, 0.5, 31.5), "edge"),
+           box((-0.4, -0.6, -38), (0.8, 1.4, 2), "steel"), box((-0.3, -0.35, -39.2), (0.6, 0.8, 1.2), "edge"),
+           box((-0.5, 1.15, -12), (1.0, 0.3, 7), "accent2")])
+SWORDS["minato_kunai"] = dict(
+    name="Minato's Tri-Pronged Kunai", damage=9, durability=3000, owner="the Fourth Hokage's marked kunai — throw it, then be where it lands",
+    colors=dict(steel=(192, 196, 206), edge=(242, 246, 252), dark=(40, 40, 46), wrap=(52, 46, 52),
+                accent=(250, 210, 70), accent2=(236, 226, 192), light=(255, 255, 255), red=(170, 40, 40)),
+    slash=(1.0, 0.9, 0.35), recipe=None,
+    cubes=[box((-0.6, -0.6, -2), (1.2, 1.2, 6), "wrap"), box((-0.7, -0.45, 0.2), (1.4, 0.9, 2.6), "accent2"),   # the seal tag
+           box((-0.3, -1.6, 3.8), (0.6, 3.2, 0.5), "dark"), box((-0.3, -1.6, 6.4), (0.6, 3.2, 0.5), "dark"),         # the ring
+           box((-0.3, -1.6, 3.8), (0.6, 0.5, 3.1), "dark"), box((-0.3, 1.1, 3.8), (0.6, 0.5, 3.1), "dark"),
+           box((-0.35, -0.9, -10), (0.7, 1.8, 8), "steel"), box((-0.3, -0.5, -12), (0.6, 1.0, 2), "steel"),         # the blade
+           box((-0.2, -0.95, -9.5), (0.4, 0.3, 7.5), "edge"),
+           box((-0.3, 0.9, -3.2), (0.6, 2.2, 0.8), "steel"), box((-0.3, 2.4, -7.5), (0.6, 0.8, 4.5), "steel"),       # the two side prongs
+           box((-0.3, -3.1, -3.2), (0.6, 2.2, 0.8), "steel"), box((-0.3, -3.2, -7.5), (0.6, 0.8, 4.5), "steel")])
+SWORDS["guy_nunchaku"] = dict(
+    name="Guy's Nunchaku", damage=10, durability=3000, owner="Might Guy's nunchaku — the Green Beast's sidearm",
+    colors=dict(steel=(188, 46, 36), edge=(232, 92, 72), dark=(52, 52, 58), wrap=(64, 42, 30),
+                accent=(222, 182, 62), accent2=(200, 200, 210), light=(255, 255, 255), red=(170, 35, 30)),
+    slash=(0.4, 0.95, 0.45), recipe=None,
+    cubes=[box((-0.8, -0.8, -9), (1.6, 1.6, 13), "steel"), box((-0.9, -0.9, 3.6), (1.8, 1.8, 0.8), "accent"),
+           box((-0.9, -0.9, -9.4), (1.8, 1.8, 0.8), "accent"),
+           *[box((-0.35, -0.35, z), (0.7, 0.7, 1.0), "dark") for z in (-10.6, -11.9, -13.2)],                       # the chain
+           box((-0.9, -0.9, -14.6), (1.8, 1.8, 0.8), "accent"), box((-0.8, -0.8, -27.5), (1.6, 1.6, 13), "steel"),
+           box((-0.9, -0.9, -28.1), (1.8, 1.8, 0.8), "accent")])
+SWORDS["six_paths_staff"] = dict(
+    name="Shakujō of the Six Paths", damage=12, durability=3000, owner="the Sage of Six Paths' staff — it pulls the world toward it",
+    colors=dict(steel=(62, 56, 68), edge=(112, 102, 122), dark=(28, 24, 30), wrap=(92, 72, 52),
+                accent=(240, 200, 80), accent2=(255, 236, 150), light=(255, 250, 230), red=(170, 40, 30)),
+    slash=(1.0, 0.85, 0.35), recipe=None,
+    cubes=[box((-0.6, -0.6, -30), (1.2, 1.2, 40), "dark"), box((-0.8, -0.8, 10), (1.6, 1.6, 1.5), "accent"),
+           box((-0.75, -0.75, -2), (1.5, 1.5, 5), "wrap"),
+           box((-0.4, -3.4, -38), (0.8, 0.8, 8), "accent"), box((-0.4, 2.6, -38), (0.8, 0.8, 8), "accent"),          # the loop
+           box((-0.4, -3.4, -38.8), (0.8, 6.8, 0.8), "accent"), box((-0.4, -3.4, -30.8), (0.8, 6.8, 0.8), "accent"),
+           box((-0.45, -0.45, -37), (0.9, 0.9, 7), "accent2"),
+           *[box((-0.3, s * 3.6 - 0.4, z), (0.6, 0.8, 1.4), "accent2") for s in (-1, 1) for z in (-37, -34.5, -32)]])  # the rings
+SWORDS["gunbai_v2"] = dict(
+    name="Madara's Gunbai", damage=13, durability=3000, owner="Madara's war fan — it turns fire back on its sender",
+    colors=dict(steel=(46, 40, 50), edge=(96, 86, 98), dark=(62, 40, 30), wrap=(112, 72, 40),
+                accent=(196, 30, 30), accent2=(240, 232, 222), light=(255, 255, 255), red=(196, 30, 30)),
+    slash=(0.95, 0.3, 0.25), recipe=None,
+    cubes=[box((-0.6, -0.6, -10), (1.2, 1.2, 14), "wrap"), box((-0.8, -0.8, 3.5), (1.6, 1.6, 1), "dark"),
+           *[box((-0.5, -h / 2, -19 - l / 2), (1.0, h, l), "steel") for h, l in ((14.2, 9.4), (12.4, 12.4), (9.4, 14.2))],  # the fan
+           # the Uchiha crest on both faces — red above, white below (thin plates, so the icon shows them too)
+           *[box((sx, -2.6, z0), (0.1, 5.2, 4.0), sw) for sx in (0.5, -0.6) for z0, sw in ((-23.0, "accent"), (-19.0, "accent2"))],
+           *[box((sx, -3.6, z0), (0.1, 7.2, 3.0), sw) for sx in (0.5, -0.6) for z0, sw in ((-22.0, "accent"), (-19.0, "accent2"))]])
+
 def palette(colors):
     img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
     random.seed(sum(sum(v) for k, v in colors.items() if k != "sheath"))

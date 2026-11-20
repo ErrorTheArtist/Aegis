@@ -20,7 +20,7 @@ import { initCurrency } from "./currency.js";
 import { initQuests } from "./quests.js";
 import { initClash, registerCast, projectilesMet } from "./clash.js";
 import { initKamui, handleKamuiUse } from "./kamui.js";
-import { initVillages, sameVillage, handleGourdUse, villageRegenMultiplier, HEADBANDS } from "./villages.js";
+import { initVillages, sameVillage, handleGourdUse, villageRegenMultiplier, HEADBANDS, getHonor } from "./villages.js";
 import { animSfx } from "./sfx.js";
 import { initM1 } from "./m1.js";
 import { spawnLayered } from "./particles.js";
@@ -42,9 +42,11 @@ import { initDailies, noteDailyCast } from "./dailies.js";
 import { initEvents } from "./events.js";
 import { initStory, noteStoryCast } from "./story.js";
 import { initFactions, factionDamageMultiplier, factionAllies } from "./factions.js";
+import { initTracker } from "./tracker.js";
+import { bountyOf } from "./bounty.js";
 import { initAdmin } from "./admin.js";
 import { initBans } from "./bans.js";
-import { initTitles, makeTitleJutsu, titleDamageMultiplier, titleRegenMultiplier, noteTitleCast, hasTitle, TITLES } from "./titles.js";
+import { initTitles, makeTitleJutsu, titleDamageMultiplier, titleRegenMultiplier, noteTitleCast, hasTitle, TITLES, titleMeleeMultiplier, titleCostMultiplier, titleCooldownMultiplier } from "./titles.js";
 import { levelDamageFactor, bossDamageFactor, meleeDamageFactor } from "./levels.js";
 import { chakraSealed } from "./clans.js";
 import { initLevels, handleRecordUse, levelChakraBonus, levelRegenMultiplier, ninjutsuMultiplier, taijutsuMultiplier, cooldownMultiplier, gainJutsuXp, getLevel, xpInfo } from "./levels.js";
@@ -136,7 +138,8 @@ function hurt(target, amount, attacker, cause = "entityAttack", kind = "tech") {
     const melee = kind === "onhit";
     amount *= (kind === "fist" || melee ? taijutsuMultiplier(attacker) : ninjutsuMultiplier(attacker)) * sageMultiplier(attacker) * armorDamageMultiplier(attacker) * natureDamageMultiplier(attacker);
     amount *= melee ? meleeDamageFactor(attacker) : levelDamageFactor(attacker); // stronger as you level (jutsu ×10, melee ×5.5 at 300)
-    amount *= titleDamageMultiplier(attacker, target); // Pain / Itachi / Tobi / Sasuke perks
+    amount *= titleDamageMultiplier(attacker, target, cause); // the titles' perks
+    if (melee || kind === "fist") amount *= titleMeleeMultiplier(attacker); // the Green Beast, the Slug Princess (v1.62)
     amount *= factionDamageMultiplier(attacker, target); // Akatsuki / Anbu perks (v1.56)
   } else if (target?.typeId === "minecraft:player" && BOSS_TYPES.has(attacker?.typeId)) {
     amount *= bossDamageFactor(target); // bosses stay dangerous for high-level shinobi
@@ -350,7 +353,7 @@ function cooldownLeft(player, itemId) {
 }
 
 function startCooldown(player, itemId, ticks) {
-  const mult = player?.typeId === "minecraft:player" ? cooldownMultiplier(player) : 1;
+  const mult = player?.typeId === "minecraft:player" ? cooldownMultiplier(player) * titleCooldownMultiplier(player, itemId) : 1; // (v1.62: the Yellow Flash, Icha Icha)
   cooldowns.set(`${player.id}|${itemId}`, system.currentTick + Math.round(ticks * mult));
 }
 
@@ -392,7 +395,7 @@ world.afterEvents.itemUse.subscribe(({ source: player, itemStack }) => {
     player.onScreenDisplay.setActionBar(`§7${jutsu.name} ready in §f${(left / 20).toFixed(1)}s`);
     return;
   }
-  const cost = Math.round(jutsu.cost * clanJutsuCostMultiplier(player, itemStack.typeId) * natureCostMultiplier(player, itemStack.typeId));
+  const cost = Math.round(jutsu.cost * clanJutsuCostMultiplier(player, itemStack.typeId) * natureCostMultiplier(player, itemStack.typeId) * titleCostMultiplier(player, itemStack.typeId));
   const chakra = getChakra(player);
   if (chakra < cost) {
     player.onScreenDisplay.setActionBar(`§cNot enough chakra! §7(${Math.floor(chakra)}/${cost})`);
@@ -1204,7 +1207,7 @@ initSwords({
 
 initLevels({ add, particle, sound, getChakra, setChakra });
 
-initHud({ getChakra, getMaxChakra, getLevel, xpInfo });
+initHud({ getChakra, getMaxChakra, getLevel, xpInfo, getBounty: bountyOf, getHonor }); // (v1.62: + the bounty & honor tracker)
 
 const npcApi = {
   add, sub, scale, norm, dot, particle, sound, knockback, hurt, isValid, canBeHit,
@@ -1238,6 +1241,7 @@ initEvents(npcApi); // v1.55: world events
 initStory(npcApi); // v1.56: the Path of the Shinobi
 initFactions({ ...npcApi, refreshName: applyNameTag }); // v1.56: the Akatsuki and the Anbu
 initAdmin(npcApi); // v1.56: the Admin Panel
+initTracker(); // v1.62: the bounty & honor tracker
 initBans();
 initTitles({ ...npcApi, refreshName: applyNameTag });
 initEdoTensei(npcApi);

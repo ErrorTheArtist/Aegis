@@ -79,7 +79,7 @@ export const TOPICS = [
   ["§5Titles", [
     "• Thirteen titles of legend: §5Pain§r, §cItachi§r, §6Tobi§r, §9Sasuke§r, §6Naruto§r and, since v1.62, §aThe Toad Sage§r, §2The Slug Princess§r, §5The White Snake§r, §eThe Yellow Flash§r, §aThe Green Beast§r, §7The Copy Ninja§r, §6The Sage of Six Paths§r and §4Madara's Heir§r. Each has hard requirements (Shinobi Record → Titles shows them ticked).",
     "• §fOne at a time§r: a new title replaces the one you held. You keep the old title's gear, but only a title's holder can use it.",
-    "• An admin grants a title when you've earned it; it brings unique gear — jutsu scrolls, weapons, tools — and strong perks.",
+    "• §fMet every requirement? Claim it yourself§r: Shinobi Record → Titles → the title → §aClaim this title§r. It brings unique gear — jutsu scrolls, weapons, tools — and strong perks.",
   ]],
   ["§dNinja movement & fun", [
     "• §bChakra Leap§r — jump again in mid-air for a chakra-powered second jump (8 chakra).",

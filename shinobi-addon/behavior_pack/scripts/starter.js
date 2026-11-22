@@ -45,6 +45,7 @@ const VCHAINS = {
 };
 
 let api;
+const DEATHS = "aegis:quest_deaths"; // (v1.65) deaths while a chain was still running — Itachi's title asks for none
 
 // Two chains: "starter" (everyone) and "village" (depends on the player's village).
 const CHAINS = {
@@ -166,6 +167,24 @@ function line(player, key) {
   const prog = q.kind === "level" ? getLevel(player) : q.kind === "rank" ? getRank(player) : s.progress;
   return `§7${name} ${s.step + 1}/${list.length}: §e${q.title} §7(${q.text}) §f${Math.min(prog, q.need)}/${q.need}`;
 }
+// (v1.65) Both chains finished — the starter quests and the player's village quest line?
+export function questChainsDone(p) {
+  const s = get(p, "starter");
+  const v = get(p, "village");
+  return !!s && s.step >= CHAIN.length && !!v && !!VCHAINS[v.v] && v.step >= VCHAINS[v.v].length;
+}
+export function questChainDeaths(p) {
+  try {
+    return Number(p.getDynamicProperty(DEATHS) ?? 0) || 0;
+  } catch {
+    return 0;
+  }
+}
+const chainRunning = (p) => Object.keys(CHAINS).some((key) => {
+  const s = get(p, key);
+  return !!s && s.step < CHAINS[key].quests(p, s).length;
+});
+
 export const starterLine = (player) => [line(player, "starter"), line(player, "village")].filter(Boolean).join("\n");
 
 function killKind(dead) {
@@ -189,6 +208,15 @@ function killKind(dead) {
 
 export function initStarter(helpers) {
   api = helpers;
+  // a death while a chain is still running counts against Itachi's "without dying" (v1.65)
+  world.afterEvents.entityDie.subscribe(({ deadEntity: p }) => {
+    if (p?.typeId !== "minecraft:player") return;
+    try {
+      if (chainRunning(p)) p.setDynamicProperty(DEATHS, questChainDeaths(p) + 1);
+    } catch {
+      /* ignore */
+    }
+  });
   world.afterEvents.entityDie.subscribe(({ deadEntity, damageSource }) => {
     let k = damageSource?.damagingEntity;
     if (k && k.typeId !== "minecraft:player") {

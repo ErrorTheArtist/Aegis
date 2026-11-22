@@ -10,13 +10,14 @@
 // "every village quest chain without dying" is left for the admin to judge.
 
 import { world, system, ItemStack } from "@minecraft/server";
-import { ActionFormData } from "@minecraft/server-ui";
+import { ActionFormData, MessageFormData } from "@minecraft/server-ui";
 import { showTitle } from "./hud.js";
 import { impactFx, chargeFx, shake, sfx } from "./cinematic.js";
 import { getLevel, getStat } from "./levels.js";
 import { getKage, sanninOf } from "./armor.js";
 import { achStats, unlocked, ACH } from "./achievements.js";
 import { storyState } from "./story.js";
+import { questChainsDone, questChainDeaths } from "./starter.js";
 import { makeLegendJutsu, makeLegendSpecials } from "./legend_titles.js";
 import { getVillage, everLeft, rogueOf, getHonor } from "./villages.js";
 import { hasSageTraining } from "./sage.js";
@@ -104,7 +105,7 @@ export const TITLES = {
   },
   itachi: {
     name: "§cItachi of the Sharingan", short: "§cItachi",
-    reqs: [R.lvl300, R.ms, ["Finish every village quest chain without dying", null], R.left,
+    reqs: [R.lvl300, R.ms, ["Finish the starter quests and your village's quest line without dying (deaths count from v1.65)", (p) => questChainsDone(p) && questChainDeaths(p) === 0], R.left,
       ["Must be a part of the Hidden Leaf before leaving it", (p) => rogueOf(p) === "leaf"], R.kage, R.bounty2],
     rewards: ["aegis:tsukuyomi_scroll", "aegis:amaterasu_scroll", "aegis:susanoo_scroll", "aegis:totsuka_blade"],
     perks: "+15% genjutsu strength · immune to one debuff every 45 seconds",
@@ -492,23 +493,82 @@ function checkTitles(p) {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Claiming (v1.65): meet every requirement and the title is yours to claim — no admin needed
+// ---------------------------------------------------------------------------
+const passes = (check, p) => {
+  try {
+    return !!check && !!check(p);
+  } catch {
+    return false;
+  }
+};
+export function titleProgress(p, id) {
+  const reqs = TITLES[id].reqs;
+  return { met: reqs.filter(([, c]) => passes(c, p)).length, total: reqs.length };
+}
+export const titleReady = (p, id) => TITLES[id].reqs.every(([, c]) => passes(c, p));
+// Gives `id` to a player who meets every requirement (replacing any title they hold). Returns true if it did.
+export function claimTitle(p, id) {
+  if (!TITLES[id] || hasTitle(p, id)) return false;
+  if (!titleReady(p, id)) {
+    p.sendMessage(`§cYou don't meet every requirement of ${TITLES[id].name}§c.`);
+    return false;
+  }
+  for (const t of TITLE_IDS) {
+    if (t === id || !hasTitle(p, t)) continue;
+    try {
+      p.removeTag(t);
+    } catch {
+      /* ignore */
+    }
+  }
+  p.addTag(id);
+  checkTitles(p); // the gear (once), the announcement and the name tag — right away
+  return true;
+}
+
 // The Shinobi Record → Titles page.
 export async function titlesMenu(player, back) {
+  const held = TITLE_IDS.find((id) => hasTitle(player, id));
   const f = new ActionFormData().title("§lTitles")
-    .body("§7Legendary titles are granted by the server's admins once you've earned them (§f/tag <player> add <title>§7). " +
-      "Each gives creative-only gear and perks. §fA shinobi holds only one title of legend at a time§7 — a new one replaces the old " +
-      "(the gear stays, but only the holder can use it). §a✔§7 = done, §c✘§7 = not yet, §8•§7 = the admins judge it.");
-  for (const id of TITLE_IDS) f.button(`${TITLES[id].name}${hasTitle(player, id) ? " §a(yours)" : ""}\n§r§8tag: ${id}`);
+    .body("§7Thirteen titles of legend, each with creative-only gear and strong perks. §fMeet every requirement of one and claim it " +
+      "right here§7 — open it and press §aClaim§7. §fYou hold one at a time§7: claiming another replaces it (you keep the old gear, but only " +
+      `a title's holder can use it). §a✔§7 = done, §c✘§7 = not yet.${held ? `\n\n§7Your title: ${TITLES[held].name}` : ""}`);
+  for (const id of TITLE_IDS) {
+    const { met, total } = titleProgress(player, id);
+    const tag = hasTitle(player, id) ? " §a(yours)" : met === total ? " §e§l★ claim it!" : "";
+    f.button(`${TITLES[id].name}${tag}\n§r§8${met}/${total} requirements met`);
+  }
   f.button("§l« Back");
   const r = await f.show(player);
   if (r.canceled || r.selection === undefined) return;
   if (r.selection === TITLE_IDS.length) return back?.();
-  const T = TITLES[TITLE_IDS[r.selection]];
-  const reqs = T.reqs.map(([text, check]) => (check ? (check(player) ? "§a✔ " : "§c✘ ") : "§8• ") + `§7${text}`);
-  await new ActionFormData().title(T.name)
-    .body(`§fRequirements\n${reqs.join("\n")}\n\n§fRewards\n§7${T.rewards.map(itemName).join("\n")}\n§7${T.perks}`)
-    .button("§l« Back").show(player);
-  return titlesMenu(player, back);
+  return titlePage(player, TITLE_IDS[r.selection], () => titlesMenu(player, back));
+}
+async function titlePage(player, id, back) {
+  const T = TITLES[id];
+  const mine = hasTitle(player, id);
+  const ready = !mine && titleReady(player, id);
+  const reqs = T.reqs.map(([text, check]) => `${passes(check, player) ? "§a✔ " : "§c✘ "}§7${text}`);
+  const f = new ActionFormData().title(T.name)
+    .body(`${mine ? "§aThis title is yours.\n\n" : ready ? "§e§lEvery requirement met — the title is yours to claim!\n\n" : ""}` +
+      `§fRequirements\n${reqs.join("\n")}\n\n§fRewards\n§7${T.rewards.map(itemName).join("\n")}\n§7${T.perks}`);
+  if (ready) f.button("§a§lClaim this title");
+  f.button("§l« Back");
+  const r = await f.show(player);
+  if (r.canceled || r.selection === undefined) return;
+  if (!ready || r.selection !== 0) return back();
+  const held = TITLE_IDS.find((t) => t !== id && hasTitle(player, t));
+  if (held) {
+    const c = await new MessageFormData().title(`Claim ${T.name}§r?`)
+      .body(`§7You hold ${TITLES[held].name}§7. A shinobi holds only one title of legend — claiming ${T.name}§7 replaces it. ` +
+        "You keep its gear, but only its holder can use it.")
+      .button1("§aClaim it").button2("Cancel").show(player);
+    if (c.canceled || c.selection !== 0) return titlePage(player, id, back);
+  }
+  claimTitle(player, id);
+  return undefined;
 }
 
 // ---------------------------------------------------------------------------

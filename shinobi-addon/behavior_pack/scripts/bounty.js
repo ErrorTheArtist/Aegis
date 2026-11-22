@@ -115,7 +115,7 @@ export function onPlayerKill(killer, victim) {
   const rec = pvpRecord(killer);
   rec.kills = (rec.kills ?? 0) + 1;
   if (getKage(victim)) rec.kage = true;
-  if (sanninOf(victim) === "jiraiya") rec.toad = true;
+  if (sanninOf(victim) === "jiraiya" || victim.hasTag?.("toad_sage")) rec.toad = true; // (v1.65: or the holder of the Toad Sage title)
   if (getRank(victim) >= 2 && getHonor(victim) >= FEARED_HONOR) rec.jonin = true;
   if (isWarKill(killer, victim)) {
     // (v1.64) the Great Shinobi War: a kill there is war — merit (war.js), never bounty, honor or a claimed bounty

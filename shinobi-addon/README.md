@@ -8,11 +8,11 @@ Uses the real Naruto names (Rasengan, Shadow Clone Jutsu, etc.) — personal use
 ## Contents
 
 - **Start here** — [Install](#install) · [Choose your village](#joining-choose-your-village) · [The Shinobi Record](#the-shinobi-record-v156) · [Commands cheat sheet](#commands-cheat-sheet)
-- **Your shinobi** — [Chakra](#chakra) · [Ninja movement](#ninja-movement-v163) · [Levels & Stats](#levels--stats) · [Clans](#clans) · [Jutsu](#jutsu-right-click-the-scroll-to-cast) · [Titles](#titles-of-legend-v154-v162) · [Armor](#armor--clothing) · [Swords](#legendary-swords) · [Ninja tools](#ninja-tools)
+- **Your shinobi** — [Chakra](#chakra) · [Ninja movement](#ninja-movement-v163) · [Levels & Stats](#levels--stats) · [Clans](#clans) · [Jutsu](#jutsu-right-click-the-scroll-to-cast) · [Titles](#titles-of-legend-v154-v162-v165) · [Armor](#armor--clothing) · [Swords](#legendary-swords) · [Ninja tools](#ninja-tools)
 - **Things to do** — [Story](#story-the-path-of-the-shinobi-v156) · [Factions](#factions-akatsuki--anbu-v156) · [Bingo Book](#bingo-book-v155) · [Bounty & Honor](#bounty--honor-tracker-v162) · [Fun & Games](#fun--games-v163) · [Achievements](#achievements-v155) · [Daily missions](#daily-missions--login-streak-v155) · [World events](#world-events-v155) · [The Great Shinobi War](#the-great-shinobi-war-v164)
 - **The world** — [Tailed Beasts](#tailed-beasts-bosses) · [NPCs](#npcs) · [Legendary bosses](#legendary-bosses-npc-spawner-only) · [Enemies](#enemies) · [Fast Travel](#fast-travel)
 - **For admins** — [Admin Panel](#admin-panel-v156) · [Economy](#economy-v158) · [Grace period](#grace-period-no-pvp) · [Lag clear](#lag-clear) · [Vanilla items](#vanilla-items-v154)
-- **What's new** — [v1.64](#the-great-shinobi-war-world-event-v164) · [v1.63](#make-it-fun-ninja-movement-mini-games-and-more-v163) · [v1.62](#titles-of-legend-one-at-a-time-and-the-bounty--honor-tracker-v162) · [v1.61](#the-tailed-beasts-are-strong-v161) · [v1.60](#melee-damage-nerfed-v160) · [v1.59](#grace-period-no-pvp-enemies-only-fight-back-v159) · [v1.58](#everything-costs-more-quests-pay-less-v158) · [v1.57](#the-leaf-weaponsmith-and-the-leaf-genin-remodelled-v157) · [v1.56](#story-factions-the-kaguya-clan-and-an-admin-panel-v156) and every version before it, at the end
+- **What's new** — [v1.65](#claim-your-own-title-v165) · [v1.64](#the-great-shinobi-war-world-event-v164) · [v1.63](#make-it-fun-ninja-movement-mini-games-and-more-v163) · [v1.62](#titles-of-legend-one-at-a-time-and-the-bounty--honor-tracker-v162) · [v1.61](#the-tailed-beasts-are-strong-v161) · [v1.60](#melee-damage-nerfed-v160) · [v1.59](#grace-period-no-pvp-enemies-only-fight-back-v159) · [v1.58](#everything-costs-more-quests-pay-less-v158) · [v1.57](#the-leaf-weaponsmith-and-the-leaf-genin-remodelled-v157) · [v1.56](#story-factions-the-kaguya-clan-and-an-admin-panel-v156) and every version before it, at the end
 
 ## Install
 
@@ -206,7 +206,7 @@ today's daily missions and streak, your story chapter and starter quest. Every p
 | **Faction** | the Akatsuki and the Anbu — what each asks, Join, your contract |
 | **Bingo Book** | bounties, the most wanted, your PvP record |
 | **Bounty & Honor** | your bounty and honor, what a kill is worth, the most wanted and most honored, the titles' goals (v1.62) |
-| **Titles** | the 13 titles of legend and their requirements (you hold one at a time) |
+| **Titles** | the 13 titles of legend and their requirements — claim one once you've met them all (you hold one at a time) |
 | **Ryō Wallet** | pay players, exchange emeralds |
 | **Fun & Games** | your records (toads, eating contest, bells, streaks, combos), emotes, how to move like a ninja (v1.63) |
 | **Handbook** | how everything works, in 13 short topics |
@@ -277,10 +277,14 @@ The menu shows your XP bar, unspent points and every stat; tap a stat and use th
 /scriptevent aegis:level xp 5000
 ```
 
-## Titles of legend (v1.54, v1.62)
+## Titles of legend (v1.54, v1.62, v1.65)
 
-Thirteen legendary titles a server admin grants by hand once a player has earned them — in the **Admin Panel**
-(Players → *Title of legend*, a list that shows how many requirements each one meets) or with a tag:
+Thirteen legendary titles. **Since v1.65 players claim them themselves** — no admin needed: **Shinobi Record →
+Titles** lists every title with how many of its requirements you meet; one you've fully earned is marked
+**★ claim it!**, and its page has a **Claim this title** button (if you already hold another title, it asks first —
+the new one replaces it). Every requirement is checked by the add-on, live, at the moment you claim.
+
+Admins can still give or take a title by hand — in the **Admin Panel** (Players → *Title of legend*) or with a tag:
 
 ```
 /tag <player> add toad_sage     (pain, itachi, tobi, sasuke, naruto, toad_sage, slug_princess, white_snake,
@@ -288,23 +292,23 @@ Thirteen legendary titles a server admin grants by hand once a player has earned
 /tag <player> remove toad_sage  takes the title and its perks away
 ```
 
-**One title at a time (v1.62).** A shinobi holds only **one** title of legend: granting a new one replaces the one they
-had, and they're told. (Granted two at once, the first in the list above stays.) They keep the old title's gear, but
+**One title at a time (v1.62).** A shinobi holds only **one** title of legend: claiming (or being granted) a new one
+replaces the one they had, and they're told. (Granted two at once, the first in the list above stays.) They keep the old title's gear, but
 only a title's holder can use it. Anyone who held several before v1.62 keeps the first of theirs in that list — the
 Admin Panel switches it.
 
-The moment the tag is added the player gets the title **over their name**, its **perks**, and its **reward gear** —
+The moment a title is claimed (or its tag added) the player gets it **over their name**, its **perks**, and its **reward gear** —
 once per title, kept on death. The gear is **creative-only**: no shop, quest, mission or drop gives it, and only the
 title's holder can use it (anyone else gets *"Only the holder of the … title can use this"*). Losing and regaining a
-title doesn't hand the gear out twice. **Shinobi Record → Titles** lists every title with its requirements, ticked
-where the add-on can check them — level, clan, village, Mangekyō, Kamui, kills, missions, honor, and since v1.55 the
-**bounties** and the **players you've defeated** (see *Bingo Book*). Only "every village quest chain without dying" is
-left for the admin to judge.
+title doesn't hand the gear out twice. The requirements cover level, clan, village, Mangekyō, Kamui, kills, missions,
+honor, the **bounties** and the **players you've defeated** (see *Bingo Book*), the legends you've beaten, jutsu
+learned and cast, and — for Itachi — the starter quests and your village's quest line, finished without dying (deaths
+are counted from v1.65 on).
 
 | Title | Requirements | Rewards | Perks |
 |---|---|---|---|
 | **Pain** | Leave your village · Level 300 · defeat the player holding *The Toad Sage* · a bounty of 5 million Ryō · the Ōtsutsuki clan | Advanced Rinnegan Eyes · Advanced Shinra Tensei · Advanced Chibaku Tensei · Chakra Receiver Rods | +15% damage vs groups |
-| **Itachi of the Sharingan** | Level 300 · Mangekyō Sharingan · every village quest chain without dying · left the Hidden Leaf · defeat a Kage-rank player · a 2 million bounty | Tsukuyomi · Amaterasu · Susanoo scrolls · Totsuka Blade | +15% genjutsu strength · shrug off one debuff every 45 s |
+| **Itachi of the Sharingan** | Level 300 · Mangekyō Sharingan · finish the starter quests and your village's quest line without dying · left the Hidden Leaf · defeat a Kage-rank player · a 2 million bounty | Tsukuyomi · Amaterasu · Susanoo scrolls · Totsuka Blade | +15% genjutsu strength · shrug off one debuff every 45 s |
 | **Tobi** | Level 300 · the world's Kamui holder · Mangekyō Sharingan · leave your village · defeat a feared and respected Jōnin-rank player · a 2 million bounty | Tobi's Spiral Mask · Uchiha War Fan (Gunbai) · Kamui Shuriken | Kamui cooldown −30% · +10% jutsu damage |
 | **Sasuke** | Level 300 · Mangekyō Sharingan · leave your village · defeat 3,000 hostile ninja · defeat a Kage-rank player · a 2 million bounty | Kusanagi Sword V2 · Indra's Arrow · Chidori Nagashi V2 · Perfect Susanoo | +15% lightning jutsu damage · +10% movement speed |
 | **Naruto** | Level 300 · Sage Mode · Kurama sealed inside you · never leave your village · 500 missions · 3,000 hostile ninja · 3 million honor | Orange Sage Coat · Rasenshuriken V2 · Tailed Beast Bomb V2 · Six Paths Sage Mode (half) | +15% chakra regen · +10% max HP |
@@ -1696,6 +1700,15 @@ hoes, food, farming, building, crafting.
 ```
 
 The timers start when the server starts. The times are the constants at the top of `behavior_pack/scripts/lagclear.js`.
+
+## Claim your own title (v1.65)
+
+- **Titles are claimed by the players themselves**: meet every requirement and press **Claim this title** on its page
+  in Shinobi Record → Titles (it asks before replacing a title you hold). The list shows each title's progress and
+  marks the ones you can claim. Admins can still grant and take titles.
+- Every requirement is now checked by the add-on. Itachi's "every village quest chain without dying" became: finish
+  the starter quests and your village's quest line without dying (deaths counted from v1.65 on).
+- Pain's "defeat the Toad Sage" also counts defeating whoever holds the Toad Sage title.
 
 ## The Great Shinobi War world event (v1.64)
 

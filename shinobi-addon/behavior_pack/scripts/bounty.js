@@ -19,6 +19,7 @@ import { world, system } from "@minecraft/server";
 import { ActionFormData, ModalFormData } from "@minecraft/server-ui";
 import { getRyo, addRyo, spendRyo, fmtRyo } from "./currency.js";
 import { getRank } from "./levels.js";
+import { isWarKill } from "./war.js";
 import { isRogue, getHonor, getVillage, addHonor } from "./villages.js";
 import { getKage, sanninOf } from "./armor.js";
 import { anbuBountyBonus, factionProgress } from "./factions.js";
@@ -116,6 +117,11 @@ export function onPlayerKill(killer, victim) {
   if (getKage(victim)) rec.kage = true;
   if (sanninOf(victim) === "jiraiya") rec.toad = true;
   if (getRank(victim) >= 2 && getHonor(victim) >= FEARED_HONOR) rec.jonin = true;
+  if (isWarKill(killer, victim)) {
+    // (v1.64) the Great Shinobi War: a kill there is war — merit (war.js), never bounty, honor or a claimed bounty
+    killer.setDynamicProperty(RECORD, JSON.stringify(rec));
+    return { war: true };
+  }
   const justice = isJustice(killer, victim); // (decided before the victim's bounty is claimed)
   const out = claim(killer, victim, rec);
   const reward = killReward();

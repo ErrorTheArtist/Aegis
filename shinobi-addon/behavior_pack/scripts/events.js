@@ -18,6 +18,7 @@
 //   /scriptevent aegis:event scrolls [village]
 //   /scriptevent aegis:event doublexp [minutes]      — default 30
 //   /scriptevent aegis:event bells                   — Kakashi's Bell Test, near you
+//   /scriptevent aegis:event war                     — the Great Shinobi War (war.js): everyone to the Hidden Leaf
 //   /scriptevent aegis:event stop                    — end the current event
 //   /scriptevent aegis:event auto on | off           — a random event every hour while 2+ players are online
 
@@ -28,6 +29,7 @@ import { VILLAGES, addHonor } from "./villages.js";
 import { QUEST_TARGETS } from "./quests.js";
 import { LEGENDS, makeCalm } from "./legends.js";
 import { bumpFun, MYSTERY } from "./fun.js";
+import { startWar } from "./war.js";
 import { giveShards } from "./xpshards.js";
 import { bumpAch } from "./achievements.js";
 import { factionProgress } from "./factions.js";
@@ -122,8 +124,24 @@ function cleanup() {
   }
 }
 
+// Events run by other modules (the Great Shinobi War — war.js) plug in here with their own tick() and stop().
+export function claimEvent(ev) {
+  if (current) return false;
+  current = ev;
+  return true;
+}
+export function releaseEvent(ev) {
+  if (current === ev) current = undefined;
+}
+
 export function stopEvent(quiet = false) {
   if (!current) return false;
+  if (current.stop) {
+    const ev = current;
+    ev.stop(ev, quiet); // (it tidies up and releases itself)
+    if (current === ev) current = undefined;
+    return true;
+  }
   if (!quiet) say(`§7The ${current.label} is over.`);
   cleanup();
   current = undefined;
@@ -495,6 +513,7 @@ export function initEvents(helpers) {
       else if (current.kind === "wanted") wantedTick(current);
       else if (current.kind === "scrolls") scrollsTick(current);
       else if (current.kind === "bells") bellsTick(current);
+      else current.tick?.(current);
     } catch {
       /* ignore */
     }
@@ -576,6 +595,7 @@ export function initEvents(helpers) {
     else if (cmd === "wanted") err = by?.typeId === "minecraft:player" ? startWanted(by, arg) : "§7Run it as a player (the legend appears near you).";
     else if (cmd === "doublexp") startDoubleXp(Number(arg) || 30);
     else if (cmd === "bells") err = by?.typeId === "minecraft:player" ? startBells(by) : "§7Run it as a player (Kakashi appears near you).";
+    else if (cmd === "war") err = startWar(by);
     else if (cmd === "stop") err = stopEvent() ? undefined : "§7No event is running.";
     else if (cmd === "auto") err = setAutoEvents(arg === "on");
     else {

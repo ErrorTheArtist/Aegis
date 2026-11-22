@@ -14,6 +14,7 @@ import { bountyOf, mostWanted, killReward, WANTED_AT } from "./bounty.js";
 import { getHonor, getVillage, isRogue, topHonor } from "./villages.js";
 import { fmtRyo } from "./currency.js";
 import { TITLES, TITLE_IDS, hasTitle } from "./titles.js";
+import { warOn } from "./war.js";
 
 const WANTED_OBJ = "aegis_wanted"; // the sidebar: fake players named after the most wanted (they show while offline)
 const HONOR_OBJ = "aegis_honor"; // the player list
@@ -102,7 +103,7 @@ export function refreshTracker() {
       /* ignore */
     }
   }
-  display(sb, "Sidebar", wanted, trackerOn("sidebar"));
+  display(sb, "Sidebar", wanted, trackerOn("sidebar") && !warOn()); // (the Great Shinobi War has the sidebar while it lasts)
   display(sb, "List", honor, trackerOn("list"));
   display(sb, "BelowName", tag, trackerOn("below"));
 }

@@ -16,6 +16,7 @@ import { bountyOf, setBounty, killReward, setKillReward, KILL_REWARD_RANGE } fro
 import { TRACKERS, trackerOn, setTracker } from "./tracker.js";
 import { movementOn, setMovement } from "./movement.js";
 import { toadsOn, setToads, streakCallsOn, setStreakCalls } from "./fun.js";
+import { startWar } from "./war.js";
 import { FACTIONS, factionOf, factionRank, leaveFaction } from "./factions.js";
 import { TITLES, TITLE_IDS, hasTitle } from "./titles.js";
 import { getLevel, setLevel, MAX_LEVEL, RANKS, getRank, meleePercent, setMeleePercent, MELEE_RANGE } from "./levels.js";
@@ -129,6 +130,7 @@ async function eventsMenu(p) {
     ["§eHidden Scrolls\n§r§8eight sealed scrolls hidden around a village", scrollsForm],
     [`§bDouble XP\n§r§8${xp ? `on — ${mins(xp)} min left · tap to restart` : "all XP counts twice for a while"}`, doubleXpForm],
     ["§bKakashi's Bell Test\n§r§8grab a bell from Kakashi, near you — 5 minutes", (q) => started(q, startBells(q), "started Kakashi's Bell Test")],
+    ["§4§lThe Great Shinobi War\n§r§8every player to the Hidden Leaf · four battles · a leaderboard", warForm], // v1.64
   ];
   if (ev) {
     opts.push([`§7Stop the event\n§r§8${ev.label}`, (q) => {
@@ -158,6 +160,17 @@ async function eventsMenu(p) {
 }
 
 // Runs an event starter: an error message comes back as text; nothing means it started.
+// v1.64: everyone is summoned, so ask first.
+async function warForm(p) {
+  const c = await showForm(p, new MessageFormData().title("§4The Great Shinobi War")
+    .body(`§7Every player online (§f${online().length}§7) is summoned to the §aHidden Leaf§7 in 15 seconds — and sent back afterwards.\n\n` +
+      "§7Four battles (about 20 minutes): the Zetsu Army, the Reanimated, the Akatsuki, Madara Uchiha. A War Merit leaderboard on the " +
+      "sidebar; prizes for the top three and the winning village.")
+    .button1("§4Declare war").button2("Cancel"));
+  if (c.canceled || c.selection !== 0) return eventsMenu(p);
+  return started(p, startWar(p), "declared the Great Shinobi War");
+}
+
 function started(p, err, what) {
   if (err) {
     p.sendMessage(err);

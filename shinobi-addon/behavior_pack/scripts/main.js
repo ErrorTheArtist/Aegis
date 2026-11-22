@@ -45,6 +45,7 @@ import { initFactions, factionDamageMultiplier, factionAllies } from "./factions
 import { initTracker } from "./tracker.js";
 import { initMovement } from "./movement.js";
 import { initFun, makeFunJutsu } from "./fun.js";
+import { initWar } from "./war.js";
 import { bountyOf } from "./bounty.js";
 import { initAdmin } from "./admin.js";
 import { initBans } from "./bans.js";
@@ -1249,6 +1250,7 @@ initBans();
 initTitles({ ...npcApi, refreshName: applyNameTag });
 initMovement(npcApi); // v1.63: chakra leap, wall running, water walking
 initFun(npcApi); // v1.63: combos, streaks, Mystery Scrolls, Treasure Toads, the eating contest, emotes
+initWar(npcApi); // v1.64: the Great Shinobi War
 initEdoTensei(npcApi);
 initM1(npcApi);
 initLagClear();

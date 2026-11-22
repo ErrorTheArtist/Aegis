@@ -9,10 +9,10 @@ Uses the real Naruto names (Rasengan, Shadow Clone Jutsu, etc.) — personal use
 
 - **Start here** — [Install](#install) · [Choose your village](#joining-choose-your-village) · [The Shinobi Record](#the-shinobi-record-v156) · [Commands cheat sheet](#commands-cheat-sheet)
 - **Your shinobi** — [Chakra](#chakra) · [Ninja movement](#ninja-movement-v163) · [Levels & Stats](#levels--stats) · [Clans](#clans) · [Jutsu](#jutsu-right-click-the-scroll-to-cast) · [Titles](#titles-of-legend-v154-v162) · [Armor](#armor--clothing) · [Swords](#legendary-swords) · [Ninja tools](#ninja-tools)
-- **Things to do** — [Story](#story-the-path-of-the-shinobi-v156) · [Factions](#factions-akatsuki--anbu-v156) · [Bingo Book](#bingo-book-v155) · [Bounty & Honor](#bounty--honor-tracker-v162) · [Fun & Games](#fun--games-v163) · [Achievements](#achievements-v155) · [Daily missions](#daily-missions--login-streak-v155) · [World events](#world-events-v155)
+- **Things to do** — [Story](#story-the-path-of-the-shinobi-v156) · [Factions](#factions-akatsuki--anbu-v156) · [Bingo Book](#bingo-book-v155) · [Bounty & Honor](#bounty--honor-tracker-v162) · [Fun & Games](#fun--games-v163) · [Achievements](#achievements-v155) · [Daily missions](#daily-missions--login-streak-v155) · [World events](#world-events-v155) · [The Great Shinobi War](#the-great-shinobi-war-v164)
 - **The world** — [Tailed Beasts](#tailed-beasts-bosses) · [NPCs](#npcs) · [Legendary bosses](#legendary-bosses-npc-spawner-only) · [Enemies](#enemies) · [Fast Travel](#fast-travel)
 - **For admins** — [Admin Panel](#admin-panel-v156) · [Economy](#economy-v158) · [Grace period](#grace-period-no-pvp) · [Lag clear](#lag-clear) · [Vanilla items](#vanilla-items-v154)
-- **What's new** — [v1.63](#make-it-fun-ninja-movement-mini-games-and-more-v163) · [v1.62](#titles-of-legend-one-at-a-time-and-the-bounty--honor-tracker-v162) · [v1.61](#the-tailed-beasts-are-strong-v161) · [v1.60](#melee-damage-nerfed-v160) · [v1.59](#grace-period-no-pvp-enemies-only-fight-back-v159) · [v1.58](#everything-costs-more-quests-pay-less-v158) · [v1.57](#the-leaf-weaponsmith-and-the-leaf-genin-remodelled-v157) · [v1.56](#story-factions-the-kaguya-clan-and-an-admin-panel-v156) and every version before it, at the end
+- **What's new** — [v1.64](#the-great-shinobi-war-world-event-v164) · [v1.63](#make-it-fun-ninja-movement-mini-games-and-more-v163) · [v1.62](#titles-of-legend-one-at-a-time-and-the-bounty--honor-tracker-v162) · [v1.61](#the-tailed-beasts-are-strong-v161) · [v1.60](#melee-damage-nerfed-v160) · [v1.59](#grace-period-no-pvp-enemies-only-fight-back-v159) · [v1.58](#everything-costs-more-quests-pay-less-v158) · [v1.57](#the-leaf-weaponsmith-and-the-leaf-genin-remodelled-v157) · [v1.56](#story-factions-the-kaguya-clan-and-an-admin-panel-v156) and every version before it, at the end
 
 ## Install
 
@@ -159,7 +159,7 @@ Panel or `/execute as <player> run scriptevent …`.
 | Command | What it does |
 |---|---|
 | `aegis:admin` | open the **Admin Panel** |
-| `aegis:event [raid / wanted / scrolls / doublexp / bells / stop / auto on·off] …` | world events (see *World events*) |
+| `aegis:event [raid / wanted / scrolls / doublexp / bells / war / stop / auto on·off] …` | world events (see *World events*; `war` = the Great Shinobi War) |
 | `aegis:fun` · `aegis:fun toad` · `aegis:fun mystery [n]` | your fun stats · a Treasure Toad near you · Mystery Scrolls (admins) |
 | `aegis:grace <minutes> [player]` · `… off [player]` · `…` alone | grace periods |
 | `aegis:lag [items / mobs / on / off]` | lag clear |
@@ -368,6 +368,7 @@ of it is creative-only, given once when the title is granted, and kept on death.
   - **any other kill** puts **+50,000 bounty** on the killer's own head — and so does **every kill by a rogue ninja**.
   - Only **player** kills count. Enemy ninja, legendary bosses and Tailed Beasts never add bounty (they give the usual
     village honor and XP, as before). Your clone, companion or summon's kills count as yours.
+  - Kills during the **Great Shinobi War** are war: they earn War Merit, never bounty (v1.64).
   - The admins set the amount (0–500,000; 0 turns it off) in *Admin Panel → Server Settings* or with
     `/scriptevent aegis:bounty reward <n>`. (Before v1.62 a killer's bounty was 1,000 Ryō + 50 per level of the
     victim.)
@@ -438,7 +439,8 @@ Record → Settings**) or for the whole server (**Admin Panel → Server Setting
   Victory, Laugh, Meditate and Hand Signs. Everyone around you sees it; moving ends it.
 
 **Shinobi Record → Fun & Games** shows your records: toads caught, your best contest (and the server record), bells
-taken, your best streak and combo, Mystery Scrolls unrolled. `/scriptevent aegis:fun` shows them in chat.
+taken, your best streak and combo, Mystery Scrolls unrolled, and since v1.64 your Great Shinobi Wars (fought, best
+merit, first places). `/scriptevent aegis:fun` shows them in chat.
 
 ## Achievements (v1.55)
 
@@ -473,6 +475,8 @@ One at a time (Double XP can run alongside).
 | **Double XP** | All XP counts twice. | — |
 | **Kakashi's Bell Test** (v1.63) | Kakashi waits near you with two bells on his belt. He can't be hurt — land a hit on him and you may snatch a bell (one per player; better odds from behind). Every hit he swaps himself for a log and reappears somewhere else, and whoever crowds him gets **A Thousand Years of Death**. 5 minutes. | Each bell: 10,000 Ryō (at the default quest rate, 5,000), 2 XP Shards and a Mystery Scroll · a little Ryō for everyone who tried. Both bells taken: *"…You pass."* None: *"You all fail!"* |
 
+| **The Great Shinobi War** (v1.64) | Every player online is summoned to the Hidden Leaf for four battles and a War Merit leaderboard — see *The Great Shinobi War*. About 20 minutes; admins only (never automatic). | The top three, the winning village, and everyone by their merit |
+
 Waiting legends guard their village against raiders (the villains don't).
 
 ```
@@ -482,9 +486,59 @@ Waiting legends guard their village against raiders (the villains don't).
 /scriptevent aegis:event scrolls [village]
 /scriptevent aegis:event doublexp [minutes]    (default 30)
 /scriptevent aegis:event bells                 (Kakashi's Bell Test, near you)
+/scriptevent aegis:event war                   (the Great Shinobi War — everyone is summoned to the Hidden Leaf)
 /scriptevent aegis:event stop
 /scriptevent aegis:event auto on | off
 ```
+
+## The Great Shinobi War (v1.64)
+
+The biggest event on the server. An admin declares war (**Admin Panel → World Events → The Great Shinobi War** — it asks
+first — or `/scriptevent aegis:event war`); everyone gets a 15-second countdown, then **every player online is summoned
+to the Hidden Leaf** — from anywhere, the Nether and the End included — healed, chakra full, with a few seconds of
+protection. Anyone who joins while it lasts is summoned too. A thunderstorm rolls in, and four battles follow, each one
+scaled to how many shinobi are fighting:
+
+| Battle | The enemy | Time |
+|---|---|---|
+| **1 · The Zetsu Army** | three waves of enemy ninja storm the village (each wave comes when the last is down, or after a minute); Zetsu leads the third | 4 min |
+| **2 · The Reanimated** | Edo Tensei legends rise around the walls — Zabuza, Hanzō, the Senju brothers, the Third and Fourth Hokage (2–4 of them) — with ninja | 5 min |
+| **3 · The Akatsuki** | 3–5 Akatsuki members, with ninja | 5 min |
+| **4 · Madara Uchiha** | *"Wake up to reality."* Madara — and with 4 or more shinobi, **the Ten-Tails** — with ninja | 6 min |
+
+A battle is won when all its enemies are down (**+15 War Merit** to every fighter). If its time runs out, the enemy
+pulls back and the war moves on. Players who fall come straight back into the fight.
+
+**War Merit** — the competition, live on the **sidebar** (every shinobi's merit and every village's total; the Most
+Wanted board steps aside while the war lasts). A new leader is announced the moment they take over, and the standings
+every minute:
+
+| | Merit |
+|---|---|
+| an enemy ninja | +10 |
+| an Akatsuki member | +60 |
+| a legend | +100 |
+| the Ten-Tails | +250 |
+| **the final blow on Madara** — *Hero of the War* | **+200** |
+| every 1% of a boss's health you deal | +1 |
+| a shinobi of another village (PvP) | +40 |
+| falling | −15 |
+
+Fighting other players is part of the war: those kills earn merit and **never** bounty. Friendly fire between
+village-mates and grace periods still apply.
+
+**The end** — *VICTORY!* if Madara falls, otherwise *"no one wins this one"* — then everyone is paid:
+
+| | Prize (at the full quest rate; the server's economy applies) |
+|---|---|
+| everyone | their merit × 25 Ryō (up to 30,000) |
+| 🥇 first | + 60,000 Ryō, 5 XP Shards, 3 Mystery Scrolls |
+| 🥈 second | + 35,000 Ryō, 3 XP Shards, 2 Mystery Scrolls |
+| 🥉 third | + 20,000 Ryō, 2 XP Shards, 1 Mystery Scroll |
+| the village with the most merit | +500 honor to each of its fighters |
+
+Fifteen seconds later **everyone is sent back to where they were** (anyone offline by then goes back when they next
+join). An admin can call the war off at any time (*Stop the event*) — everyone goes home, with no prizes.
 
 ## Story: the Path of the Shinobi (v1.56)
 
@@ -545,7 +599,7 @@ vanilla bans, friendly fire, lag clear, the Tailed Beast that's loose and who ho
 
 | Section | What you can do |
 |---|---|
-| **World Events** | start a **Village Raid** or **Hidden Scrolls** (pick the village), a **Wanted** legend (pick one or random, near any player) or **Double XP** (5–240 minutes) · **Kakashi's Bell Test** (near you) · stop the event · end Double XP · switch the hourly automatic events on or off |
+| **World Events** | start a **Village Raid** or **Hidden Scrolls** (pick the village), a **Wanted** legend (pick one or random, near any player) or **Double XP** (5–240 minutes) · **Kakashi's Bell Test** (near you) · **the Great Shinobi War** (everyone is summoned — it asks first) · stop the event · end Double XP · switch the hourly automatic events on or off |
 | **Grace Periods** | grace (no PvP; enemies only fight back when attacked, 60% softer) for everyone or one player · end them all · end one |
 | **Players** | pick an online player to see their level, rank, Ryō, honor, village, clan, faction, bounty, titles, Kage/Sannin, grace and position — then **give or take Ryō** · **set their level** (stat points refunded) · **give XP Shards** · **heal & refill chakra** · **teleport** (go to them, bring them to you, send them to any village) · **set their clan** · **set their title of legend** (one at a time — a list that shows how many requirements each one meets) · **Kage & Sannin** (appoint, with or without the set, or remove) · **set or clear a bounty** · **remove them from a faction** · **let them choose a village again** (how a rogue gets back in) · **give or end their grace** |
 | **Server Settings** | vanilla weapon & armour bans · automatic lag clear · friendly fire · automatic world events · the **Bounty & Honor boards** (Most Wanted sidebar, honor in the player list, bounties under names) · **ninja movement**, **Treasure Toads** and **kill streak shout-outs** (v1.63) · **players' melee damage** (25–200%) · **honor / bounty per player kill** (0–500,000) |
@@ -1642,6 +1696,14 @@ hoes, food, farming, building, crafting.
 ```
 
 The timers start when the server starts. The times are the constants at the top of `behavior_pack/scripts/lagclear.js`.
+
+## The Great Shinobi War world event (v1.64)
+
+- **The Great Shinobi War**: an admin declares it and every player online is summoned to the Hidden Leaf for four
+  battles — the Zetsu Army, the Reanimated, the Akatsuki, Madara Uchiha (and the Ten-Tails) — scaled to the number of
+  players. **War Merit** for kills, boss damage and enemy-village shinobi, a live leaderboard of players and villages,
+  lead changes announced, big prizes for the top three and the winning village, and everyone sent home at the end.
+- Kills between players during the war earn merit instead of bounty. Your wars are recorded in *Fun & Games*.
 
 ## Make it fun: ninja movement, mini-games and more (v1.63)
 

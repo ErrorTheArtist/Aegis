@@ -51,9 +51,9 @@ export const setStreakCalls = (on) => world.setDynamicProperty(CALLS_OFF, on ? u
 
 export function funStats(p) {
   try {
-    return { toads: 0, bowls: 0, bells: 0, streak: 0, combo: 0, contests: 0, scrolls: 0, ...JSON.parse(p.getDynamicProperty(STATS) ?? "{}") };
+    return { toads: 0, bowls: 0, bells: 0, streak: 0, combo: 0, contests: 0, scrolls: 0, wars: 0, warBest: 0, warWins: 0, ...JSON.parse(p.getDynamicProperty(STATS) ?? "{}") };
   } catch {
-    return { toads: 0, bowls: 0, bells: 0, streak: 0, combo: 0, contests: 0, scrolls: 0 };
+    return { toads: 0, bowls: 0, bells: 0, streak: 0, combo: 0, contests: 0, scrolls: 0, wars: 0, warBest: 0, warWins: 0 };
   }
 }
 export function bumpFun(p, key, by = 1, best = false) {
@@ -415,7 +415,7 @@ export function finishContest(p) {
   if (record) {
     world.setDynamicProperty(RECORD, JSON.stringify({ name: p.name, bowls }));
     give(p, MYSTERY);
-    world.sendMessage(`§e🍜 ${p.name}§e set a new Ichiraku record: §f${bowls} bowls§e in ${CONTEST_SECONDS} seconds!`);
+    world.sendMessage(`§e✦ ${p.name}§e set a new Ichiraku record: §f${bowls} bowls§e in ${CONTEST_SECONDS} seconds!`);
   }
   showTitle(p, `§e§l${bowls} bowls!`, { subtitle: prize ? `§f+${fmtRyo(prize)}${bowls >= 20 ? " and a Mystery Scroll" : ""}${record ? " · §6a new server record!" : ""}` : "§7ten bowls wins a prize — try again!",
     fadeInDuration: 2, stayDuration: 50, fadeOutDuration: 12 });
@@ -466,6 +466,7 @@ export async function funMenu(p, back) {
     `§7Bells taken from Kakashi: §b${s.bells}`,
     `§7Best kill streak: §c${s.streak}§7 · best hit combo: §6${s.combo}`,
     `§7Mystery Scrolls unrolled: §d${s.scrolls}`,
+    `§7Great Shinobi Wars fought: §4${s.wars}§7 · best War Merit §6${s.warBest}§7 · first places §6${s.warWins}`,
     "",
     "§fMove like a ninja" + (movementOn() ? "" : " §8(switched off on this server)"),
     "§7· §bChakra Leap§7 — jump again in mid-air (8 chakra).",

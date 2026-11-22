@@ -73,7 +73,8 @@ export const TOPICS = [
   ["§aDaily, achievements & events", [
     "• §fDaily§r: three random missions every day, a bonus for all three, and a login streak (day 7 pays the most).",
     "• §fAchievements§r: 51 of them, each with a reward the moment you unlock it.",
-    "• §fWorld events§r — raids on villages, wanted legends, hidden scroll hunts, Double XP — are started by the server's admins.",
+    "• §fWorld events§r — raids on villages, wanted legends, hidden scroll hunts, Double XP, Kakashi's Bell Test — are started by the server's admins.",
+    "• §4The Great Shinobi War§r: every shinobi is summoned to the Hidden Leaf for four battles. Earn §6War Merit§r (kills, boss damage, enemy-village shinobi) for the top prizes — and win it for your village. Everyone goes home afterwards.",
   ]],
   ["§5Titles", [
     "• Thirteen titles of legend: §5Pain§r, §cItachi§r, §6Tobi§r, §9Sasuke§r, §6Naruto§r and, since v1.62, §aThe Toad Sage§r, §2The Slug Princess§r, §5The White Snake§r, §eThe Yellow Flash§r, §aThe Green Beast§r, §7The Copy Ninja§r, §6The Sage of Six Paths§r and §4Madara's Heir§r. Each has hard requirements (Shinobi Record → Titles shows them ticked).",

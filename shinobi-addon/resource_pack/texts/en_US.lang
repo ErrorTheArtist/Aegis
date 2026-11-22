@@ -42,3 +42,5 @@ entity.aegis:summon_hound.name=Ninja Hound
 item.spawn_egg.entity.aegis:summon_hound.name=Spawn Ninja Hound
 entity.aegis:summon_hawk.name=Summoned Hawk
 item.spawn_egg.entity.aegis:summon_hawk.name=Spawn Summoned Hawk
+entity.aegis:treasure_toad.name=Treasure Toad
+item.spawn_egg.entity.aegis:treasure_toad.name=Spawn Treasure Toad

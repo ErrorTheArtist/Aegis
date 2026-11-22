@@ -80,6 +80,14 @@ export const TOPICS = [
     "• §fOne at a time§r: a new title replaces the one you held. You keep the old title's gear, but only a title's holder can use it.",
     "• An admin grants a title when you've earned it; it brings unique gear — jutsu scrolls, weapons, tools — and strong perks.",
   ]],
+  ["§dNinja movement & fun", [
+    "• §bChakra Leap§r — jump again in mid-air for a chakra-powered second jump (8 chakra).",
+    "• §bWall Running§r — hold jump against a wall or a tree to run straight up it; you vault over the top.",
+    "• §bWater Walking§r — run across lakes and the sea. Sneak to sink in. (Each can be switched off in Settings.)",
+    "• §6Treasure Toads§r hop out every few minutes — catch one for Ryō and a §dMystery Scroll§r (right-click it for a random prize).",
+    "• §eRamen Shop → Eating Contest§r: as many bowls as you can in 30 seconds. §bKakashi's Bell Test§r: grab a bell from him.",
+    "• Kill streaks (Double Kill… Legendary Shinobi) give bonus XP, melee from behind is a §cBackstab§r (+25%), and Shinobi Record → Fun & Games has emotes.",
+  ]],
 ];
 
 export async function handbookMenu(player, back) {

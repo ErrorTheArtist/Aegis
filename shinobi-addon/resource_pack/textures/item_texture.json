@@ -745,6 +745,12 @@
     },
     "aegis_kakashi_mask": {
       "textures": "textures/items/aegis/kakashi_mask"
+    },
+    "aegis_mystery_scroll": {
+      "textures": "textures/items/aegis/mystery_scroll"
+    },
+    "aegis_thousand_years_scroll": {
+      "textures": "textures/items/aegis/thousand_years_scroll"
     }
   }
 }

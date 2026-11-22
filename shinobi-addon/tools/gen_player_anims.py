@@ -988,6 +988,80 @@ A["animation.aegis.kusanagi_sheathe"] = anim(0.4, [
 ], plant=False, loop="hold")
 
 
+# ===========================================================================
+# v1.63: ninja movement, the prank jutsu and emotes (fun.js / movement.js)
+# ===========================================================================
+# Chakra Leap: a tucked front flip. The root's pivot is at the feet, so the body is lifted and shifted as it turns to keep
+# the flip centred on the hips; the 360° is unwound with a cut.
+_TUCK = {"rl": [-100, 0, 8], "ll": [-100, 0, -8], "ra": [-70, 0, 14], "la": [-70, 0, -14], "w": HIPS(36), "h": [20, 0, 0]}
+A["animation.aegis.chakra_leap"] = anim(0.5, [
+    (0.0, "lin", {"rl": [-30, 0, 6], "ll": [10, 0, -6], "ra": [30, 0, 30], "la": [30, 0, -30]}),
+    (0.06, "out", {**_TUCK, "rt": R(pitch=45, y=4, f=-8)}),
+    (0.14, "lin", {"rt": R(pitch=135, y=20, f=-10)}),
+    (0.22, "lin", {"rt": R(pitch=225, y=22, f=10)}),
+    (0.32, "lin", {"rt": R(pitch=315, y=8, f=10)}),
+    (0.38, "out", {"rt": R(pitch=360, y=2), "rl": [-30, 0, 6], "ll": [-20, 0, -6], "ra": [-30, 0, 40], "la": [-30, 0, -40], "w": HIPS(14), "h": Z}),
+    (0.38, "cut", {"rt": R(y=2)}),
+    (0.5, "io", REST),
+], plant=False)
+
+# Wall Running: one stride of a sprint up a wall — arms swept back, head up (movement.js replays it while climbing).
+A["animation.aegis.wall_run"] = anim(0.5, [
+    (0.0, "lin", {"w": HIPS(-6), "h": [-35, 0, 0], "ra": [70, 0, 14], "la": [70, 0, -14], "rl": [-70, 0, 4], "ll": [20, 0, -4]}),
+    (0.25, "io", {"rl": [20, 0, 4], "ll": [-70, 0, -4]}),
+    (0.5, "io", {"rl": [-70, 0, 4], "ll": [20, 0, -4]}),
+], plant=False)
+
+# A Thousand Years of Death: crouch behind them, the tiger seal… and UP.
+A["animation.aegis.thousand_years"] = anim(0.8, [
+    (0.08, "out", {**seal("tiger"), "w": HIPS(30, drop=4), "rl": [-30, 0, 12], "ll": [26, 0, -12], "h": [-10, 0, 0]}),
+    (0.2, "lin", {"w": HIPS(34, drop=4.5)}),
+    (0.28, "snap", {"ra": [-150, -24, 0], "la": [-150, 24, 0], "w": HIPS(-6, drop=1), "h": [-30, 0, 0], "rt": R(y=1.5, f=1)}),
+    (0.45, "back", {"rt": R(y=0.5)}),
+    (0.8, "io", REST),
+])
+
+# Emotes (Shinobi Record → Fun & Games). Moving ends them (fun.js plays them with a stop expression).
+_NICE = {"w": HIPS(-4, -10, drop=0.5), "rl": [0, 0, 14], "ll": [0, 0, -14], "ra": [-92, -12, 4], "la": [-20, 30, -48], "h": [-6, 12, 6]}
+A["animation.aegis.emote_nice_guy"] = anim(2.2, [
+    (0.15, "back", {**_NICE, "rt": R(y=1)}),
+    (0.3, "io", {"rt": R()}),
+    (1.9, "lin", _NICE),
+    (2.2, "io", REST),
+])
+A["animation.aegis.emote_wave"] = anim(2.0, [
+    (0.15, "out", {"ra": [-10, 0, 150], "h": [-4, 8, 0], "w": HIPS(-3, 6)}),
+    *[(0.15 + (i + 1) * 0.25, "io", {"ra": [-10, 0, 166 if i % 2 == 0 else 146]}) for i in range(6)],
+    (2.0, "io", REST),
+])
+A["animation.aegis.emote_bow"] = anim(1.8, [
+    (0.35, "io", {"w": HIPS(48, drop=1.2), "h": [12, 0, 0], "ra": [8, 0, 6], "la": [8, 0, -6]}),
+    (1.3, "lin", {"w": HIPS(48, drop=1.2)}),
+    (1.8, "io", REST),
+])
+A["animation.aegis.emote_victory"] = anim(1.6, [
+    (0.15, "in", {"w": HIPS(20, drop=3), "ra": [20, 0, 20], "la": [20, 0, -20], "rl": [-30, 0, 6], "ll": [-30, 0, -6]}),
+    (0.3, "snap", {"w": HIPS(-10), "rt": R(y=7), "ra": [-170, 0, 22], "la": [-170, 0, -22], "h": [-25, 0, 0], "rl": [10, 0, 6], "ll": [16, 0, -6]}),
+    (0.55, "in", {"rt": R(), "w": HIPS(10, drop=1.5), "rl": [-20, 0, 6], "ll": [-20, 0, -6]}),
+    (0.7, "back", {"w": HIPS(0, drop=0.5), "rl": Z, "ll": Z}),
+    (1.3, "lin", {"ra": [-170, 0, 24], "la": [-170, 0, -24]}),
+    (1.6, "io", REST),
+], plant=False)
+A["animation.aegis.emote_laugh"] = anim(2.0, [
+    (0.15, "out", {"w": HIPS(-16, drop=0.5), "h": [-28, 0, 0], "ra": [-40, -30, 10], "la": [-40, 30, -10]}),
+    *tremble(0.2, 1.6, "b", Z, 3, 0.08, axis=0),
+    (1.7, "in", {"b": Z, "w": HIPS(24, drop=1.5), "h": [16, 0, 0]}),
+    (2.0, "io", REST),
+])
+_SIT = {"rl": [-84, 34, 4], "ll": [-84, -34, -4], "ra": [-38, -14, 0], "la": [-38, 14, 0], "w": HIPS(2), "h": [10, 0, 0]}
+A["animation.aegis.emote_meditate"] = anim(4.2, [
+    (0.4, "io", _SIT),
+    *[(0.4 + k * 0.9, "io", {**_SIT, "b": [1.5 if k % 2 else -0.5, 0, 0]}) for k in range(1, 4)],
+    (3.8, "lin", {**_SIT, "b": Z}),
+    (4.2, "io", REST),
+])
+
+
 def mirrored(a):
     """The same motion for the other hand: left and right limbs swapped, turns and sideways moves reversed."""
     swap = {"rightArm": "leftArm", "leftArm": "rightArm", "rightLeg": "leftLeg", "leftLeg": "rightLeg"}

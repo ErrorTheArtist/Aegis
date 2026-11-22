@@ -1,0 +1,23 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:item": {
+    "description": {
+      "identifier": "aegis:mystery_scroll",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "aegis_mystery_scroll"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "§dMystery Scroll§r\n§7Right-click to unroll it: a random prize"
+      },
+      "minecraft:max_stack_size": 16,
+      "minecraft:glint": true
+    }
+  }
+}

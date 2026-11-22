@@ -15,6 +15,7 @@
 
 import { bingoBook, bountyOf } from "./bounty.js";
 import { trackerMenu } from "./tracker.js";
+import { funMenu } from "./fun.js";
 import { CLANS, getClanId } from "./clans.js";
 import { FACTIONS, factionOf, factionRank, factionMenu } from "./factions.js";
 import { storyMenu, storyLine } from "./story.js";
@@ -243,6 +244,7 @@ export async function openStats(player) {
     [`§cBounty §8& §eHonor\n§r§7${bountyOf(player) ? fmtRyo(bountyOf(player)) : "no bounty"} · ${getHonor(player).toLocaleString("en-US")} honor`, () => trackerMenu(player, back)],
     ["§5Titles\n§r§7Pain · Itachi · Tobi · Sasuke · Naruto", () => titlesMenu(player, back)],
     ["§6Ryō Wallet\n§r§7pay players · exchange emeralds", () => walletMenu(player)],
+    ["§dFun & Games\n§r§7emotes · your records · ninja movement", () => funMenu(player, back)],
     ["§bHandbook\n§r§7how everything works", () => handbookMenu(player, back)],
     ["§7Settings", () => settingsMenu(player, back)],
   ];

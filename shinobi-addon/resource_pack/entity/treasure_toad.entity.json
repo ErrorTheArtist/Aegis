@@ -1,0 +1,32 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "aegis:treasure_toad",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/aegis/treasure_toad"
+      },
+      "geometry": {
+        "default": "geometry.aegis.summon_toad"
+      },
+      "animations": {
+        "idle": "animation.aegis.summon_toad.idle"
+      },
+      "scripts": {
+        "animate": [
+          "idle"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ],
+      "spawn_egg": {
+        "base_color": "#f0c040",
+        "overlay_color": "#8a5a10"
+      }
+    }
+  }
+}

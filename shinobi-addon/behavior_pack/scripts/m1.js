@@ -11,6 +11,7 @@ import { getStat, meleeDamageFactor } from "./levels.js";
 import { boostHit, isEcho, healBack, scriptedHit, capBeastHit } from "./dmgutil.js";
 import { bijuuMeleeBonus } from "./bijuu.js";
 import { titleMeleeMultiplier, titleStrikeMultiplier, titleFinisherMultiplier } from "./titles.js";
+import { backstabMultiplier } from "./fun.js";
 
 const WINDOW = 28; // ticks between hits to keep the combo going
 const FISTS = [
@@ -57,7 +58,8 @@ function onHit(player, target, damage) {
   const bonus = Math.round(move.bonus * (blade ? 1 : 1 + getStat(player, "taijutsu") / 100));
   // …and in Tailed Beast Mode every hit carries the beast's chakra
   // (v1.60: half the jutsu growth; v1.61: beasts capped; v1.62: the titles of legend)
-  const titles = titleMeleeMultiplier(player) * titleStrikeMultiplier(player, target) * (move.finisher ? titleFinisherMultiplier(player) : 1);
+  const titles = titleMeleeMultiplier(player) * titleStrikeMultiplier(player, target) * (move.finisher ? titleFinisherMultiplier(player) : 1) *
+    backstabMultiplier(player, target); // (v1.63: +25% from behind)
   const total = capBeastHit(target, (damage + bonus + bijuuMeleeBonus(player, target)) * meleeDamageFactor(player) * titles);
   if (total > damage) boostHit(target, damage, total, player);
   else healBack(target, damage - total);

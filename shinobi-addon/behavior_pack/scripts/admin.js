@@ -7,13 +7,15 @@
 import { world, system } from "@minecraft/server";
 import { ActionFormData, ModalFormData, MessageFormData } from "@minecraft/server-ui";
 import { showForm } from "./ui.js";
-import { currentEvent, startRaid, startWanted, startScrolls, startDoubleXp, stopEvent, doubleXpLeft, endDoubleXp, autoEvents,
+import { currentEvent, startRaid, startWanted, startScrolls, startDoubleXp, startBells, stopEvent, doubleXpLeft, endDoubleXp, autoEvents,
   setAutoEvents, wantedPool, nearestVillage } from "./events.js";
 import { startGrace, stopGrace, graceLines, graceLeftText, GRACE_MAX_MINUTES } from "./grace.js";
 import { clearItems, clearMobs, lagClearOn, setLagClear, nextItemClear } from "./lagclear.js";
 import { vanillaBanned, setVanillaBan } from "./bans.js";
 import { bountyOf, setBounty, killReward, setKillReward, KILL_REWARD_RANGE } from "./bounty.js";
 import { TRACKERS, trackerOn, setTracker } from "./tracker.js";
+import { movementOn, setMovement } from "./movement.js";
+import { toadsOn, setToads, streakCallsOn, setStreakCalls } from "./fun.js";
 import { FACTIONS, factionOf, factionRank, leaveFaction } from "./factions.js";
 import { TITLES, TITLE_IDS, hasTitle } from "./titles.js";
 import { getLevel, setLevel, MAX_LEVEL, RANKS, getRank, meleePercent, setMeleePercent, MELEE_RANGE } from "./levels.js";
@@ -126,6 +128,7 @@ async function eventsMenu(p) {
     ["§4Wanted Legend\n§r§8a legend roams the world, already fighting", wantedForm],
     ["§eHidden Scrolls\n§r§8eight sealed scrolls hidden around a village", scrollsForm],
     [`§bDouble XP\n§r§8${xp ? `on — ${mins(xp)} min left · tap to restart` : "all XP counts twice for a while"}`, doubleXpForm],
+    ["§bKakashi's Bell Test\n§r§8grab a bell from Kakashi, near you — 5 minutes", (q) => started(q, startBells(q), "started Kakashi's Bell Test")],
   ];
   if (ev) {
     opts.push([`§7Stop the event\n§r§8${ev.label}`, (q) => {
@@ -607,6 +610,10 @@ const SETTINGS = () => [
   ["Automatic world events §8(one every hour while 2+ players are online)", autoEvents, (on, p) => p.sendMessage(setAutoEvents(on))],
   // v1.62: the bounty & honor tracker's boards
   ...Object.entries(TRACKERS).map(([id, label]) => [label, () => trackerOn(id), (on) => setTracker(id, on)]),
+  // v1.63: fun & games
+  ["Ninja movement §8(chakra leap, wall running, water walking)", movementOn, (on) => setMovement(on)],
+  ["Treasure Toads §8(a golden toad to catch every 6–10 minutes)", toadsOn, (on) => setToads(on)],
+  ["Kill streak shout-outs in chat §8(Legendary Shinobi)", streakCallsOn, (on) => setStreakCalls(on)],
 ];
 
 async function serverSettings(p) {

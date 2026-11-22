@@ -8,11 +8,11 @@ Uses the real Naruto names (Rasengan, Shadow Clone Jutsu, etc.) — personal use
 ## Contents
 
 - **Start here** — [Install](#install) · [Choose your village](#joining-choose-your-village) · [The Shinobi Record](#the-shinobi-record-v156) · [Commands cheat sheet](#commands-cheat-sheet)
-- **Your shinobi** — [Chakra](#chakra) · [Levels & Stats](#levels--stats) · [Clans](#clans) · [Jutsu](#jutsu-right-click-the-scroll-to-cast) · [Titles](#titles-of-legend-v154-v162) · [Armor](#armor--clothing) · [Swords](#legendary-swords) · [Ninja tools](#ninja-tools)
-- **Things to do** — [Story](#story-the-path-of-the-shinobi-v156) · [Factions](#factions-akatsuki--anbu-v156) · [Bingo Book](#bingo-book-v155) · [Bounty & Honor](#bounty--honor-tracker-v162) · [Achievements](#achievements-v155) · [Daily missions](#daily-missions--login-streak-v155) · [World events](#world-events-v155)
+- **Your shinobi** — [Chakra](#chakra) · [Ninja movement](#ninja-movement-v163) · [Levels & Stats](#levels--stats) · [Clans](#clans) · [Jutsu](#jutsu-right-click-the-scroll-to-cast) · [Titles](#titles-of-legend-v154-v162) · [Armor](#armor--clothing) · [Swords](#legendary-swords) · [Ninja tools](#ninja-tools)
+- **Things to do** — [Story](#story-the-path-of-the-shinobi-v156) · [Factions](#factions-akatsuki--anbu-v156) · [Bingo Book](#bingo-book-v155) · [Bounty & Honor](#bounty--honor-tracker-v162) · [Fun & Games](#fun--games-v163) · [Achievements](#achievements-v155) · [Daily missions](#daily-missions--login-streak-v155) · [World events](#world-events-v155)
 - **The world** — [Tailed Beasts](#tailed-beasts-bosses) · [NPCs](#npcs) · [Legendary bosses](#legendary-bosses-npc-spawner-only) · [Enemies](#enemies) · [Fast Travel](#fast-travel)
 - **For admins** — [Admin Panel](#admin-panel-v156) · [Economy](#economy-v158) · [Grace period](#grace-period-no-pvp) · [Lag clear](#lag-clear) · [Vanilla items](#vanilla-items-v154)
-- **What's new** — [v1.62](#titles-of-legend-one-at-a-time-and-the-bounty--honor-tracker-v162) · [v1.61](#the-tailed-beasts-are-strong-v161) · [v1.60](#melee-damage-nerfed-v160) · [v1.59](#grace-period-no-pvp-enemies-only-fight-back-v159) · [v1.58](#everything-costs-more-quests-pay-less-v158) · [v1.57](#the-leaf-weaponsmith-and-the-leaf-genin-remodelled-v157) · [v1.56](#story-factions-the-kaguya-clan-and-an-admin-panel-v156) and every version before it, at the end
+- **What's new** — [v1.63](#make-it-fun-ninja-movement-mini-games-and-more-v163) · [v1.62](#titles-of-legend-one-at-a-time-and-the-bounty--honor-tracker-v162) · [v1.61](#the-tailed-beasts-are-strong-v161) · [v1.60](#melee-damage-nerfed-v160) · [v1.59](#grace-period-no-pvp-enemies-only-fight-back-v159) · [v1.58](#everything-costs-more-quests-pay-less-v158) · [v1.57](#the-leaf-weaponsmith-and-the-leaf-genin-remodelled-v157) · [v1.56](#story-factions-the-kaguya-clan-and-an-admin-panel-v156) and every version before it, at the end
 
 ## Install
 
@@ -159,7 +159,8 @@ Panel or `/execute as <player> run scriptevent …`.
 | Command | What it does |
 |---|---|
 | `aegis:admin` | open the **Admin Panel** |
-| `aegis:event [raid / wanted / scrolls / doublexp / stop / auto on·off] …` | world events (see *World events*) |
+| `aegis:event [raid / wanted / scrolls / doublexp / bells / stop / auto on·off] …` | world events (see *World events*) |
+| `aegis:fun` · `aegis:fun toad` · `aegis:fun mystery [n]` | your fun stats · a Treasure Toad near you · Mystery Scrolls (admins) |
 | `aegis:grace <minutes> [player]` · `… off [player]` · `…` alone | grace periods |
 | `aegis:lag [items / mobs / on / off]` | lag clear |
 | `aegis:vanilla [on / off]` | ban (on) or allow (off) vanilla weapons, armour, redstone and bundles |
@@ -207,16 +208,17 @@ today's daily missions and streak, your story chapter and starter quest. Every p
 | **Bounty & Honor** | your bounty and honor, what a kill is worth, the most wanted and most honored, the titles' goals (v1.62) |
 | **Titles** | the 13 titles of legend and their requirements (you hold one at a time) |
 | **Ryō Wallet** | pay players, exchange emeralds |
-| **Handbook** | how everything works, in 12 short topics |
+| **Fun & Games** | your records (toads, eating contest, bells, streaks, combos), emotes, how to move like a ninja (v1.63) |
+| **Handbook** | how everything works, in 13 short topics |
 | **Settings** | your own options |
 | **Admin Panel** | only for admins — see *Admin Panel* |
 
 **Handbook** — Getting started, Chakra & jutsu, Levels & stats, Clans, Villages & honor, Bosses, Jinchūriki, Ryō &
-shops, Bingo Book & PvP, Factions, Daily/achievements/events and Titles: everything a new player asks, in game.
+shops, Bingo Book & PvP, Factions, Daily/achievements/events, Titles and Ninja movement & fun: everything a new player asks, in game.
 
 **Settings** — each player's own: **M1 combo animations** (the damage bonus stays either way), **swords on your back**
-when you switch away, and **chat messages for achievements and daily missions** (switch them off for a quiet chat —
-the titles on screen stay).
+when you switch away, **chat messages for achievements and daily missions** (switch them off for a quiet chat —
+the titles on screen stay), and since v1.63 **Chakra Leap**, **Wall Running** and **Water Walking** (see *Ninja movement*).
 
 ## Levels & Stats
 
@@ -398,6 +400,46 @@ The boards refresh every 2 seconds. Admins switch each one on or off in *Admin P
 scoreboard's display slots (sidebar, list, below name): while a board is on, it takes that slot over from anything else
 (another add-on, `/scoreboard objectives setdisplay`).
 
+## Ninja movement (v1.63)
+
+Every shinobi moves like one — chakra does the work:
+
+| Move | How | Chakra |
+|---|---|---|
+| **Chakra Leap** | jump again in mid-air: a burst of chakra launches you up and forward with a front flip — once per jump (twice for the Yellow Flash and the Sage of Six Paths) | 8 |
+| **Wall Running** | hold jump with a wall or a tree right in front of you and run straight up it; at the top you vault over the edge | 8 a second |
+| **Water Walking** | run across lakes and the sea like solid ground. **Sneak** to sink in; once your head is under you swim as usual | 1 a second |
+
+Ladders, vines, grass and flowers don't count as walls. Each move can be switched off by each player (**Shinobi
+Record → Settings**) or for the whole server (**Admin Panel → Server Settings → Ninja movement**).
+
+## Fun & Games (v1.63)
+
+- **Treasure Toads** — every 6–10 minutes a small golden toad hops out near someone and runs from every player in
+  sight. Catch it within a minute: **5,000 Ryō** (2,500 at the default quest rate), a **Mystery Scroll** and maybe an
+  XP Shard — and the server hears about it. (Switch them off in Server Settings.)
+- **Mystery Scrolls** — right-click to unroll one: it spins through the prizes and lands on Ryō, XP Shards, a jutsu
+  scroll, ramen, Soldier Pills or ninja tools — or, rarely, two more Mystery Scrolls, a Bloodline Reroll Scroll or the
+  jackpot (25,000 Ryō at the full quest rate; announced). From Treasure Toads, the Bell Test, the eating contest, kill
+  streaks, and sometimes the Travelling Merchant's cart.
+- **Ichiraku Eating Contest** — *Ramen Shop → Eating Contest* (an entry fee): 3, 2, 1… eat as many bowls of Contest
+  Ramen as you can in **30 seconds**. 10 bowls wins Ryō (more for every bowl), 20 a Mystery Scroll; beat the server
+  record for another one and a shout-out. Your best is kept.
+- **Kakashi's Bell Test** — a world event (see *World events*).
+- **Kill streaks** — defeat enemies within 6 seconds of each other: *Double Kill*, *Triple Kill*, *Quadra Kill*, **Ninja
+  Rampage** (5), **Unstoppable** (8), **Legendary Shinobi** (12 — a Mystery Scroll and a shout-out). From the second
+  kill on, every kill of the streak pays **+10% XP per step** (+100% at most).
+- **Hit combos** — every hit within 2.5 seconds of the last one counts; the counter shows on your action bar (10, 25,
+  50 and 100 get a callout). Just for the thrill.
+- **Backstab** — melee from behind hits 25% harder.
+- **A Thousand Years of Death** — the Jutsu Sensei's prank (Ninjutsu, cheap, level 1): get behind someone, the tiger
+  seal… and up they go.
+- **Emotes** — *Shinobi Record → Fun & Games → Emotes*: the **Nice Guy Pose** (teeth sparkle included), Wave, Bow,
+  Victory, Laugh, Meditate and Hand Signs. Everyone around you sees it; moving ends it.
+
+**Shinobi Record → Fun & Games** shows your records: toads caught, your best contest (and the server record), bells
+taken, your best streak and combo, Mystery Scrolls unrolled. `/scriptevent aegis:fun` shows them in chat.
+
 ## Achievements (v1.55)
 
 **51 achievements** in seven groups — Combat, Bosses, Jutsu, Path of the Shinobi, Wealth & Village, Daily & Events and
@@ -429,6 +471,7 @@ One at a time (Double XP can run alongside).
 | **Wanted** | A legendary shinobi appears out in the world, already fighting, and its position is announced. 15 minutes. | Whoever brings it down: 20,000 Ryō + 3 XP Shards (everyone who hit it: 5,000) |
 | **Hidden Scrolls** | Eight sealed scrolls are hidden around a village, each marked by a pillar of light. 20 minutes. | Open one (right-click): Ryō, an XP Shard, a jutsu scroll — or, rarely, a Bloodline Reroll Scroll |
 | **Double XP** | All XP counts twice. | — |
+| **Kakashi's Bell Test** (v1.63) | Kakashi waits near you with two bells on his belt. He can't be hurt — land a hit on him and you may snatch a bell (one per player; better odds from behind). Every hit he swaps himself for a log and reappears somewhere else, and whoever crowds him gets **A Thousand Years of Death**. 5 minutes. | Each bell: 10,000 Ryō (at the default quest rate, 5,000), 2 XP Shards and a Mystery Scroll · a little Ryō for everyone who tried. Both bells taken: *"…You pass."* None: *"You all fail!"* |
 
 Waiting legends guard their village against raiders (the villains don't).
 
@@ -438,6 +481,7 @@ Waiting legends guard their village against raiders (the villains don't).
 /scriptevent aegis:event wanted [legend]       (e.g. wanted kakashi — appears near you)
 /scriptevent aegis:event scrolls [village]
 /scriptevent aegis:event doublexp [minutes]    (default 30)
+/scriptevent aegis:event bells                 (Kakashi's Bell Test, near you)
 /scriptevent aegis:event stop
 /scriptevent aegis:event auto on | off
 ```
@@ -501,10 +545,10 @@ vanilla bans, friendly fire, lag clear, the Tailed Beast that's loose and who ho
 
 | Section | What you can do |
 |---|---|
-| **World Events** | start a **Village Raid** or **Hidden Scrolls** (pick the village), a **Wanted** legend (pick one or random, near any player) or **Double XP** (5–240 minutes) · stop the event · end Double XP · switch the hourly automatic events on or off |
+| **World Events** | start a **Village Raid** or **Hidden Scrolls** (pick the village), a **Wanted** legend (pick one or random, near any player) or **Double XP** (5–240 minutes) · **Kakashi's Bell Test** (near you) · stop the event · end Double XP · switch the hourly automatic events on or off |
 | **Grace Periods** | grace (no PvP; enemies only fight back when attacked, 60% softer) for everyone or one player · end them all · end one |
 | **Players** | pick an online player to see their level, rank, Ryō, honor, village, clan, faction, bounty, titles, Kage/Sannin, grace and position — then **give or take Ryō** · **set their level** (stat points refunded) · **give XP Shards** · **heal & refill chakra** · **teleport** (go to them, bring them to you, send them to any village) · **set their clan** · **set their title of legend** (one at a time — a list that shows how many requirements each one meets) · **Kage & Sannin** (appoint, with or without the set, or remove) · **set or clear a bounty** · **remove them from a faction** · **let them choose a village again** (how a rogue gets back in) · **give or end their grace** |
-| **Server Settings** | vanilla weapon & armour bans · automatic lag clear · friendly fire · automatic world events · the **Bounty & Honor boards** (Most Wanted sidebar, honor in the player list, bounties under names) · **players' melee damage** (25–200%) · **honor / bounty per player kill** (0–500,000) |
+| **Server Settings** | vanilla weapon & armour bans · automatic lag clear · friendly fire · automatic world events · the **Bounty & Honor boards** (Most Wanted sidebar, honor in the player list, bounties under names) · **ninja movement**, **Treasure Toads** and **kill streak shout-outs** (v1.63) · **players' melee damage** (25–200%) · **honor / bounty per player kill** (0–500,000) |
 | **Economy** | how expensive everything is (25–1000%) and how much Ryō quests pay (0–200%) — see *Economy* |
 | **Clear Lag Now** | dropped items, or every hostile mob |
 | **Admin Log** | the last 30 admin actions — who did what, and when (kept in the world) |
@@ -1442,6 +1486,8 @@ toward the target so the next one connects.
 | **Fists** (or anything that isn't a blade) | jab → cross → roundhouse kick → **rising uppercut** | +2, +2, +3, **+5** damage (×(1 + Taijutsu/100)); the uppercut launches and staggers the target |
 | **Blades** (legendary swords, vanilla swords, kunai, axes) | slash → backhand → **leaping chop** | +2 on the chop, which also launches and staggers |
 
+**Backstab** (v1.63): a melee hit on an enemy from behind (more than 120° from where it's looking) deals **+25%**.
+
 `/scriptevent aegis:m1 off` turns your own combo animations off (the bonus stays).
 
 **Melee damage** (v1.60): a melee hit is multiplied by **+1.5% per level** (×5.49 at level 300 — half the jutsu growth).
@@ -1596,6 +1642,17 @@ hoes, food, farming, building, crafting.
 ```
 
 The timers start when the server starts. The times are the constants at the top of `behavior_pack/scripts/lagclear.js`.
+
+## Make it fun: ninja movement, mini-games and more (v1.63)
+
+- **Ninja movement** for everyone: **Chakra Leap** (a second jump in mid-air, with a flip), **Wall Running** (hold jump
+  against a wall or a tree) and **Water Walking** (sneak to sink). Each can be switched off.
+- **Treasure Toads** to chase, **Mystery Scrolls** to unroll, the **Ichiraku Eating Contest**, and **Kakashi's Bell
+  Test** as a new world event (also in the automatic rotation).
+- **Kill streaks** with bonus XP, **hit combos** on the action bar, **backstabs** (+25% from behind).
+- **A Thousand Years of Death** — a prank jutsu at the Sensei; **emotes**, including the Nice Guy Pose.
+- A **Fun & Games** page in the Shinobi Record with your records, a Handbook topic, and three new switches in Server
+  Settings (ninja movement, Treasure Toads, kill streak shout-outs).
 
 ## Titles of legend, one at a time, and the bounty & honor tracker (v1.62)
 

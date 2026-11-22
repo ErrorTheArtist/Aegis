@@ -1,6 +1,6 @@
 // Personal settings (v1.56) — Shinobi Record → Settings.
 //   M1 combo animations · swords on your back · quiet notifications (no chat lines for achievements and daily
-//   missions — the titles on screen stay).
+//   missions — the titles on screen stay) · v1.63: Chakra Leap, Wall Running and Water Walking (each can be turned off).
 
 import { ModalFormData } from "@minecraft/server-ui";
 
@@ -18,6 +18,10 @@ const OPTIONS = [
   ["M1 combo animations", "aegis:m1_off", true],
   ["Swords go on your back when you switch away", "aegis:sheath_off", true],
   ["Chat messages for achievements and daily missions", QUIET, true],
+  // v1.63: ninja movement (movement.js)
+  ["Chakra Leap §8(jump again in mid-air)", "aegis:leap_off", true],
+  ["Wall Running §8(hold jump against a wall or a tree)", "aegis:wallrun_off", true],
+  ["Water Walking §8(run on water; sneak to sink)", "aegis:waterwalk_off", true],
 ];
 
 export async function settingsMenu(player, back) {

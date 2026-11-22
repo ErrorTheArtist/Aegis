@@ -2232,6 +2232,7 @@ export function initLegends(helpers) {
   // Talk to a legend that's waiting → its challenge.
   world.afterEvents.playerInteractWithEntity.subscribe(({ player, target }) => {
     if (target?.typeId !== "aegis:legend" || !isCalm(target)) return;
+    if (target.hasTag?.("aegis_bells")) return void player.sendMessage("§bKakashi§f: The bells? Come and take them — with the intent to kill. §8(hit him)"); // v1.63
     system.run(() => challengeMenu(player, target).catch(() => {}));
   });
 

@@ -43,6 +43,8 @@ import { initEvents } from "./events.js";
 import { initStory, noteStoryCast } from "./story.js";
 import { initFactions, factionDamageMultiplier, factionAllies } from "./factions.js";
 import { initTracker } from "./tracker.js";
+import { initMovement } from "./movement.js";
+import { initFun, makeFunJutsu } from "./fun.js";
 import { bountyOf } from "./bounty.js";
 import { initAdmin } from "./admin.js";
 import { initBans } from "./bans.js";
@@ -1218,6 +1220,7 @@ Object.assign(JUTSU, makeJutsu2(npcApi));
 Object.assign(JUTSU, makeJutsu3(npcApi));
 Object.assign(JUTSU, makeJutsu4(npcApi)); // v1.55: the fourth wave
 Object.assign(JUTSU, makeTitleJutsu(npcApi)); // v1.54: the titles' scrolls
+Object.assign(JUTSU, makeFunJutsu(npcApi)); // v1.63: A Thousand Years of Death
 {
   const rel = makeReleases(npcApi);
   Object.assign(JUTSU, rel.jutsu);
@@ -1244,6 +1247,8 @@ initAdmin(npcApi); // v1.56: the Admin Panel
 initTracker(); // v1.62: the bounty & honor tracker
 initBans();
 initTitles({ ...npcApi, refreshName: applyNameTag });
+initMovement(npcApi); // v1.63: chakra leap, wall running, water walking
+initFun(npcApi); // v1.63: combos, streaks, Mystery Scrolls, Treasure Toads, the eating contest, emotes
 initEdoTensei(npcApi);
 initM1(npcApi);
 initLagClear();

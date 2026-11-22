@@ -16,6 +16,7 @@ import { hasSageTraining, grantSage } from "./sage.js";
 import { hasEternalMangekyo, awakenEternal } from "./clans.js";
 import { natureTraining } from "./natures.js";
 import { getRyo, spendRyo, addRyo, fmtRyo, exchangeEmeralds, EMERALD_RATE, priceMultiplier, questRyo } from "./currency.js";
+import { startEatingContest, inContest } from "./fun.js";
 import { RELEASE_SCROLLS } from "./releases.js";
 import { questGiver, questSetup } from "./quests.js";
 import { VILLAGE_GEAR, getVillage } from "./villages.js";
@@ -710,6 +711,7 @@ const SENSEI = [
   ]],
   ["§bNinjutsu", [
     ["aegis:flash_scroll", 1, "Body Flicker", 6, 1],
+    ["aegis:thousand_years_scroll", 1, "A Thousand Years of Death (prank!)", 4, 1], // v1.63
     ["aegis:substitution_scroll", 1, "Substitution Jutsu", 10, 5],
     ["aegis:explosive_tags_scroll", 1, "Explosive Tag Barrage", 8, 10],
     ["aegis:clone_scroll", 1, "Shadow Clone Jutsu", 16, 15],
@@ -796,6 +798,7 @@ const SHOPS = {
     ["aegis:blood_pill", 3, "Blood Increasing Pills ×3", 5, 5],
     ["aegis:food_pill", 3, "Akimichi Food Pills ×3 (+80 chakra)", 6, 10],
     ["aegis:curry_of_life", 1, "Curry of Life (full heal!)", 24, 40],
+    ["__contest", 0, "Eating Contest — as many bowls as you can in 30 s", 3, 1], // v1.63
   ],
 };
 
@@ -817,7 +820,7 @@ async function shop(player, npc, cfg, list, title, back) {
   if (back) f.button("§l« Back");
   for (const [id, , label, base, req] of list) {
     const p = priceOf(base, cfg);
-    f.button(id === "__exchange" ? `§e${label}\n§r§7${EMERALD_RATE} Ryō per emerald` : base === 0 ? `§5${label}\n§r§7price depends on how many you know` : `${lvl < req ? "§8" : ems >= p ? "§2" : "§c"}${label}\n§r§7${fmtRyo(p)}${lvl < req ? ` · Lv ${req}` : ""}`);
+    f.button(id === "__exchange" ? `§e${label}\n§r§7${EMERALD_RATE} Ryō per emerald` : id === "__contest" ? `§e${label}\n§r§7entry ${fmtRyo(p)} · 10 bowls wins` : base === 0 ? `§5${label}\n§r§7price depends on how many you know` : `${lvl < req ? "§8" : ems >= p ? "§2" : "§c"}${label}\n§r§7${fmtRyo(p)}${lvl < req ? ` · Lv ${req}` : ""}`);
   }
   const r = await f.show(player);
   if (r.canceled || r.selection === undefined) return;
@@ -828,6 +831,11 @@ async function shop(player, npc, cfg, list, title, back) {
   else if (id === "__exchange") {
     const n = exchangeEmeralds(player);
     player.sendMessage(n ? `§aExchanged ${n} emeralds for §6${fmtRyo(n * EMERALD_RATE)}§a.` : "§7You have no emeralds to exchange.");
+  } else if (id === "__contest") {
+    if (inContest(player)) player.sendMessage("§7You're already in a contest — eat!");
+    else if (!spendRyo(player, price)) player.sendMessage(`§cThe entry fee is ${fmtRyo(price)}.`);
+    else return void startEatingContest(player);
+    return;
   } else if (id === "__nature") {
     return natureTraining(player, (n) => priceOf(n, cfg), getLevel);
   } else if (id === "__sage") {
@@ -877,6 +885,7 @@ const WARES = [
   { id: "aegis:akatsuki_cloak", n: 1, label: "Akatsuki Cloak", price: 16, lvl: 20, weight: 4, stock: [1, 1] },
   { id: "aegis:akatsuki_hat", n: 1, label: "Akatsuki Straw Hat", price: 6, lvl: 10, weight: 5, stock: [1, 1] },
   // bargains: something the Jutsu Sensei or the Weaponsmith sells, at a cut price (level requirements still apply)
+  { id: "aegis:mystery_scroll", n: 1, label: "Mystery Scroll (a random prize)", price: 8, weight: 10, stock: [1, 3] }, // v1.63
   { deal: "scroll", weight: 14 },
   { deal: "scroll", weight: 10 },
   { deal: "weapon", weight: 7 },

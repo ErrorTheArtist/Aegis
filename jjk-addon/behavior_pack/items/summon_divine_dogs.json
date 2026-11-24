@@ -1,0 +1,32 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:item": {
+    "description": {
+      "identifier": "jjk:summon_divine_dogs",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "jjk_summon_divine_dogs"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "§5Divine Dogs§r\n§8Ten Shadows\n§7Summon the white and black shikigami wolves"
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:can_destroy_in_creative": false,
+      "minecraft:use_modifiers": {
+        "use_duration": 0.25,
+        "movement_modifier": 1.0
+      },
+      "minecraft:use_animation": "none",
+      "minecraft:cooldown": {
+        "category": "jjk_summon_divine_dogs",
+        "duration": 0.1
+      }
+    }
+  }
+}

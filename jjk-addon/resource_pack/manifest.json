@@ -1,0 +1,39 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Jujutsu Legacy (Resources)",
+    "description": "The Best Jujutsu Kaisen Addon made by _errorlegend",
+    "uuid": "11784616-951b-49fd-a5c1-7fa8114a573a",
+    "version": [
+      1,
+      0,
+      0
+    ],
+    "min_engine_version": [
+      1,
+      21,
+      60
+    ]
+  },
+  "modules": [
+    {
+      "type": "resources",
+      "uuid": "7181e0ae-d84d-4f1a-aae3-6879e901937b",
+      "version": [
+        1,
+        0,
+        0
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "uuid": "7f8cd698-a213-4623-959f-1e378063fcd3",
+      "version": [
+        1,
+        0,
+        0
+      ]
+    }
+  ]
+}

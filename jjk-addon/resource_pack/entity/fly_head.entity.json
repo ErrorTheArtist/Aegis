@@ -1,0 +1,32 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "jjk:fly_head",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/jjk/fly_head"
+      },
+      "geometry": {
+        "default": "geometry.jjk.fly_head"
+      },
+      "animations": {
+        "idle": "animation.jjk.fly_head.idle"
+      },
+      "scripts": {
+        "animate": [
+          "idle"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ],
+      "spawn_egg": {
+        "base_color": "#7a8460",
+        "overlay_color": "#46122a"
+      }
+    }
+  }
+}

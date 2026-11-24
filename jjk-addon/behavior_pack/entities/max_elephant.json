@@ -1,0 +1,67 @@
+{
+  "format_version": "1.21.0",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "jjk:max_elephant",
+      "is_spawnable": false,
+      "is_summonable": true,
+      "is_experimental": false
+    },
+    "component_groups": {
+      "jjk:despawn": {
+        "minecraft:instant_despawn": {}
+      }
+    },
+    "components": {
+      "minecraft:type_family": {
+        "family": [
+          "jjk_fx"
+        ]
+      },
+      "minecraft:collision_box": {
+        "width": 0.1,
+        "height": 0.1
+      },
+      "minecraft:physics": {
+        "has_gravity": false,
+        "has_collision": false
+      },
+      "minecraft:pushable": {
+        "is_pushable": false,
+        "is_pushable_by_piston": false
+      },
+      "minecraft:damage_sensor": {
+        "triggers": [
+          {
+            "cause": "all",
+            "deals_damage": "no"
+          }
+        ]
+      },
+      "minecraft:health": {
+        "value": 100,
+        "max": 100
+      },
+      "minecraft:timer": {
+        "time": 40,
+        "looping": false,
+        "time_down_event": {
+          "event": "jjk:despawn",
+          "target": "self"
+        }
+      },
+      "minecraft:scale": {
+        "value": 2.4
+      }
+    },
+    "events": {
+      "jjk:despawn": {
+        "add": {
+          "component_groups": [
+            "jjk:despawn"
+          ]
+        }
+      }
+    }
+  }
+}

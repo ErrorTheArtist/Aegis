@@ -1,0 +1,32 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:item": {
+    "description": {
+      "identifier": "jjk:chimera_shadow_garden",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "jjk_chimera_shadow_garden"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "§5Domain Expansion: Chimera Shadow Garden§r\n§8Ten Shadows\n§7Flood the ground with shadow"
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:can_destroy_in_creative": false,
+      "minecraft:use_modifiers": {
+        "use_duration": 0.25,
+        "movement_modifier": 1.0
+      },
+      "minecraft:use_animation": "none",
+      "minecraft:cooldown": {
+        "category": "jjk_chimera_shadow_garden",
+        "duration": 0.1
+      }
+    }
+  }
+}

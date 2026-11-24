@@ -1,0 +1,32 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "jjk:nue",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/jjk/nue"
+      },
+      "geometry": {
+        "default": "geometry.jjk.nue"
+      },
+      "animations": {
+        "idle": "animation.jjk.nue.idle"
+      },
+      "scripts": {
+        "animate": [
+          "idle"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ],
+      "spawn_egg": {
+        "base_color": "#3e4660",
+        "overlay_color": "#e6e6ec"
+      }
+    }
+  }
+}

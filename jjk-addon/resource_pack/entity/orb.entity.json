@@ -1,0 +1,30 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "jjk:orb",
+      "materials": {
+        "default": "entity_alphablend"
+      },
+      "textures": {
+        "blue": "textures/entity/jjk/orb_blue",
+        "red": "textures/entity/jjk/orb_red",
+        "purple": "textures/entity/jjk/orb_purple"
+      },
+      "geometry": {
+        "default": "geometry.jjk.orb"
+      },
+      "render_controllers": [
+        "controller.render.jjk.variant3"
+      ],
+      "animations": {
+        "spin": "animation.jjk.orb.spin"
+      },
+      "scripts": {
+        "animate": [
+          "spin"
+        ]
+      }
+    }
+  }
+}

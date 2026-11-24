@@ -1,0 +1,32 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:item": {
+    "description": {
+      "identifier": "jjk:dismantle",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "jjk_dismantle"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "§cDismantle§r\n§8Shrine\n§7A flying slash that cuts everything in a line"
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:can_destroy_in_creative": false,
+      "minecraft:use_modifiers": {
+        "use_duration": 0.25,
+        "movement_modifier": 1.0
+      },
+      "minecraft:use_animation": "none",
+      "minecraft:cooldown": {
+        "category": "jjk_dismantle",
+        "duration": 0.1
+      }
+    }
+  }
+}

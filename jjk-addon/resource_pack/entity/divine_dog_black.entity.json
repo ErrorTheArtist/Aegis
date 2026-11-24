@@ -1,0 +1,32 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "jjk:divine_dog_black",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/jjk/divine_dog_black"
+      },
+      "geometry": {
+        "default": "geometry.jjk.divine_dog"
+      },
+      "animations": {
+        "idle": "animation.jjk.divine_dog.idle"
+      },
+      "scripts": {
+        "animate": [
+          "idle"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ],
+      "spawn_egg": {
+        "base_color": "#222228",
+        "overlay_color": "#5aa0f0"
+      }
+    }
+  }
+}

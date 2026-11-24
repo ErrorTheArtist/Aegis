@@ -1,0 +1,20 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "jjk:shrine",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/jjk/shrine"
+      },
+      "geometry": {
+        "default": "geometry.jjk.shrine"
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ]
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "jjk:eye_curse",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/jjk/eye_curse"
+      },
+      "geometry": {
+        "default": "geometry.jjk.eye_curse"
+      },
+      "animations": {
+        "idle": "animation.jjk.eye_curse.idle"
+      },
+      "scripts": {
+        "animate": [
+          "idle"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ],
+      "spawn_egg": {
+        "base_color": "#70567c",
+        "overlay_color": "#e0dcc8"
+      }
+    }
+  }
+}

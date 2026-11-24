@@ -1,0 +1,41 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:item": {
+    "description": {
+      "identifier": "jjk:inverted_spear_of_heaven",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "jjk_inverted_spear_of_heaven"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "§eInverted Spear of Heaven§r\n§8Cursed Tool\n§7Forcibly nullifies any cursed technique it touches"
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:can_destroy_in_creative": false,
+      "minecraft:use_modifiers": {
+        "use_duration": 0.25,
+        "movement_modifier": 1.0
+      },
+      "minecraft:use_animation": "none",
+      "minecraft:hand_equipped": true,
+      "minecraft:damage": 8,
+      "minecraft:durability": {
+        "max_durability": 9999
+      },
+      "minecraft:enchantable": {
+        "slot": "sword",
+        "value": 14
+      },
+      "minecraft:cooldown": {
+        "category": "jjk_inverted_spear_of_heaven",
+        "duration": 0.1
+      }
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "jjk:lanky_curse",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/jjk/lanky_curse"
+      },
+      "geometry": {
+        "default": "geometry.jjk.lanky_curse"
+      },
+      "animations": {
+        "idle": "animation.jjk.lanky_curse.idle"
+      },
+      "scripts": {
+        "animate": [
+          "idle"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ],
+      "spawn_egg": {
+        "base_color": "#b2a8b0",
+        "overlay_color": "#501020"
+      }
+    }
+  }
+}

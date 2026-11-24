@@ -1,0 +1,46 @@
+{
+  "format_version": "1.8.0",
+  "render_controllers": {
+    "controller.render.jjk.variant3": {
+      "arrays": {
+        "textures": {
+          "Array.v": [
+            "Texture.blue",
+            "Texture.red",
+            "Texture.purple"
+          ]
+        }
+      },
+      "geometry": "Geometry.default",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Array.v[q.variant]"
+      ],
+      "ignore_lighting": true
+    },
+    "controller.render.jjk.variant2": {
+      "arrays": {
+        "textures": {
+          "Array.v": [
+            "Texture.void",
+            "Texture.garden"
+          ]
+        }
+      },
+      "geometry": "Geometry.default",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Array.v[q.variant]"
+      ],
+      "ignore_lighting": true
+    }
+  }
+}

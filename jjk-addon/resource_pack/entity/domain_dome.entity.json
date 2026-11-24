@@ -1,0 +1,21 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "jjk:domain_dome",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "void": "textures/entity/jjk/dome_void",
+        "garden": "textures/entity/jjk/dome_garden"
+      },
+      "geometry": {
+        "default": "geometry.jjk.domain_dome"
+      },
+      "render_controllers": [
+        "controller.render.jjk.variant2"
+      ]
+    }
+  }
+}

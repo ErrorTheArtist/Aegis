@@ -1,0 +1,32 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "jjk:max_elephant",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/jjk/max_elephant"
+      },
+      "geometry": {
+        "default": "geometry.jjk.max_elephant"
+      },
+      "animations": {
+        "idle": "animation.jjk.max_elephant.idle"
+      },
+      "scripts": {
+        "animate": [
+          "idle"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ],
+      "spawn_egg": {
+        "base_color": "#808ca0",
+        "overlay_color": "#f0f0fa"
+      }
+    }
+  }
+}

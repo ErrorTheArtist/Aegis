@@ -1,0 +1,415 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.jjk.fly_head.idle": {
+      "loop": true,
+      "bones": {
+        "body": {
+          "position": [
+            0,
+            "3 + math.sin(q.life_time * 200) * 1.5",
+            0
+          ],
+          "rotation": [
+            "math.sin(v.attack_time * 180) * 20",
+            0,
+            0
+          ]
+        },
+        "wing0": {
+          "rotation": [
+            0,
+            0,
+            "1 * math.sin(q.life_time * 2400 + 0) * 35"
+          ]
+        },
+        "wing1": {
+          "rotation": [
+            0,
+            0,
+            "1 * math.sin(q.life_time * 2400 + 60) * 35"
+          ]
+        },
+        "wing2": {
+          "rotation": [
+            0,
+            0,
+            "-1 * math.sin(q.life_time * 2400 + 120) * 35"
+          ]
+        },
+        "wing3": {
+          "rotation": [
+            0,
+            0,
+            "-1 * math.sin(q.life_time * 2400 + 180) * 35"
+          ]
+        }
+      }
+    },
+    "animation.jjk.lanky_curse.idle": {
+      "loop": true,
+      "bones": {
+        "head": {
+          "rotation": [
+            "q.target_x_rotation * 0.6",
+            "q.target_y_rotation * 0.6",
+            0
+          ]
+        },
+        "leg0": {
+          "rotation": [
+            "math.cos(q.modified_distance_moved * 32) * 30 * math.min(1, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg1": {
+          "rotation": [
+            "-math.cos(q.modified_distance_moved * 32) * 30 * math.min(1, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "arm0": {
+          "rotation": [
+            "-math.cos(q.modified_distance_moved * 32) * 30 * math.min(1, q.modified_move_speed * 2) * 0.8 - math.sin(v.attack_time * 180) * 80 + math.sin(q.life_time * 90) * 4",
+            0,
+            0
+          ]
+        },
+        "arm1": {
+          "rotation": [
+            "math.cos(q.modified_distance_moved * 32) * 30 * math.min(1, q.modified_move_speed * 2) * 0.8 - math.sin(v.attack_time * 180) * 80 - math.sin(q.life_time * 90) * 4",
+            0,
+            0
+          ]
+        }
+      }
+    },
+    "animation.jjk.mouth_curse.idle": {
+      "loop": true,
+      "bones": {
+        "leg0": {
+          "rotation": [
+            "1 * math.cos(q.modified_distance_moved * 32) * 30 * math.min(1, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg1": {
+          "rotation": [
+            "-1 * math.cos(q.modified_distance_moved * 32) * 30 * math.min(1, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg2": {
+          "rotation": [
+            "-1 * math.cos(q.modified_distance_moved * 32) * 30 * math.min(1, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg3": {
+          "rotation": [
+            "1 * math.cos(q.modified_distance_moved * 32) * 30 * math.min(1, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "jaw": {
+          "rotation": [
+            "6 + math.sin(q.life_time * 120) * 4 + math.sin(v.attack_time * 180) * 30",
+            0,
+            0
+          ]
+        },
+        "body": {
+          "rotation": [
+            "math.sin(v.attack_time * 180) * 12",
+            0,
+            0
+          ],
+          "position": [
+            0,
+            "math.sin(q.life_time * 90) * 0.4",
+            0
+          ]
+        }
+      }
+    },
+    "animation.jjk.eye_curse.idle": {
+      "loop": true,
+      "bones": {
+        "head": {
+          "rotation": [
+            "q.target_x_rotation * 0.6",
+            "q.target_y_rotation * 0.6",
+            0
+          ]
+        },
+        "leg0": {
+          "rotation": [
+            "math.cos(q.modified_distance_moved * 32) * 30 * math.min(1, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg1": {
+          "rotation": [
+            "-math.cos(q.modified_distance_moved * 32) * 30 * math.min(1, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "arm0": {
+          "rotation": [
+            "-math.cos(q.modified_distance_moved * 32) * 30 * math.min(1, q.modified_move_speed * 2) * 0.8 - math.sin(v.attack_time * 180) * 80 + math.sin(q.life_time * 90) * 4",
+            0,
+            0
+          ]
+        },
+        "arm1": {
+          "rotation": [
+            "math.cos(q.modified_distance_moved * 32) * 30 * math.min(1, q.modified_move_speed * 2) * 0.8 - math.sin(v.attack_time * 180) * 80 - math.sin(q.life_time * 90) * 4",
+            0,
+            0
+          ]
+        },
+        "body": {
+          "rotation": [
+            "math.sin(v.attack_time * 180) * 12",
+            0,
+            0
+          ],
+          "position": [
+            0,
+            "math.sin(q.life_time * 90) * 0.4",
+            0
+          ]
+        }
+      }
+    },
+    "animation.jjk.finger_bearer.idle": {
+      "loop": true,
+      "bones": {
+        "head": {
+          "rotation": [
+            "q.target_x_rotation * 0.6",
+            "q.target_y_rotation * 0.6",
+            0
+          ]
+        },
+        "leg0": {
+          "rotation": [
+            "math.cos(q.modified_distance_moved * 32) * 30 * math.min(1, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg1": {
+          "rotation": [
+            "-math.cos(q.modified_distance_moved * 32) * 30 * math.min(1, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "arm0": {
+          "rotation": [
+            "-math.cos(q.modified_distance_moved * 32) * 30 * math.min(1, q.modified_move_speed * 2) * 0.8 - math.sin(v.attack_time * 180) * 80 + math.sin(q.life_time * 90) * 4",
+            0,
+            0
+          ]
+        },
+        "arm1": {
+          "rotation": [
+            "math.cos(q.modified_distance_moved * 32) * 30 * math.min(1, q.modified_move_speed * 2) * 0.8 - math.sin(v.attack_time * 180) * 80 - math.sin(q.life_time * 90) * 4",
+            0,
+            0
+          ]
+        },
+        "jaw": {
+          "rotation": [
+            "6 + math.sin(q.life_time * 120) * 4 + math.sin(v.attack_time * 180) * 30",
+            0,
+            0
+          ]
+        },
+        "body": {
+          "rotation": [
+            "math.sin(v.attack_time * 180) * 12",
+            0,
+            0
+          ],
+          "position": [
+            0,
+            "math.sin(q.life_time * 90) * 0.4",
+            0
+          ]
+        }
+      }
+    },
+    "animation.jjk.divine_dog.idle": {
+      "loop": true,
+      "bones": {
+        "head": {
+          "rotation": [
+            "q.target_x_rotation * 0.6",
+            "q.target_y_rotation * 0.6",
+            0
+          ]
+        },
+        "leg0": {
+          "rotation": [
+            "1 * math.cos(q.modified_distance_moved * 32) * 30 * math.min(1, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg1": {
+          "rotation": [
+            "-1 * math.cos(q.modified_distance_moved * 32) * 30 * math.min(1, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg2": {
+          "rotation": [
+            "-1 * math.cos(q.modified_distance_moved * 32) * 30 * math.min(1, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg3": {
+          "rotation": [
+            "1 * math.cos(q.modified_distance_moved * 32) * 30 * math.min(1, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "tail": {
+          "rotation": [
+            0,
+            "math.sin(q.life_time * 500) * 25",
+            0
+          ]
+        }
+      }
+    },
+    "animation.jjk.nue.idle": {
+      "loop": true,
+      "bones": {
+        "head": {
+          "rotation": [
+            "q.target_x_rotation * 0.6",
+            "q.target_y_rotation * 0.6",
+            0
+          ]
+        },
+        "wing0": {
+          "rotation": [
+            0,
+            0,
+            "math.sin(q.life_time * 700) * 35"
+          ]
+        },
+        "wing1": {
+          "rotation": [
+            0,
+            0,
+            "-math.sin(q.life_time * 700) * 35"
+          ]
+        },
+        "body": {
+          "position": [
+            0,
+            "math.sin(q.life_time * 350) * 1.5",
+            0
+          ]
+        }
+      }
+    },
+    "animation.jjk.max_elephant.idle": {
+      "loop": true,
+      "bones": {
+        "head": {
+          "rotation": [
+            "q.target_x_rotation * 0.6",
+            "q.target_y_rotation * 0.6",
+            0
+          ]
+        },
+        "leg0": {
+          "rotation": [
+            "1 * math.cos(q.modified_distance_moved * 32) * 30 * math.min(1, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg1": {
+          "rotation": [
+            "-1 * math.cos(q.modified_distance_moved * 32) * 30 * math.min(1, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg2": {
+          "rotation": [
+            "-1 * math.cos(q.modified_distance_moved * 32) * 30 * math.min(1, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "leg3": {
+          "rotation": [
+            "1 * math.cos(q.modified_distance_moved * 32) * 30 * math.min(1, q.modified_move_speed * 2)",
+            0,
+            0
+          ]
+        },
+        "trunk0": {
+          "rotation": [
+            "math.sin(q.life_time * 140) * 8 - 10",
+            0,
+            0
+          ]
+        },
+        "trunk1": {
+          "rotation": [
+            "math.sin(q.life_time * 140 - 40) * 10 - 10",
+            0,
+            0
+          ]
+        },
+        "trunk2": {
+          "rotation": [
+            "math.sin(q.life_time * 140 - 80) * 12 - 12",
+            0,
+            0
+          ]
+        }
+      }
+    },
+    "animation.jjk.orb.spin": {
+      "loop": true,
+      "bones": {
+        "core": {
+          "rotation": [
+            0,
+            "q.life_time * 360",
+            "q.life_time * 200"
+          ],
+          "scale": "1 + math.sin(q.life_time * 900) * 0.06"
+        },
+        "shell": {
+          "rotation": [
+            "q.life_time * -300",
+            "q.life_time * -240",
+            0
+          ],
+          "scale": "1.05 + math.sin(q.life_time * 600) * 0.08"
+        }
+      }
+    }
+  }
+}

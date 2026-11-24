@@ -1,0 +1,32 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:item": {
+    "description": {
+      "identifier": "jjk:speech_twist",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "jjk_speech_twist"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "§3Maximum: \"Twist\"§r\n§8Cursed Speech\n§7Everyone nearby is wrung out — costs your throat"
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:can_destroy_in_creative": false,
+      "minecraft:use_modifiers": {
+        "use_duration": 0.25,
+        "movement_modifier": 1.0
+      },
+      "minecraft:use_animation": "none",
+      "minecraft:cooldown": {
+        "category": "jjk_speech_twist",
+        "duration": 0.1
+      }
+    }
+  }
+}

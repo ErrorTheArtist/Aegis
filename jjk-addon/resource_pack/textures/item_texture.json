@@ -1,0 +1,105 @@
+{
+  "resource_pack_name": "jujutsu_legacy",
+  "texture_name": "atlas.items",
+  "texture_data": {
+    "jjk_blue": {
+      "textures": "textures/items/jjk/blue"
+    },
+    "jjk_red": {
+      "textures": "textures/items/jjk/red"
+    },
+    "jjk_hollow_purple": {
+      "textures": "textures/items/jjk/hollow_purple"
+    },
+    "jjk_unlimited_void": {
+      "textures": "textures/items/jjk/unlimited_void"
+    },
+    "jjk_dismantle": {
+      "textures": "textures/items/jjk/dismantle"
+    },
+    "jjk_cleave": {
+      "textures": "textures/items/jjk/cleave"
+    },
+    "jjk_fuga": {
+      "textures": "textures/items/jjk/fuga"
+    },
+    "jjk_malevolent_shrine": {
+      "textures": "textures/items/jjk/malevolent_shrine"
+    },
+    "jjk_summon_divine_dogs": {
+      "textures": "textures/items/jjk/summon_divine_dogs"
+    },
+    "jjk_summon_nue": {
+      "textures": "textures/items/jjk/summon_nue"
+    },
+    "jjk_summon_max_elephant": {
+      "textures": "textures/items/jjk/summon_max_elephant"
+    },
+    "jjk_chimera_shadow_garden": {
+      "textures": "textures/items/jjk/chimera_shadow_garden"
+    },
+    "jjk_speech_dont_move": {
+      "textures": "textures/items/jjk/speech_dont_move"
+    },
+    "jjk_speech_blast_away": {
+      "textures": "textures/items/jjk/speech_blast_away"
+    },
+    "jjk_speech_crush": {
+      "textures": "textures/items/jjk/speech_crush"
+    },
+    "jjk_speech_twist": {
+      "textures": "textures/items/jjk/speech_twist"
+    },
+    "jjk_piercing_blood": {
+      "textures": "textures/items/jjk/piercing_blood"
+    },
+    "jjk_convergence": {
+      "textures": "textures/items/jjk/convergence"
+    },
+    "jjk_supernova": {
+      "textures": "textures/items/jjk/supernova"
+    },
+    "jjk_flowing_red_scale_stack": {
+      "textures": "textures/items/jjk/flowing_red_scale_stack"
+    },
+    "jjk_boogie_swap": {
+      "textures": "textures/items/jjk/boogie_swap"
+    },
+    "jjk_boogie_feint": {
+      "textures": "textures/items/jjk/boogie_feint"
+    },
+    "jjk_clap_barrage": {
+      "textures": "textures/items/jjk/clap_barrage"
+    },
+    "jjk_black_flash_swap": {
+      "textures": "textures/items/jjk/black_flash_swap"
+    },
+    "jjk_reverse_cursed_technique": {
+      "textures": "textures/items/jjk/reverse_cursed_technique"
+    },
+    "jjk_simple_domain": {
+      "textures": "textures/items/jjk/simple_domain"
+    },
+    "jjk_playful_cloud": {
+      "textures": "textures/items/jjk/playful_cloud"
+    },
+    "jjk_dragon_bone": {
+      "textures": "textures/items/jjk/dragon_bone"
+    },
+    "jjk_inverted_spear_of_heaven": {
+      "textures": "textures/items/jjk/inverted_spear_of_heaven"
+    },
+    "jjk_split_soul_katana": {
+      "textures": "textures/items/jjk/split_soul_katana"
+    },
+    "jjk_jujutsu_record": {
+      "textures": "textures/items/jjk/jujutsu_record"
+    },
+    "jjk_sukuna_finger": {
+      "textures": "textures/items/jjk/sukuna_finger"
+    },
+    "jjk_cursed_womb": {
+      "textures": "textures/items/jjk/cursed_womb"
+    }
+  }
+}

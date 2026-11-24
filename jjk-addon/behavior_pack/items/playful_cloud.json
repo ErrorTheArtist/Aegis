@@ -1,0 +1,41 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:item": {
+    "description": {
+      "identifier": "jjk:playful_cloud",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "jjk_playful_cloud"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "§ePlayful Cloud§r\n§8Cursed Tool\n§7A three-section staff: pure physical force"
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:can_destroy_in_creative": false,
+      "minecraft:use_modifiers": {
+        "use_duration": 0.25,
+        "movement_modifier": 1.0
+      },
+      "minecraft:use_animation": "none",
+      "minecraft:hand_equipped": true,
+      "minecraft:damage": 9,
+      "minecraft:durability": {
+        "max_durability": 9999
+      },
+      "minecraft:enchantable": {
+        "slot": "sword",
+        "value": 14
+      },
+      "minecraft:cooldown": {
+        "category": "jjk_playful_cloud",
+        "duration": 0.1
+      }
+    }
+  }
+}

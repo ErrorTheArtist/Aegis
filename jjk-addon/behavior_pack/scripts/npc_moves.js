@@ -1,7 +1,7 @@
 // Attacks only the cast uses (the rest of their arsenal is the players' own techniques — see sorcerers.js).
 // Each is run(npc, target) and returns false if it couldn't be used.
 
-import { V, fx, sound, task, foes, mid, knock, anim, COLOR, effect, spawnFx, removeFx, tp, valid, alive, ground, look, eye, later } from "./core.js";
+import { V, fx, sound, foes, mid, knock, anim, COLOR, tp, alive, eye, later } from "./core.js";
 import { hurt, blackFlashFx, BF_MULT, stun } from "./combat.js";
 import { projectile } from "./projectile.js";
 
@@ -90,137 +90,6 @@ function rika(e, t) {
   return true;
 }
 
-// Geto: Cursed Spirit Manipulation — releases two of the curses he has swallowed
-function curseRelease(e, t) {
-  if (!near(e, t, 20)) return false;
-  anim(e, "summon");
-  for (let i = 0; i < 2; i++) {
-    const a = Math.random() * Math.PI * 2;
-    const at = ground(e.dimension, { x: e.location.x + Math.cos(a) * 2, y: e.location.y + 2, z: e.location.z + Math.sin(a) * 2 }, 6);
-    try {
-      e.dimension.spawnEntity(i ? "jjk:lanky_curse" : "jjk:mouth_curse", at);
-    } catch {
-      /* ignore */
-    }
-    fx(e.dimension, "jjk:smoke", at, COLOR.dark, 1.2);
-  }
-  sound(e.dimension, "mob.wither.ambient", e.location, 0.8, 0.8);
-  return true;
-}
-
-// Geto: Maximum: Uzumaki — every curse he holds, compressed into one spiralling blast
-function uzumaki(e, t) {
-  if (!near(e, t, 24)) return false;
-  anim(e, "purple");
-  const dim = e.dimension;
-  task((age) => {
-    if (!alive(e)) return false;
-    if (age < 14) {
-      if (age % 2 === 0) fx(dim, "jjk:implode", V.add(eye(e), V.mul(look(e), 1.5)), COLOR.shadow, 1, { radius: 2.5 });
-      return true;
-    }
-    const from = V.add(eye(e), V.mul(look(e), 1.5));
-    const dir = valid(t) ? V.norm(V.sub(mid(t), from)) : look(e);
-    const hit = new Set();
-    for (let d = 1; d <= 22; d += 1) {
-      const at = V.add(from, V.mul(dir, d));
-      for (const x of foes(e, at, 2.2)) {
-        if (hit.has(x.id)) continue;
-        hit.add(x.id);
-        hurt(e, x, 24);
-      }
-      if (d % 2 === 0) fx(dim, "jjk:burst", at, COLOR.shadow, 0.8);
-    }
-    sound(dim, "random.explode", from, 1.2, 0.6);
-    return false;
-  }, 16);
-  return true;
-}
-
-// Mahito: Idle Transfiguration — a touch that reshapes the soul
-function idleTransfiguration(e, t) {
-  if (!near(e, t, 3.5)) return false;
-  anim(e, "point");
-  hurt(e, t, 14);
-  effect(t, "nausea", 120, 0);
-  effect(t, "slowness", 80, 1);
-  fx(t.dimension, "jjk:aura", t.location, COLOR.shadow, 1.6);
-  sound(t.dimension, "mob.zombie.unfect", t.location, 0.8, 0.7);
-  return true;
-}
-
-// Mahito: spikes burst from his body
-function soulSpikes(e, t) {
-  if (!near(e, t, 4)) return false;
-  for (const x of foes(e, e.location, 4)) {
-    hurt(e, x, 10);
-    const d = V.flat(V.sub(x.location, e.location));
-    knock(x, d.x, d.z, 1, 0.3);
-  }
-  fx(e.dimension, "jjk:spark", mid(e), COLOR.grey, 1.8);
-  sound(e.dimension, "random.anvil_land", e.location, 0.5, 0.6);
-  return true;
-}
-
-// Jogo: ember insects — little bugs of flame that burst on contact
-function emberInsects(e, t) {
-  if (!near(e, t, 24)) return false;
-  anim(e, "point");
-  const from = V.add(eye(e), V.mul(look(e), 1));
-  for (const off of [-0.25, 0, 0.25]) {
-    const d = V.norm(V.sub(mid(t), from));
-    const dir = V.norm({ x: d.x + off * d.z, y: d.y + 0.05, z: d.z - off * d.x });
-    projectile(e, {
-      from, dir, speed: 1.4, range: 26, radius: 1.2,
-      trail: (pos) => fx(e.dimension, "jjk:orb", pos, COLOR.fire, 0.6),
-      onHit: (at, x) => {
-        if (x) {
-          hurt(e, x, 8);
-          try {
-            x.setOnFire(4, true);
-          } catch {
-            /* ignore */
-          }
-        }
-        fx(e.dimension, "jjk:burst", at, COLOR.fire, 0.7);
-      },
-    });
-  }
-  sound(e.dimension, "mob.blaze.shoot", from, 1, 1);
-  return true;
-}
-
-// Jogo: Maximum: Meteor — a burning mountain falls on them
-function meteor(e, t) {
-  if (!near(e, t, 24)) return false;
-  anim(e, "domain_sign");
-  const dim = e.dimension;
-  const spot = ground(dim, t.location, 8);
-  const top = V.add(spot, { x: 0, y: 16, z: 0 });
-  const rock = spawnFx(dim, "jjk:orb", top, "jjk:as_fire");
-  sound(dim, "mob.ghast.warn", spot, 1.4, 0.6);
-  task((age) => {
-    const u = Math.min(1, age / 20);
-    if (valid(rock)) tp(rock, { x: spot.x, y: top.y - 15 * u * u, z: spot.z });
-    if (age % 4 === 0) fx(dim, "jjk:ring", spot, COLOR.fire, 2.5 - u);
-    if (age < 20) return true;
-    for (const x of foes(e, spot, 6)) {
-      hurt(e, x, 24);
-      try {
-        x.setOnFire(6, true);
-      } catch {
-        /* ignore */
-      }
-    }
-    fx(dim, "jjk:burst", spot, COLOR.fire, 3);
-    fx(dim, "jjk:smoke", spot, COLOR.dark, 3);
-    sound(dim, "random.explode", spot, 1.6, 0.5);
-    removeFx(rock);
-    return false;
-  }, 24);
-  return true;
-}
-
 // Toji: speed — he closes any gap in an instant
 function burst(e, t) {
   if (!alive(t) || V.dist(e.location, t.location) < 4) return false;
@@ -239,16 +108,9 @@ export const NPC_MOVES = {
   bird_strike: birdStrike,
   axe_cleave: axeCleave,
   rika,
-  curse_release: curseRelease,
-  uzumaki,
-  idle_transfiguration: idleTransfiguration,
-  soul_spikes: soulSpikes,
-  ember_insects: emberInsects,
-  meteor,
   burst,
 };
 export const NPC_MOVE_NAMES = {
   divergent_fist: "Divergent Fist", black_flash_strike: "Black Flash", gorilla_core: "Gorilla Core", bird_strike: "Bird Strike",
-  axe_cleave: "Axe Cleave", rika: "Rika", curse_release: "Curse Release", uzumaki: "Maximum: Uzumaki", idle_transfiguration: "Idle Transfiguration",
-  soul_spikes: "Soul Spikes", ember_insects: "Ember Insects", meteor: "Maximum: Meteor", burst: "Burst",
+  axe_cleave: "Axe Cleave", rika: "Rika", burst: "Burst",
 };

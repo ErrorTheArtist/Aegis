@@ -23,9 +23,11 @@ for (const clan of Object.keys(Cl.CLANS)) {
   for (const t of Object.keys(Cl.CLANS[clan].techniques)) check(`${clan}: can inherit ${t}`, seen.has(t));
 }
 check("Limitless is Gojo-only", Cl.BOUND.limitless === "gojo" && !Cl.canInherit("zenin", "limitless") && !Cl.canInherit("clanless", "limitless"));
-check("Ten Shadows and Heavenly Restriction are Zen'in", Cl.BOUND.ten_shadows === "zenin" && Cl.BOUND.heavenly === "zenin");
+check("Ten Shadows, Heavenly Restriction and Projection are Zen'in", ["ten_shadows", "heavenly", "projection"].every((t) => Cl.BOUND[t] === "zenin"));
 check("Blood is Kamo, Cursed Speech is Inumaki", Cl.BOUND.blood === "kamo" && Cl.BOUND.cursed_speech === "inumaki");
-check("Boogie Woogie, Straw Doll, Ratio and Shrine have no clan", ["boogie", "straw_doll", "ratio", "shrine"].every((t) => !Cl.BOUND[t]));
+const OPEN_TECHS = ["boogie", "straw_doll", "ratio", "shrine", "disaster_flames", "idle_death_gamble", "cursed_spirit", "idle_transfiguration"];
+check("the eight open techniques have no clan", OPEN_TECHS.every((t) => !Cl.BOUND[t] && Cl.OPEN[t] > 0));
+check("…and every clanless sorcerer can roll each of them", (() => { const s = new Set(); for (let i = 0; i < 6000; i++) s.add(Cl.rollTechnique("clanless")); return OPEN_TECHS.every((t) => s.has(t)); })());
 
 // --- a player: their clan rules their rerolls ------------------------------------------------------------------
 const p = mkPlayer("Maki");
@@ -112,7 +114,7 @@ check("Record: clan line", formLog[0]?.b.includes("Clan: §b§lGojo"), formLog[0
 check("Record: credit line on the first page", formLog[0]?.b.includes("made by §derrorlegend"));
 check("Record: Clans page lists Limitless under Gojo", formLog[1]?.b.includes("Gojo") && formLog[1]?.b.includes("Limitless"), formLog[1]?.b);
 formLog.length = 0;
-answers.push({ selection: 5 }, { canceled: true });
+answers.push({ selection: 6 }, { canceled: true }); // (Credits)
 await use(p, "jjk:jujutsu_record"); await tick(2);
 check("Credits page: errorlegend and the Discord name", formLog[1]?.b.includes("errorlegend") && formLog[1]?.b.includes("errorlegend_") && formLog[1]?.b.includes("Discord"), formLog[1]?.b);
 check("there's no setting to hide the credits", !formLog.some((f) => (f.ctl ?? []).some((c) => /credit/i.test(c.l))));

@@ -1,4 +1,4 @@
-# Jujutsu Legacy — v1.1.0
+# Jujutsu Legacy — v1.2.0
 
 **Made by errorlegend.** Questions, ideas or bug reports: DM **errorlegend_** on Discord.
 
@@ -6,12 +6,22 @@ A Jujutsu Kaisen add-on for Minecraft Bedrock (1.21.60+).
 - **Your start:** every player is born into a **clan** and awakens an **innate technique** their bloodline allows.
 - **Progress:** fight **cursed spirits** to climb from **Grade 4 to Special Grade**, land **Black Flashes** and open
   **Domain Expansions**.
-- **The cast:** fight beside **Gojo, Yuji, Megumi, Nobara, Maki and the rest of Jujutsu High**, and face **Sukuna,
-  Toji, Geto, Mahito, Choso and Jogo**.
+- **The cast:** fight beside **Gojo, Yuji, Megumi, Nobara, Maki, Hakari and the rest of Jujutsu High**, and face
+  **Sukuna, Toji, Geto, Mahito, Choso, Jogo and Naoya**.
+- **And more:** tame **Mahoraga**, make **Binding Vows**.
 
 No experimental toggles are needed, and the pack doesn't replace the player file, so it runs next to other add-ons.
 
 **Install:** open `dist/JujutsuLegacy.mcaddon` (build it with `./build.sh`), then turn on both packs in your world.
+
+**New in 1.2:**
+- **Five new innate techniques:** Projection Sorcery (Zen'in), Disaster Flames, Idle Death Gamble, Cursed Spirit
+  Manipulation and Idle Transfiguration, each with its own domain or Maximum.
+- **Two new characters:** Kinji Hakari (Jujutsu High) and Naoya Zen'in (villain). Geto, Mahito and Jogo now fight with
+  their real techniques.
+- **Mahoraga:** the Ten Shadows' Special Grade ritual. It adapts to every attack: beat it alone to tame it.
+- **Binding Vows:** give something up, get something back.
+- **Better models:** every character remodelled, new curse anatomy and textures, four new domain barriers.
 
 ---
 
@@ -40,9 +50,9 @@ techniques and running moves, and tells everyone who really made it.
 - **Cursed energy (CE)** fuels every move. It regenerates every second, twice as fast while you **sneak and stand still**.
 - **The bar above your hotbar** shows health, CE, grade and what's active (∞ Infinity, DOMAIN, BURNOUT, ZONE, OVERTIME…).
 - **The Jujutsu Record** (right-click it) shows:
-  - your clan, technique and grade
+  - your clan, technique, grade and Binding Vow
   - every move with its cost and cooldown
-  - the clans, a guide to fighting, and settings
+  - the clans, Binding Vows, a guide to fighting, and settings
   - the credits
 
 ## Clans
@@ -53,28 +63,32 @@ member who doesn't inherit it awakens a technique of no clan, like everyone clan
 | Clan | Born into | Clan techniques (chance) | Perk |
 |---|---|---|---|
 | **Gojo** | 6% | Limitless 25% | +15% max cursed energy |
-| **Zen'in** | 20% | Ten Shadows 25%, Heavenly Restriction 35% | +10% melee damage |
+| **Zen'in** | 20% | Ten Shadows 22%, Heavenly Restriction 30%, Projection Sorcery 20% | +10% melee damage |
 | **Kamo** | 20% | Blood Manipulation 70% | +20% cursed energy regeneration |
 | **Inumaki** | 14% | Cursed Speech 70% | 10% shorter cooldowns |
 | **Clanless** | 40% | — | +15% XP (self-made) |
 
-**Techniques of no clan:** Boogie Woogie, Straw Doll, Ratio and Shrine. Shrine is Sukuna's own and the rarest of all.
+**Techniques of no clan** (for the clanless, and for clan members who don't inherit): Boogie Woogie 28, Straw Doll 18, Ratio 18, Disaster Flames 11, Idle Death Gamble 9, Cursed Spirit Manipulation 7, Idle Transfiguration 5, Shrine 4 (out of 100).
+Shrine is Sukuna's own and the rarest of all.
 
 **Overall chances:**
 
 | Technique | Chance | | Technique | Chance |
 |---|---|---|---|---|
-| Limitless | 1.5% | | Blood Manipulation | 14% |
-| Shrine | 3% | | Straw Doll | 19% |
-| Ten Shadows | 5% | | Ratio | 19% |
-| Heavenly Restriction | 7% | | Boogie Woogie | 22% |
-| Cursed Speech | 10% | | | |
+| Limitless | 1.5% | | Heavenly Restriction | 6.0% |
+| Shrine | 2.4% | | Disaster Flames | 6.6% |
+| Idle Transfiguration | 3.0% | | Cursed Speech | 9.8% |
+| Projection Sorcery | 4.0% | | Straw Doll | 11% |
+| Cursed Spirit Manipulation | 4.2% | | Ratio | 11% |
+| Ten Shadows | 4.4% | | Blood Manipulation | 14% |
+| Idle Death Gamble | 5.4% | | Boogie Woogie | 17% |
 
 A **Cursed Womb** rerolls your technique, always into a different one your clan's blood allows.
 
 ## Techniques and moves
 
-Each technique has two moves from the start, a third at **Grade 2**, and its domain or Maximum at **Grade 1**.
+Each technique has two moves from the start, a third at **Grade 2**, and its domain or Maximum at **Grade 1**
+(listed rarest first). The Ten Shadows also has a fifth, at **Special Grade**: the Mahoraga ritual.
 Damage below is the base. Every grade adds +20% technique damage and each of Sukuna's Fingers adds +2%. Against
 other players, technique damage is ×0.6.
 
@@ -89,7 +103,7 @@ Infinity itself. Blue pulls, Red repels, Hollow Purple erases — and while you 
 | Hollow Purple | Grade 2 | 80 CE | 30 s | 1 s to form, then 30 damage to everything in a 40-block path. |
 | Domain Expansion: Unlimited Void | Grade 1 | 70% of max CE | 90 s | Radius 12, 8 s: everyone inside is frozen and takes +50% damage from you. |
 
-### Shrine — Special · 3% · any clan
+### Shrine — Special · 2.4% · any clan
 
 The King of Curses' slashes. Dismantle cuts everything in a line, Cleave adapts to toughness, and Fuga opens into fire.
 
@@ -100,7 +114,40 @@ The King of Curses' slashes. Dismantle cuts everything in a line, Cleave adapts 
 | Fuga | Grade 2 | 60 CE | 20 s | A flame arrow: 25 damage in a 5-block blast, and sets them alight. |
 | Domain Expansion: Malevolent Shrine | Grade 1 | 70% of max CE | 90 s | Radius 14, 10 s, no barrier: 4 damage every half second, and a Cleave every 1.5 s. |
 
-### Ten Shadows — Rare · 5% · Zen'in clan only
+### Idle Transfiguration — Special · 3.0% · any clan
+
+You touch the soul, and the body follows: twist the ones you touch, grow spikes, and make transfigured humans fight for you.
+
+| Move | Unlocks | Cost | Cooldown | What it does |
+|---|---|---|---|---|
+| Soul Touch | Grade 4 | 20 CE | 6 s | 12 damage to the one you touch, plus nausea and slowness. |
+| Body Repel | Grade 4 | 25 CE | 9 s | 10 damage and a push to everyone within 4 blocks; Resistance for 3 s. |
+| Polymorphic Soul Isomer | Grade 2 | 45 CE | 20 s | Two transfigured humans fight for you for 20 s. |
+| Domain Expansion: Self-Embodiment of Perfection | Grade 1 | 70% of max CE | 90 s | Radius 11, 9 s: 3 damage a second, slowness and nausea — and a final 12 to whoever is still inside. |
+
+### Projection Sorcery — Rare · 4.0% · Zen'in clan only
+
+One second split into 24 frames. Move along them faster than anyone can follow — and freeze whoever can't keep up inside a frame.
+
+| Move | Unlocks | Cost | Cooldown | What it does |
+|---|---|---|---|---|
+| 24 FPS Rush | Grade 4 | 15 CE | 4 s | Blink 12 blocks ahead: 6 damage to everyone you pass, frozen for 1 s. |
+| Frame Freeze | Grade 4 | 20 CE | 8 s | Freeze the one in front for 2.5 s (6 damage) — or shatter a frozen one for 14. |
+| Accelerated Barrage | Grade 2 | 40 CE | 18 s | 6 s of Speed III and +50% damage. |
+| Domain Expansion: Time Cell Moon Palace | Grade 1 | 70% of max CE | 90 s | Radius 12, 9 s: whoever moves inside takes 5 damage every second. |
+
+### Cursed Spirit Manipulation — Rare · 4.2% · any clan
+
+Every curse you exorcise is swallowed and kept (up to 12). Release them to fight for you — or compress them all into Uzumaki.
+
+| Move | Unlocks | Cost | Cooldown | What it does |
+|---|---|---|---|---|
+| Release | Grade 4 | 15 CE | 6 s | Your strongest stored curse fights for you for 30 s. |
+| Absorb | Grade 4 | 20 CE | 10 s | Swallow a curse in front of you at 40% health or less (XP as if exorcised). |
+| Cursed Swarm | Grade 2 | 45 CE | 25 s | Release up to four stored curses at once. |
+| Maximum: Uzumaki | Grade 1 | 60 CE | 45 s | All stored curses in one blast along 24 blocks: 10 + 3 damage per curse. |
+
+### Ten Shadows — Rare · 4.4% · Zen'in clan only
 
 Shikigami from your shadow: the Divine Dogs, Nue and Max Elephant fight for you.
 
@@ -110,8 +157,20 @@ Shikigami from your shadow: the Divine Dogs, Nue and Max Elephant fight for you.
 | Nue | Grade 4 | 35 CE | 20 s | For 20 s it dives at your nearest enemy: 6 damage and slowness. |
 | Max Elephant | Grade 2 | 60 CE | 25 s | Drops on the enemy you aim at (or where you look, 20 blocks): 20 damage in 5 blocks. |
 | Domain Expansion: Chimera Shadow Garden | Grade 1 | 70% of max CE | 90 s | Radius 12, 10 s: enemies slowed, 2 damage a second; you're faster and tougher; two more dogs. |
+| Eight-Handled Sword Divergent Sila Divine General Mahoraga | Special Grade | 120 CE | 120 s | The ritual: Mahoraga attacks everyone, you first. Beat it alone and it's yours — then it fights beside you for 40 s. |
 
-### Heavenly Restriction — Rare · 7% · Zen'in clan only
+### Idle Death Gamble — Rare · 5.4% · any clan
+
+A gambler's technique. Its domain hurts no one — it spins for a JACKPOT, and a jackpot makes you all but immortal for 20 s.
+
+| Move | Unlocks | Cost | Cooldown | What it does |
+|---|---|---|---|---|
+| Rough Energy | Grade 4 | 15 CE | 3 s | 9 damage to who you look at (10 blocks); 1 in 8: +20 CE back. |
+| Shutter Doors | Grade 4 | 25 CE | 8 s | Two doors slam on who you look at: 14 damage and slowness. |
+| Pachinko Rush | Grade 2 | 40 CE | 18 s | Eight balls fly out: 5 damage each. |
+| Domain Expansion: Idle Death Gamble | Grade 1 | 70% of max CE | 90 s | Hurts no one. Every 2 s: 1 in 4 for a JACKPOT — 20 s of endless CE, fast healing and +25% damage, no burnout. |
+
+### Heavenly Restriction — Rare · 6.0% · Zen'in clan only
 
 No cursed energy at all — instead a monstrous body, cursed tools, and immunity to every domain's sure-hit.
 
@@ -122,7 +181,18 @@ No cursed energy at all — instead a monstrous body, cursed tools, and immunity
 | Inverted Spear of Heaven | Grade 2 | — | 20 s | Nullify: 10 damage through Infinity; breaks their domain and strips their buffs. |
 | Split Soul Katana | Grade 1 | — | 16 s | Soul Split: 12 + 10% of their max health (up to +25). |
 
-### Cursed Speech — Uncommon · 10% · Inumaki clan only
+### Disaster Flames — Rare · 6.6% · any clan
+
+Volcanic heat as a technique: burning insects, a stream of fire, a falling meteor — and a domain inside a volcano.
+
+| Move | Unlocks | Cost | Cooldown | What it does |
+|---|---|---|---|---|
+| Ember Insects | Grade 4 | 20 CE | 6 s | Three burning insects: 8 damage each, and they set the target alight. |
+| Fire Stream | Grade 4 | 25 CE | 7 s | A cone of fire (8 blocks) for 1 s: 4 damage four times, and burning. |
+| Maximum: Meteor | Grade 2 | 70 CE | 30 s | A burning mountain falls on who you aim at: 28 damage within 6 blocks. |
+| Domain Expansion: Coffin of the Iron Mountain | Grade 1 | 70% of max CE | 90 s | Radius 12, 10 s: everyone inside takes 3 damage a second and burns. |
+
+### Cursed Speech — Uncommon · 9.8% · Inumaki clan only
 
 Your words are commands — Don't Move, Blast Away, Crush. Every word costs your throat a little health.
 
@@ -132,6 +202,28 @@ Your words are commands — Don't Move, Blast Away, Crush. Every word costs your
 | "Blast Away" | Grade 4 | 20 CE + 1 HP | 6 s | 8 damage and a big push to everyone in front. |
 | "Crush" | Grade 2 | 45 CE + 3 HP | 15 s | 22 damage to the one you look at (16 blocks). |
 | Maximum: "Twist" | Grade 1 | 80 CE + 6 HP | 45 s | 30 damage to everyone within 10 blocks. |
+
+### Straw Doll — Uncommon · 11% · any clan
+
+Hammer, nails and a straw doll. Anyone you've hurt has left a piece of themselves behind — and what you do to the doll happens to them.
+
+| Move | Unlocks | Cost | Cooldown | What it does |
+|---|---|---|---|---|
+| Hairpin | Grade 4 | 20 CE | 5 s | Three nails, 4 damage each; every nail that sticks bursts for 6 more. |
+| Resonance | Grade 4 | 30 CE | 10 s | 14 damage to the last enemy you hurt in 30 s, wherever they are (64 blocks). |
+| Nail Barrage | Grade 2 | 45 CE | 15 s | Ten nails in every direction, 6 damage each. |
+| Resonance: Cursed Doll | Grade 1 | 70 CE | 45 s | 20 damage and wither to every enemy you hurt in the last 30 s. |
+
+### Ratio — Uncommon · 11% · any clan
+
+Divide anything along a 7:3 line and strike that point for a critical hit. Work overtime and it only gets worse for them.
+
+| Move | Unlocks | Cost | Cooldown | What it does |
+|---|---|---|---|---|
+| 7:3 | Grade 4 | 20 CE | 6 s | 10 damage to the one in front, x1.7 while they're above 70% health. |
+| Blunt Sword Flurry | Grade 4 | 25 CE | 9 s | Three blows of 5; the third is a guaranteed critical (13.6). |
+| Overtime | Grade 2 | 40 CE | 60 s | A binding vow: 20 s of +40% damage and Strength. |
+| Extension: Collapse | Grade 1 | 70 CE | 40 s | Shatter the ground ahead: 26 damage within 6 blocks, and a short stun. |
 
 ### Blood Manipulation — Uncommon · 14% · Kamo clan only
 
@@ -144,29 +236,7 @@ Your blood is a weapon: Piercing Blood, Supernova, and buffs that push your body
 | Supernova | Grade 2 | 50 CE | 18 s | 18 damage to everyone within 5 blocks. |
 | Flowing Red Scale: Stack | Grade 1 | 70 CE | 60 s | 20 s: Strength III, Speed III, Resistance II, Regeneration II — then 5 s weak. |
 
-### Straw Doll — Common · 19% · any clan
-
-Hammer, nails and a straw doll. Anyone you've hurt has left a piece of themselves behind — and what you do to the doll happens to them.
-
-| Move | Unlocks | Cost | Cooldown | What it does |
-|---|---|---|---|---|
-| Hairpin | Grade 4 | 20 CE | 5 s | Three nails, 4 damage each; every nail that sticks bursts for 6 more. |
-| Resonance | Grade 4 | 30 CE | 10 s | 14 damage to the last enemy you hurt in 30 s, wherever they are (64 blocks). |
-| Nail Barrage | Grade 2 | 45 CE | 15 s | Ten nails in every direction, 6 damage each. |
-| Resonance: Cursed Doll | Grade 1 | 70 CE | 45 s | 20 damage and wither to every enemy you hurt in the last 30 s. |
-
-### Ratio — Common · 19% · any clan
-
-Divide anything along a 7:3 line and strike that point for a critical hit. Work overtime and it only gets worse for them.
-
-| Move | Unlocks | Cost | Cooldown | What it does |
-|---|---|---|---|---|
-| 7:3 | Grade 4 | 20 CE | 6 s | 10 damage to the one in front, x1.7 while they're above 70% health. |
-| Blunt Sword Flurry | Grade 4 | 25 CE | 9 s | Three blows of 5; the third is a guaranteed critical (13.6). |
-| Overtime | Grade 2 | 40 CE | 60 s | A binding vow: 20 s of +40% damage and Strength. |
-| Extension: Collapse | Grade 1 | 70 CE | 40 s | Shatter the ground ahead: 26 damage within 6 blocks, and a short stun. |
-
-### Boogie Woogie — Common · 22% · any clan
+### Boogie Woogie — Common · 17% · any clan
 
 Clap and swap places with anyone you see. Simple, and terrifying in the right hands.
 
@@ -187,6 +257,12 @@ Clap and swap places with anyone you see. Simple, and terrifying in the right ha
 **Black Flash (passive, everyone but Heavenly Restriction).** Any melee hit has a 4% chance (+1% per grade) to land as
 a Black Flash. It deals ×2.5 damage, gives back 30% of your CE and puts you **in the zone** for 30 s (+10% chance).
 
+**Curses you store (Cursed Spirit Manipulation).** Every Grade 4–1 curse you exorcise is absorbed, up to 12. Released
+curses fight for you for 30 s and give no XP. The bar shows how many you hold.
+
+**JACKPOT (Idle Death Gamble).** The domain hurts no one: every 2 s it spins (1 in 4). A jackpot closes it with no
+burnout and gives 20 s of endless cursed energy, Regeneration IV and +25% damage.
+
 **Infinity (Limitless passive).** While you have 10+ CE you take 40% less damage, and each blow it turns costs 2 CE.
 A domain's sure-hit, the Inverted Spear of Heaven and burnout switch it off.
 
@@ -205,6 +281,10 @@ It can't land a Black Flash.
   - **Unlimited Void:** a starry barrier dome.
   - **Malevolent Shrine:** no barrier; Sukuna's shrine rises behind you.
   - **Chimera Shadow Garden:** a shadow dome.
+  - **Time Cell Moon Palace:** a moonlit dome cut into film frames. Whoever moves inside is torn apart.
+  - **Coffin of the Iron Mountain:** the inside of a volcano. Everyone burns.
+  - **Self-Embodiment of Perfection:** a dark dome of stitches and hands. A last touch for whoever stays to the end.
+  - **Idle Death Gamble:** a pachinko parlour that hurts no one, but can hit the JACKPOT.
 - **Burnout:** when it ends, your technique burns out for 15 s. Reverse Cursed Technique and Simple Domain still work.
 - **Clash:** if two domains overlap, the stronger sorcerer keeps theirs.
 - **Protection:**
@@ -253,10 +333,52 @@ shikigami count as yours.
 
 **Sukuna's Fingers:** eat one for +10 max CE and +2% damage, up to 20.
 
+## Mahoraga
+
+The **Eight-Handled Sword Divergent Sila Divine General Mahoraga** is the strongest shikigami of the Ten Shadows, and
+no one has ever tamed it.
+- **The ritual:** at **Special Grade**, the Ten Shadows' fifth move calls it out as a wild boss (1,600 health, a boss
+  bar). It attacks everyone near it, its summoner first.
+- **Taming it:** beat it **alone** and it's yours. From then on the same move calls it to fight beside you for 40 s.
+- **A void ritual:** if anyone else lands a blow (another player, an NPC, someone else's shikigami), the ritual is void.
+  It can still be exorcised (1,500 XP and a Cursed Womb), but not tamed this time.
+- **If the summoner falls:** when they die, leave or run 64 blocks, the ritual ends and Mahoraga sinks back into the
+  shadows.
+- **Adaptation:** Mahoraga adapts to whatever hurts it, and each kind of attack is counted on its own: each technique,
+  melee, domain sure-hits, shikigami, arrows, fire.
+  - After enough of one kind, **the wheel over its head turns**. Mahoraga heals 4%, and that kind does less from then
+    on: 100% → 65% → 40% → 20% → 5%.
+  - Switch it up, or finish it before it adapts.
+- **Its attacks:**
+  - a sweep of the Sword of Extermination: double damage against curses, +50% against a sorcerer whose technique it has
+    fully adapted to
+  - a leap at anyone who keeps their distance
+  - below half health it moves faster and swings more often
+- Jujutsu High stays out of a ritual.
+
+## Binding Vows
+
+A Binding Vow is a promise to yourself: give something up and get something back.
+- **One vow at a time.** Make it in the Jujutsu Record (**Binding Vows**).
+- **Changing it:** you can change or break it once every **10 minutes**.
+- Ratio's Overtime is a vow of its own and stacks with these.
+
+| Vow | You get | You give up |
+|---|---|---|
+| **Glass Cannon** | +25% technique damage | techniques hit you 20% harder |
+| **Revealed Technique** | +20% technique damage | every move is explained aloud to everyone near you |
+| **Swift Hands** | 30% shorter cooldowns | moves cost 30% more cursed energy |
+| **Frugal** | moves cost 30% less cursed energy | cooldowns are 30% longer |
+| **Blood Price** | +35% technique damage | every move also costs you 3 health |
+| **Chase the Spark** | double Black Flash chance | techniques hit 15% softer |
+| **Brawler** | +30% melee damage | techniques hit 20% softer |
+| **Deep Reserves** | +50% cursed energy regeneration | techniques hit 10% softer |
+
 ## The cast
 
 One entity, `jjk:sorcerer`, wears every character's 3D model: hair, collars, hoods, Sukuna's four arms, the weapons on
-their backs. Each character fights with the same techniques players use, plus a few of their own.
+their backs. Each character fights with the same techniques players use, plus a few of their own. A spawn egg gives a
+random member of Jujutsu High.
 
 | Character | Side | Clan | Fights with | Health | Spar XP / reward |
 |---|---|---|---|---|---|
@@ -271,12 +393,14 @@ their backs. Each character fights with the same techniques players use, plus a 
 | Mei Mei — *Black Bird Manipulation* | Jujutsu High | Clanless | Bird Strike, Axe Cleave | 200 | 300 XP |
 | Aoi Todo — *Boogie Woogie* | Jujutsu High | Clanless | Boogie Woogie, Clap Barrage, Vibe Swap: Black Flash | 240 | 350 XP |
 | Yuta Okkotsu — *Special Grade Sorcerer* | Jujutsu High | Clanless | Rika, "Blast Away", Black Flash | 300 | 800 XP |
+| Kinji Hakari — *Idle Death Gamble* | Jujutsu High | Clanless | Rough Energy, Shutter Doors, Pachinko Rush, Domain Expansion: Idle Death Gamble | 240 | 400 XP |
 | Ryomen Sukuna — *King of Curses* | villain | Clanless | Dismantle, Cleave, Fuga, Domain Expansion: Malevolent Shrine | 3000 | 3000 XP · 3× Sukuna's Finger, 1× Cursed Womb |
 | Toji Fushiguro — *Sorcerer Killer* | villain | Zen'in | Burst, Inverted Spear of Heaven, Playful Cloud, Split Soul Katana | 900 | 1200 XP · 1× Cursed Womb (50%) |
-| Suguru Geto — *The Worst Curse User* | villain | Clanless | Curse Release, Maximum: Uzumaki | 1400 | 1500 XP · 1× Sukuna's Finger |
-| Mahito — *Special Grade Curse* | villain | Clanless | Idle Transfiguration, Soul Spikes | 1000 | 1200 XP · 1× Cursed Womb (60%) |
+| Suguru Geto — *The Worst Curse User* | villain | Clanless | Release, Cursed Swarm, Maximum: Uzumaki | 1400 | 1500 XP · 1× Sukuna's Finger |
+| Mahito — *Special Grade Curse* | villain | Clanless | Soul Touch, Body Repel, Polymorphic Soul Isomer, Domain Expansion: Self-Embodiment of Perfection | 1000 | 1200 XP · 1× Cursed Womb (60%) |
 | Choso — *Death Painting* | villain | Kamo | Piercing Blood, Supernova, Convergence | 800 | 1000 XP · 1× Cursed Womb (50%) |
-| Jogo — *Special Grade Curse* | villain | Clanless | Ember Insects, Maximum: Meteor | 1100 | 1200 XP · 1× Sukuna's Finger |
+| Jogo — *Special Grade Curse* | villain | Clanless | Ember Insects, Fire Stream, Maximum: Meteor, Domain Expansion: Coffin of the Iron Mountain | 1100 | 1200 XP · 1× Sukuna's Finger |
+| Naoya Zen'in — *Projection Sorcery* | villain | Zen'in | 24 FPS Rush, Frame Freeze, Accelerated Barrage, Domain Expansion: Time Cell Moon Palace | 950 | 1100 XP · 1× Cursed Womb (60%) |
 
 **Jujutsu High (allies):**
 - They exorcise curses and fight villains.
@@ -294,7 +418,7 @@ technique, and they'll offer a **spar**.
 - **How they appear:** at night, one may come for a Grade 1 sorcerer (one villain at a time). Sukuna only comes for
   the Special Grade, or for whoever has eaten 15 of his fingers.
 - **Fighting them:** they use their techniques for real. Sukuna opens the Malevolent Shrine when he's hurt; an NPC's
-  sure-hit lands at half strength.
+  sure-hit lands at half strength. Geto's released curses and Mahito's transfigured humans fight for them.
 - **If nobody comes:** they leave when no one is near for a minute.
 
 ## Admins
@@ -302,7 +426,7 @@ technique, and they'll offer a **spar**.
 - **Admin Panel:** tag yourself (`/tag @s add jjk_admin`) and it appears in your Jujutsu Record. You can also open it
   with `/scriptevent jjk:admin`. It lets you:
   - edit any player (clan, technique, grade, fingers, refill)
-  - summon the Finger Bearer or any character (optionally standing still, for a hub)
+  - summon the Finger Bearer, Mahoraga or any character (optionally standing still, for a hub)
   - change server settings: night curse surges, natural Finger Bearer, villains at night, Jujutsu High helping (all on),
     and Hollow Purple destroying terrain (off)
 - **Commands** (the last word can name another player):
@@ -317,7 +441,9 @@ technique, and they'll offer a **spar**.
   | `/scriptevent jjk:ce [name]` | refill CE and reset cooldowns |
   | `/scriptevent jjk:summon gojo [stay]` | summon a character next to you |
   | `/scriptevent jjk:boss` | summon the Finger Bearer next to you |
-  | `/scriptevent jjk:reset [name]` | wipe a player; they're born and awaken again |
+  | `/scriptevent jjk:mahoraga` | summon a wild Mahoraga next to you (no ritual: it can't be tamed) |
+  | `/scriptevent jjk:tame_mahoraga [off] [name]` | let a Ten Shadows sorcerer skip the ritual (`off` undoes it) |
+  | `/scriptevent jjk:reset [name]` | wipe a player (also their vow, stored curses and Mahoraga); they're born and awaken again |
   | `/scriptevent jjk:record` | open your Jujutsu Record |
   | `/scriptevent jjk:credits` | who made this add-on |
 
@@ -328,8 +454,8 @@ output. Run the generators from this folder:
 
 | Generator | Makes |
 |---|---|
-| `tools/gen_entities.py` | Curses, shikigami and effect models (orbs, the domain dome, the shrine): geometry, painted textures, idle animations, BP/RP entities, spawn rules, names |
-| `tools/gen_sorcerers.py` | The cast: painted skins + 3D gear for all 17 characters, the `jjk:sorcerer` entity (BP + RP), render controllers, `roster_ids.js`. Preview with `--preview out.png [--only gojo,sukuna]` |
+| `tools/gen_entities.py` | Curses, shikigami (Mahoraga too) and effect models (orbs, the domain dome and its six barriers, the shrine): geometry, painted textures, idle animations, BP/RP entities, spawn rules, names |
+| `tools/gen_sorcerers.py` | The cast: painted skins + 3D gear for all 19 characters (built with `tools/sorcerer_kit.py`), the `jjk:sorcerer` entity (BP + RP), render controllers, `roster_ids.js`. Preview with `--preview out.png [--only gojo,sukuna]` |
 | `tools/gen_items.py` | Every item: 32×32 icons drawn in code, item JSON, `item_texture.json`, both pack icons |
 | `tools/gen_particles.py` | The `jjk:` particles and their textures (tinted per use from script) |
 | `tools/gen_anims.py` | Player animations (point, Hollow Purple, domain hand sign, clap, shout, summon…) |
@@ -345,8 +471,11 @@ output. Run the generators from this folder:
 | `grades.js` | grades, XP, fingers |
 | `energy.js` | cursed energy and the bar |
 | `combat.js` | damage, Black Flash, Infinity, stuns |
-| `domains.js` | domains, clashes, Simple Domain |
-| `tech_*.js` | the nine techniques |
+| `domains.js` | domains, clashes, Simple Domain (`registerDomain` lets a technique add its own) |
+| `tech_*.js` | the fourteen techniques |
+| `servants.js` | curses that fight for someone (Geto's, Mahito's) |
+| `mahoraga.js` | Mahoraga: the ritual, adaptation, the wheel |
+| `vows.js` | Binding Vows |
 | `techniques.js` | awakening, items, using moves |
 | `curses.js` | curses, the Finger Bearer, night surges |
 | `sorcerers.js` + `npc_moves.js` | the cast |
@@ -355,6 +484,8 @@ output. Run the generators from this folder:
 
 **Tests:** `./tests/run.sh` runs the mock tests (no Minecraft needed). They cover:
 - every move of every technique and of every character
+- what each of the five new techniques does, their domains, and whose side a summoned curse is on
+- Mahoraga's ritual, adaptation and taming; every Binding Vow
 - Black Flash, Infinity, domains and clashes
 - clans and their perks
 - sparring, encounters and rewards

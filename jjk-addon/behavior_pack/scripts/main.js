@@ -6,7 +6,9 @@
 //   energy.js      cursed energy and the action-bar HUD
 //   combat.js      technique damage, Black Flash, Infinity, stuns
 //   domains.js     Domain Expansion, clashes, burnout, Simple Domain
-//   tech_*.js      the nine innate techniques
+//   tech_*.js      the fourteen innate techniques; servants.js the curses some of them call to fight
+//   vows.js        Binding Vows: one trade-off at a time
+//   mahoraga.js    the Ten Shadows' Divine General: the ritual, adaptation, the wheel
 //   techniques.js  awakening, move items, using a move, fingers, Cursed Wombs
 //   curses.js      exorcism XP and drops, the Finger Bearer, night surges
 //   sorcerers.js   the cast: Jujutsu High allies (talk, spar) and villain bosses; npc_moves.js their own attacks
@@ -27,6 +29,7 @@ import { openRecord } from "./record.js";
 import { initCommands } from "./commands.js";
 import { initSorcerers } from "./sorcerers.js";
 import { applyStats } from "./grades.js";
+import { initMahoraga } from "./mahoraga.js";
 
 initTasks();
 initEnergy();
@@ -37,6 +40,7 @@ initHeavenly();
 initCurses();
 initCommands();
 initSorcerers();
+initMahoraga();
 
 function ready(p, respawn) {
   if (!valid(p)) return;

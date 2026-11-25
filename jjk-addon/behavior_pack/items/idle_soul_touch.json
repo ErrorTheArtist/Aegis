@@ -1,0 +1,32 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:item": {
+    "description": {
+      "identifier": "jjk:idle_soul_touch",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "jjk_idle_soul_touch"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "§9Soul Touch§r\n§8Idle Transfiguration\n§7Touch someone and twist the shape of their soul"
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:can_destroy_in_creative": false,
+      "minecraft:use_modifiers": {
+        "use_duration": 0.25,
+        "movement_modifier": 1.0
+      },
+      "minecraft:use_animation": "none",
+      "minecraft:cooldown": {
+        "category": "jjk_idle_soul_touch",
+        "duration": 0.1
+      }
+    }
+  }
+}

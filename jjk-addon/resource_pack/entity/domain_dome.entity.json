@@ -8,13 +8,17 @@
       },
       "textures": {
         "void": "textures/entity/jjk/dome_void",
-        "garden": "textures/entity/jjk/dome_garden"
+        "garden": "textures/entity/jjk/dome_garden",
+        "moon": "textures/entity/jjk/dome_moon",
+        "volcano": "textures/entity/jjk/dome_volcano",
+        "perfection": "textures/entity/jjk/dome_perfection",
+        "jackpot": "textures/entity/jjk/dome_jackpot"
       },
       "geometry": {
         "default": "geometry.jjk.domain_dome"
       },
       "render_controllers": [
-        "controller.render.jjk.variant2"
+        "controller.render.jjk.dome"
       ]
     }
   }

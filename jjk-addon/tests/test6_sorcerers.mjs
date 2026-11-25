@@ -17,7 +17,7 @@ await fire("w.playerSpawn", { player: p, initialSpawn: true });
 await tick(61);
 
 // --- every character is set up from the real behaviour file -----------------------------------------------------
-check("17 characters", NPC_IDS.length === 17 && Object.keys(S.CAST).length === 17);
+check("19 characters", NPC_IDS.length === 19 && Object.keys(S.CAST).length === 19 && NPC_IDS.at(-2) === "hakari" && NPC_IDS.at(-1) === "naoya");
 for (const who of NPC_IDS) {
   const e = S.spawnSorcerer(dim, who, { x: 200, y: 64, z: 200 });
   const c = S.CAST[who];
@@ -28,13 +28,24 @@ for (const who of NPC_IDS) {
 }
 check("villains are tougher than allies", S.CAST.sukuna && hp(S.spawnSorcerer(dim, "sukuna", { x: 300, y: 64, z: 300 })) === 3000);
 for (const e of H.entities) if (e.typeId === "jjk:sorcerer") e._valid = false;
-// a spawn egg: the event picks a random ally, the script dresses it up
-const egg = spawn("jjk:sorcerer", { x: 210, y: 64, z: 210 });
-egg._props["P:jjk:npc"] = 3; // (what minecraft:entity_spawned would have rolled)
-await fire("w.entitySpawn", { entity: egg });
+// a spawn egg: minecraft:entity_spawned rolls jjk:roll, the script turns it into a random ally and dresses it up
+for (const roll of [3, 11, 23, 99]) {
+  const egg = spawn("jjk:sorcerer", { x: 210, y: 64, z: 210 });
+  egg._props["P:jjk:roll"] = roll; // (what minecraft:entity_spawned would have rolled)
+  await fire("w.entitySpawn", { entity: egg });
+  await tick(3);
+  const who = S.ALLIES[roll % S.ALLIES.length];
+  check(`spawn egg (roll ${roll}) -> ${who}`, egg._props["jjk:who"] === who && egg._props["P:jjk:npc"] === NPC_IDS.indexOf(who) && S.CAST[who].side === "ally", egg.nameTag);
+  egg._valid = false;
+}
+check("Hakari can come out of an egg", S.ALLIES.includes("hakari") && S.ALLIES.length === 12);
+// /summon jjk:sorcerer ~ ~ ~ jjk:as_naoya: no roll, the event set jjk:npc
+const summoned = spawn("jjk:sorcerer", { x: 212, y: 64, z: 210 });
+summoned._props["P:jjk:npc"] = NPC_IDS.indexOf("naoya");
+await fire("w.entitySpawn", { entity: summoned });
 await tick(3);
-check("spawn egg -> dressed as whoever the event rolled", egg._props["jjk:who"] === NPC_IDS[3] && egg.nameTag.includes("Nobara"), egg.nameTag);
-egg._valid = false;
+check("/summon with an event keeps who it is", summoned._props["jjk:who"] === "naoya", summoned.nameTag);
+summoned._valid = false;
 
 // --- every move of every character works for an NPC caster ----------------------------------------------------------
 for (const who of NPC_IDS) {
@@ -56,7 +67,9 @@ for (const who of NPC_IDS) {
     }
     await tick(45);
     check(`${who}: ${id}`, ok === true, String(ok));
-    if (isFinite(range) && !["convergence", "summon_divine_dogs", "summon_nue", "curse_release"].includes(id)) { // (summons fight through the game AI)
+    // (summons fight through the game AI; buffs and the jackpot hurt no one; the Moon Palace only hurts those who move)
+    if (isFinite(range) && !["convergence", "summon_divine_dogs", "summon_nue", "spirit_release", "spirit_swarm", "idle_isomer", "projection_barrage",
+      "idle_death_gamble_domain", "time_cell_moon_palace"].includes(id)) {
       check(`${who}: ${id} hurt the target`, t._dmgLog.length > 0 || t._effects.slowness || t._effects.weakness, JSON.stringify(t._dmgLog.slice(0, 2)));
     }
     if (t.typeId === "minecraft:player") { t._valid = false; H.players.splice(H.players.indexOf(t), 1); }
@@ -180,7 +193,7 @@ check("jjk:summon gojo stay", g2 && g2._events.includes("jjk:stay") && g2._stay 
 await fire("s.scriptEventReceive", { id: "jjk:summon", message: "nobody", sourceEntity: p });
 check("jjk:summon: unknown names explained", p._msgs.at(-1).includes("Who?"));
 globalThis.formLog = [];
-answers.push({ selection: 2 }, { selection: NPC_IDS.indexOf("mahito") }, { formValues: [false] });
+answers.push({ selection: 2 }, { selection: Object.keys(S.CAST).indexOf("mahito") }, { formValues: [false] });
 const { adminMenu } = await import("./record.mjs");
 await adminMenu(p); await tick(2);
 check("Admin Panel: summon a character", H.entities.some((e) => e._valid && e._props["jjk:who"] === "mahito"));

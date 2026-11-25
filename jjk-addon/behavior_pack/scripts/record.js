@@ -1,6 +1,6 @@
 // The Jujutsu Record (right-click it): your clan, technique, grade, cursed energy and fingers; every move with its cost,
-// cooldown and unlock; the grade ladder; the clans; a short guide to fighting; settings; the credits — and, for admins
-// (tag jjk_admin), the Admin Panel. The credit line on its first page can't be switched off.
+// cooldown and unlock; the grade ladder; the clans; your Binding Vow; a short guide to fighting; settings; the credits —
+// and, for admins (tag jjk_admin), the Admin Panel. The credit line on its first page can't be switched off.
 
 import { world, system } from "@minecraft/server";
 import { ActionFormData, ModalFormData } from "@minecraft/server-ui";
@@ -13,6 +13,8 @@ import { creditLine, creditPage } from "./credits.js";
 import { bfChance } from "./combat.js";
 import { spawnFingerBearer } from "./curses.js";
 import { CAST, spawnSorcerer, nameOfCast } from "./sorcerers.js";
+import { VOWS, vowOf, vowInfo, vowReadyIn, setVow } from "./vows.js";
+import { spawnMahoraga } from "./mahoraga.js";
 
 export const ADMIN_TAG = "jjk_admin";
 export const isAdmin = (p) => {
@@ -60,6 +62,8 @@ export async function openRecord(p) {
     `§fSukuna's Fingers: §4${fingersOf(p)}/${MAX_FINGERS}`,
     isHeavenly(p) ? "" : `§fBlack Flash chance: §c${Math.round(bfChance(p) * 100)}%§7 · landed ${getProp(p, "black_flashes", 0)}`,
     `§fCurses exorcised: §a${getProp(p, "exorcised", 0)} §7· sorcerers beaten: §a${getProp(p, "sorcerers_beaten", 0)}`,
+    vowInfo(p) ? `§fBinding Vow: ${vowInfo(p).c}${vowInfo(p).name} §7(${vowInfo(p).gain}; ${vowInfo(p).cost})` : "§fBinding Vow: §7none",
+    techniqueOf(p) === "ten_shadows" ? `§fMahoraga: ${getProp(p, "mahoraga", false) ? "§6tamed — it answers your call" : "§7untamed (the ritual is a Special Grade move)"}` : false,
     "",
     creditLine(),
   ].filter((l) => l !== false && l !== undefined);
@@ -67,6 +71,7 @@ export async function openRecord(p) {
     ["§lTechnique & Moves\n§r§7costs, cooldowns, unlocks", () => movesPage(p)],
     ["§lGrades\n§r§7the road to Special Grade", () => gradesPage(p)],
     ["§lClans\n§r§7bloodlines and their techniques", () => clansPage(p)],
+    ["§lBinding Vows\n§r§7give something up, get something back", () => vowsPage(p)],
     ["§lHow to Fight\n§r§7Black Flash, domains, curses", () => guidePage(p)],
     ["§lSettings", () => settingsPage(p)],
     ["§d§lCredits\n§r§7who made Jujutsu Legacy", () => back(p, "§dCredits", creditPage(), () => openRecord(p))],
@@ -135,6 +140,34 @@ function clansPage(p) {
   return back(p, "§5Clans", lines.join("\n"), () => openRecord(p));
 }
 
+// Binding Vows: one at a time, changed (or broken) once every 10 minutes.
+export async function vowsPage(p) {
+  const mine = vowOf(p);
+  const wait = vowReadyIn(p);
+  const lines = ["§7A Binding Vow is a promise to yourself: give something up and get something back. You keep one at a time.",
+    wait > 0 ? `§cYou can change your vow again in ${Math.ceil(wait / 60000)} min.` : "§7You can change it now — after that, not for 10 minutes.", ""];
+  const ids = Object.keys(VOWS);
+  for (const id of ids) {
+    const v = VOWS[id];
+    lines.push(`${id === mine ? "§l» " : ""}${v.c}${v.name}§r §a+ ${v.gain} §c- ${v.cost}`);
+  }
+  const f = new ActionFormData().title("§5Binding Vows").body(lines.join("\n"));
+  for (const id of ids) f.button(`${id === mine ? "§l» " : ""}${VOWS[id].c}${VOWS[id].name}\n§r§8${VOWS[id].gain}`);
+  f.button(mine ? "§lBreak your vow" : "§8(no vow)");
+  f.button("§l« Back");
+  const res = await show(p, f);
+  if (res.canceled || res.selection === undefined) return;
+  if (res.selection === ids.length + 1) return openRecord(p);
+  const id = res.selection < ids.length ? ids[res.selection] : undefined;
+  if (id === undefined && !mine) return vowsPage(p);
+  const out = setVow(p, id);
+  if (out === "wait") return tell(p, `§cA vow can't be changed again so soon — ${Math.ceil(vowReadyIn(p) / 60000)} min left.`);
+  if (out === "same") return tell(p, "§7That's already your vow.");
+  if (out !== "ok") return undefined;
+  if (!id) return tell(p, "§7You broke your vow. §8(You can make a new one in 10 minutes.)");
+  return tell(p, `§5✦ §fYou made a Binding Vow: ${VOWS[id].c}${VOWS[id].name}§f — §a${VOWS[id].gain}§f, §c${VOWS[id].cost}§f.`);
+}
+
 function guidePage(p) {
   const lines = [
     "§l§fUsing moves", "§7Right-click a move item. It costs cursed energy (CE) and recharges; the bar above your hotbar shows your CE.",
@@ -144,8 +177,10 @@ function guidePage(p) {
     "§7Protection: Simple Domain (Grade 2), Heavenly Restriction, or your own domain. The Inverted Spear of Heaven breaks a domain by stabbing its caster.", "",
     "§l§fCurses", "§7Curses gather around sorcerers at night — the higher your grade, the stronger they come. At Grade 1 a Special Grade curse may come for you: the Finger Bearer. Bring friends.", "",
     "§l§fSukuna's Fingers & Cursed Wombs", "§7Eat a finger for permanent power. A Cursed Womb rerolls your innate technique — always into one your clan's blood allows.", "",
-    "§l§fJujutsu High", "§7Gojo, Yuji, Megumi, Nobara, Maki, Inumaki, Panda, Nanami, Mei Mei, Todo and Yuta fight curses, and sometimes come to help at night. Right-click one to talk — and to spar for XP (a spar can't kill you).", "",
-    "§l§fVillains", "§7Sukuna, Toji, Geto, Mahito, Choso and Jogo are bosses. At night one may come for a Grade 1 sorcerer (Sukuna only for the Special Grade — or whoever eats 15 of his fingers).",
+    "§l§fBinding Vows", "§7Give something up, get something back: more damage for more risk, faster moves for more CE... One vow at a time (this Record, Binding Vows).", "",
+    "§l§fMahoraga", "§7At Special Grade the Ten Shadows can call the Divine General — and must beat it alone to tame it. It adapts to every kind of attack that hurts it: when its wheel turns, switch to something else.", "",
+    "§l§fJujutsu High", "§7Gojo, Yuji, Megumi, Nobara, Maki, Inumaki, Panda, Nanami, Mei Mei, Todo, Yuta and Hakari fight curses, and sometimes come to help at night. Right-click one to talk — and to spar for XP (a spar can't kill you).", "",
+    "§l§fVillains", "§7Sukuna, Toji, Geto, Mahito, Choso, Jogo and Naoya are bosses. At night one may come for a Grade 1 sorcerer (Sukuna only for the Special Grade — or whoever eats 15 of his fingers).",
   ];
   return back(p, "§5How to Fight", lines.join("\n"), () => openRecord(p));
 }
@@ -171,6 +206,7 @@ export async function adminMenu(p) {
     .button("§lSummon the Finger Bearer\n§r§7right here")
     .button("§lSummon a character\n§r§7Gojo, Sukuna, Yuji...")
     .button("§lServer settings\n§r§7curses · villains · terrain")
+    .button("§lSummon Mahoraga\n§r§7a wild one (no ritual: it can't be tamed)")
     .button("§l« Back");
   const r = await show(p, f);
   if (r.canceled) return;
@@ -181,6 +217,10 @@ export async function adminMenu(p) {
   }
   if (r.selection === 2) return summonMenu(p);
   if (r.selection === 3) return serverSettings(p);
+  if (r.selection === 4) {
+    spawnMahoraga(p.dimension, { x: p.location.x + 4, y: p.location.y, z: p.location.z + 4 });
+    return tell(p, "§6Mahoraga has been summoned.");
+  }
   return openRecord(p);
 }
 

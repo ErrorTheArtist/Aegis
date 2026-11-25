@@ -24,6 +24,8 @@
         "s14": "textures/entity/jjk/sorcerer/mahito",
         "s15": "textures/entity/jjk/sorcerer/choso",
         "s16": "textures/entity/jjk/sorcerer/jogo",
+        "s17": "textures/entity/jjk/sorcerer/hakari",
+        "s18": "textures/entity/jjk/sorcerer/naoya",
         "gear_gojo": "textures/entity/jjk/sorcerer/gear_gojo",
         "gear_yuji": "textures/entity/jjk/sorcerer/gear_yuji",
         "gear_megumi": "textures/entity/jjk/sorcerer/gear_megumi",
@@ -40,7 +42,9 @@
         "gear_geto": "textures/entity/jjk/sorcerer/gear_geto",
         "gear_mahito": "textures/entity/jjk/sorcerer/gear_mahito",
         "gear_choso": "textures/entity/jjk/sorcerer/gear_choso",
-        "gear_jogo": "textures/entity/jjk/sorcerer/gear_jogo"
+        "gear_jogo": "textures/entity/jjk/sorcerer/gear_jogo",
+        "gear_hakari": "textures/entity/jjk/sorcerer/gear_hakari",
+        "gear_naoya": "textures/entity/jjk/sorcerer/gear_naoya"
       },
       "geometry": {
         "default": "geometry.humanoid.custom",
@@ -60,7 +64,9 @@
         "gear_geto": "geometry.jjk.sorcerer_gear_geto",
         "gear_mahito": "geometry.jjk.sorcerer_gear_mahito",
         "gear_choso": "geometry.jjk.sorcerer_gear_choso",
-        "gear_jogo": "geometry.jjk.sorcerer_gear_jogo"
+        "gear_jogo": "geometry.jjk.sorcerer_gear_jogo",
+        "gear_hakari": "geometry.jjk.sorcerer_gear_hakari",
+        "gear_naoya": "geometry.jjk.sorcerer_gear_naoya"
       },
       "animations": {
         "humanoid_base_pose": "animation.humanoid.base_pose",
@@ -135,6 +141,12 @@
         },
         {
           "controller.render.jjk.sorcerer_gear_jogo": "q.property('jjk:npc') == 16"
+        },
+        {
+          "controller.render.jjk.sorcerer_gear_hakari": "q.property('jjk:npc') == 17"
+        },
+        {
+          "controller.render.jjk.sorcerer_gear_naoya": "q.property('jjk:npc') == 18"
         }
       ],
       "enable_attachables": true,

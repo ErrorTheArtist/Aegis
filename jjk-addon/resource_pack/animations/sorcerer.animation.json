@@ -25,6 +25,13 @@
             0
           ]
         },
+        "g_skirt": {
+          "rotation": [
+            "q.modified_move_speed * 6",
+            0,
+            0
+          ]
+        },
         "g_arm3": {
           "rotation": [
             "math.sin(q.life_time * 140) * 6",

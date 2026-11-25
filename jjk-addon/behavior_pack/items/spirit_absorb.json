@@ -1,0 +1,32 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:item": {
+    "description": {
+      "identifier": "jjk:spirit_absorb",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "jjk_spirit_absorb"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "§dAbsorb§r\n§8Cursed Spirit Manipulation\n§7Swallow a weakened curse on the spot"
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:can_destroy_in_creative": false,
+      "minecraft:use_modifiers": {
+        "use_duration": 0.25,
+        "movement_modifier": 1.0
+      },
+      "minecraft:use_animation": "none",
+      "minecraft:cooldown": {
+        "category": "jjk_spirit_absorb",
+        "duration": 0.1
+      }
+    }
+  }
+}

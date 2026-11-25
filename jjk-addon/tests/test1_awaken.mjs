@@ -24,10 +24,14 @@ const counts = {};
 for (let i = 0; i < 40000; i++) { const t = Cl.rollTechnique(Cl.rollClan()); counts[t] = (counts[t] || 0) + 1; }
 const pct = (k) => (counts[k] / 400).toFixed(1);
 check("Limitless ~1.5%", Math.abs(counts.limitless / 400 - 1.5) < 0.5, pct("limitless"));
-check("Shrine ~3.1%", Math.abs(counts.shrine / 400 - 3.1) < 0.6, pct("shrine"));
-check("Boogie Woogie ~22%", Math.abs(counts.boogie / 400 - 21.9) < 1.5, pct("boogie"));
-check("Straw Doll ~19%", Math.abs(counts.straw_doll / 400 - 18.8) < 1.5, pct("straw_doll"));
-check("all nine techniques appear", Object.keys(counts).length === 9, JSON.stringify(counts));
+check("Shrine ~2.4%", Math.abs(counts.shrine / 400 - 2.4) < 0.5, pct("shrine"));
+check("Boogie Woogie ~17%", Math.abs(counts.boogie / 400 - 16.9) < 1.2, pct("boogie"));
+check("Projection Sorcery ~4%", Math.abs(counts.projection / 400 - 4) < 0.7, pct("projection"));
+const T0 = await import("./techniques.mjs");
+check("all 14 techniques appear", Object.keys(counts).length === 14 && Object.keys(T0.TECHNIQUES).length === 14, JSON.stringify(counts));
+check("techChance adds up to 100%", Math.abs(Object.keys(T0.TECHNIQUES).reduce((s, t) => s + Cl.techChance(t), 0) - 100) < 1e-6);
+for (const t of Object.keys(T0.TECHNIQUES)) check(`${t}: rolled as often as techChance says`, Math.abs(counts[t] / 400 - Cl.techChance(t)) < 1.3, `${pct(t)} vs ${Cl.techChance(t).toFixed(2)}`);
+check("rarity text comes from the tables", T0.TECHNIQUES.limitless.rarity.includes("1.5%") && T0.TECHNIQUES.boogie.rarity.includes("Common"), T0.TECHNIQUES.boogie.rarity);
 check("reroll never repeats", [...Array(500)].every(() => Cl.rollTechnique("clanless", "boogie") !== "boogie"));
 check("born into a clan", !!Cl.CLANS[p._props["jjk:clan"]], p._props["jjk:clan"]);
 check("…and the technique is one their blood allows", Cl.canInherit(p._props["jjk:clan"], p._props["jjk:technique"]));

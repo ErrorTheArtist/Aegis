@@ -1,0 +1,35 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "jjk:mahoraga",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/jjk/mahoraga"
+      },
+      "geometry": {
+        "default": "geometry.jjk.mahoraga"
+      },
+      "animations": {
+        "idle": "animation.jjk.mahoraga.idle"
+      },
+      "scripts": {
+        "animate": [
+          "idle"
+        ],
+        "pre_animation": [
+          "v.wheel = math.lerp(v.wheel, q.property('jjk:turn') * 45, 0.12);"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.default"
+      ],
+      "spawn_egg": {
+        "base_color": "#d4d2ca",
+        "overlay_color": "#aa8a46"
+      }
+    }
+  }
+}

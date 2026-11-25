@@ -4,6 +4,8 @@
 //   Nue                    an owl of lightning circles above you for 20 s and dives at your nearest enemy.
 //   Max Elephant           (Grade 2) drops a colossal elephant onto the spot you look at.
 //   Chimera Shadow Garden  (Grade 1) Domain Expansion.
+//   Mahoraga               (Special Grade) the exorcism ritual of the Divine General — beat it alone to tame it
+//                          (mahoraga.js). Once it's yours, the same move calls it to fight beside you for 40 s.
 
 import {
   V, eye, look, fx, sound, task, spawnFx, removeFx, tp, valid, alive, foes, mid, knock, anim, COLOR, rayEnd, ground, setProp, effect,
@@ -11,6 +13,7 @@ import {
 } from "./core.js";
 import { hurt } from "./combat.js";
 import { expand, setDogSummoner } from "./domains.js";
+import { ritual } from "./mahoraga.js";
 
 const dogs = new Map(); // owner id -> [dog ids]
 const nues = new Map(); // owner id -> { entity, until }
@@ -164,5 +167,7 @@ export const TEN_SHADOWS = {
     info: "Drops on the enemy you aim at (or where you look, 20 blocks): 20 damage in 5 blocks." },
   chimera_shadow_garden: { name: "Domain Expansion: Chimera Shadow Garden", cost: "domain", cd: 90, grade: 4, run: (p) => expand(p, "garden"),
     info: "Radius 12, 10 s: enemies slowed, 2 damage a second; you're faster and tougher; two more dogs." },
+  summon_mahoraga: { name: "Eight-Handled Sword Divergent Sila Divine General Mahoraga", cost: 120, cd: 120, grade: 5, run: ritual,
+    info: "The ritual: Mahoraga attacks everyone, you first. Beat it alone and it's yours — then it fights beside you for 40 s." },
 };
 export const _state = { dogs, nues };

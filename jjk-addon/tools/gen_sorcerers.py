@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 """The Jujutsu Kaisen cast as NPCs: a painted 64x64 skin (both layers) plus a 3D gear model for each character (hair,
 collars, hoods, extra arms, weapons on the back...), all drawn on ONE entity, jjk:sorcerer, whose int property
-jjk:npc picks the character (its position in ROSTER).
+jjk:npc picks the character (its position in ROSTER). The painting and modelling kit is tools/sorcerer_kit.py.
 
   Jujutsu High (allies): Satoru Gojo, Yuji Itadori, Megumi Fushiguro, Nobara Kugisaki, Maki Zen'in, Toge Inumaki, Panda,
-    Kento Nanami, Mei Mei, Aoi Todo, Yuta Okkotsu
-  Villains (bosses): Ryomen Sukuna (four arms), Toji Fushiguro, Suguru Geto (Kenjaku), Mahito, Choso, Jogo
+    Kento Nanami, Mei Mei, Aoi Todo, Yuta Okkotsu, Kinji Hakari
+  Villains (bosses): Ryomen Sukuna (four arms), Toji Fushiguro, Suguru Geto (Kenjaku), Mahito, Choso, Jogo, Naoya Zen'in
 
 Writes: textures/entity/jjk/sorcerer/<id>.png and gear_<id>.png, models/entity/sorcerer_gear_<id>.geo.json, the client
 and BP entity, render controllers, the gear sway animation, names, and behavior_pack/scripts/roster_ids.js (the
-index of every character, read by sorcerers.js — never edit it by hand).
+index of every character, read by sorcerers.js — never edit it by hand). New characters go at the END of ROSTER
+(the index is stored on every NPC already in a world).
 
 Same conventions as every model here: 16 px = 1 block, the front is -Z, the character's right is -X. Gear bones are
 named like the body's (head, body, rightArm...), so the walk, look and attack animations move the gear too.
@@ -21,810 +22,659 @@ named like the body's (head, body, rightArm...), so the walk, look and attack an
 import argparse
 import json
 import math
-import random
 import sys
 from pathlib import Path
 
 from PIL import Image
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from sorcerer_kit import (  # noqa: E402
+    SIDES, NONE, Skin, Gear, w, mul, mix, uv, ring, head, outfit, jjh_uniform, sneakers, sandals, bake, hair_tex, spikes,
+    hair_cap, fringe, sideburns, collar, hem, cuffs, soles, muscles, on_back, BONE_PIVOT,
+)
+
 ROOT = Path(__file__).resolve().parent.parent
 BP, RP = ROOT / "behavior_pack", ROOT / "resource_pack"
 SK = RP / "textures" / "entity" / "jjk" / "sorcerer"
-
-
-def w(path, obj):
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(obj, indent=2, ensure_ascii=False) + "\n")
-
-
-def mul(c, k):
-    return tuple(max(0, min(255, int(round(v * k)))) for v in c[:3])
-
-
-def mix(a, b, u):
-    return tuple(int(round(a[i] + (b[i] - a[i]) * u)) for i in range(3))
+NAVY = (34, 37, 58)
+GOLD = (226, 186, 80)
 
 
 # ===========================================================================
-# Skins (64x64, both layers) — the player skin layout
+# Shared pieces
 # ===========================================================================
-BOXES = {  # part: (base uv, overlay uv, (w, h, d))
-    "head": ((0, 0), (32, 0), (8, 8, 8)),
-    "body": ((16, 16), (16, 32), (8, 12, 4)),
-    "rarm": ((40, 16), (40, 32), (4, 12, 4)),
-    "larm": ((32, 48), (48, 48), (4, 12, 4)),
-    "rleg": ((0, 16), (0, 32), (4, 12, 4)),
-    "lleg": ((16, 48), (0, 48), (4, 12, 4)),
-}
-SIDES = ("right", "front", "left", "back")
-
-
-def rects(origin, dims):
-    ox, oy = origin
-    wd, ht, dp = dims
-    return {"top": (ox + dp, oy, wd, dp), "bottom": (ox + dp + wd, oy, wd, dp), "right": (ox, oy + dp, dp, ht),
-            "front": (ox + dp, oy + dp, wd, ht), "left": (ox + dp + wd, oy + dp, dp, ht), "back": (ox + 2 * dp + wd, oy + dp, wd, ht)}
-
-
-class Skin:
-    def __init__(self, seed):
-        self.img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
-        self.p = self.img.load()
-        self.rng = random.Random(seed)
-
-    def rect(self, part, face, layer=0):
-        return rects(BOXES[part][layer], BOXES[part][2])[face]
-
-    def paint(self, part, faces, fn, layer=0):
-        """fn(face, u, v, w, h) -> colour or None for every pixel of those faces."""
-        for face in faces:
-            x, y, wd, ht = self.rect(part, face, layer)
-            for u in range(wd):
-                for v in range(ht):
-                    c = fn(face, u, v, wd, ht)
-                    if c is not None:
-                        self.p[x + u, y + v] = tuple(c[:3]) + ((c[3],) if len(c) > 3 else (255,))
-
-    def put(self, part, face, u, v, c, layer=0):
-        x, y, wd, ht = self.rect(part, face, layer)
-        if 0 <= u < wd and 0 <= v < ht:
-            self.p[x + u, y + v] = tuple(c[:3]) + ((c[3],) if len(c) > 3 else (255,))
-
-    def rows(self, part, face, art, pal, layer=0):
-        """Pixel art: one string per row, one char per pixel ('.' = leave as is)."""
-        for v, row in enumerate(art):
-            for u, ch in enumerate(row):
-                if ch in pal:
-                    self.put(part, face, u, v, pal[ch], layer)
-
-    def cloth(self, base, face, u, v, wd, ht, grain=0.05, top=1.06, bottom=0.9):
-        """A shaded fabric pixel: lighter at the top, darker at the bottom and toward the edges of side faces."""
-        k = top + (bottom - top) * (v / max(1, ht - 1))
-        if face in ("right", "left") and (u == 0 or u == wd - 1):
-            k *= 0.92
-        if face == "front" and (u == 0 or u == wd - 1):
-            k *= 0.95
-        return mul(base, k * (1 + self.rng.uniform(-grain, grain)))
-
-
-def palette(c):
-    S = c["skin"]
-    H = c.get("hair", (30, 30, 36))
-    return {"H": H, "h": c.get("hair_h", mul(H, 1.3)), "d": c.get("hair_d", mul(H, 0.7)), "S": S, "s": c.get("skin_d", mul(S, 0.86)),
-            "E": c.get("eye", (244, 240, 236)), "I": c.get("iris", (60, 50, 44)), "i": c.get("iris2", c.get("iris", (60, 50, 44))),
-            "P": (18, 16, 22), "K": c.get("brow", mul(H, 0.8)), "B": c.get("black", (22, 20, 26)), "X": c.get("mark", (30, 22, 26)),
-            "M": c.get("mouth", (120, 64, 60)), "L": c.get("lip", (196, 110, 112)), "T": (240, 236, 226), "G": c.get("frame", (30, 30, 36)),
-            "g": c.get("lens", (150, 200, 190)), "C": c.get("collar", c.get("jacket", (34, 36, 58))), "c": mul(c.get("collar", c.get("jacket", (34, 36, 58))), 0.8),
-            "W": c.get("white", (236, 236, 240)), "O": c.get("scar", mix(S, (150, 70, 70), 0.5)), "R": c.get("red", (190, 40, 50)),
-            "Y": c.get("gold", (220, 180, 70)), "Q": (60, 20, 24)}
-
-
-def head(s, c, front, side, back, front1=None, side1=None, back1=None, top_streaks=True):
-    """The head: skin everywhere, the hair colour on top, then pixel-art rows for each face (side rows run back -> front)."""
-    pal = palette(c)
-    s.paint("head", ("top",), lambda f, u, v, wd, ht: mul(c.get("top", pal["H"]), 1 + s.rng.uniform(-0.1, 0.14)))
-    s.paint("head", ("bottom",), lambda f, u, v, wd, ht: pal["s"])
-    s.paint("head", SIDES, lambda f, u, v, wd, ht: s.cloth(pal["S"], f, u, v, wd, ht, 0.02))
-    s.rows("head", "front", front, pal)
-    s.rows("head", "right", side, pal)
-    s.rows("head", "left", [r[::-1] for r in side], pal)
-    s.rows("head", "back", back, pal)
-    for rows_, faces in ((front1, ("front",)), (side1, ("right", "left")), (back1, ("back",))):
-        if rows_:
-            for fc in faces:
-                s.rows("head", fc, rows_ if fc != "left" else [r[::-1] for r in rows_], pal, layer=1)
-    if top_streaks:
-        s.paint("head", ("top",), lambda f, u, v, wd, ht: mul(c.get("top", pal["H"]), 1.2) if (u * 5 + v * 3) % 6 == 0 else None, layer=1)
-
-
-def outfit(s, c, top, sleeve, pants, shoes, hands=None, top_fn=None, arm_fn=None, leg_fn=None, sleeve_to=10, shoe_rows=1):
-    """Body, arms and legs in plain shaded cloth; *_fn(face, u, v, w, h) may return a colour to override a pixel."""
-    S = c["skin"]
-    hands = hands or S
-
-    def body(f, u, v, wd, ht):
-        o = top_fn(f, u, v, wd, ht) if top_fn else None
-        return o if o is not None else s.cloth(top, f, u, v, wd, ht, 0.04)
-    s.paint("body", SIDES, body)
-    s.paint("body", ("top",), lambda f, u, v, wd, ht: mul(top, 1.05))
-    s.paint("body", ("bottom",), lambda f, u, v, wd, ht: mul(top, 0.85))
-    for arm in ("rarm", "larm"):
-        def ap(f, u, v, wd, ht, arm=arm):
-            o = arm_fn(arm, f, u, v, wd, ht) if arm_fn else None
-            if o is not None:
-                return o
-            return s.cloth(sleeve, f, u, v, wd, ht) if v < sleeve_to else s.cloth(hands, f, u, v, wd, ht, 0.02)
-        s.paint(arm, SIDES, ap)
-        s.paint(arm, ("top",), lambda f, u, v, wd, ht: sleeve)
-        s.paint(arm, ("bottom",), lambda f, u, v, wd, ht: mul(hands, 0.86))
-    for leg in ("rleg", "lleg"):
-        def lp(f, u, v, wd, ht, leg=leg):
-            o = leg_fn(leg, f, u, v, wd, ht) if leg_fn else None
-            if o is not None:
-                return o
-            return s.cloth(pants, f, u, v, wd, ht) if v < 12 - shoe_rows else (mul(shoes, 1.15) if v == 12 - shoe_rows and f == "front" else shoes)
-        s.paint(leg, SIDES, lp)
-        s.paint(leg, ("top",), lambda f, u, v, wd, ht: pants)
-        s.paint(leg, ("bottom",), lambda f, u, v, wd, ht: shoes)
-
-
-def jjh_top(c, buttons=True, collar_rows=2, seam=3):
-    """The Jujutsu High uniform: a dark high-collared jacket, closed down one side with gold spiral buttons."""
-    J = c["jacket"]
-
-    def fn(f, u, v, wd, ht):
-        if v < collar_rows:
-            return mul(J, 1.18 if v == 0 else 1.08)
-        if f == "front":
-            if u == seam:
-                return mul(J, 0.72)
-            if buttons and u == seam + 1 and v in (3, 6, 9):
-                return c.get("gold", (222, 182, 76))
-        if f == "back" and u in (3, 4) and v == 11:
-            return mul(J, 0.8)
-        return None
-    return fn
-
-
-# ===========================================================================
-# Gear (a second geometry over the skin) and its texture
-# ===========================================================================
-GW = 64
-NONE = (60, 60, 4, 4)    # transparent corner of every gear texture
-
-
-class Gear:
-    def __init__(self, ident):
-        self.ident = ident
-        self.bones, self.idx = [], {}
-        self.tex = Image.new("RGBA", (GW, GW), (0, 0, 0, 0))
-        self._x = self._y = self._row = 0
-        for name, parent, piv in (("root", None, (0, 0, 0)), ("waist", "root", (0, 12, 0)), ("body", "waist", (0, 24, 0)),
-                                  ("head", "body", (0, 24, 0)), ("rightArm", "body", (-5, 22, 0)), ("leftArm", "body", (5, 22, 0)),
-                                  ("rightLeg", "root", (-1.9, 12, 0)), ("leftLeg", "root", (1.9, 12, 0))):
-            self.bone(name, parent, piv)
-
-    def bone(self, name, parent, pivot, rotation=None):
-        if name in self.idx:
-            return name
-        b = {"name": name, "pivot": [round(v, 3) for v in pivot], "cubes": []}
-        if parent:
-            b["parent"] = parent
-        if rotation:
-            b["rotation"] = [round(v, 3) for v in rotation]
-        self.bones.append(b)
-        self.idx[name] = b
-        return name
-
-    def cube(self, bone, origin, size, uv, inflate=0.0, rotation=None, pivot=None):
-        c = {"origin": [round(v, 3) for v in origin], "size": [round(v, 3) for v in size], "uv": uv}
-        if inflate:
-            c["inflate"] = round(inflate, 3)
-        if rotation:
-            c["rotation"] = [round(v, 3) for v in rotation]
-            c["pivot"] = [round(v, 3) for v in (pivot or [origin[i] + size[i] / 2 for i in range(3)])]
-        self.idx[bone]["cubes"].append(c)
-
-    def region(self, wd, ht, fn):
-        """Allocates a wd x ht area of the gear texture (shelf packing) and paints it with fn(u, v, wd, ht)."""
-        if self._x + wd > GW:
-            self._x, self._y, self._row = 0, self._y + self._row, 0
-        r = (self._x, self._y, wd, ht)
-        if self._y + ht > GW - 4 and self._x + wd > NONE[0]:
-            raise ValueError(f"{self.ident}: gear texture full")
-        self._x += wd
-        self._row = max(self._row, ht)
-        p = self.tex.load()
-        for u in range(wd):
-            for v in range(ht):
-                col = fn(u, v, wd, ht)
-                if col is not None:
-                    p[r[0] + u, r[1] + v] = tuple(col[:3]) + ((col[3],) if len(col) > 3 else (255,))
-        return r
-
-    def flat(self, col, wd=4, ht=4, k=(1.12, 0.86)):
-        return self.region(wd, ht, lambda u, v, w_, h_: mul(col, k[0] + (k[1] - k[0]) * v / max(1, h_ - 1)))
-
-    def json(self, bw=3.2, bh=3.6):
-        return {"format_version": "1.12.0", "minecraft:geometry": [{
-            "description": {"identifier": self.ident, "texture_width": GW, "texture_height": GW,
-                            "visible_bounds_width": bw, "visible_bounds_height": bh, "visible_bounds_offset": [0, 1.4, 0]},
-            "bones": [{k: v for k, v in b.items() if k != "cubes" or v} for b in self.bones]}]}
-
-
-def uv(**faces):
-    """Per-face UVs: face=(x, y, w, h) or 'none'; rest= fills the faces not named."""
-    rest = faces.pop("rest", "none")
-    out = {}
-    for f in ("north", "south", "east", "west", "up", "down"):
-        r = faces.get(f, rest)
-        if r == "none":
-            r = (NONE[0] + 1, NONE[1] + 1, 2, 2)
-        x, y, wd, ht = r
-        out[f] = {"uv": [x, y], "uv_size": [wd, ht]}
-    return out
-
-
-def ring(region):
-    return uv(north=region, south=region, east=region, west=region)
-
-
-BONE_PIVOT = {"head": (0, 24, 0), "body": (0, 24, 0), "rightArm": (-5, 22, 0), "leftArm": (5, 22, 0), "rightLeg": (-1.9, 12, 0),
-              "leftLeg": (1.9, 12, 0)}
-
-
-def spikes(g, col, items, parent="head", name="g_hair", shade=(1.3, 0.75)):
-    """Spiky hair: items = [(origin, size, rotation)], each spike turned about its own base."""
-    r = g.region(6, 8, lambda u, v, wd, ht: mul(col, shade[0] + (shade[1] - shade[0]) * v / ht - (0.06 if u % 3 == 0 else 0)))
-    b = g.bone(name, parent, BONE_PIVOT[parent] if parent in BONE_PIVOT else (0, 32, 0))
-    for o, sz, rot in items:
-        g.cube(b, o, sz, uv(rest=r), rotation=rot, pivot=(o[0] + sz[0] / 2, o[1], o[2] + sz[2] / 2))
-    return b
-
-
-def hair_cap(g, col, y0=29.0, inflate=0.55, back_to=24.5, name="g_hair"):
-    """A shell of hair over the top and back of the head (the hair's volume), open at the face."""
-    top = g.region(8, 8, lambda u, v, wd, ht: mul(col, 1.15 + (0.08 if (u + v) % 3 == 0 else 0)))
-    side = g.region(8, 6, lambda u, v, wd, ht: mul(col, 1.1 - 0.3 * v / ht - (0.06 if u % 2 else 0)))
+def glasses(g, frame, lens=None, y=25.7, h=2.6, name="g_glasses"):
+    """3D glasses: a frame plate in front of the eye rows; lens=None leaves the lenses see-through."""
+    def fn(u, v, wd, ht):
+        inside = 1 <= v <= ht - 2 and (1 <= u <= 2 or 5 <= u <= 6)
+        if inside:
+            return lens
+        return frame
+    r = g.region(8, 6, fn)
     b = g.bone(name, "head", (0, 24, 0))
-    g.cube(b, (-4, y0, -4), (8, 32 - y0, 8), uv(up=top, east=side, west=side, south=side, north="none", down="none"), inflate=inflate)
-    if back_to < y0:
-        g.cube(b, (-4, back_to, 0.6), (8, y0 - back_to, 3.4), uv(south=side, east=side, west=side, rest="none"), inflate=inflate)
+    g.cube(b, (-4.1, y, -4.45), (8.2, h, 0.3), uv(north=r, south=r, rest=(r[0], r[1], 1, 1)))
+    g.cube(b, (-4.45, y + h - 0.5, -4.3), (0.3, 0.45, 4.4), uv(rest=(r[0], r[1], 1, 1)))          # arms over the ears
+    g.cube(b, (4.15, y + h - 0.5, -4.3), (0.3, 0.45, 4.4), uv(rest=(r[0], r[1], 1, 1)))
     return b
 
 
-def collar(g, col, y0=24.0, h=1.6, inflate=0.75, name="g_collar"):
-    """A high collar hugging the jaw."""
-    r = g.region(8, 2, lambda u, v, wd, ht: mul(col, 1.18 if v == 0 else 1.0))
+def coat_skirt(g, col, y0=5.0, name="g_skirt"):
+    """A long coat or robe below the waist (it doesn't swing with the legs, like a real coat)."""
+    r = g.region(8, 6, lambda u, v, wd, ht: mul(col, 0.98 - 0.18 * v / ht - (0.08 if u in (3, 4) else 0)))
     b = g.bone(name, "body", (0, 24, 0))
-    g.cube(b, (-4, y0, -4), (8, h, 8), ring(r), inflate=inflate)
+    g.cube(b, (-4, y0, -2), (8, 12 - y0, 4), uv(north=r, south=r, east=r, west=r, rest="none"), inflate=0.55)
     return b
 
 
-SPINE = (0, 18, 2.6)
+def wide_legs(g, col, name="g_wide"):
+    """Hakama / baggy trousers: a looser layer round each leg."""
+    r = g.region(4, 6, lambda u, v, wd, ht: mul(col, 1.02 - 0.18 * v / ht - (0.07 if u == 2 else 0)))
+    for leg, x in (("rightLeg", -3.9), ("leftLeg", -0.1)):
+        b = g.bone(f"{name}_{leg}", leg, BONE_PIVOT[leg])
+        g.cube(b, (x, 1.5, -2), (4, 10.5, 4), ring(r), inflate=0.5)
 
 
-def on_back(g, parts, angle=-38, name="g_back"):
-    """Things strapped diagonally across the back: parts = [(origin, size, region)] measured from the spine (cube
-    origins in a geometry are absolute model coordinates, so they're shifted onto the back here)."""
-    b = g.bone(name, "body", SPINE, (0, 0, angle))
-    for o, sz, r in parts:
-        g.cube(b, (o[0] + SPINE[0], o[1] + SPINE[1], o[2] + SPINE[2] + 0.4), sz, uv(rest=r))
-    return b
+def lapels(g, col, inner=None, name="g_lapels"):
+    """An open jacket's lapels: two plates forming a V down the chest."""
+    r = g.region(2, 6, lambda u, v, wd, ht: mul(col, 1.12 - 0.12 * v / ht))
+    b = g.bone(name, "body", (0, 24, 0))
+    for side in (-1, 1):
+        x = side * 1.6
+        g.cube(b, (x - 0.8, 17.0, -2.55), (1.6, 6.8, 0.4), uv(rest=r), rotation=[0, 0, side * 14], pivot=(x, 23.8, -2.4))
+
+
+def chain(g, col=GOLD, name="g_chain"):
+    r = g.region(4, 2, lambda u, v, wd, ht: mul(col, 1.15) if (u + v) % 2 == 0 else mul(col, 0.8))
+    b = g.bone(name, "body", (0, 24, 0))
+    g.cube(b, (-2.6, 21.0, -2.35), (5.2, 0.6, 0.3), uv(rest=r))
+    g.cube(b, (-2.9, 21.4, -2.35), (0.6, 2.6, 0.3), uv(rest=r))
+    g.cube(b, (2.3, 21.4, -2.35), (0.6, 2.6, 0.3), uv(rest=r))
+
+
+def earrings(g, col, big=False, name="g_earrings"):
+    r = g.flat(col, 2, 2)
+    b = g.bone(name, "head", (0, 24, 0))
+    s_ = 1.3 if big else 0.6
+    for x in (-4.5 - s_ / 2, 4.2):
+        g.cube(b, (x, 26.0, -0.4), (s_ / 2 + 0.3, s_, s_), uv(rest=r))
+
+
+def uniform_3d(g, J, button=True, sole=(30, 30, 34), toe=None, collar_h=1.2):
+    """The Jujutsu High jacket's 3D parts: high collar (and its spiral button), flared hem, cuffs, sneaker soles."""
+    collar(g, J, h=collar_h, button=GOLD if button else None)
+    hem(g, J)
+    cuffs(g, J)
+    soles(g, sole, toe)
 
 
 # ===========================================================================
 # The cast
 # ===========================================================================
-NAVY = (34, 37, 58)
-
-
 def gojo():
-    c = dict(skin=(238, 214, 198), hair=(236, 240, 248), hair_h=(255, 255, 255), hair_d=(196, 206, 226), jacket=(30, 32, 52),
-             mouth=(176, 112, 108), black=(16, 16, 20))
+    c = dict(skin=(240, 218, 204), hair=(236, 240, 250), hair_h=(255, 255, 255), hair_d=(186, 198, 222), jacket=(28, 30, 50),
+             mouth=(178, 108, 104), black=(14, 14, 18))
     s = Skin(1)
-    head(s, c, ["hHHhHHHh",
-                "HhHHHhHH",
-                "HSHSSHSH",
+    head(s, c, ["hHhHHhHh",
+                "HhHdHHhH",
+                "HSHSSHSd",
                 "BBBBBBBB",
                 "BBBBBBBB",
                 "SSSSSSSS",
-                "SSSMMSSS",
+                "SSSMmSSS",
                 "SSSSSSSS"],
-         ["HHHHHHHH",
-          "HHHHHHHH",
-          "HHHHSSSS",
-          "BBBBBBBB",
-          "BBBBBBBB",
-          "HHSSSSSS",
-          "HSSSSSSS",
-          "SSSSSSSS"],
-         ["HHhHHHhH", "HHHHHHHH", "HhHHHHhH", "BBBBBBBB", "BBBBBBBB", "HHHHHHHH", "HHHhHHHH", "SHHHHHHS"],
-         front1=["H.h..h.H", ".H....H.", "........", "B......B", "B......B"])
+         ["HHhHHHHH", "HHHHhHHH", "dHHHHHHS", "BBBBBBBB", "BBBBBBBB", "HHHsSSSS", "dHHSSSSS", "SSSSSSSS"],
+         ["HhHHHHhH", "HHHdHHHH", "HhHHHhHH", "BBBBBBBB", "BBBBBBBB", "HHdHHdHH", "dHHhHHHd", "SSSSSSSS"],
+         front1=["H.h..h.H", ".H.hH.d.", "h..H..H.", "B......B"], side1=["HhH.hH.H", "..H..H.."], back1=["hHHhHHhH", "H.hH.Hh."])
     J = c["jacket"]
-    outfit(s, c, J, J, (26, 28, 44), (18, 18, 22), top_fn=jjh_top(c, buttons=False), sleeve_to=10)
-    # the long coat flares over the thighs
+    outfit(s, c, J, J, (24, 26, 42), (16, 16, 20), top_fn=jjh_uniform(c, buttons=False)[0],
+           leg_fn=sneakers((16, 16, 20), (40, 40, 46)), shoe_rows=2)
     for leg in ("rleg", "lleg"):
         s.paint(leg, SIDES, lambda f, u, v, wd, ht: s.cloth(mul(J, 0.96), f, u, v, wd, ht) if v < 6 else None, layer=1)
+    bake(s)
     g = Gear("geometry.jjk.sorcerer_gear_gojo")
-    hair_cap(g, c["hair"], y0=30.2, inflate=0.6, back_to=26)
-    sp = []
-    for i, (x, z, ln, rx, rz) in enumerate(((-3, -3, 4.5, 28, -22), (-0.6, -3.4, 5.2, 34, 4), (2, -3, 4.6, 26, 24), (-3.4, 0, 4.2, -6, -34),
-                                            (3.0, 0, 4.4, -8, 34), (-1, 0.5, 5.5, -18, -8), (1.2, 1.5, 5.0, -24, 12), (-2.4, 2.6, 4.0, -36, -18),
-                                            (2.2, 2.8, 4.0, -38, 20), (0, -1.5, 5.8, 10, 0))):
-        sp.append(((x - 1.1, 31.2, z - 1.1), (2.2, ln, 2.2), [rx, 0, rz]))
-    spikes(g, c["hair"], sp, shade=(1.08, 0.92))
-    collar(g, J, h=1.7)
-    return s.img, g
-
-
-def sukuna():
-    c = dict(skin=(232, 196, 178), hair=(232, 140, 150), hair_h=(250, 180, 186), hair_d=(150, 80, 96), iris=(200, 30, 40),
-             mark=(26, 18, 22), mouth=(70, 16, 20), white=(238, 234, 226), black=(24, 22, 26))
-    s = Skin(2)
-    head(s, c, ["HhHHHHhH",
-                "HSXXXXSH",
-                "SKKSSKKS",
-                "SEISSIES",
-                "SXXSSXXS",
-                "SIESSEIS",
-                "SSMTTMSS",
-                "SSSMMSSS"],
-         ["HHHHHHHH",
-          "HHHHHXSS",
-          "HHHHSSSS",
-          "HHHSSSXS",
-          "HHSSSSXS",
-          "HSSSSSSS",
-          "SSSSSSSS",
-          "SSSSSSSS"],
-         ["HHHhHHHH", "HHHHHHhH", "HhHHHHHH", "HHHHHHHH", "HHHHhHHH", "dHHHHHHd", "SdHHHHdS", "SSSSSSSS"],
-         front1=["h.H..H.h"])
-    W, B = c["white"], (30, 28, 32)
-
-    def kimono(f, u, v, wd, ht):
-        if f == "front" and v < 5 and abs(u - 3.5) < 2.2 - v * 0.45:
-            return c["skin"]                                   # the V of the collar
-        if f == "front" and ((u == 1 and v < 7) or (u == 6 and v < 7)):
-            return mul(W, 0.8)                                 # lapel edges
-        if v in (7, 8):
-            return B if v == 7 else mul(B, 1.3)                # the obi
-        return None
-
-    def tattoo_arm(arm, f, u, v, wd, ht):
-        if v < 4:
-            return s.cloth(W, f, u, v, wd, ht)                 # short sleeves
-        if v in (6, 9):
-            return c["mark"]                                   # black bands round the forearms
-        return None
-    outfit(s, c, W, W, (34, 32, 38), (40, 34, 30), top_fn=kimono, arm_fn=tattoo_arm, sleeve_to=4)
-    for leg in ("rleg", "lleg"):                               # wide hakama
-        s.paint(leg, SIDES, lambda f, u, v, wd, ht: s.cloth((40, 38, 46), f, u, v, wd, ht) if v < 10 else None, layer=1)
-    g = Gear("geometry.jjk.sorcerer_gear_sukuna")
-    hair_cap(g, c["hair"], y0=30.5, inflate=0.5, back_to=27)
-    sp = [((x - 1, 30.8, z - 1), (2, ln, 2.2), [rx, 0, rz]) for x, z, ln, rx, rz in
-          ((-2.6, -2.8, 4.2, -48, -14), (0, -3.2, 4.6, -52, 0), (2.6, -2.8, 4.2, -48, 14), (-3.2, 0, 4.0, -60, -26),
-           (3.2, 0, 4.0, -60, 26), (-1.4, 1.5, 3.8, -66, -8), (1.4, 1.5, 3.8, -66, 8))]
-    spikes(g, c["hair"], sp)
-    # a dark scarf round the neck
-    scarf = g.flat((36, 30, 36), 8, 2)
-    sc = g.bone("g_scarf", "body", (0, 24, 0))
-    g.cube(sc, (-4, 22.4, -2), (8, 1.8, 4), ring(scarf), inflate=0.7)
-    # the second pair of arms, lower on the torso, held out
-    skin = g.region(4, 12, lambda u, v, wd, ht: c["mark"] if v in (5, 8) else mul(c["skin"], 1.02 - 0.12 * v / ht))
-    for side, name in ((-1, "g_arm3"), (1, "g_arm4")):
-        b = g.bone(name, "body", (side * 4.4, 17, -0.5), (-50, side * 10, side * 28))
-        g.cube(b, (side * 4.4 - 1.5, 7, -2), (3, 10, 3), uv(rest=skin))
+    hair_cap(g, c["hair"], y0=30.0, inflate=0.6, back_to=26, light=0.1)
+    spikes(g, c["hair"], [((-2.6, 31.2, -2.4), 5.0, 2.8, [28, 0, -24]), ((0.0, 31.2, -2.8), 5.6, 3.0, [32, 0, 0]), ((2.6, 31.2, -2.4), 5.0, 2.8, [28, 0, 24]), ((-3.2, 31.2, 0.2), 4.6, 2.8, [-4, 0, -38]), ((3.2, 31.2, 0.2), 4.6, 2.8, [-4, 0, 38]), ((-1.2, 31.2, 0.4), 5.8, 3.0, [-10, 0, -10]), ((1.3, 31.2, 0.6), 5.6, 3.0, [-14, 0, 12]), ((-2.2, 31.2, 2.6), 4.4, 2.8, [-34, 0, -20]), ((0.2, 31.2, 2.8), 4.6, 2.8, [-38, 0, 0]), ((2.4, 31.2, 2.6), 4.4, 2.8, [-34, 0, 20])], light=0.1)
+    fringe(g, c["hair"], [(-3.8, 1.4, 2.6), (-2.0, 1.2, 2.1), (-0.4, 1.4, 2.8), (1.3, 1.2, 2.2), (2.8, 1.2, 2.5)], y=31.4)
+    collar(g, J, h=1.4)
+    coat_skirt(g, J, y0=5.5)
+    soles(g, (40, 40, 46))
     return s.img, g
 
 
 def yuji():
-    c = dict(skin=(232, 196, 170), hair=(232, 146, 156), hair_h=(248, 178, 186), hair_d=(70, 46, 44), iris=(156, 96, 50),
-             jacket=NAVY, red=(196, 44, 52))
+    c = dict(skin=(234, 198, 172), hair=(236, 150, 160), hair_h=(252, 190, 198), hair_d=(84, 54, 52), iris=(150, 92, 46),
+             jacket=NAVY, red=(198, 44, 52))
     s = Skin(3)
-    head(s, c, ["HhHHhHHh",
-                "hHHHHHHH",
-                "dSKSSKSd",
-                "dEISSIEd",
-                "SSSSSSSS",
-                "SSSSSSSS",
+    head(s, c, ["hHHhHHhH",
+                "HhHHhHHd",
+                "dKKSSKKd",
+                "SLLSSLLS",
+                "SEISSIES",
+                "SEJSSJES",
                 "SSSMMSSS",
                 "SSSSSSSS"],
-         ["HHHHHHHH",
-          "dddddHHS",
-          "dddddSSS",
-          "ddddSSSS",
-          "dddSSSSS",
-          "ddSSSSSS",
-          "SSSSSSSS",
-          "SSSSSSSS"],
-         ["HHhHHHhH", "HHHHHHHH", "dddddddd", "dddddddd", "dddddddd", "dddddddd", "SddddddS", "SSSSSSSS"])
+         ["HHhHHHHH", "ddddddHH", "dddddSSS", "ddddSSSS", "dddsSSSS", "ddSSSSSS", "SSSSSSSS", "SSSSSSSS"],
+         ["HHhHHHhH", "HhHHHHHH", "dddddddd", "dddddddd", "dddddddd", "dddddddd", "SddddddS", "SSSSSSSS"],
+         front1=["h.H..H.h", ".H....H."])
     J = c["jacket"]
+    top, arm = jjh_uniform(c, collar_rows=0)
 
-    def top(f, u, v, wd, ht):
+    def body(f, u, v, wd, ht):
         if v < 2:
-            return c["red"] if v == 0 else mul(c["red"], 0.8)    # the red hoodie collar
-        return jjh_top(c, collar_rows=0)(f, u, v, wd, ht)
-    outfit(s, c, J, J, (30, 32, 50), (200, 46, 52), top_fn=top,
-           leg_fn=lambda leg, f, u, v, wd, ht: (236, 236, 236) if v == 10 else None, shoe_rows=2)
+            return mul(c["red"], 1.1 if v == 0 else 0.85)          # the red hoodie under the jacket
+        return top(f, u, v, wd, ht)
+    outfit(s, c, J, J, (28, 30, 48), (200, 46, 52), top_fn=body, arm_fn=arm, leg_fn=sneakers((200, 46, 52)), shoe_rows=2)
+    bake(s)
     g = Gear("geometry.jjk.sorcerer_gear_yuji")
-    sp = [((x - 0.9, 31.4, z - 0.9), (1.8, ln, 1.8), [rx, 0, rz]) for x, z, ln, rx, rz in
-          ((-2.6, -2.6, 2.4, 30, -14), (0, -3, 2.8, 36, 0), (2.6, -2.6, 2.4, 30, 14), (-1.4, -0.4, 2.6, -10, -10),
-           (1.4, -0.4, 2.6, -10, 10), (0, 1.6, 2.4, -26, 0))]
-    spikes(g, c["hair"], sp)
-    hood = g.region(8, 6, lambda u, v, wd, ht: mul(c["red"], 1.1 - 0.3 * v / ht - (0.08 if u in (0, wd - 1) else 0)))
+    spikes(g, c["hair"], [((-2.6, 31.2, -2.6), 2.6, 2.4, [30, 0, -14]), ((0, 31.2, -3), 3.0, 2.4, [36, 0, 0]), ((2.6, 31.2, -2.6), 2.6, 2.4, [30, 0, 14]), ((-1.4, 31.2, -0.4), 2.8, 2.4, [-10, 0, -10]), ((1.4, 31.2, -0.4), 2.8, 2.4, [-10, 0, 10]), ((0, 31.2, 1.6), 2.6, 2.4, [-26, 0, 0]), ((-2.8, 31.2, 1.2), 2.4, 2.2, [-20, 0, -24]), ((2.8, 31.2, 1.2), 2.4, 2.2, [-20, 0, 24])], light=0.08)
+    hood = g.region(8, 6, lambda u, v, wd, ht: mul(c["red"], 1.12 - 0.3 * v / ht - (0.1 if u in (0, wd - 1) else 0)))
     hb = g.bone("g_hood", "body", (0, 24, 0))
-    g.cube(hb, (-3.6, 19.4, 2.0), (7.2, 4.8, 1.6), uv(rest=hood))             # the hood hangs down the back
-    g.cube(hb, (-4, 23.2, -2), (8, 1.3, 4), ring(hood), inflate=0.65)          # and rings the neck
+    g.cube(hb, (-3.6, 19.2, 2.0), (7.2, 5.0, 1.8), uv(rest=hood))            # the hood down the back
+    g.cube(hb, (-4, 23.2, -2), (8, 1.4, 4), ring(hood), inflate=0.68)          # its collar round the neck
+    hem(g, J)
+    cuffs(g, J)
+    soles(g, (238, 236, 230), (200, 46, 52))
     return s.img, g
 
 
 def megumi():
-    c = dict(skin=(228, 202, 186), hair=(26, 28, 38), hair_h=(56, 62, 84), iris=(40, 64, 96), jacket=NAVY)
+    c = dict(skin=(230, 204, 188), hair=(26, 28, 40), hair_h=(70, 78, 104), iris=(48, 76, 116), jacket=NAVY)
     s = Skin(4)
-    head(s, c, ["HHHHHHHH",
-                "HHhHHhHH",
-                "HKKSSKKH",
+    head(s, c, ["HHhHHhHH",
+                "HdHHHdHH",
+                "HKKHSKKH",
+                "SLLSSLLS",
                 "SEISSIES",
-                "SSSSSSSS",
-                "SSSSSSSS",
+                "SEJSSJES",
                 "SSSMMSSS",
                 "SSSSSSSS"],
-         ["HHHHHHHH", "HHHHHHHH", "HHHHHHSS", "HHHHSSSS", "HHHSSSSS", "HHSSSSSS", "HSSSSSSS", "SSSSSSSS"],
-         ["HHHHHHHH", "HHhHHHHH", "HHHHHhHH", "HHHHHHHH", "HhHHHHHH", "HHHHHHHH", "SHHHHHHS", "SSSSSSSS"])
-    outfit(s, c, c["jacket"], c["jacket"], (30, 32, 50), (18, 18, 22), top_fn=jjh_top(c))
+         ["HHHHHHHH", "HHhHHHHH", "HHHHHHSS", "HHHHSSSS", "HHHsSSSS", "HHSSSSSS", "HSSSSSSS", "SSSSSSSS"],
+         ["HHhHHHHH", "HHHHHhHH", "HhHHHHHH", "HHHHHHhH", "HHHHHHHH", "HHHhHHHH", "SHHHHHHS", "SSSSSSSS"],
+         front1=["H.hH.H.h", ".H..H..H", "..H....."])
+    top, arm = jjh_uniform(c)
+    outfit(s, c, c["jacket"], c["jacket"], (28, 30, 48), (18, 18, 22), top_fn=top, arm_fn=arm,
+           leg_fn=sneakers((18, 18, 22), (44, 44, 50)), shoe_rows=2)
+    bake(s)
     g = Gear("geometry.jjk.sorcerer_gear_megumi")
     hair_cap(g, c["hair"], y0=29.5, inflate=0.6, back_to=25.5)
-    sp = []
-    rnd = random.Random(4)
-    for x, z, ln, rx, rz in ((-3, -3, 4.0, 26, -26), (-1, -3.4, 4.6, 32, -6), (1.2, -3.4, 4.6, 32, 8), (3, -3, 4.0, 26, 26),
-                             (-3.4, -0.6, 4.4, -2, -40), (3.4, -0.6, 4.4, -2, 40), (-1.8, 0.4, 5.4, -14, -16), (0.4, 0.2, 6.0, -10, 4),
-                             (2.2, 0.6, 5.2, -16, 18), (-2.6, 2.6, 4.6, -40, -24), (0, 2.8, 5.0, -44, 0), (2.6, 2.6, 4.6, -40, 24)):
-        sp.append(((x - 1.15, 31.0, z - 1.15), (2.3, ln + rnd.uniform(-0.4, 0.4), 2.3), [rx, 0, rz]))
-    spikes(g, c["hair"], sp)
-    collar(g, c["jacket"])
+    spikes(g, c["hair"], [((-2.8, 31.2, -2.6), 4.4, 2.8, [24, 0, -30]), ((-0.4, 31.2, -3.0), 5.0, 3.0, [30, 0, -6]), ((2.2, 31.2, -2.8), 4.6, 2.8, [26, 0, 22]), ((-3.4, 31.2, -0.4), 5.0, 3.0, [0, 0, -46]), ((3.4, 31.2, -0.4), 5.0, 3.0, [0, 0, 46]), ((-1.6, 31.2, 0.2), 6.0, 3.2, [-12, 0, -16]), ((1.0, 31.2, 0.4), 6.2, 3.2, [-14, 0, 10]), ((-2.8, 31.2, 2.4), 5.0, 2.8, [-40, 0, -28]), ((0.0, 31.2, 2.8), 5.2, 3.0, [-46, 0, 0]), ((2.8, 31.2, 2.4), 5.0, 2.8, [-40, 0, 28]), ((-0.6, 31.2, -0.8), 5.4, 3.0, [8, 0, -2])], light=0.05)
+    uniform_3d(g, c["jacket"], sole=(44, 44, 50))
     return s.img, g
 
 
 def nobara():
-    c = dict(skin=(238, 208, 188), hair=(190, 104, 50), hair_h=(222, 140, 76), iris=(136, 84, 46), jacket=NAVY, lip=(206, 112, 120))
+    c = dict(skin=(240, 210, 190), hair=(192, 106, 52), hair_h=(228, 146, 80), iris=(140, 86, 46), jacket=NAVY, lip=(210, 110, 120))
     s = Skin(5)
     head(s, c, ["HHHHHHHH",
-                "HHhHHHHH",
-                "HSKSSKSH",
+                "HhHHHHhH",
+                "HHHHdSSH",
+                "HLLSSLLH",
                 "HEISSIEH",
-                "HSSSSSSH",
-                "HSSSSSSH",
-                "HSSLLSSH",
+                "HEJSSJEH",
+                "HbSmmSbH",
                 "SSSSSSSS"],
-         ["HHHHHHHH", "HHHHHHHH", "HHHHHHHS", "HHHHHHSS", "HHHHHSSS", "HHHHHSSS", "HHHHHSSS", "SSSSSSSS"],
-         ["HHHHHHHH", "HHhHHHHH", "HHHHHhHH", "HHHHHHHH", "HHHHHHHH", "HhHHHHhH", "HHHHHHHH", "SSSSSSSS"])
+         ["HHHHHHHH", "HhHHHHHH", "HHHHHHHS", "HHHHHHSS", "HHHHHsSS", "HHHHHSSS", "HHHHHSSS", "SSSSSSSS"],
+         ["HHHHHHHH", "HhHHHHhH", "HHHHHHHH", "HHHhHHHH", "HHHHHHHH", "HhHHHHhH", "HHHHHHHH", "SSSSSSSS"])
     J = c["jacket"]
+    top, arm = jjh_uniform(c)
 
-    def top(f, u, v, wd, ht):
+    def body(f, u, v, wd, ht):
         if v == 10:
-            return (90, 60, 40) if not (f == "front" and u in (3, 4)) else (200, 170, 90)   # belt and buckle
-        return jjh_top(c, buttons=True)(f, u, v, wd, ht)
-    tights = (30, 28, 34)
-    outfit(s, c, J, J, tights, (110, 70, 44), top_fn=top, shoe_rows=3)
-    for leg in ("rleg", "lleg"):                                                # the skirt
+            return (200, 170, 90) if f == "front" and u in (3, 4) else (90, 60, 40)         # belt and buckle
+        return top(f, u, v, wd, ht)
+    outfit(s, c, J, J, (30, 28, 34), (112, 72, 44), top_fn=body, arm_fn=arm, shoe_rows=3)
+    for leg in ("rleg", "lleg"):
         s.paint(leg, SIDES, lambda f, u, v, wd, ht: s.cloth(mul(J, 1.05), f, u, v, wd, ht) if v < 4 else None, layer=1)
+    bake(s)
     g = Gear("geometry.jjk.sorcerer_gear_nobara")
-    bob = g.region(8, 8, lambda u, v, wd, ht: mul(c["hair"], 1.18 - 0.3 * v / ht - (0.06 if u % 3 == 0 else 0)))
+    bob = hair_tex(g, c["hair"], 0.05, 8, 8)
     hb = g.bone("g_hair", "head", (0, 24, 0))
     g.cube(hb, (-4, 29.6, -4), (8, 2.4, 8), uv(up=bob, east=bob, west=bob, south=bob, rest="none"), inflate=0.6)
-    for x in (-4.7, 3.9):                                                       # the bob falls to the chin
-        g.cube(hb, (x, 25.2, -3.4), (0.8, 4.6, 7.2), uv(rest=bob))
-    g.cube(hb, (-4.2, 25.0, 3.7), (8.4, 4.8, 0.8), uv(rest=bob))
-    g.cube(hb, (-3.8, 30.3, -4.7), (4.6, 1.4, 0.7), uv(rest=bob))              # side-swept fringe
+    for x in (-4.7, 3.9):
+        g.cube(hb, (x, 25.0, -3.5), (0.8, 4.8, 7.4), uv(rest=bob))                    # the bob falls to the chin
+        g.cube(hb, (x + (0.2 if x < 0 else -0.2), 24.6, -3.6), (0.8, 1.0, 2.4), uv(rest=bob))   # flicked-out ends
+    g.cube(hb, (-4.2, 24.8, 3.7), (8.4, 5.0, 0.8), uv(rest=bob))
+    fringe(g, c["hair"], [(-3.9, 2.2, 2.0), (-1.8, 1.8, 1.5), (-0.1, 1.4, 1.0)], y=31.3)   # swept to one side
     handle = g.flat((120, 80, 46), 2, 6)
-    hammer = g.flat((90, 92, 104), 4, 3)
+    hammer = g.flat((92, 94, 106), 4, 3)
     hm = g.bone("g_hammer", "body", (0, 24, 0))
-    g.cube(hm, (-5.4, 11.6, -1.0), (1.0, 4.2, 1.0), uv(rest=handle))
-    g.cube(hm, (-6.0, 15.5, -1.6), (2.2, 1.6, 2.2), uv(rest=hammer))
+    g.cube(hm, (-5.4, 11.4, -1.0), (1.0, 4.4, 1.0), uv(rest=handle))
+    g.cube(hm, (-6.1, 15.4, -1.7), (2.4, 1.7, 2.4), uv(rest=hammer))
+    uniform_3d(g, J, sole=(70, 44, 28))
     return s.img, g
 
 
 def maki():
-    c = dict(skin=(236, 210, 190), hair=(40, 70, 52), hair_h=(66, 104, 78), iris=(150, 120, 60), jacket=NAVY, frame=(24, 24, 28),
-             lens=(170, 190, 196))
+    c = dict(skin=(238, 212, 192), hair=(40, 72, 54), hair_h=(70, 110, 84), iris=(160, 124, 60), jacket=NAVY, frame=(22, 22, 26))
     s = Skin(6)
     head(s, c, ["HHHHHHHH",
                 "HhHHHHhH",
-                "SKKSSKKS",
-                "GgIGGIgG",
-                "SGGSSGGS",
-                "SSSSSSSS",
+                "HKKSSKKH",
+                "SLLSSLLS",
+                "SEISSIES",
+                "SEJSSJES",
                 "SSSMMSSS",
                 "SSSSSSSS"],
-         ["HHHHHHHH", "HHHHHHHH", "HHHHHHSS", "HHHGGGGG", "HHHSSSSS", "HHSSSSSS", "HSSSSSSS", "SSSSSSSS"],
+         ["HHHHHHHH", "HHhHHHHH", "HHHHHHSS", "HHHGGGGG", "HHHsSSSS", "HHSSSSSS", "HSSSSSSS", "SSSSSSSS"],
          ["HHHHHHHH", "HHhHHHHH", "HHHHHHHH", "HHHhhHHH", "HHHHHHHH", "HHHHHHHH", "HHHHHHHH", "SSSSSSSS"])
-    outfit(s, c, c["jacket"], c["jacket"], (30, 32, 50), (20, 20, 24), top_fn=jjh_top(c))
+    top, arm = jjh_uniform(c)
+    outfit(s, c, c["jacket"], c["jacket"], (28, 30, 48), (20, 20, 24), top_fn=top, arm_fn=arm,
+           leg_fn=sneakers((20, 20, 24), (50, 50, 56)), shoe_rows=2)
+    bake(s)
     g = Gear("geometry.jjk.sorcerer_gear_maki")
     hair_cap(g, c["hair"], y0=30.0, inflate=0.5, back_to=30)
-    pt = g.region(4, 8, lambda u, v, wd, ht: mul(c["hair"], 1.2 - 0.4 * v / ht - (0.08 if u % 2 else 0)))
-    tail = g.bone("g_tail", "head", (0, 30.5, 4.2), (-28, 0, 0))               # a high ponytail
-    g.cube(tail, (-1.2, 23.5, 4.0), (2.4, 7.5, 2.0), uv(rest=pt))
-    g.cube(tail, (-0.8, 22.0, 4.2), (1.6, 1.6, 1.6), uv(rest=pt))
+    fringe(g, c["hair"], [(-3.9, 1.6, 2.0), (-1.6, 1.4, 1.5), (2.2, 1.7, 2.1)], y=31.3)
+    pt = hair_tex(g, c["hair"], 0.05, 4, 8)
+    tail = g.bone("g_tail", "head", (0, 30.5, 4.2), (-28, 0, 0))
+    g.cube(tail, (-1.3, 23.4, 4.0), (2.6, 7.6, 2.2), uv(rest=pt))
+    g.cube(tail, (-0.9, 21.6, 4.2), (1.8, 1.9, 1.8), uv(rest=pt))
     tie = g.flat((180, 40, 50), 2, 2)
-    g.cube(tail, (-1.4, 30.0, 3.8), (2.8, 1.0, 2.4), uv(rest=tie))
+    g.cube(tail, (-1.5, 30.0, 3.8), (3.0, 1.0, 2.6), uv(rest=tie))
+    glasses(g, c["frame"], None)
     shaft = g.flat((60, 44, 36), 2, 8)
-    blade = g.region(2, 6, lambda u, v, wd, ht: (220, 226, 236) if u == 0 else (170, 176, 190))
-    on_back(g, [((-0.5, -6, -0.5), (1, 22, 1), shaft), ((-0.75, 16, -0.6), (1.5, 6, 1.2), blade)], angle=-34)
+    blade = g.region(2, 6, lambda u, v, wd, ht: (226, 230, 240) if u == 0 else (170, 176, 190))
+    wrap = g.region(2, 2, lambda u, v, wd, ht: (200, 40, 50))
+    on_back(g, [((-0.5, -2, -0.5), (1, 18, 1), shaft), ((-0.75, 16, -0.6), (1.5, 6, 1.2), blade), ((-0.6, 14.6, -0.6), (1.2, 1.4, 1.2), wrap)], angle=-34)
+    uniform_3d(g, c["jacket"], sole=(50, 50, 56))
     return s.img, g
 
 
 def inumaki():
-    c = dict(skin=(238, 216, 200), hair=(226, 218, 196), hair_h=(248, 244, 228), iris=(120, 90, 170), jacket=NAVY)
+    c = dict(skin=(240, 218, 202), hair=(228, 220, 198), hair_h=(250, 246, 232), iris=(128, 96, 178), jacket=NAVY)
     s = Skin(7)
     head(s, c, ["HhHHHHhH",
                 "HHHHhHHH",
-                "HSKSSKSH",
+                "HKKSSKKH",
+                "SLLSSLLS",
                 "SEISSIES",
-                "SSSSSSSS",
-                "SSSSSSSS",
+                "SEJSSJES",
                 "SSSSSSSS",
                 "SSSSSSSS"],
-         ["HHHHHHHH", "HHHHHHHH", "HHHHHHSS", "HHHHSSSS", "HHHSSSSS", "HHSSSSSS", "HSSSSSSS", "SSSSSSSS"],
+         ["HHHHHHHH", "HHhHHHHH", "HHHHHHSS", "HHHHSSSS", "HHHsSSSS", "HHSSSSSS", "HSSSSSSS", "SSSSSSSS"],
          ["HHhHHHHH", "HHHHHhHH", "HHHHHHHH", "HHHhHHHH", "HHHHHHHH", "HHHHHHHH", "SHHHHHHS", "SSSSSSSS"],
-         front1=["H.hH.H.h", ".h....H."])
-    outfit(s, c, c["jacket"], c["jacket"], (30, 32, 50), (20, 20, 24), top_fn=jjh_top(c, buttons=False))
+         front1=["H.hH.H.h", ".h..H.H."])
+    top, arm = jjh_uniform(c, buttons=False)
+    outfit(s, c, c["jacket"], c["jacket"], (28, 30, 48), (20, 20, 24), top_fn=top, arm_fn=arm,
+           leg_fn=sneakers((20, 20, 24), (50, 50, 56)), shoe_rows=2)
+    bake(s)
     g = Gear("geometry.jjk.sorcerer_gear_inumaki")
     hair_cap(g, c["hair"], y0=29.6, inflate=0.6, back_to=26)
-    zip_ = g.region(8, 4, lambda u, v, wd, ht: (200, 190, 120) if (u == 4 and v > 0) else mul(c["jacket"], 1.15 - 0.08 * v))
+    spikes(g, c["hair"], [((-2.2, 31.2, -2), 2.6, 2.6, [26, 0, -16]), ((0.4, 31.2, -2.2), 3.0, 2.8, [30, 0, 4]), ((2.6, 31.2, -1.6), 2.4, 2.4, [22, 0, 22]), ((-0.8, 31.2, 0.8), 2.6, 2.6, [-8, 0, -6]), ((1.8, 31.2, 1.0), 2.2, 2.4, [-14, 0, 14])])
+    zip_ = g.region(8, 4, lambda u, v, wd, ht: (210, 196, 120) if (u == 4 and v > 0) else mul(c["jacket"], 1.18 - 0.08 * v))
     hc = g.bone("g_collar", "body", (0, 24, 0))
-    g.cube(hc, (-4, 24, -4), (8, 3.6, 8), ring(zip_), inflate=0.75)            # the zipped collar over the mouth
+    g.cube(hc, (-4, 24, -4), (8, 3.7, 8), ring(zip_), inflate=0.75)            # the zipped collar over the mouth
+    hem(g, c["jacket"])
+    cuffs(g, c["jacket"])
+    soles(g, (50, 50, 56))
     return s.img, g
 
 
 def panda():
-    c = dict(skin=(236, 236, 232), hair=(236, 236, 232), black=(30, 30, 34), iris=(30, 30, 34), mouth=(40, 30, 30))
+    c = dict(skin=(238, 238, 234), hair=(238, 238, 234), black=(28, 28, 32), iris=(26, 26, 30), mouth=(40, 30, 30))
     s = Skin(8)
     head(s, c, ["WWWWWWWW",
                 "WWWWWWWW",
-                "WBBWWBBW",
-                "WBEWWEBW",
-                "WBBWWBBW",
                 "WWWWWWWW",
+                "WBBWWBBW",
+                "BBEBBEBB".replace("BBEBBEBB", "WBEWWEBW"),
+                "WBBWWBBW",
                 "WWWBBWWW",
-                "WWWWWWWW"],
-         ["WWWWWWWW"] * 8, ["WWWWWWWW"] * 8, top_streaks=False)
+                "WWWMMWWW"],
+         ["WWWWWWWW"] * 8, ["WWWWWWWW"] * 8)
     B, Wt = c["black"], c["skin"]
 
     def body(f, u, v, wd, ht):
         if v < 4:
-            return s.cloth(B, f, u, v, wd, ht, 0.03)           # a black band over the shoulders
+            return s.cloth(B, f, u, v, wd, ht, 0.03)
+        if f == "front" and 2 <= u <= 5 and 5 <= v <= 10:
+            return mul(Wt, 1.04)                                    # belly
         return s.cloth(Wt, f, u, v, wd, ht, 0.03)
     outfit(s, c, Wt, B, B, B, hands=B, top_fn=body, sleeve_to=12, shoe_rows=1)
+    s.paint("head", ("top",), lambda f, u, v, wd, ht: mul(Wt, 1.02 - (0.04 if (u + v) % 4 == 0 else 0)))
+    bake(s)
     g = Gear("geometry.jjk.sorcerer_gear_panda")
-    ear = g.flat(B, 3, 3)
-    snout = g.region(4, 3, lambda u, v, wd, ht: (40, 36, 38) if v == 0 and u in (1, 2) else (226, 226, 222))
+    ear = g.region(3, 3, lambda u, v, wd, ht: B if (u, v) != (1, 1) else (60, 56, 60))
+    snout = g.region(4, 3, lambda u, v, wd, ht: (30, 28, 32) if v == 0 and u in (1, 2) else (230, 230, 226))
     hb = g.bone("g_ears", "head", (0, 24, 0))
-    for x in (-4.6, 2.2):
-        g.cube(hb, (x, 31.0, -1.2), (2.4, 2.4, 1.4), uv(rest=ear))
-    g.cube(hb, (-1.6, 25.0, -5.2), (3.2, 2.2, 1.4), uv(rest=snout))
+    for x in (-4.7, 2.2):
+        g.cube(hb, (x, 31.0, -1.3), (2.5, 2.5, 1.5), uv(rest=ear))
+    g.cube(hb, (-1.7, 25.0, -5.4), (3.4, 2.4, 1.6), uv(rest=snout))
+    belly = g.flat(Wt, 4, 4)
+    bb = g.bone("g_belly", "body", (0, 24, 0))
+    g.cube(bb, (-3.2, 13.0, -3.0), (6.4, 7.0, 1.2), uv(rest=belly))
+    muscles(g, B)
     return s.img, g
 
 
 def nanami():
-    c = dict(skin=(236, 206, 180), hair=(222, 192, 112), hair_h=(244, 220, 150), iris=(60, 70, 60), frame=(40, 60, 50), lens=(120, 170, 130))
+    c = dict(skin=(238, 208, 182), hair=(226, 196, 116), hair_h=(250, 228, 160), iris=(70, 84, 70), frame=(40, 60, 50))
     s = Skin(9)
     head(s, c, ["HHHHHHHH",
                 "HHhhHHHH",
                 "SHHSSKKS",
-                "GgggGgggG"[:8],
-                "SGGSSGGS",
-                "SSSSSSSS",
+                "SLLSSLLS",
+                "SEISSIES",
+                "SEJSSJES",
                 "SSSMMSSS",
                 "SSSSSSSS"],
-         ["HHHHHHHH", "HHHHHHHH", "HHHHHHSS", "HHHGGGGG", "HHHSSSSS", "HHSSSSSS", "HSSSSSSS", "SSSSSSSS"],
+         ["HHHHHHHH", "HHhHHHHH", "HHHHHHSS", "HHHGGGGG", "HHHsSSSS", "HHSSSSSS", "HSSSSSSS", "SSSSSSSS"],
          ["HHHHHHHH", "HHHHhHHH", "HHHHHHHH", "HGGGGGGH", "HHHHHHHH", "HHHHHHHH", "SHHHHHHS", "SSSSSSSS"])
-    suit, shirt = (204, 186, 146), (64, 74, 96)
+    suit, shirt = (206, 188, 150), (60, 72, 96)
 
     def top(f, u, v, wd, ht):
         if f == "front":
             if u in (3, 4) and v < 9:
                 if v == 0:
                     return shirt
-                return (214, 170, 60) if (u + v) % 3 else (120, 80, 30)   # the leopard tie
+                return (216, 172, 62) if (u + v) % 3 else (116, 78, 30)    # the leopard tie
             if u in (2, 5) and v < 6:
                 return shirt
+            if v in (7, 8) and u in (0, 7):
+                return mul(suit, 0.85)                                 # pockets
         return None
-    outfit(s, c, suit, suit, mul(suit, 0.9), (90, 60, 40), top_fn=top)
+    outfit(s, c, suit, suit, mul(suit, 0.9), (88, 58, 38), top_fn=top)
+    bake(s)
     g = Gear("geometry.jjk.sorcerer_gear_nanami")
     hair_cap(g, c["hair"], y0=29.8, inflate=0.5, back_to=27)
-    sw = g.region(4, 6, lambda u, v, wd, ht: (230, 230, 232) if (u + v * 2) % 4 else (40, 40, 50))   # polka-dot wrap
-    on_back(g, [((-0.9, -4, -0.6), (1.8, 18, 1.2), sw)], angle=-40)
-    gl = g.flat(c["frame"], 2, 2)
-    gb = g.bone("g_glasses", "head", (0, 24, 0))
-    g.cube(gb, (-4.2, 28.3, -4.35), (8.4, 1.3, 0.3), uv(rest=gl))
+    fringe(g, c["hair"], [(-3.9, 3.2, 1.6), (-0.9, 2.0, 1.1)], y=31.4)                 # side part
+    glasses(g, c["frame"], (110, 168, 128))
+    lapels(g, suit)
+    sw = g.region(4, 6, lambda u, v, wd, ht: (232, 232, 234) if (u + v * 2) % 4 else (40, 40, 52))
+    on_back(g, [((-0.9, -2, -0.6), (1.8, 16, 1.2), sw)], angle=-40)
+    soles(g, (60, 40, 26))
     return s.img, g
 
 
 def mei_mei():
-    c = dict(skin=(242, 222, 210), hair=(222, 222, 232), hair_h=(250, 250, 255), iris=(100, 90, 140), lip=(200, 100, 120))
+    c = dict(skin=(244, 224, 212), hair=(224, 224, 234), hair_h=(252, 252, 255), iris=(110, 96, 150), lip=(206, 96, 116))
     s = Skin(10)
     head(s, c, ["HHHHHHHH",
                 "HHhHHHhH",
                 "HHHHHHHH",
-                "HSKSSKSH",
+                "HLLSSLLH",
                 "SSSSSSSS",
-                "SSSSSSSS",
-                "SSSLLSSS",
+                "SbSSSSbS",
+                "SSSmmSSS",
                 "SSSSSSSS"],
-         ["HHHHHHHH", "HHHHHHHH", "HHHHHHHH", "HHHHHHSS", "HHHHHSSS", "HHHHHSSS", "HHHHSSSS", "HHHSSSSS"],
-         ["HHHHHHHH"] * 7 + ["HHHHHHHH"])
-    dress = (30, 28, 34)
+         ["HHHHHHHH", "HHHHHHHH", "HHHHHHHH", "HHHHHHSS", "HHHHHsSS", "HHHHHSSS", "HHHHSSSS", "HHHSSSSS"],
+         ["HHHHHHHH"] * 8)
+    dress = (30, 28, 36)
 
     def top(f, u, v, wd, ht):
         if f == "front" and u == 4 and v in (2, 5, 8):
-            return (210, 172, 80)
+            return GOLD
         if v < 2:
-            return mul(dress, 1.25)
+            return mul(dress, 1.3)
         return None
     outfit(s, c, dress, dress, dress, (20, 18, 22), top_fn=top)
     for leg in ("rleg", "lleg"):
         s.paint(leg, SIDES, lambda f, u, v, wd, ht: s.cloth(mul(dress, 1.08), f, u, v, wd, ht) if v < 9 else None, layer=1)
+    bake(s)
     g = Gear("geometry.jjk.sorcerer_gear_mei_mei")
-    hair_cap(g, c["hair"], y0=29.4, inflate=0.55, back_to=22)
-    br = g.region(4, 8, lambda u, v, wd, ht: mul(c["hair"], 1.12 - 0.1 * ((u + v) % 3)))
-    braid = g.bone("g_braid", "head", (-3.0, 25.5, -3.2), (6, 0, -6))         # the long braid over the right shoulder
-    for i in range(6):
-        g.cube(braid, (-4.2 + (i % 2) * 0.3, 25.5 - (i + 1) * 2.3, -4.0), (2.2, 2.4, 2.2), uv(rest=br))
-    tip = g.flat((40, 40, 48), 2, 2)
-    g.cube(braid, (-3.9, 10.6, -3.7), (1.6, 1.0, 1.6), uv(rest=tip))
+    hair_cap(g, c["hair"], y0=29.4, inflate=0.55, back_to=21.5, light=0.05)
+    fringe(g, c["hair"], [(-3.9, 2.6, 3.0), (-1.2, 2.2, 2.4), (1.2, 2.6, 3.0)], y=31.4)   # bangs over the eyes
+    br = g.region(4, 8, lambda u, v, wd, ht: mul(c["hair"], 1.14 - 0.12 * ((u + v) % 3)))
+    braid = g.bone("g_braid", "head", (-3.0, 25.5, -3.2), (6, 0, -6))
+    for i in range(7):
+        g.cube(braid, (-4.3 + (i % 2) * 0.35, 25.5 - (i + 1) * 2.1, -4.1), (2.3, 2.3, 2.3), uv(rest=br))
+    tip = g.flat((36, 36, 44), 2, 2)
+    g.cube(braid, (-3.95, 9.6, -3.75), (1.6, 1.0, 1.6), uv(rest=tip))
+    collar(g, dress)
     shaft = g.flat((54, 40, 34), 2, 8)
-    axe = g.region(6, 6, lambda u, v, wd, ht: (200, 204, 214) if u < wd - 1 else (240, 244, 250))
-    on_back(g, [((-0.6, -6, -0.6), (1.2, 20, 1.2), shaft), ((0.6, 9, -0.5), (5, 6, 1.0), axe)], angle=-32)
-    crow = g.flat((26, 24, 30), 3, 3)
+    axe = g.region(6, 6, lambda u, v, wd, ht: (204, 208, 218) if u < wd - 1 else (244, 246, 252))
+    on_back(g, [((-0.6, -2, -0.6), (1.2, 18, 1.2), shaft), ((0.6, 11, -0.5), (5, 6, 1.0), axe)], angle=-32)
+    crow = g.region(3, 3, lambda u, v, wd, ht: (40, 36, 48) if (u + v) % 3 == 0 else (24, 22, 28))
     cb = g.bone("g_crow", "body", (5, 24, 0))
     g.cube(cb, (4.2, 24.0, -1.0), (2.2, 2.0, 3.0), uv(rest=crow))
     g.cube(cb, (4.6, 25.6, -2.0), (1.4, 1.4, 1.4), uv(rest=crow))
-    beak = g.flat((210, 170, 60), 2, 2)
+    beak = g.flat((214, 172, 60), 2, 2)
     g.cube(cb, (4.9, 25.9, -2.8), (0.8, 0.6, 0.8), uv(rest=beak))
+    tailr = g.flat((24, 22, 28), 2, 2)
+    g.cube(cb, (4.6, 23.8, 1.9), (1.4, 0.6, 1.6), uv(rest=tailr))
     return s.img, g
 
 
 def todo():
-    c = dict(skin=(214, 168, 128), hair=(40, 30, 28), iris=(50, 40, 34), jacket=NAVY, scar=(170, 100, 90))
+    c = dict(skin=(214, 168, 128), hair=(42, 32, 30), iris=(56, 44, 36), jacket=NAVY, scar=(172, 102, 92))
     s = Skin(11)
     head(s, c, ["HHHHHHHH",
                 "HSSSSSSH",
-                "SOSOSSSS",
-                "SKKSSKKS",
+                "SOKKSKKS",
+                "SLOSSLLS",
                 "SEISSIES",
-                "SSSssSSS",
+                "SEJsSJES",
                 "SSMMMMSS",
                 "SSSSSSSS"],
-         ["HHHHHHHH", "HHHHHSSS", "HHHHSSSS", "HHHSSSSS", "HHHSSSSS", "HHSSSSSS", "HSSSSSSS", "SSSSSSSS"],
-         ["HHHHHHHH", "HHHHHHHH", "HHHHHHHH", "HHHHHHHH", "HHHHHHHH", "SHHHHHHS", "SSSSSSSS", "SSSSSSSS"])
-    tank = (230, 228, 220)
+         ["HHHHHHHH", "HHHHHSSS", "HHHHSSSS", "HHHsSSSS", "HHHSSSSS", "HHSSSSSS", "HSSSSSSS", "SSSSSSSS"],
+         ["HHHHHHHH", "HHHHHHHH", "HHHHHHHH", "HHHhHHHH", "HHHHHHHH", "SHHHHHHS", "SSSSSSSS", "SSSSSSSS"])
+    tank = (232, 230, 222)
 
     def top(f, u, v, wd, ht):
         if f == "front" and 2 <= u <= 5:
-            return s.cloth(tank, f, u, v, wd, ht, 0.03)       # the open jacket shows the white tank top
+            return s.cloth(tank, f, u, v, wd, ht, 0.03)
         return None
-    outfit(s, c, c["jacket"], c["jacket"], (30, 32, 50), (26, 24, 26), top_fn=top, sleeve_to=6)
+    outfit(s, c, c["jacket"], c["jacket"], (28, 30, 48), (24, 22, 24), top_fn=top, sleeve_to=6,
+           leg_fn=sneakers((24, 22, 24), (60, 56, 56)), shoe_rows=2)
+    bake(s)
     g = Gear("geometry.jjk.sorcerer_gear_todo")
-    bun = g.flat(c["hair"], 4, 4)
+    bun = hair_tex(g, c["hair"], 0.0, 4, 4)
     tb = g.bone("g_bun", "head", (0, 24, 0))
-    g.cube(tb, (-1.4, 31.8, -0.4), (2.8, 2.2, 2.8), uv(rest=bun))
-    g.cube(tb, (-0.8, 33.8, 0.2), (1.6, 1.0, 1.6), uv(rest=bun))
+    g.cube(tb, (-1.5, 31.8, -0.4), (3.0, 2.3, 3.0), uv(rest=bun))
+    g.cube(tb, (-0.8, 34.0, 0.2), (1.6, 1.0, 1.6), uv(rest=bun))
+    sideburns(g, c["hair"], 3.6)
+    muscles(g, c["skin"], c["jacket"])
+    lapels(g, c["jacket"])
+    soles(g, (60, 56, 56))
     return s.img, g
 
 
 def yuta():
-    c = dict(skin=(232, 206, 190), hair=(30, 30, 38), iris=(36, 34, 44), jacket=(230, 230, 236), black=(90, 80, 100))
+    c = dict(skin=(234, 208, 192), hair=(30, 30, 40), hair_h=(70, 70, 90), iris=(40, 38, 52), jacket=(232, 232, 238))
     s = Skin(12)
     head(s, c, ["HHHHHHHH",
                 "HhHHHhHH",
                 "HHSHSSHH",
+                "SLLSSLLS",
                 "SEISSIES",
-                "SBBSSBBS",
-                "SSSSSSSS",
-                "SSSMMSSS",
+                "SEJSSJES",
+                "SssMMssS",
                 "SSSSSSSS"],
-         ["HHHHHHHH", "HHHHHHHH", "HHHHHHHS", "HHHHSSSS", "HHHSSSSS", "HHSSSSSS", "HSSSSSSS", "SSSSSSSS"],
-         ["HHHHHHHH", "HHhHHHHH", "HHHHHHHH", "HHHHhHHH", "HHHHHHHH", "HHHHHHHH", "SHHHHHHS", "SSSSSSSS"])
+         ["HHHHHHHH", "HHHHHHHH", "HHHHHHHS", "HHHHSSSS", "HHHsSSSS", "HHSSSSSS", "HSSSSSSS", "SSSSSSSS"],
+         ["HHHHHHHH", "HHhHHHHH", "HHHHHHHH", "HHHHhHHH", "HHHHHHHH", "HHHHHHHH", "SHHHHHHS", "SSSSSSSS"],
+         front1=["H.hH..Hh", ".H...H..", "..H....H"])
     J = c["jacket"]
-    outfit(s, c, J, J, mul(J, 0.92), (30, 30, 34), top_fn=jjh_top(dict(c, gold=(200, 170, 80))))
+    top, arm = jjh_uniform(dict(c, gold=(206, 176, 86)))
+    outfit(s, c, J, J, mul(J, 0.9), (30, 30, 34), top_fn=top, arm_fn=arm, leg_fn=sneakers((30, 30, 34), (70, 70, 76)), shoe_rows=2)
+    bake(s)
     g = Gear("geometry.jjk.sorcerer_gear_yuta")
     hair_cap(g, c["hair"], y0=29.4, inflate=0.6, back_to=26)
-    fr = g.flat(c["hair"], 6, 3)
-    fb = g.bone("g_fringe", "head", (0, 24, 0))
-    g.cube(fb, (-4.2, 29.0, -4.7), (8.4, 1.6, 0.8), uv(rest=fr))
-    sheath = g.region(2, 8, lambda u, v, wd, ht: (24, 22, 28) if v > 1 else (150, 120, 60))
-    hilt = g.region(2, 4, lambda u, v, wd, ht: (230, 226, 216) if (u + v) % 2 else (40, 36, 40))
-    collar(g, J)
-    on_back(g, [((-0.6, -6, -0.6), (1.2, 16, 1.2), sheath), ((-0.5, 10, -0.5), (1.0, 4.6, 1.0), hilt)], angle=-36)
+    spikes(g, c["hair"], [((-2.4, 31.2, -1.6), 2.6, 2.6, [10, 0, -26]), ((0.4, 31.2, -2), 2.8, 2.6, [14, 0, 6]), ((2.6, 31.2, -1.2), 2.4, 2.6, [8, 0, 28]), ((-1.2, 31.2, 1.4), 2.6, 2.6, [-24, 0, -12]), ((1.6, 31.2, 1.6), 2.4, 2.6, [-26, 0, 16])])
+    fringe(g, c["hair"], [(-3.9, 1.8, 2.6), (-1.6, 1.6, 2.0), (0.6, 1.6, 2.4), (2.6, 1.3, 1.8)], y=31.4)
+    sheath = g.region(2, 8, lambda u, v, wd, ht: (24, 22, 28) if v > 1 else (156, 124, 62))
+    hilt = g.region(2, 4, lambda u, v, wd, ht: (232, 228, 218) if (u + v) % 2 else (40, 36, 40))
+    on_back(g, [((-0.6, -2, -0.6), (1.2, 14, 1.2), sheath), ((-0.5, 12, -0.5), (1.0, 4.6, 1.0), hilt)], angle=-36)
+    uniform_3d(g, J, sole=(70, 70, 76))
+    return s.img, g
+
+
+def hakari():
+    c = dict(skin=(232, 200, 176), hair=(200, 152, 96), hair_h=(236, 196, 140), iris=(60, 48, 40), jacket=NAVY)
+    s = Skin(18)
+    head(s, c, ["HHhHHhHH",
+                "HhHHHHhH",
+                "SKKSSKKS",
+                "SLLSSLLS",
+                "SEISSIES",
+                "SEJSSJES",
+                "SSMmmMSS",
+                "SSSSSSSS"],
+         ["HHHHHHHH", "HHHHHHHH", "dHHHHHSS", "ddHHSSSS", "dddsSSSS", "ddSSSSSS", "dSSSSSSS", "SSSSSSSS"],
+         ["HHHHHHHH", "HhHHHHhH", "dddddddd", "dddddddd", "dddddddd", "dddddddd", "SddddddS", "SSSSSSSS"])
+    J = c["jacket"]
+    top, arm = jjh_uniform(c)
+
+    def body(f, u, v, wd, ht):
+        if f == "front" and v < 3 and 2 <= u <= 5:
+            return (40, 120, 110)                                       # a teal shirt at the open collar
+        return top(f, u, v, wd, ht)
+    outfit(s, c, J, J, (28, 30, 48), (230, 228, 220), top_fn=body, arm_fn=arm, leg_fn=sneakers((230, 228, 220), (36, 36, 40)), shoe_rows=2)
+    bake(s)
+    g = Gear("geometry.jjk.sorcerer_gear_hakari")
+    hair_cap(g, c["hair"], y0=30.6, inflate=0.5, back_to=30.6)
+    # the pompadour: a quiff swept up and forward off the forehead
+    spikes(g, c["hair"], [((-2.2, 31.0, -2.4), 4.0, 3.2, [50, 0, -8]), ((0.4, 31.2, -2.6), 4.8, 3.4, [54, 0, 2]),
+                          ((2.6, 31.0, -2.2), 4.0, 3.2, [50, 0, 10]), ((-1.2, 31.4, -0.2), 3.6, 3.2, [40, 0, -4]),
+                          ((1.4, 31.4, -0.2), 3.6, 3.2, [40, 0, 4]), ((0, 31.4, 1.8), 3.0, 3.0, [24, 0, 0])], light=0.05)
+    sideburns(g, c["hair"], 3.0)
+    chain(g)
+    hem(g, J)
+    cuffs(g, J)
+    soles(g, (36, 36, 40))
+    return s.img, g
+
+
+def sukuna():
+    c = dict(skin=(234, 198, 180), hair=(236, 142, 152), hair_h=(252, 186, 192), hair_d=(156, 82, 98), iris=(206, 30, 40),
+             mark=(24, 16, 20), mouth=(70, 16, 20), white=(240, 236, 228), black=(24, 22, 26))
+    s = Skin(2)
+    head(s, c, ["HhHHHHhH",
+                "HSXXXXSH",
+                "SKKSSKKS",
+                "SLLSSLLS",
+                "SEISSIES",
+                "SXXSSXXS",
+                "SIESSEIS",
+                "SSMTTMSS"],
+         ["HHHHHHHH", "HHHHHXSS", "HHHHSSSS", "HHHSSSXS", "HHHsSSXS", "HSSSSSSS", "SSSSSSSS", "SSSSSSSS"],
+         ["HHHhHHHH", "HHHHHHhH", "HhHHHHHH", "HHHHHHHH", "HHHHhHHH", "dHHHHHHd", "SdHHHHdS", "SSSSSSSS"],
+         front1=["h.H..H.h"])
+    W, B = c["white"], (30, 28, 32)
+
+    def kimono(f, u, v, wd, ht):
+        if f == "front" and v < 5 and abs(u - 3.5) < 2.2 - v * 0.45:
+            return c["skin"]
+        if f == "front" and ((u == 1 and v < 7) or (u == 6 and v < 7)):
+            return mul(W, 0.82)
+        if v in (7, 8):
+            return B if v == 7 else mul(B, 1.3)
+        return None
+
+    def tattoo_arm(arm, f, u, v, wd, ht):
+        if v < 4:
+            return s.cloth(W, f, u, v, wd, ht)
+        if v in (6, 9):
+            return c["mark"]
+        return None
+    outfit(s, c, W, W, (34, 32, 38), (40, 34, 30), top_fn=kimono, arm_fn=tattoo_arm, sleeve_to=4, leg_fn=sandals(c["skin"]))
+    bake(s)
+    g = Gear("geometry.jjk.sorcerer_gear_sukuna")
+    hair_cap(g, c["hair"], y0=30.4, inflate=0.5, back_to=27, light=0.05)
+    spikes(g, c["hair"], [((-2.6, 31.2, -2.6), 4.4, 2.8, [-48, 0, -14]), ((0, 31.2, -3.0), 4.8, 3.0, [-52, 0, 0]), ((2.6, 31.2, -2.6), 4.4, 2.8, [-48, 0, 14]), ((-3.2, 31.2, 0), 4.2, 2.8, [-58, 0, -26]), ((3.2, 31.2, 0), 4.2, 2.8, [-58, 0, 26]), ((-1.4, 31.2, 1.2), 4.0, 2.8, [-64, 0, -8]), ((1.4, 31.2, 1.2), 4.0, 2.8, [-64, 0, 8])], light=0.05)
+    scarf = g.region(8, 2, lambda u, v, wd, ht: (40, 32, 40) if v == 0 else (28, 22, 28))
+    sc = g.bone("g_scarf", "body", (0, 24, 0))
+    g.cube(sc, (-4, 22.4, -2), (8, 1.9, 4), ring(scarf), inflate=0.72)
+    obi = g.region(8, 2, lambda u, v, wd, ht: (30, 28, 34) if v == 0 else (52, 48, 56))
+    g.cube(sc, (-4, 14.6, -2), (8, 2.0, 4), ring(obi), inflate=0.4)
+    skin = g.region(4, 12, lambda u, v, wd, ht: c["mark"] if v in (4, 7) else mul(c["skin"], 1.02 - 0.12 * v / ht))
+    for side, name in ((-1, "g_arm3"), (1, "g_arm4")):
+        b = g.bone(name, "body", (side * 4.4, 17, -0.5), (-50, side * 10, side * 28))
+        g.cube(b, (side * 4.4 - 1.5, 7, -2), (3, 10, 3), uv(rest=skin))
+        g.cube(b, (side * 4.4 - 1.3, 5.4, -1.8), (2.6, 1.8, 2.6), uv(rest=(skin[0], skin[1] + 9, 4, 3)))   # the fists
+    wide_legs(g, (40, 38, 46))
     return s.img, g
 
 
 def toji():
-    c = dict(skin=(226, 192, 166), hair=(24, 24, 28), iris=(40, 50, 44), scar=(196, 150, 140))
+    c = dict(skin=(228, 194, 168), hair=(24, 24, 30), hair_h=(60, 62, 74), iris=(64, 84, 70), scar=(198, 152, 142))
     s = Skin(13)
     head(s, c, ["HHHHHHHH",
                 "HhHHHHhH",
-                "SHKSSKHS",
+                "SHKKSKKS",
+                "SLLSSLLS",
                 "SEISSIES",
-                "SSSSSSSS",
-                "SSSSSSSS",
+                "SEJSSJES",
                 "SSMMMOSS",
                 "SSSSSOSS"],
-         ["HHHHHHHH", "HHHHHHHH", "HHHHHHSS", "HHHHSSSS", "HHHSSSSS", "HHSSSSSS", "HSSSSSSS", "SSSSSSSS"],
-         ["HHHHHHHH", "HHHHhHHH", "HHHHHHHH", "HHHHHHHH", "HHHHHHHH", "SHHHHHHS", "SSSSSSSS", "SSSSSSSS"])
-    shirt, pants = (28, 28, 32), (220, 216, 204)  # (the scar at the corner of his mouth is painted in O)
-    outfit(s, c, shirt, shirt, pants, (24, 22, 24), sleeve_to=9)
-    for leg in ("rleg", "lleg"):                                               # baggy
-        s.paint(leg, SIDES, lambda f, u, v, wd, ht: s.cloth(mul(pants, 0.96), f, u, v, wd, ht) if 2 < v < 10 else None, layer=1)
+         ["HHHHHHHH", "HHHHHHHH", "HHHHHHSS", "HHHHSSSS", "HHHsSSSS", "HHSSSSSS", "HSSSSSSS", "SSSSSSSS"],
+         ["HHHHHHHH", "HHHHhHHH", "HHHHHHHH", "HHHHHHHH", "HHHHHHHH", "SHHHHHHS", "SSSSSSSS", "SSSSSSSS"],
+         front1=["H.H..H.h", ".h....H."])
+    shirt, pants = (28, 28, 32), (222, 218, 206)
+    outfit(s, c, shirt, shirt, pants, (24, 22, 24), sleeve_to=9, leg_fn=sneakers((24, 22, 24), (40, 40, 44)), shoe_rows=2)
+    bake(s)
     g = Gear("geometry.jjk.sorcerer_gear_toji")
     hair_cap(g, c["hair"], y0=30.4, inflate=0.45, back_to=28)
-    worm = g.region(4, 4, lambda u, v, wd, ht: (130, 80, 150) if (u + v) % 2 else (96, 56, 118))
+    spikes(g, c["hair"], [((-2.4, 31.2, -2), 2.4, 2.6, [20, 0, -20]), ((0.4, 31.2, -2.4), 2.6, 2.6, [24, 0, 4]), ((2.6, 31.2, -1.6), 2.2, 2.4, [16, 0, 26]), ((-1, 31.2, 1), 2.4, 2.6, [-20, 0, -8]), ((1.8, 31.2, 1.2), 2.2, 2.4, [-22, 0, 14])])
+    muscles(g, c["skin"], shirt)
+    wide_legs(g, pants)
+    worm = g.region(4, 4, lambda u, v, wd, ht: (134, 82, 154) if (u + v) % 2 else (98, 58, 120))
     wb = g.bone("g_worm", "body", (0, 24, 0))
-    for i in range(7):                                                           # the inventory curse coiled round him
-        a = i / 7 * math.pi * 2
-        g.cube(wb, (math.cos(a) * 4.4 - 1.1, 14.5 + i * 0.9, math.sin(a) * 2.6 - 1.1), (2.2, 1.6, 2.2), uv(rest=worm))
-    eye = g.flat((230, 220, 120), 2, 2)
-    g.cube(wb, (3.6, 21.0, -2.6), (1.4, 1.4, 1.0), uv(rest=eye))
+    for i in range(9):
+        a = i / 9 * math.pi * 2
+        g.cube(wb, (math.cos(a) * 4.5 - 1.1, 14.0 + i * 0.8, math.sin(a) * 2.7 - 1.1), (2.2, 1.6, 2.2), uv(rest=worm))
+    eye = g.region(2, 2, lambda u, v, wd, ht: (236, 226, 120) if u == 0 else (20, 16, 20))
+    g.cube(wb, (3.4, 21.0, -2.9), (1.6, 1.6, 1.0), uv(rest=eye))
+    soles(g, (40, 40, 44))
     return s.img, g
 
 
 def geto():
-    c = dict(skin=(234, 210, 192), hair=(24, 22, 28), iris=(40, 34, 30), mark=(150, 90, 90))
+    c = dict(skin=(236, 212, 194), hair=(26, 24, 30), hair_h=(66, 62, 76), iris=(44, 36, 32), mark=(150, 92, 92))
     s = Skin(14)
     head(s, c, ["HHHHHHHH",
                 "HHXXXXHH",
-                "HHSSSSHH",
                 "HKKSSKKH",
-                "HEISSIEH",
+                "HSLSSLSH",
+                "HELSSLEH",
                 "HSSSSSSH",
-                "HSSMMSSH",
+                "HSSMmSSH",
                 "SSSSSSSS"],
-         ["HHHHHHHH", "HHHHHXXH", "HHHHHHSS", "HHHHHSSS", "HHHHHSSS", "HHHHSSSS", "HHHHSSSS", "HHHSSSSS"],
+         ["HHHHHHHH", "HHHHHXXH", "HHHHHHSS", "HHHHHSSS", "HHHHHsSS", "HHHHSSSS", "HHHHSSSS", "HHHSSSSS"],
          ["HHHHHHHH"] * 8)
-    robe, kesa = (30, 28, 32), (196, 120, 50)
+    robe, kesa = (30, 28, 34), (198, 122, 50)
 
     def top(f, u, v, wd, ht):
         if f == "front" and abs(u - (6 - v * 0.55)) < 1.1 and v < 11:
-            return mul(kesa, 1.0 + (0.1 if v % 3 == 0 else 0))  # the stole from the left shoulder to the right hip
+            return mul(kesa, 1.0 + (0.1 if v % 3 == 0 else 0))
         if f == "back" and abs(u - (1 + v * 0.55)) < 1.1 and v < 11:
             return kesa
         return None
-    outfit(s, c, robe, robe, robe, (60, 44, 34), top_fn=top)
-    for leg in ("rleg", "lleg"):
-        s.paint(leg, SIDES, lambda f, u, v, wd, ht: s.cloth(mul(robe, 1.1), f, u, v, wd, ht) if v < 10 else None, layer=1)
+    outfit(s, c, robe, robe, robe, (60, 44, 34), top_fn=top, leg_fn=sandals(c["skin"]))
+    bake(s)
     g = Gear("geometry.jjk.sorcerer_gear_geto")
-    hair_cap(g, c["hair"], y0=29.6, inflate=0.55, back_to=22)
-    bun = g.flat(c["hair"], 4, 4)
+    hair_cap(g, c["hair"], y0=29.6, inflate=0.55, back_to=21.5)
+    fringe(g, c["hair"], [(-4.2, 1.0, 5.0), (3.4, 0.8, 3.0)], y=31.4)                     # a long lock over the right temple
+    bun = hair_tex(g, c["hair"], 0.05, 4, 4)
     gb = g.bone("g_bun", "head", (0, 24, 0))
-    g.cube(gb, (-1.5, 30.6, 3.0), (3.0, 2.6, 2.4), uv(rest=bun))
-    ring_ = g.flat((40, 40, 46), 2, 2)
-    for x in (-4.6, 4.0):
-        g.cube(gb, (x, 26.2, -0.6), (0.6, 1.4, 1.4), uv(rest=ring_))            # gauge earrings
+    g.cube(gb, (-1.6, 30.6, 3.0), (3.2, 2.8, 2.6), uv(rest=bun))
+    earrings(g, (44, 44, 52), big=True)
+    coat_skirt(g, robe, y0=4.5)
+    kr = g.region(2, 8, lambda u, v, wd, ht: mul(kesa, 1.1 - 0.2 * v / ht))
+    kb = g.bone("g_kesa", "body", (0, 24, 0))
+    g.cube(kb, (-0.9, 12.6, -2.6), (1.8, 13.0, 0.4), uv(rest=kr), rotation=[0, 0, 30], pivot=(0, 18, -2.4))
     return s.img, g
 
 
 def mahito():
-    c = dict(skin=(214, 210, 214), hair=(110, 130, 160), hair_h=(150, 170, 200), iris=(90, 150, 220), iris2=(150, 170, 140),
-             mark=(70, 60, 80))
+    c = dict(skin=(216, 212, 216), hair=(112, 132, 164), hair_h=(156, 176, 206), iris=(96, 156, 226), iris2=(156, 176, 146),
+             mark=(70, 60, 82))
     s = Skin(15)
     head(s, c, ["HHHHHHHH",
                 "HXHHHhHH",
                 "SXSSXSSS",
+                "SLLXSLLS",
                 "SEIXSiES",
-                "XXSSSXXS",
-                "SSXSSSXS",
-                "SSMMMXSS",
+                "XXJSSJXS",
+                "SMMMMXSS",
                 "SXSSSSSS"],
          ["HHHHHHHH", "HHHHHHHH", "HHHHHXSS", "HHHHSSXS", "HHHHXXSS", "HHHSSSSS", "HHHSSSSS", "HHHSSSSS"],
          ["HHHHHHHH"] * 7 + ["HhHHHHhH"])
-    shirt, patch, pants = (196, 198, 206), (150, 160, 184), (40, 40, 52)
+    shirt, patch, pants = (198, 200, 208), (150, 162, 186), (40, 40, 54)
 
     def top(f, u, v, wd, ht):
         if (u * 3 + v * 7) % 11 == 0:
-            return c["mark"]                                    # stitches
+            return c["mark"]
         if (u // 3 + v // 4) % 3 == 0:
-            return s.cloth(patch, f, u, v, wd, ht, 0.02)        # patchwork
+            return s.cloth(patch, f, u, v, wd, ht, 0.02)
         return None
 
     def arms(arm, f, u, v, wd, ht):
@@ -832,56 +682,60 @@ def mahito():
             return c["mark"]
         return None
     outfit(s, c, shirt, shirt, pants, (30, 28, 34), top_fn=top, arm_fn=arms, sleeve_to=6)
+    bake(s)
     g = Gear("geometry.jjk.sorcerer_gear_mahito")
-    hair_cap(g, c["hair"], y0=29.2, inflate=0.6, back_to=22.5)
-    lk = g.flat(c["hair"], 3, 6)
+    hair_cap(g, c["hair"], y0=29.2, inflate=0.6, back_to=22.5, light=0.05)
+    lk = hair_tex(g, c["hair"], 0.05, 3, 6)
     hb = g.bone("g_locks", "head", (0, 24, 0))
     for x in (-4.8, 3.9):
-        g.cube(hb, (x, 22.6, -2.6), (0.9, 6.0, 5.4), uv(rest=lk))
+        g.cube(hb, (x, 22.4, -2.6), (0.9, 6.2, 5.4), uv(rest=lk))
+    fringe(g, c["hair"], [(-3.6, 1.2, 2.2), (-1.2, 1.4, 1.6), (1.6, 1.2, 2.4)], y=31.4, name="g_locks")
     return s.img, g
 
 
 def choso():
-    c = dict(skin=(226, 200, 186), hair=(24, 22, 28), iris=(90, 40, 50), mark=(60, 30, 36))
+    c = dict(skin=(228, 202, 188), hair=(24, 22, 30), hair_h=(64, 60, 76), iris=(110, 40, 54), mark=(64, 30, 38))
     s = Skin(16)
     head(s, c, ["HHHHHHHH",
                 "HHHhHHHH",
                 "HSKSSKSH",
+                "SLLSSLLS",
                 "SEISSIES",
                 "XXXXXXXX",
-                "SSSSSSSS",
                 "SSSMMSSS",
                 "SSSSSSSS"],
-         ["HHHHHHHH", "HHHHHHHH", "HHHHHHSS", "HHHHSSSS", "HHHXXXXX", "HHSSSSSS", "HSSSSSSS", "SSSSSSSS"],
+         ["HHHHHHHH", "HHHHHHHH", "HHHHHHSS", "HHHHSSSS", "HHHsSSSS", "HHHXXXXX", "HSSSSSSS", "SSSSSSSS"],
          ["HHHHHHHH", "HHHHHHHH", "HHHHHHHH", "HHHHHHHH", "HHHHHHHH", "HHHHHHHH", "SHHHHHHS", "SSSSSSSS"])
-    robe, inner = (220, 214, 206), (70, 56, 80)
+    robe, inner = (222, 216, 208), (72, 56, 82)
 
     def top(f, u, v, wd, ht):
         if f == "front" and 2 <= u <= 5 and v < 10:
             return s.cloth(inner, f, u, v, wd, ht, 0.03)
         return None
-    outfit(s, c, robe, robe, (60, 50, 70), (30, 28, 32), top_fn=top)
+    outfit(s, c, robe, robe, (60, 50, 72), (30, 28, 32), top_fn=top, leg_fn=sandals(c["skin"], (40, 34, 40)))
+    bake(s)
     g = Gear("geometry.jjk.sorcerer_gear_choso")
     hair_cap(g, c["hair"], y0=30.0, inflate=0.5, back_to=27)
-    sp = [((x - 1, 31.0, z - 1), (2, ln, 2), [rx, 0, rz]) for x, z, ln, rx, rz in
-          ((-3.0, 0.5, 4.4, -10, -46), (-3.2, 1.6, 3.4, -24, -64), (3.0, 0.5, 4.4, -10, 46), (3.2, 1.6, 3.4, -24, 64))]
-    spikes(g, c["hair"], sp)
+    spikes(g, c["hair"], [((-3.0, 31.0, 0.5), 4.6, 2.8, [-10, 0, -46]), ((-3.2, 31.0, 1.6), 3.8, 2.6, [-24, 0, -64]),
+                          ((3.0, 31.0, 0.5), 4.6, 2.8, [-10, 0, 46]), ((3.2, 31.0, 1.6), 3.8, 2.6, [-24, 0, 64])])
+    fringe(g, c["hair"], [(-3.6, 1.3, 1.8), (-1.0, 2.0, 1.4), (2.2, 1.4, 1.9)], y=31.4)
+    wide_legs(g, (60, 50, 72))
     return s.img, g
 
 
 def jogo():
-    c = dict(skin=(226, 214, 192), hair=(70, 60, 56), black=(30, 26, 26), iris=(30, 26, 26), mouth=(40, 30, 30))
+    c = dict(skin=(228, 216, 194), hair=(70, 60, 56), black=(30, 26, 26), iris=(30, 26, 26), mouth=(40, 30, 30))
     s = Skin(17)
     head(s, c, ["SSSSSSSS",
                 "SSSSSSSS",
-                "SSSSSSSS",
-                "SSSEESSS",
-                "SSEIIESS",
-                "SSSEESSS",
+                "SSSssSSS",
+                "SSsEEsSS",
+                "SSEIJESS",
+                "SSsEEsSS",
                 "STTTTTTS",
-                "SSSSSSSS"],
-         ["SSSSSSSS"] * 6 + ["SSSSSSTS", "SSSSSSSS"], ["SSSSSSSS"] * 8, top_streaks=False)
-    robe, sash = (110, 108, 116), (40, 36, 44)
+                "SMMMMMMS"],
+         ["SSSSSSSS"] * 6 + ["SSSSSSTS", "SSSSSSSS"], ["SSSSSSSS"] * 8)
+    robe, sash = (112, 110, 120), (40, 36, 46)
 
     def top(f, u, v, wd, ht):
         if v in (7, 8):
@@ -889,21 +743,63 @@ def jogo():
         if f == "front" and v < 5 and abs(u - 3.5) < 2.2 - v * 0.45:
             return c["skin"]
         return None
-    outfit(s, c, robe, robe, mul(robe, 0.9), (40, 36, 34), top_fn=top)
+    outfit(s, c, robe, robe, mul(robe, 0.9), (40, 36, 34), top_fn=top, leg_fn=sandals(c["skin"], (46, 40, 36)))
+    bake(s)
     g = Gear("geometry.jjk.sorcerer_gear_jogo")
-    rock = g.region(8, 6, lambda u, v, wd, ht: mul((80, 70, 66), 1.1 - 0.2 * v / ht + (0.1 if (u + v) % 4 == 0 else 0)))
+    rock = g.region(8, 6, lambda u, v, wd, ht: mul((84, 72, 66), 1.12 - 0.22 * v / ht + (0.12 if (u + v) % 4 == 0 else 0)))
     lava = g.region(4, 4, lambda u, v, wd, ht: (255, 150 + (u * 20) % 60, 40))
     vb = g.bone("g_volcano", "head", (0, 24, 0))
-    for i, (wd, ht) in enumerate(((8.6, 1.8), (7.0, 1.8), (5.6, 1.8))):     # the cone rises from the crown of his head
+    for i, (wd, ht) in enumerate(((8.6, 1.8), (7.0, 1.8), (5.6, 1.8))):
         y = 31.4 + i * 1.8
         g.cube(vb, (-wd / 2, y, -wd / 2), (wd, ht, wd), uv(up="none", rest=rock))
-    g.cube(vb, (-2.0, 36.4, -2.0), (4.0, 0.2, 4.0), uv(up=lava, rest=lava))      # lava glowing in the crater
-    for x, z in ((-2.9, -2.9), (2.1, -3.3)):                                      # lava running down the front
+    g.cube(vb, (-2.0, 36.4, -2.0), (4.0, 0.2, 4.0), uv(up=lava, rest=lava))
+    for x, z in ((-2.9, -2.9), (2.1, -3.3), (-0.4, -4.0)):
         g.cube(vb, (x, 32.4, z - 0.5), (0.8, 3.2, 0.5), uv(rest=lava))
+    obi = g.region(8, 2, lambda u, v, wd, ht: (40, 36, 46) if v == 0 else (60, 56, 66))
+    ob = g.bone("g_obi", "body", (0, 24, 0))
+    g.cube(ob, (-4, 14.6, -2), (8, 2.0, 4), ring(obi), inflate=0.4)
+    coat_skirt(g, robe, y0=6.0)
     return s.img, g
 
 
-# id: (name, side, clan, look builder, scale, spawn egg colours)
+def naoya():
+    c = dict(skin=(236, 210, 190), hair=(236, 208, 120), hair_h=(252, 236, 170), hair_d=(40, 34, 30), iris=(110, 84, 50))
+    s = Skin(19)
+    head(s, c, ["HhHHHhHH",
+                "HHHhHHHd",
+                "dKKSSKKd",
+                "SSLSSLSS",
+                "SEISSIES",
+                "SSJSSJSS",
+                "SSSMmSSS",
+                "SSSSSSSS"],
+         ["HHHHHHHH", "ddddHHHH", "ddddddSS", "dddSSSSS", "dddsSSSS", "ddSSSSSS", "dSSSSSSS", "SSSSSSSS"],
+         ["HHhHHHHH", "HHHHHhHH", "dddddddd", "dddddddd", "dddddddd", "dddddddd", "SddddddS", "SSSSSSSS"])
+    haori, kimono, hakama = (40, 44, 46), (210, 204, 190), (54, 58, 62)
+
+    def top(f, u, v, wd, ht):
+        if f == "front" and 2 <= u <= 5 and v < 8:
+            if abs(u - 3.5) < 1.6 - v * 0.15:
+                return c["skin"] if v < 2 else kimono
+            return kimono
+        if v in (8, 9):
+            return (150, 120, 70) if v == 8 else mul((150, 120, 70), 0.8)
+        return None
+    outfit(s, c, haori, haori, hakama, (40, 34, 30), top_fn=top, leg_fn=sandals(c["skin"], (40, 34, 30)))
+    bake(s)
+    g = Gear("geometry.jjk.sorcerer_gear_naoya")
+    hair_cap(g, c["hair"], y0=30.4, inflate=0.5, back_to=30.4, light=0.05)
+    spikes(g, c["hair"], [((-2, 31.2, -2.4), 3.0, 2.6, [-36, 0, -10]), ((0.4, 31.2, -2.6), 3.2, 2.8, [-40, 0, 2]), ((2.4, 31.2, -2), 3.0, 2.6, [-36, 0, 12]), ((-1, 31.2, 0.6), 2.8, 2.6, [-52, 0, -6]), ((1.4, 31.2, 0.8), 2.8, 2.6, [-52, 0, 8])], light=0.06)
+    earrings(g, (210, 210, 220))
+    sl = g.region(4, 6, lambda u, v, wd, ht: mul(haori, 1.05 - 0.2 * v / ht))
+    for arm, x in (("rightArm", -8.4), ("leftArm", 4.0)):
+        b = g.bone(f"g_sleeve_{arm}", arm, BONE_PIVOT[arm])
+        g.cube(b, (x, 11.0, -2.4), (4.4, 6.0, 4.8), uv(rest=sl))                      # the haori's hanging sleeves
+    wide_legs(g, hakama)
+    return s.img, g
+
+
+# id: (name, side, clan, look builder, scale, spawn egg colours) — new characters go at the end
 ROSTER = {
     "gojo": ("Satoru Gojo", "ally", "gojo", gojo, 1.06, ("#e8ecf4", "#1e2034")),
     "yuji": ("Yuji Itadori", "ally", "clanless", yuji, 1.0, ("#e8929c", "#22253a")),
@@ -922,12 +818,16 @@ ROSTER = {
     "mahito": ("Mahito", "villain", "clanless", mahito, 1.0, ("#6e82a0", "#c4c6ce")),
     "choso": ("Choso", "villain", "kamo", choso, 1.02, ("#dcd6ce", "#46303c")),
     "jogo": ("Jogo", "villain", "clanless", jogo, 0.92, ("#e2d6c0", "#ff9628")),
+    "hakari": ("Kinji Hakari", "ally", "clanless", hakari, 1.08, ("#c89860", "#22253a")),
+    "naoya": ("Naoya Zen'in", "villain", "zenin", naoya, 1.02, ("#ecd078", "#282c2e")),
 }
+
+
 # health, melee damage, speed — allies are strong teammates, villains are bosses
 STATS = {"gojo": (400, 12, 0.32), "yuji": (160, 9, 0.33), "megumi": (130, 6, 0.3), "nobara": (110, 6, 0.3), "maki": (160, 10, 0.34),
          "inumaki": (100, 5, 0.3), "panda": (200, 9, 0.28), "nanami": (220, 10, 0.3), "mei_mei": (200, 10, 0.3), "todo": (240, 11, 0.32),
          "yuta": (300, 11, 0.32), "sukuna": (3000, 20, 0.33), "toji": (900, 16, 0.38), "geto": (1400, 12, 0.3), "mahito": (1000, 12, 0.32),
-         "choso": (800, 11, 0.3), "jogo": (1100, 12, 0.28)}
+         "choso": (800, 11, 0.3), "jogo": (1100, 12, 0.28), "hakari": (240, 10, 0.31), "naoya": (950, 14, 0.36)}
 fam = lambda v, op="==": {"test": "is_family", "subject": "other", "operator": op, "value": v}
 
 
@@ -982,6 +882,7 @@ SWAY = {
     "g_tail": {"rotation": ["math.sin(q.life_time * 200) * 5 - q.modified_move_speed * 14", 0, "math.sin(q.life_time * 150) * 4"]},
     "g_braid": {"rotation": ["math.sin(q.life_time * 160) * 3 + q.modified_move_speed * 10", 0, "math.sin(q.life_time * 120) * 3"]},
     "g_hood": {"rotation": ["q.modified_move_speed * 8", 0, 0]},
+    "g_skirt": {"rotation": ["q.modified_move_speed * 6", 0, 0]},
     "g_arm3": {"rotation": ["math.sin(q.life_time * 140) * 6", 0, "-math.sin(q.life_time * 100) * 4"]},
     "g_arm4": {"rotation": ["-math.sin(q.life_time * 140) * 6", 0, "math.sin(q.life_time * 100) * 4"]},
     "g_crow": {"rotation": [0, "math.sin(q.life_time * 90) * 20", 0]},
@@ -1045,12 +946,12 @@ def build():
     events["jjk:wanderer"] = {"add": {"component_groups": ["jjk:wanderer"]}}
     events["jjk:stay"] = {"add": {"component_groups": ["jjk:stay"]}}
     events["jjk:move"] = {"remove": {"component_groups": ["jjk:stay"]}}
-    # a spawn egg makes a random member of Jujutsu High; the script dresses it up (sorcerers.js)
-    allies = [i for i, n in enumerate(names) if ROSTER[n][1] == "ally"]
-    events["minecraft:entity_spawned"] = {"set_property": {"jjk:npc": f"math.random_integer(0, {len(allies) - 1})"}}
+    # a spawn egg rolls a number; the script turns it into a random member of Jujutsu High (sorcerers.js)
+    events["minecraft:entity_spawned"] = {"set_property": {"jjk:roll": "math.random_integer(1, 99)"}}
     w(BP / "entities" / "sorcerer.json", {"format_version": "1.21.0", "minecraft:entity": {
         "description": {"identifier": "jjk:sorcerer", "is_spawnable": True, "is_summonable": True, "is_experimental": False,
-                        "properties": {"jjk:npc": {"type": "int", "range": [0, len(names) - 1], "default": 0, "client_sync": True}}},
+                        "properties": {"jjk:npc": {"type": "int", "range": [0, len(names) - 1], "default": 0, "client_sync": True},
+                                       "jjk:roll": {"type": "int", "range": [0, 99], "default": 0, "client_sync": False}}},
         "component_groups": groups, "components": base_components(), "events": events}})
     # the scripts read every character's index from here
     (BP / "scripts" / "roster_ids.js").write_text(

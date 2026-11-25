@@ -20,11 +20,12 @@ import {
 import { gradeOf, dmgMult, maxCE, addXp, fingersOf } from "./grades.js";
 import { getCE, setCE, addCE, isHeavenly, statusHooks } from "./energy.js";
 import { clanMelee } from "./clans.js";
+import { vowMult } from "./vows.js";
 
 export const PVP_SCALE = 0.6; // technique damage against players (fights last longer than one Hollow Purple)
 export const BOSS_CAP = 0.06; // no single hit takes more than 6% of a Special Grade curse's health
 export const BF_MULT = 2.5;
-const BOSSES = new Set(["jjk:finger_bearer"]);
+const BOSSES = new Set(["jjk:finger_bearer", "jjk:mahoraga"]);
 
 const scripted = new Map(); // target id -> tick of the last technique hit
 const echoes = new Map(); // target id -> { tick, bonus, total }
@@ -37,6 +38,7 @@ export const dmgHooks = []; // (caster, target) => multiplier (domains: +50% ins
 export const hitHooks = []; // (caster, target) => after any technique or melee hit lands (Straw Doll remembers who you hurt)
 export const dmgCaps = []; // (caster, target, damage) => damage (a sparring partner never takes you below 1 health)
 export const infinityBlockers = []; // (player) => true when Infinity can't run (burnout)
+export const lastHit = new Map(); // target id -> { tick, caster, how: "technique" | "sure" | "melee" } (Mahoraga adapts by kind)
 
 export function capBoss(target, amount) {
   if (!BOSSES.has(target?.typeId)) return amount;
@@ -56,6 +58,7 @@ export function hurt(caster, target, base, opts = {}) {
       /* ignore */
     }
   }
+  dmg *= vowMult(caster, "dmg") * vowMult(target, "taken"); // Binding Vows
   if (isPlayer(target) && isPlayer(caster)) dmg *= PVP_SCALE;
   if (opts.sure || opts.pierce) suppressInfinity(target, opts.pierce ? 120 : 25);
   dmg = capBoss(target, dmg);
@@ -68,6 +71,7 @@ export function hurt(caster, target, base, opts = {}) {
   }
   if (!(dmg > 0)) return false;
   scripted.set(target.id, now());
+  lastHit.set(target.id, { tick: now(), caster, how: opts.sure ? "sure" : "technique" });
   try {
     target.applyDamage(Math.max(0.5, dmg), { cause: "entityAttack", damagingEntity: caster });
   } catch {
@@ -130,7 +134,7 @@ export const stunned = (e) => (stunUntil.get(e?.id) ?? 0) > now();
 // ---------------------------------------------------------------------------
 export const inZone = (p) => (zone.get(p.id) ?? 0) > now();
 export function bfChance(p) {
-  return 0.04 + gradeOf(p) * 0.01 + (inZone(p) ? 0.1 : 0);
+  return (0.04 + gradeOf(p) * 0.01 + (inZone(p) ? 0.1 : 0)) * vowMult(p, "bf");
 }
 export function blackFlashFx(p, target) {
   const at = mid(target);
@@ -153,7 +157,7 @@ export function blackFlashed(p, target) {
 }
 
 function meleeMult(p) {
-  return (1 + gradeOf(p) * (isHeavenly(p) ? 0.1 : 0.08) + fingersOf(p) * 0.01) * clanMelee(p);
+  return (1 + gradeOf(p) * (isHeavenly(p) ? 0.1 : 0.08) + fingersOf(p) * 0.01) * clanMelee(p) * vowMult(p, "melee");
 }
 
 function onMelee(p, target, damage) {
@@ -169,6 +173,7 @@ function onMelee(p, target, damage) {
   const bf = !isHeavenly(p) && Math.random() < bfChance(p);
   if (bf) total *= BF_MULT;
   total = capBoss(target, total);
+  lastHit.set(target.id, { tick: now(), caster: p, how: "melee" });
   if (total > damage + 0.05) boostHit(target, damage, total, p);
   if (bf) blackFlashed(p, target);
   hit(p, target);
@@ -247,6 +252,10 @@ export function initCombat() {
     stunUntil.delete(playerId);
     taken.delete(playerId);
   });
+  // (forget old hits now and then)
+  system.runInterval(() => {
+    for (const [id, h] of lastHit) if (now() - h.tick > 40) lastHit.delete(id);
+  }, 200);
 }
 // (exported for tests and the Record)
-export const _state = { scripted, echoes, zone, stunUntil, infinityOff, infinityOn };
+export const _state = { scripted, echoes, zone, stunUntil, infinityOff, infinityOn, lastHit };

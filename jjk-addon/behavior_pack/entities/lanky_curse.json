@@ -10,6 +10,90 @@
     "component_groups": {
       "jjk:despawn": {
         "minecraft:instant_despawn": {}
+      },
+      "jjk:servant": {
+        "minecraft:type_family": {
+          "family": [
+            "shikigami",
+            "servant",
+            "mob"
+          ]
+        },
+        "minecraft:is_tamed": {},
+        "minecraft:behavior.owner_hurt_by_target": {
+          "priority": 1
+        },
+        "minecraft:behavior.owner_hurt_target": {
+          "priority": 2
+        },
+        "minecraft:behavior.hurt_by_target": {
+          "priority": 1,
+          "entity_types": {
+            "filters": {
+              "test": "is_family",
+              "subject": "other",
+              "operator": "!=",
+              "value": "player"
+            }
+          }
+        },
+        "minecraft:behavior.nearest_attackable_target": {
+          "priority": 3,
+          "must_see": false,
+          "reselect_targets": true,
+          "within_radius": 20,
+          "entity_types": [
+            {
+              "filters": {
+                "all_of": [
+                  {
+                    "any_of": [
+                      {
+                        "test": "is_family",
+                        "subject": "other",
+                        "operator": "==",
+                        "value": "monster"
+                      },
+                      {
+                        "test": "is_family",
+                        "subject": "other",
+                        "operator": "==",
+                        "value": "jjk_villain"
+                      }
+                    ]
+                  },
+                  {
+                    "test": "is_family",
+                    "subject": "other",
+                    "operator": "!=",
+                    "value": "creeper"
+                  },
+                  {
+                    "test": "has_tag",
+                    "subject": "other",
+                    "operator": "!=",
+                    "value": "jjk_servant"
+                  }
+                ]
+              },
+              "max_dist": 20
+            }
+          ]
+        },
+        "minecraft:behavior.follow_owner": {
+          "priority": 5,
+          "speed_multiplier": 1.2,
+          "start_distance": 10,
+          "stop_distance": 3
+        },
+        "minecraft:timer": {
+          "time": 40,
+          "looping": false,
+          "time_down_event": {
+            "event": "jjk:despawn",
+            "target": "self"
+          }
+        }
       }
     },
     "components": {
@@ -70,6 +154,10 @@
           }
         ]
       },
+      "minecraft:tameable": {
+        "probability": 0.0,
+        "tame_items": "minecraft:barrier"
+      },
       "minecraft:type_family": {
         "family": [
           "curse",
@@ -126,6 +214,13 @@
         "add": {
           "component_groups": [
             "jjk:despawn"
+          ]
+        }
+      },
+      "jjk:servant": {
+        "add": {
+          "component_groups": [
+            "jjk:servant"
           ]
         }
       }

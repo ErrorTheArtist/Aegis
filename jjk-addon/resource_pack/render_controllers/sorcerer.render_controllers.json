@@ -21,7 +21,9 @@
             "Texture.s13",
             "Texture.s14",
             "Texture.s15",
-            "Texture.s16"
+            "Texture.s16",
+            "Texture.s17",
+            "Texture.s18"
           ]
         }
       },
@@ -220,6 +222,28 @@
       ],
       "textures": [
         "Texture.gear_jogo"
+      ]
+    },
+    "controller.render.jjk.sorcerer_gear_hakari": {
+      "geometry": "Geometry.gear_hakari",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_hakari"
+      ]
+    },
+    "controller.render.jjk.sorcerer_gear_naoya": {
+      "geometry": "Geometry.gear_naoya",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_naoya"
       ]
     }
   }

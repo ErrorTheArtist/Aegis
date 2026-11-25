@@ -11,10 +11,19 @@
           "type": "int",
           "range": [
             0,
-            16
+            18
           ],
           "default": 0,
           "client_sync": true
+        },
+        "jjk:roll": {
+          "type": "int",
+          "range": [
+            0,
+            99
+          ],
+          "default": 0,
+          "client_sync": false
         }
       }
     },
@@ -533,6 +542,49 @@
           "name": "Jogo",
           "should_darken_sky": false
         }
+      },
+      "jjk:c_hakari": {
+        "minecraft:health": {
+          "value": 240,
+          "max": 240
+        },
+        "minecraft:attack": {
+          "damage": 10
+        },
+        "minecraft:movement": {
+          "value": 0.31
+        },
+        "minecraft:scale": {
+          "value": 1.08
+        },
+        "minecraft:collision_box": {
+          "width": 0.648,
+          "height": 1.9440000000000002
+        }
+      },
+      "jjk:c_naoya": {
+        "minecraft:health": {
+          "value": 950,
+          "max": 950
+        },
+        "minecraft:attack": {
+          "damage": 14
+        },
+        "minecraft:movement": {
+          "value": 0.36
+        },
+        "minecraft:scale": {
+          "value": 1.02
+        },
+        "minecraft:collision_box": {
+          "width": 0.612,
+          "height": 1.836
+        },
+        "minecraft:boss": {
+          "hud_range": 40,
+          "name": "Naoya Zen'in",
+          "should_darken_sky": false
+        }
       }
     },
     "components": {
@@ -641,6 +693,8 @@
             "jjk:c_mahito",
             "jjk:c_choso",
             "jjk:c_jogo",
+            "jjk:c_hakari",
+            "jjk:c_naoya",
             "jjk:villain"
           ]
         }
@@ -673,6 +727,8 @@
             "jjk:c_mahito",
             "jjk:c_choso",
             "jjk:c_jogo",
+            "jjk:c_hakari",
+            "jjk:c_naoya",
             "jjk:villain"
           ]
         }
@@ -705,6 +761,8 @@
             "jjk:c_mahito",
             "jjk:c_choso",
             "jjk:c_jogo",
+            "jjk:c_hakari",
+            "jjk:c_naoya",
             "jjk:villain"
           ]
         }
@@ -737,6 +795,8 @@
             "jjk:c_mahito",
             "jjk:c_choso",
             "jjk:c_jogo",
+            "jjk:c_hakari",
+            "jjk:c_naoya",
             "jjk:villain"
           ]
         }
@@ -769,6 +829,8 @@
             "jjk:c_mahito",
             "jjk:c_choso",
             "jjk:c_jogo",
+            "jjk:c_hakari",
+            "jjk:c_naoya",
             "jjk:villain"
           ]
         }
@@ -801,6 +863,8 @@
             "jjk:c_mahito",
             "jjk:c_choso",
             "jjk:c_jogo",
+            "jjk:c_hakari",
+            "jjk:c_naoya",
             "jjk:villain"
           ]
         }
@@ -833,6 +897,8 @@
             "jjk:c_mahito",
             "jjk:c_choso",
             "jjk:c_jogo",
+            "jjk:c_hakari",
+            "jjk:c_naoya",
             "jjk:villain"
           ]
         }
@@ -865,6 +931,8 @@
             "jjk:c_mahito",
             "jjk:c_choso",
             "jjk:c_jogo",
+            "jjk:c_hakari",
+            "jjk:c_naoya",
             "jjk:villain"
           ]
         }
@@ -897,6 +965,8 @@
             "jjk:c_mahito",
             "jjk:c_choso",
             "jjk:c_jogo",
+            "jjk:c_hakari",
+            "jjk:c_naoya",
             "jjk:villain"
           ]
         }
@@ -929,6 +999,8 @@
             "jjk:c_mahito",
             "jjk:c_choso",
             "jjk:c_jogo",
+            "jjk:c_hakari",
+            "jjk:c_naoya",
             "jjk:villain"
           ]
         }
@@ -961,6 +1033,8 @@
             "jjk:c_mahito",
             "jjk:c_choso",
             "jjk:c_jogo",
+            "jjk:c_hakari",
+            "jjk:c_naoya",
             "jjk:villain"
           ]
         }
@@ -993,6 +1067,8 @@
             "jjk:c_mahito",
             "jjk:c_choso",
             "jjk:c_jogo",
+            "jjk:c_hakari",
+            "jjk:c_naoya",
             "jjk:ally"
           ]
         }
@@ -1025,6 +1101,8 @@
             "jjk:c_mahito",
             "jjk:c_choso",
             "jjk:c_jogo",
+            "jjk:c_hakari",
+            "jjk:c_naoya",
             "jjk:ally"
           ]
         }
@@ -1057,6 +1135,8 @@
             "jjk:c_mahito",
             "jjk:c_choso",
             "jjk:c_jogo",
+            "jjk:c_hakari",
+            "jjk:c_naoya",
             "jjk:ally"
           ]
         }
@@ -1089,6 +1169,8 @@
             "jjk:c_geto",
             "jjk:c_choso",
             "jjk:c_jogo",
+            "jjk:c_hakari",
+            "jjk:c_naoya",
             "jjk:ally"
           ]
         }
@@ -1121,6 +1203,8 @@
             "jjk:c_geto",
             "jjk:c_mahito",
             "jjk:c_jogo",
+            "jjk:c_hakari",
+            "jjk:c_naoya",
             "jjk:ally"
           ]
         }
@@ -1153,6 +1237,76 @@
             "jjk:c_geto",
             "jjk:c_mahito",
             "jjk:c_choso",
+            "jjk:c_hakari",
+            "jjk:c_naoya",
+            "jjk:ally"
+          ]
+        }
+      },
+      "jjk:as_hakari": {
+        "set_property": {
+          "jjk:npc": 17
+        },
+        "add": {
+          "component_groups": [
+            "jjk:c_hakari",
+            "jjk:ally"
+          ]
+        },
+        "remove": {
+          "component_groups": [
+            "jjk:c_gojo",
+            "jjk:c_yuji",
+            "jjk:c_megumi",
+            "jjk:c_nobara",
+            "jjk:c_maki",
+            "jjk:c_inumaki",
+            "jjk:c_panda",
+            "jjk:c_nanami",
+            "jjk:c_mei_mei",
+            "jjk:c_todo",
+            "jjk:c_yuta",
+            "jjk:c_sukuna",
+            "jjk:c_toji",
+            "jjk:c_geto",
+            "jjk:c_mahito",
+            "jjk:c_choso",
+            "jjk:c_jogo",
+            "jjk:c_naoya",
+            "jjk:villain"
+          ]
+        }
+      },
+      "jjk:as_naoya": {
+        "set_property": {
+          "jjk:npc": 18
+        },
+        "add": {
+          "component_groups": [
+            "jjk:c_naoya",
+            "jjk:villain"
+          ]
+        },
+        "remove": {
+          "component_groups": [
+            "jjk:c_gojo",
+            "jjk:c_yuji",
+            "jjk:c_megumi",
+            "jjk:c_nobara",
+            "jjk:c_maki",
+            "jjk:c_inumaki",
+            "jjk:c_panda",
+            "jjk:c_nanami",
+            "jjk:c_mei_mei",
+            "jjk:c_todo",
+            "jjk:c_yuta",
+            "jjk:c_sukuna",
+            "jjk:c_toji",
+            "jjk:c_geto",
+            "jjk:c_mahito",
+            "jjk:c_choso",
+            "jjk:c_jogo",
+            "jjk:c_hakari",
             "jjk:ally"
           ]
         }
@@ -1188,7 +1342,7 @@
       },
       "minecraft:entity_spawned": {
         "set_property": {
-          "jjk:npc": "math.random_integer(0, 10)"
+          "jjk:roll": "math.random_integer(1, 99)"
         }
       }
     }

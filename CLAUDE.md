@@ -240,8 +240,8 @@ tools.
 
 | Generator | Makes |
 |---|---|
-| `gen_entities.py` | Curses, shikigami and effect models: geometry, textures, idle animations, BP/RP entities, spawn rules, entity names in `en_US.lang` |
-| `gen_sorcerers.py` | The cast (Gojo, Sukuna, Yuji…): painted skins + 3D gear, the `jjk:sorcerer` entity, render controllers, `scripts/roster_ids.js` |
+| `gen_entities.py` | Curses, shikigami (Mahoraga too) and effect models: geometry, textures, idle animations, BP/RP entities, spawn rules, entity names in `en_US.lang` (it keeps the cast's lines) |
+| `gen_sorcerers.py` | The cast (Gojo, Sukuna, Yuji… 19 characters): painted skins + 3D gear, the `jjk:sorcerer` entity, render controllers, `scripts/roster_ids.js`. Its painting and modelling helpers are in `sorcerer_kit.py` |
 | `gen_items.py` | Every item: 32×32 icons drawn in code, item JSON, `item_texture.json`, pack icons |
 | `gen_particles.py` | `jjk:` particles + their white textures |
 | `gen_anims.py` | Player animations `animation.jjk.*` (the same pose-to-pose rig as `gen_player_anims.py`) |
@@ -249,7 +249,8 @@ tools.
 ## Models (`gen_entities.py`)
 
 - **Kit:** a small creature kit like the beasts' one, on a **128×128 atlas of 32×32 tiles**.
-  - Tiles: skin, dark, light, accent, mouth, teeth, eye, pupil, wing, bone, mark, under, claw.
+  - Tiles: skin, dark, light, accent, mouth, teeth, eye, pupil, wing, bone, mark, under, claw, steel.
+  - `paint(pal, seed, curse=...)`: curses get veins and bloodshot eyes; shikigami are painted clean.
   - Each face samples a random window of its tile.
   - Parts: `k.bone(name, parent, pivot)`, `k.box(bone, origin, size, tile, …)`, `k.eye(bone, x, y, z, size, pupil)`.
   - Each tile's colour comes from the creature's `pal` dict.
@@ -275,6 +276,11 @@ tools.
     from inside. Variants: `jjk:as_void`, `jjk:as_garden`.
   - **`jjk:shrine`** and the shikigami models.
   - All of them are listed in `FX_IDS` in `core.js`, so techniques never target them. Add new ones there.
+  - **A new domain barrier:** paint it in `dome_texture()` and add its name to `DOMES` (the variant index is its place
+    there; the event is `jjk:as_<name>`).
+- **Mahoraga** (`jjk:mahoraga`) has its own behaviour file (`mahoraga_bp()`):
+  - It is wild (a boss bar, hostile) from its spawn event; the `jjk:tamed` event makes it fight for its owner.
+  - Its int property `jjk:turn` turns the wheel. The client eases to it in a `pre_animation` script (`v.wheel`).
 - **Preview:** `cine_preview.py` from the Naruto tools renders these too:
   `CP.load_geo("jjk-addon/resource_pack/models/entity/<geo>.geo.json", "jjk-addon/resource_pack/textures/entity/jjk/<id>.png")`.
 
@@ -294,9 +300,13 @@ tools.
   - The event `jjk:as_<id>` sets the property and adds `jjk:c_<id>` (health, damage, speed, scale, a boss bar for
     villains) and `jjk:ally` / `jjk:villain` (family and targeting).
   - The render controller array picks the skin, and one gear controller per character is gated on the property.
+- **Spawn eggs:** `minecraft:entity_spawned` rolls the int property `jjk:roll` (1-99). The script turns it into a random
+  ally (`setupSorcerer`). `/summon jjk:sorcerer ~ ~ ~ jjk:as_<id>` skips the roll.
 - **Adding a character:**
-  1. Write `<id>()` returning `(skin image, Gear)`.
-  2. Add it to `ROSTER` and `STATS`, and any swaying bones to `SWAY`.
+  1. Write `<id>()` returning `(skin image, Gear)`, with the helpers in `sorcerer_kit.py` (`head()`, `jjh_uniform()`,
+     `spikes()` with hand-placed `[(base, length, width, rot)]`, `fringe()`, `collar()`, `on_back()`...) and
+     `gen_sorcerers.py` (`glasses()`, `lapels()`, `coat_skirt()`, `uniform_3d()`...).
+  2. Add it to the END of `ROSTER` (an index is stored on every NPC in a world), and to `STATS`; any swaying bones to `SWAY`.
   3. Re-run the generator.
   4. Add a `CAST` entry in `sorcerers.js`: title, side, clan, technique, grade, power, moves `[[id, range]]`, spar XP
      or xp and drops, lines.
@@ -313,17 +323,35 @@ tools.
   `minecraft:cooldown` category `jjk_<id>`, which the script starts for the hotbar overlay.
 - **Item ids** must match the script move tables: `tech_<technique>.js` exports `{ <item id>: { name, cost, hp?, cd,
   grade, run, info } }`. `cost: "domain"` means 70% of max CE. `run(p)` returning `false` refunds the move and skips
-  its cooldown.
+  its cooldown. An item id must not be the same as a technique id.
 
 ## Scripts (`jjk-addon/behavior_pack/scripts/`)
 
 - **Clans** (`clans.js`): clan techniques are bound to their clan's blood (`BOUND`). `rollTechnique(clan, except)`
   never returns another clan's technique, and `setTechnique` moves a player into the clan of a clan technique they're
   given. Moves refuse anyone who didn't awaken their technique.
+  - A technique's rarity text is worked out from the tables (`techChance`, `rarityOf`): change the weights, not the text.
+- **A new technique:** a `tech_<id>.js` move table, an entry in `TECHNIQUES` (`techniques.js`), a weight in a clan or
+  `OPEN` (`clans.js`), its icons in `gen_items.py` (`TECH_RIM`, `TECH_COL`, `TECH_NAME`, `MOVES`), and a test.
+  - Its domain: `registerDomain(kind, def, tick, end)` from `domains.js`. `tick(d, victims, every, k, age)` runs each
+    tick (`k` is 0.5 for an NPC caster); `end(d, why)` runs when it closes (`why` is empty when it ran its full course).
+    Set `d.noBurnout` to close it without burnout. `shielded(d, e)` says who a sure-hit can't touch.
+- **Servant curses** (`servants.js`, `spawnServant(owner, typeId, loc, secs)`):
+  - A player's or ally's: the curse's `jjk:servant` event tames it, tag `jjk_servant`.
+  - A villain's stays hostile, tag `jjk_minion`; it spares its master (owner property).
+  - Neither gives XP. `sorcerers.js` and `curses.js` know which side each is on.
+- **Mahoraga** (`mahoraga.js`): the Ten Shadows' Special Grade ritual. Beat it alone to tame it (player property
+  `mahoraga`).
+  - Adaptation is counted per kind of attack. `combat.js` records each hit's kind in `lastHit` (technique, sure-hit,
+    melee), and Mahoraga heals back the part it has adapted to.
+- **Binding Vows** (`vows.js`): one vow per player, changed once every 10 minutes. `vowMult(p, key)` is read in
+  `combat.js` (damage, damage taken, Black Flash, melee), `grades.js` (regeneration) and `techniques.js` (cost,
+  cooldown, health, Revealed Technique's explanation).
 - **The cast** (`sorcerers.js`):
   - Allies and villains use the players' move functions (`MOVES[id].run(npc)`) plus `npc_moves.js`.
   - `core.targetRules` keeps the teams apart.
   - `combat.dmgCaps` makes spars harmless.
+  - Allies never target Mahoraga: a ritual is the summoner's alone.
   - Any message that names a caster must use `nameOf(e)`, because NPCs have no `.name`.
 - **Damage:** every technique hit goes through `hurt()` in `combat.js`. It applies the grade multiplier, ×0.6
   against players, and the 6% boss cap, and it marks the hit so the melee listener doesn't treat it as a punch.

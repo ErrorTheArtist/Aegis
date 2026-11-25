@@ -20,6 +20,26 @@
         "minecraft:variant": {
           "value": 1
         }
+      },
+      "jjk:v_moon": {
+        "minecraft:variant": {
+          "value": 2
+        }
+      },
+      "jjk:v_volcano": {
+        "minecraft:variant": {
+          "value": 3
+        }
+      },
+      "jjk:v_perfection": {
+        "minecraft:variant": {
+          "value": 4
+        }
+      },
+      "jjk:v_jackpot": {
+        "minecraft:variant": {
+          "value": 5
+        }
       }
     },
     "components": {
@@ -77,7 +97,11 @@
         },
         "remove": {
           "component_groups": [
-            "jjk:v_garden"
+            "jjk:v_garden",
+            "jjk:v_moon",
+            "jjk:v_volcano",
+            "jjk:v_perfection",
+            "jjk:v_jackpot"
           ]
         }
       },
@@ -89,7 +113,75 @@
         },
         "remove": {
           "component_groups": [
-            "jjk:v_void"
+            "jjk:v_void",
+            "jjk:v_moon",
+            "jjk:v_volcano",
+            "jjk:v_perfection",
+            "jjk:v_jackpot"
+          ]
+        }
+      },
+      "jjk:as_moon": {
+        "add": {
+          "component_groups": [
+            "jjk:v_moon"
+          ]
+        },
+        "remove": {
+          "component_groups": [
+            "jjk:v_void",
+            "jjk:v_garden",
+            "jjk:v_volcano",
+            "jjk:v_perfection",
+            "jjk:v_jackpot"
+          ]
+        }
+      },
+      "jjk:as_volcano": {
+        "add": {
+          "component_groups": [
+            "jjk:v_volcano"
+          ]
+        },
+        "remove": {
+          "component_groups": [
+            "jjk:v_void",
+            "jjk:v_garden",
+            "jjk:v_moon",
+            "jjk:v_perfection",
+            "jjk:v_jackpot"
+          ]
+        }
+      },
+      "jjk:as_perfection": {
+        "add": {
+          "component_groups": [
+            "jjk:v_perfection"
+          ]
+        },
+        "remove": {
+          "component_groups": [
+            "jjk:v_void",
+            "jjk:v_garden",
+            "jjk:v_moon",
+            "jjk:v_volcano",
+            "jjk:v_jackpot"
+          ]
+        }
+      },
+      "jjk:as_jackpot": {
+        "add": {
+          "component_groups": [
+            "jjk:v_jackpot"
+          ]
+        },
+        "remove": {
+          "component_groups": [
+            "jjk:v_void",
+            "jjk:v_garden",
+            "jjk:v_moon",
+            "jjk:v_volcano",
+            "jjk:v_perfection"
           ]
         }
       }

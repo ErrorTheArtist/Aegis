@@ -1,8 +1,9 @@
 // Admin commands (/scriptevent needs operator permission). The last word may name another player.
 //   /scriptevent jjk:record                      open your Jujutsu Record
 //   /scriptevent jjk:admin                       open the Admin Panel
-//   /scriptevent jjk:technique limitless [name]  set an innate technique (limitless, shrine, ten_shadows,
-//                                                cursed_speech, heavenly, blood, boogie, random)
+//   /scriptevent jjk:technique limitless [name]  set an innate technique (limitless, shrine, ten_shadows, heavenly,
+//                                                projection, cursed_speech, blood, disaster_flames, idle_death_gamble,
+//                                                cursed_spirit, idle_transfiguration, straw_doll, ratio, boogie, random)
 //   /scriptevent jjk:grade 4 [name]              set a grade (0 = Grade 4 … 5 = Special Grade)
 //   /scriptevent jjk:xp 500 [name]               give XP
 //   /scriptevent jjk:finger 20 [name]            set Sukuna's Fingers eaten
@@ -10,6 +11,8 @@
 //   /scriptevent jjk:clan zenin [name]           set a clan (gojo, zenin, kamo, inumaki, clanless); a technique their
 //                                                new clan's blood doesn't allow is rerolled
 //   /scriptevent jjk:boss                        summon the Finger Bearer next to you
+//   /scriptevent jjk:mahoraga                    summon a wild Mahoraga next to you (no ritual: nobody can tame it)
+//   /scriptevent jjk:tame_mahoraga [name]        let a Ten Shadows sorcerer skip the ritual (or "off" to undo it)
 //   /scriptevent jjk:summon gojo [stay]          summon a character next to you (stay: they don't move — for a hub)
 //   /scriptevent jjk:reset [name]                wipe a player (they're born and awaken again)
 //   /scriptevent jjk:credits                     who made this add-on
@@ -23,6 +26,7 @@ import { CLANS, BOUND, ensureClan, rollTechnique, canInherit } from "./clans.js"
 import { creditLine } from "./credits.js";
 import { spawnFingerBearer } from "./curses.js";
 import { openRecord, adminMenu } from "./record.js";
+import { spawnMahoraga } from "./mahoraga.js";
 import { CAST, spawnSorcerer, nameOfCast } from "./sorcerers.js";
 
 function say(src, text) {
@@ -61,6 +65,20 @@ export function runCommand(id, message, src) {
     if (!isPlayer(src)) return say(src, "§7Run it as a player.");
     spawnFingerBearer(src, true);
     return say(src, "§4The Finger Bearer has been summoned.");
+  }
+  if (cmd === "mahoraga") {
+    if (!isPlayer(src)) return say(src, "§7Run it as a player.");
+    spawnMahoraga(src.dimension, { x: src.location.x + 4, y: src.location.y, z: src.location.z + 4 });
+    return say(src, "§6Mahoraga has been summoned. §7(No ritual: it can't be tamed.)");
+  }
+  if (cmd === "tame_mahoraga") {
+    const words = String(message ?? "").trim().split(/\s+/).filter(Boolean);
+    const off = words[0] === "off";
+    if (off) words.shift();
+    const who = words.length ? world.getAllPlayers().find((q) => q.name.toLowerCase() === words.join(" ").toLowerCase()) : isPlayer(src) ? src : undefined;
+    if (!who) return say(src, "§cName a player.");
+    setProp(who, "mahoraga", off ? undefined : true);
+    return say(src, off ? `§7${who.name} no longer commands Mahoraga.` : `§7${who.name} has tamed Mahoraga (the Ten Shadows' ritual now calls it to fight for them).`);
   }
   const [value, q, name] = parse(src, message);
   const needsValue = ["technique", "grade", "xp", "finger", "clan"].includes(cmd);
@@ -104,13 +122,14 @@ export function runCommand(id, message, src) {
       resetCooldowns(target);
       return say(src, `§7Refilled ${target.name}.`);
     case "reset":
-      for (const k of ["technique", "clan", "xp", "fingers", "ce", "black_flashes", "exorcised", "sorcerers_beaten", "moves_used", "hb"]) setProp(target, k, undefined);
+      for (const k of ["technique", "clan", "xp", "fingers", "ce", "black_flashes", "exorcised", "sorcerers_beaten", "moves_used", "hb", "vow", "vow_at",
+        "mahoraga", "spirits"]) setProp(target, k, undefined);
       resetCooldowns(target);
       applyStats(target);
       awaken(target);
       return say(src, `§7${target.name} was reset and awakened again.`);
     default:
-      return say(src, "§7Commands: jjk:record, admin, technique, clan, grade, xp, finger, ce, boss, summon, reset, credits");
+      return say(src, "§7Commands: jjk:record, admin, technique, clan, grade, xp, finger, ce, boss, mahoraga, tame_mahoraga, summon, reset, credits");
   }
 }
 

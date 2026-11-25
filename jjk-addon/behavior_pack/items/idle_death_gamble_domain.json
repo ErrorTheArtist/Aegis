@@ -1,0 +1,32 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:item": {
+    "description": {
+      "identifier": "jjk:idle_death_gamble_domain",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "jjk_idle_death_gamble_domain"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "§aDomain Expansion: Idle Death Gamble§r\n§8Idle Death Gamble\n§7Spin for a JACKPOT: 20 s you can't lose"
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:can_destroy_in_creative": false,
+      "minecraft:use_modifiers": {
+        "use_duration": 0.25,
+        "movement_modifier": 1.0
+      },
+      "minecraft:use_animation": "none",
+      "minecraft:cooldown": {
+        "category": "jjk_idle_death_gamble_domain",
+        "duration": 0.1
+      }
+    }
+  }
+}

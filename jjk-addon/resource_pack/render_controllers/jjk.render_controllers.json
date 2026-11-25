@@ -23,12 +23,16 @@
       ],
       "ignore_lighting": true
     },
-    "controller.render.jjk.variant2": {
+    "controller.render.jjk.dome": {
       "arrays": {
         "textures": {
           "Array.v": [
             "Texture.void",
-            "Texture.garden"
+            "Texture.garden",
+            "Texture.moon",
+            "Texture.volcano",
+            "Texture.perfection",
+            "Texture.jackpot"
           ]
         }
       },

@@ -9,10 +9,11 @@ Date.now = () => BASE + system.currentTick * 50;
 const FAM = (t) => t === "minecraft:player" ? ["player", "mob"]
   : /jjk:(fly_head|lanky_curse|mouth_curse|eye_curse|finger_bearer)/.test(t) ? ["curse", "monster", "mob"]
   : /divine_dog/.test(t) ? ["shikigami", "mob"]
+  : t === "jjk:mahoraga" ? ["mahoraga", "special_grade", "monster", "mob"]
   : /jjk:(orb|domain_dome|shrine|nue|max_elephant)/.test(t) ? ["jjk_fx"]
   : /zombie|skeleton/.test(t) ? ["monster", "mob"] : ["mob"];
 const MAXHP = { "minecraft:player": 20, "jjk:fly_head": 14, "jjk:lanky_curse": 30, "jjk:mouth_curse": 70, "jjk:eye_curse": 180, "jjk:finger_bearer": 1500,
-  "minecraft:zombie": 20, "jjk:divine_dog_white": 40, "jjk:divine_dog_black": 40, "minecraft:iron_golem": 100 };
+  "minecraft:zombie": 20, "jjk:divine_dog_white": 40, "jjk:divine_dog_black": 40, "minecraft:iron_golem": 100, "jjk:mahoraga": 1600 };
 const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y, a.z - b.z);
 // the real behaviour file of the character NPCs: its "jjk:as_<who>" events apply their component groups here
 const SORC_BP = process.env.JJK_ROOT && existsSync(`${process.env.JJK_ROOT}/behavior_pack/entities/sorcerer.json`)
@@ -60,8 +61,9 @@ export function mkEntity(typeId, loc, dimId = "minecraft:overworld") {
       const r = e.getEffect("resistance");
       if (r) a *= Math.max(0, 1 - 0.2 * (r.amplifier + 1));
       let applied = a;
-      if (now() - e._lastHurt < 10) { if (a <= e._lastDmg) return false; applied = a - e._lastDmg; } else e._lastHurt = now();
-      e._lastDmg = Math.max(a, now() - e._lastHurt < 10 ? e._lastDmg : 0);
+      // Bedrock's hurt cooldown: for 10 ticks after a hit only damage above that hit's lands (the difference); after that, a new window
+      if (now() - e._lastHurt < 10) { if (a <= e._lastDmg) return false; applied = a - e._lastDmg; e._lastDmg = a; }
+      else { e._lastHurt = now(); e._lastDmg = a; }
       e._hp -= applied;
       e._dmgLog.push({ amount, applied, by: opts.damagingEntity?.id, cause: opts.cause, tick: now() });
       const src = { cause: opts.cause ?? "none", damagingEntity: opts.damagingEntity };

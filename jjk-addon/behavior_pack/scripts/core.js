@@ -336,7 +336,7 @@ export function canHit(caster, e) {
     }
   }
   if (isPlayer(e)) {
-    if (!pvpOn()) return false;
+    if (isPlayer(caster) && !pvpOn()) return false; // (PvP off stops players' techniques — not curses, villains or Mahoraga)
     const gm = gameMode(e);
     if (gm === "creative" || gm === "spectator") return false;
   }

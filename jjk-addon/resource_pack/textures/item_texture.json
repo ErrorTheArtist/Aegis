@@ -38,6 +38,9 @@
     "jjk_chimera_shadow_garden": {
       "textures": "textures/items/jjk/chimera_shadow_garden"
     },
+    "jjk_summon_mahoraga": {
+      "textures": "textures/items/jjk/summon_mahoraga"
+    },
     "jjk_speech_dont_move": {
       "textures": "textures/items/jjk/speech_dont_move"
     },
@@ -97,6 +100,66 @@
     },
     "jjk_ratio_collapse": {
       "textures": "textures/items/jjk/ratio_collapse"
+    },
+    "jjk_projection_rush": {
+      "textures": "textures/items/jjk/projection_rush"
+    },
+    "jjk_projection_freeze": {
+      "textures": "textures/items/jjk/projection_freeze"
+    },
+    "jjk_projection_barrage": {
+      "textures": "textures/items/jjk/projection_barrage"
+    },
+    "jjk_time_cell_moon_palace": {
+      "textures": "textures/items/jjk/time_cell_moon_palace"
+    },
+    "jjk_disaster_ember": {
+      "textures": "textures/items/jjk/disaster_ember"
+    },
+    "jjk_disaster_stream": {
+      "textures": "textures/items/jjk/disaster_stream"
+    },
+    "jjk_disaster_meteor": {
+      "textures": "textures/items/jjk/disaster_meteor"
+    },
+    "jjk_iron_mountain": {
+      "textures": "textures/items/jjk/iron_mountain"
+    },
+    "jjk_idle_soul_touch": {
+      "textures": "textures/items/jjk/idle_soul_touch"
+    },
+    "jjk_idle_body_repel": {
+      "textures": "textures/items/jjk/idle_body_repel"
+    },
+    "jjk_idle_isomer": {
+      "textures": "textures/items/jjk/idle_isomer"
+    },
+    "jjk_self_embodiment": {
+      "textures": "textures/items/jjk/self_embodiment"
+    },
+    "jjk_gamble_rough": {
+      "textures": "textures/items/jjk/gamble_rough"
+    },
+    "jjk_gamble_shutter": {
+      "textures": "textures/items/jjk/gamble_shutter"
+    },
+    "jjk_gamble_pachinko": {
+      "textures": "textures/items/jjk/gamble_pachinko"
+    },
+    "jjk_idle_death_gamble_domain": {
+      "textures": "textures/items/jjk/idle_death_gamble_domain"
+    },
+    "jjk_spirit_release": {
+      "textures": "textures/items/jjk/spirit_release"
+    },
+    "jjk_spirit_absorb": {
+      "textures": "textures/items/jjk/spirit_absorb"
+    },
+    "jjk_spirit_swarm": {
+      "textures": "textures/items/jjk/spirit_swarm"
+    },
+    "jjk_uzumaki": {
+      "textures": "textures/items/jjk/uzumaki"
     },
     "jjk_reverse_cursed_technique": {
       "textures": "textures/items/jjk/reverse_cursed_technique"

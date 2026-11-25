@@ -12,13 +12,18 @@ await tick(61);
 let foes = [];
 function fresh() {
   for (const f of foes) f._valid = false;
+  for (const e of H.entities) if (e.typeId === "jjk:mahoraga") e._valid = false; // (the ritual's Mahoraga fights on otherwise)
   foes = [spawn("minecraft:zombie", { x: 0, y: 64, z: 5 }), spawn("minecraft:zombie", { x: 2, y: 64, z: 3 }), spawn("minecraft:zombie", { x: 0, y: 64, z: -4 })];
   for (const f of foes) { f._max = 400; f._hp = 400; }
 }
 const DAMAGING = new Set(["blue", "red", "hollow_purple", "unlimited_void", "dismantle", "cleave", "fuga", "malevolent_shrine", "summon_nue",
   "summon_max_elephant", "chimera_shadow_garden", "speech_blast_away", "speech_crush", "speech_twist", "piercing_blood", "supernova", "clap_barrage",
-  "black_flash_swap", "playful_cloud", "dragon_bone", "straw_hairpin", "straw_nail_barrage", "ratio_seven_three", "ratio_flurry", "ratio_collapse", "inverted_spear_of_heaven", "split_soul_katana"]);
-const WAIT = { straw_hairpin: 30, ratio_flurry: 40, hollow_purple: 70, fuga: 60, unlimited_void: 60, malevolent_shrine: 60, chimera_shadow_garden: 60, summon_nue: 60, summon_max_elephant: 40, clap_barrage: 50, playful_cloud: 40 };
+  "black_flash_swap", "playful_cloud", "dragon_bone", "straw_hairpin", "straw_nail_barrage", "ratio_seven_three", "ratio_flurry", "ratio_collapse", "inverted_spear_of_heaven", "split_soul_katana",
+  "projection_rush", "projection_freeze", "disaster_ember", "disaster_stream", "disaster_meteor", "iron_mountain", "idle_soul_touch", "idle_body_repel",
+  "self_embodiment", "gamble_rough", "gamble_shutter", "gamble_pachinko", "uzumaki"]);
+const WAIT = { straw_hairpin: 30, ratio_flurry: 40, hollow_purple: 70, fuga: 60, unlimited_void: 60, malevolent_shrine: 60, chimera_shadow_garden: 60, summon_nue: 60, summon_max_elephant: 40, clap_barrage: 50, playful_cloud: 40,
+  disaster_meteor: 30, iron_mountain: 50, self_embodiment: 50, uzumaki: 20, gamble_pachinko: 20 };
+const CLOSE = new Set(["projection_freeze", "idle_soul_touch"]); // touch range: bring the first one in close
 for (const [techId, t] of Object.entries(T.TECHNIQUES)) {
   T.setTechnique(p, techId);
   Gr.setXp(p, 40000);
@@ -30,6 +35,9 @@ for (const [techId, t] of Object.entries(T.TECHNIQUES)) {
     for (const d of [...D.activeDomains()]) D.collapse(d);
     D._state.burnout.clear();
     if (id === "straw_resonance" || id === "straw_cursed_doll") C.hurt(p, foes[0], 1); // they need a piece of someone
+    if (CLOSE.has(id)) foes[0].location = { x: 0, y: 64, z: 3 };
+    if (techId === "cursed_spirit") p._props["jjk:spirits"] = "jjk:eye_curse,jjk:mouth_curse,jjk:lanky_curse"; // curses to release
+    if (id === "spirit_absorb") { foes[0]._valid = false; foes[0] = spawn("jjk:mouth_curse", { x: 0, y: 64, z: 3 }); foes[0]._max = 100; foes[0]._hp = 30; }
     const ce0 = E.getCE(p);
     const before = foes.map(hp);
     await use(p, "jjk:" + id);
@@ -40,6 +48,7 @@ for (const [techId, t] of Object.entries(T.TECHNIQUES)) {
     await tick(WAIT[id] ?? 30);
     const dmg = foes.map((f, i) => before[i] - hp(f));
     if (DAMAGING.has(id)) check(`${techId}/${id}: hurt someone`, dmg.some((x) => x > 0), JSON.stringify(dmg));
+    for (const d of [...D.activeDomains()]) D.collapse(d); // (the new domains end with a hook — close them before the next move)
     // a second use straight away is refused
     const ce1 = E.getCE(p);
     await use(p, "jjk:" + id);

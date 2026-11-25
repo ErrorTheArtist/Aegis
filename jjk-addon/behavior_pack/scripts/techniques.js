@@ -25,29 +25,48 @@ import { BOOGIE } from "./tech_boogie.js";
 import { HEAVENLY } from "./tech_heavenly.js";
 import { STRAW_DOLL } from "./tech_straw.js";
 import { RATIO } from "./tech_ratio.js";
-import { CLANS, BOUND, clanOf, ensureClan, rollTechnique, clanCooldown } from "./clans.js";
+import { PROJECTION } from "./tech_projection.js";
+import { DISASTER_FLAMES } from "./tech_disaster.js";
+import { IDLE_TRANSFIGURATION } from "./tech_transfiguration.js";
+import { IDLE_DEATH_GAMBLE } from "./tech_gamble.js";
+import { CURSED_SPIRITS } from "./tech_spirits.js";
+import { CLANS, BOUND, clanOf, ensureClan, rollTechnique, clanCooldown, rarityOf } from "./clans.js";
 import { creditsIntact, creditLine, tamperedLine } from "./credits.js";
+import { vowMult, vowInfo } from "./vows.js";
+import { nameKinds } from "./mahoraga.js";
 
 export const TECHNIQUES = {
-  limitless: { name: "Limitless", c: "§b", rarity: "§6Special · 1.5%", moves: LIMITLESS,
+  limitless: { name: "Limitless", c: "§b", moves: LIMITLESS,
     blurb: "Infinity itself. Blue pulls, Red repels, Hollow Purple erases — and while you have cursed energy, Infinity turns aside 40% of every blow." },
-  shrine: { name: "Shrine", c: "§c", rarity: "§6Special · 3%", moves: SHRINE,
+  shrine: { name: "Shrine", c: "§c", moves: SHRINE,
     blurb: "The King of Curses' slashes. Dismantle cuts everything in a line, Cleave adapts to toughness, and Fuga opens into fire." },
-  ten_shadows: { name: "Ten Shadows", c: "§5", rarity: "§dRare · 5%", moves: TEN_SHADOWS,
+  ten_shadows: { name: "Ten Shadows", c: "§5", moves: TEN_SHADOWS,
     blurb: "Shikigami from your shadow: the Divine Dogs, Nue and Max Elephant fight for you." },
-  heavenly: { name: "Heavenly Restriction", c: "§e", rarity: "§dRare · 7%", moves: HEAVENLY,
+  heavenly: { name: "Heavenly Restriction", c: "§e", moves: HEAVENLY,
     blurb: "No cursed energy at all — instead a monstrous body, cursed tools, and immunity to every domain's sure-hit." },
-  cursed_speech: { name: "Cursed Speech", c: "§3", rarity: "§bUncommon · 10%", moves: CURSED_SPEECH,
+  projection: { name: "Projection Sorcery", c: "§f", moves: PROJECTION,
+    blurb: "One second split into 24 frames. Move along them faster than anyone can follow — and freeze whoever can't keep up inside a frame." },
+  cursed_speech: { name: "Cursed Speech", c: "§3", moves: CURSED_SPEECH,
     blurb: "Your words are commands — Don't Move, Blast Away, Crush. Every word costs your throat a little health." },
-  blood: { name: "Blood Manipulation", c: "§4", rarity: "§bUncommon · 14%", moves: BLOOD,
+  blood: { name: "Blood Manipulation", c: "§4", moves: BLOOD,
     blurb: "Your blood is a weapon: Piercing Blood, Supernova, and buffs that push your body past its limits." },
-  straw_doll: { name: "Straw Doll", c: "§6", rarity: "§aCommon · 19%", moves: STRAW_DOLL,
+  disaster_flames: { name: "Disaster Flames", c: "§6", moves: DISASTER_FLAMES,
+    blurb: "Volcanic heat as a technique: burning insects, a stream of fire, a falling meteor — and a domain inside a volcano." },
+  idle_death_gamble: { name: "Idle Death Gamble", c: "§a", moves: IDLE_DEATH_GAMBLE,
+    blurb: "A gambler's technique. Its domain hurts no one — it spins for a JACKPOT, and a jackpot makes you all but immortal for 20 s." },
+  cursed_spirit: { name: "Cursed Spirit Manipulation", c: "§d", moves: CURSED_SPIRITS,
+    blurb: "Every curse you exorcise is swallowed and kept (up to 12). Release them to fight for you — or compress them all into Uzumaki." },
+  idle_transfiguration: { name: "Idle Transfiguration", c: "§9", moves: IDLE_TRANSFIGURATION,
+    blurb: "You touch the soul, and the body follows: twist the ones you touch, grow spikes, and make transfigured humans fight for you." },
+  straw_doll: { name: "Straw Doll", c: "§6", moves: STRAW_DOLL,
     blurb: "Hammer, nails and a straw doll. Anyone you've hurt has left a piece of themselves behind — and what you do to the doll happens to them." },
-  ratio: { name: "Ratio", c: "§9", rarity: "§aCommon · 19%", moves: RATIO,
+  ratio: { name: "Ratio", c: "§9", moves: RATIO,
     blurb: "Divide anything along a 7:3 line and strike that point for a critical hit. Work overtime and it only gets worse for them." },
-  boogie: { name: "Boogie Woogie", c: "§6", rarity: "§aCommon · 22%", moves: BOOGIE,
+  boogie: { name: "Boogie Woogie", c: "§6", moves: BOOGIE,
     blurb: "Clap and swap places with anyone you see. Simple, and terrifying in the right hands." },
 };
+for (const [id, t] of Object.entries(TECHNIQUES)) t.rarity = rarityOf(id); // from the clan tables (clans.js)
+nameKinds(Object.fromEntries(Object.entries(TECHNIQUES).map(([id, t]) => [id, `${t.c}${t.name}`]))); // (what Mahoraga adapts to)
 for (const [id, t] of Object.entries(TECHNIQUES)) t.clan = BOUND[id] ?? null; // the clan whose blood it runs in (null: any)
 
 const universal = {
@@ -85,7 +104,7 @@ for (const [id, m] of Object.entries(universal)) MOVES[id] = { ...m, tech: null 
 export const UNIVERSAL = universal;
 
 export const techniqueOf = (p) => getProp(p, "technique");
-export const moveCost = (p, m) => (m.cost === "domain" ? Math.round(maxCE(p) * DOMAIN_COST) : m.cost);
+export const moveCost = (p, m) => Math.round((m.cost === "domain" ? maxCE(p) * DOMAIN_COST : m.cost) * vowMult(p, "ce"));
 
 // The move items this player should be holding right now.
 export function itemsFor(p) {
@@ -193,7 +212,7 @@ export function resetCooldowns(p) {
 }
 function startCooldown(p, id, secs) {
   const c = cooldowns.get(p.id) ?? {};
-  secs *= clanCooldown(p);
+  secs *= clanCooldown(p) * vowMult(p, "cd");
   c[id] = Date.now() + secs * 1000;
   cooldowns.set(p.id, c);
   try {
@@ -226,6 +245,8 @@ export function useMove(p, id) {
   if (getCE(p) + 1e-6 < cost) return nag(p, `§9Not enough cursed energy §7(${Math.floor(getCE(p))}/${cost})`), false;
   const h = health(p);
   if (m.hp && h && h.currentValue <= m.hp + 1) return nag(p, "§cYour throat can't take another word right now."), false;
+  const vow = vowInfo(p);
+  if (vow?.hp && h && h.currentValue <= vow.hp + 1) return nag(p, "§4Blood Price: §cyou haven't the blood to pay for that."), false;
   let ok = false;
   try {
     ok = m.run(p) !== false;
@@ -235,9 +256,23 @@ export function useMove(p, id) {
   if (!ok) return false;
   spendCE(p, cost);
   if (m.hp && h) h.setCurrentValue(Math.max(1, h.currentValue - m.hp));
+  if (vow?.hp && h) h.setCurrentValue(Math.max(1, h.currentValue - vow.hp));
+  if (vow?.reveal) reveal(p, m);
   startCooldown(p, id, m.cd);
   bump(p, "moves_used");
   return true;
+}
+
+// Revealed Technique: every move is explained aloud to everyone near you.
+function reveal(p, m) {
+  for (const q of world.getAllPlayers()) {
+    try {
+      if (q.dimension.id !== p.dimension.id || Math.hypot(q.location.x - p.location.x, q.location.z - p.location.z) > 20) continue;
+    } catch {
+      continue;
+    }
+    tell(q, `§e✦ ${p.name} reveals: §f${m.name} §7— ${m.info}`);
+  }
 }
 
 // ---------------------------------------------------------------------------

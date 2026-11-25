@@ -4,6 +4,13 @@
 //   Malevolent Shrine     (Shrine)      no barrier, radius 14, 10 s: endless slashes, and a Cleave every 1.5 s
 //   Chimera Shadow Garden (Ten Shadows) barrier, radius 12, 10 s: they sink and slow; you get faster and tougher,
 //                                       and two Divine Dogs rise out of the shadows
+//   Time Cell Moon Palace (Projection)  barrier, radius 12, 9 s: whoever moves inside takes 5 damage every second
+//   Coffin of the Iron Mountain (Disaster Flames)  barrier, radius 12, 10 s: 3 damage a second, and everyone burns
+//   Self-Embodiment of Perfection (Idle Transfiguration)  barrier, radius 11, 9 s: 3 a second, slowed and sick —
+//                                       and a final 12 to whoever is still inside at the end
+//   Idle Death Gamble     (Idle Death Gamble)  barrier, radius 12, 10 s: hurts no one; spins for a JACKPOT
+//                                       (1 in 4 every 2 s) — a jackpot closes it with no burnout
+// Those four live in their technique's own module (registerDomain).
 // It costs 70% of your maximum cursed energy. When it ends your technique burns out for 15 s (Reverse Cursed
 // Technique and Simple Domain still work).
 // Two domains that overlap CLASH: the stronger sorcerer (grade, cursed energy left, fingers, a little luck) keeps
@@ -28,6 +35,13 @@ export const KINDS = {
   garden: { name: "Chimera Shadow Garden", tech: "ten_shadows", radius: 12, ticks: 200, color: COLOR.shadow, dome: "garden" },
 };
 
+const CUSTOM = {}; // kind -> { tick(d, victims, every, k, age), end(d, why) } — domains added by technique modules
+// A technique module adds its own domain: def = { name, tech, radius, ticks, color, dome (barrier texture) or null }.
+export function registerDomain(kind, def, tick, end) {
+  KINDS[kind] = def;
+  CUSTOM[kind] = { tick, end };
+}
+
 const active = []; // { kind, def, caster, center, dim, start, until, fx: [entities] }
 const burnout = new Map(); // player id -> tick
 const simple = new Map(); // player id -> tick
@@ -41,6 +55,8 @@ export const activeDomains = () => active;
 export function setBurnout(p, ticks) {
   burnout.set(p.id, now() + ticks);
 }
+export const insideDomain = (d, e) => inside(d, e);
+export const shielded = (d, e) => protectedFrom(d, e); // (sure-hits never touch them)
 function inside(d, e) {
   return e.dimension?.id === d.dim.id && V.dist(e.location, d.center) <= d.def.radius;
 }
@@ -123,10 +139,17 @@ export function collapse(d, why) {
   const i = active.indexOf(d);
   if (i < 0) return;
   active.splice(i, 1);
+  try {
+    CUSTOM[d.kind]?.end?.(d, why);
+  } catch {
+    /* ignore */
+  }
   for (const e of d.fx) removeFx(e);
   fx(d.dim, "jjk:shell", V.add(d.center, { x: 0, y: 1, z: 0 }), COLOR.grey, 1, { radius: d.def.radius });
   sound(d.dim, "random.glass", d.center, 1, 0.6);
-  if (valid(d.caster)) {
+  if (valid(d.caster) && d.noBurnout) {
+    bar(d.caster, why ?? "§7Your domain closes.", 50);
+  } else if (valid(d.caster)) {
     setBurnout(d.caster, BURNOUT);
     if (d.kind === "garden") clearEffect(d.caster, "speed");
     bar(d.caster, `${why ?? "§7Your domain closes."} §cBurnout: ${BURNOUT / 20}s §7(no technique)`, 70);
@@ -184,6 +207,8 @@ function tickDomain(d) {
       if (every(20)) sound(d.dim, "item.trident.throw", d.center, 0.8, 1.6);
     }
     if (every(40)) fx(d.dim, "jjk:ring", d.center, COLOR.red, d.def.radius / 3);
+  } else if (CUSTOM[d.kind]) {
+    CUSTOM[d.kind].tick(d, victims, every, k, age);
   } else if (d.kind === "garden") {
     for (const e of victims) {
       if (every(20)) {

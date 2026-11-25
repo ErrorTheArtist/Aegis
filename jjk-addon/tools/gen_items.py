@@ -84,7 +84,8 @@ def poly(d, pts, col):
 # ---------------------------------------------------------------------------
 TECH_RIM = {"limitless": (90, 200, 255), "shrine": (200, 30, 40), "ten_shadows": (120, 90, 190), "cursed_speech": (60, 190, 170),
             "blood": (150, 14, 28), "boogie": (240, 160, 40), "universal": (235, 225, 190), "straw_doll": (200, 128, 60),
-            "ratio": (206, 186, 128)}
+            "ratio": (206, 186, 128), "projection": (196, 222, 240), "disaster_flames": (236, 104, 30),
+            "idle_transfiguration": (96, 130, 200), "idle_death_gamble": (60, 196, 104), "cursed_spirit": (150, 100, 170)}
 
 
 def i_blue():
@@ -433,6 +434,280 @@ def i_collapse():
     return img
 
 
+# --- Projection Sorcery: film frames ---------------------------------------
+def i_fps_rush():
+    img, d = badge(TECH_RIM["projection"], (20, 26, 36))
+    for x, c in ((4, (70, 80, 96)), (11, (130, 142, 160)), (18, (236, 242, 252))):
+        d.rectangle((x, 9, x + 8, 20), outline=c + (255,))
+    d.ellipse((21, 11, 24, 14), fill=(236, 242, 252, 255))                  # a figure in the last frame
+    line(d, [(22, 15), (22, 17)], (236, 242, 252))
+    line(d, [(22, 17), (20, 19)], (236, 242, 252))
+    line(d, [(22, 17), (24, 19)], (236, 242, 252))
+    line(d, [(5, 24), (24, 24)], (150, 220, 255))
+    poly(d, [(23, 22), (26, 24), (23, 26)], (150, 220, 255))
+    return img
+
+
+def i_frame_freeze():
+    img, d = badge(TECH_RIM["projection"], (20, 26, 36))
+    d.rectangle((7, 6, 24, 25), fill=(236, 242, 252, 255))
+    d.rectangle((9, 8, 22, 23), fill=(40, 54, 76, 255))
+    for y in (10, 14, 18, 22):                                             # sprocket holes on the frame's edges
+        d.point([(8, y), (23, y)], fill=(40, 54, 76, 255))
+    d.ellipse((14, 10, 17, 13), fill=(150, 200, 240, 255))                 # the one caught in the frame
+    d.rectangle((14, 14, 17, 18), fill=(150, 200, 240, 255))
+    line(d, [(13, 14), (11, 17)], (150, 200, 240))
+    line(d, [(18, 14), (20, 17)], (150, 200, 240))
+    line(d, [(15, 19), (14, 22)], (150, 200, 240))
+    line(d, [(16, 19), (17, 22)], (150, 200, 240))
+    d.point([(11, 10), (20, 20), (19, 11)], fill=(255, 255, 255, 255))
+    return img
+
+
+def i_accel_barrage():
+    img, d = badge(TECH_RIM["projection"], (20, 26, 36))
+    for dx, c in ((-6, (90, 100, 118)), (-3, (150, 160, 178)), (0, (240, 204, 172))):
+        d.rectangle((15 + dx, 11, 23 + dx, 19), fill=c + (255,))            # the fist and its after-images
+        d.rectangle((12 + dx, 13, 15 + dx, 18), fill=c + (255,))
+    for y in (13, 15, 17):
+        line(d, [(20, y), (23, y)], (170, 128, 106))                          # curled fingers
+    line(d, [(15, 11), (15, 19)], (200, 160, 130))
+    for y in (8, 22, 25):
+        line(d, [(5, y), (14, y)], (236, 242, 252))
+    return img
+
+
+def i_moon_palace():
+    img, d = badge(TECH_RIM["projection"], (12, 12, 24))
+    d.ellipse((8, 5, 23, 20), fill=(226, 228, 236, 255))
+    for x, y, r in ((12, 9, 2), (18, 13, 3), (13, 15, 1)):
+        d.ellipse((x - r, y - r, x + r, y + r), fill=(186, 188, 200, 255))
+    d.rectangle((4, 21, 27, 26), fill=(30, 30, 36, 255))                     # a strip of film under the moon
+    for x in range(6, 27, 3):
+        d.point([(x, 22), (x, 25)], fill=(226, 228, 236, 255))
+    for x in (11, 19):
+        line(d, [(x, 23), (x, 24)], (110, 112, 124))
+    return img
+
+
+# --- Disaster Flames ---------------------------------------------------------
+def flame(d, cx, cy, s, outer=(236, 80, 20), mid_=(255, 150, 40), core=(255, 232, 150)):
+    poly(d, [(cx - s, cy + s), (cx, cy - 2 * s), (cx + s, cy + s)], outer)
+    d.ellipse((cx - s, cy - s // 2, cx + s, cy + s + 1), fill=outer + (255,))
+    d.ellipse((cx - s + 1, cy, cx + s - 1, cy + s), fill=mid_ + (255,))
+    d.point((cx, cy + s // 2), fill=core + (255,))
+
+
+def i_ember_insects():
+    img, d = badge(TECH_RIM["disaster_flames"], (36, 14, 8))
+    for cx, cy in ((10, 21), (17, 11), (23, 20)):
+        line(d, [(cx - 5, cy + 4), (cx - 1, cy + 1)], (180, 40, 20))          # their burning trails
+        d.ellipse((cx - 2, cy - 2, cx + 3, cy + 2), fill=(255, 150, 40, 255))
+        d.point([(cx, cy), (cx + 1, cy)], fill=(255, 236, 160, 255))
+        d.point([(cx - 2, cy - 3), (cx + 3, cy - 3)], fill=(255, 210, 120, 255))  # little wings of flame
+    return img
+
+
+def i_fire_stream():
+    img, d = badge(TECH_RIM["disaster_flames"], (36, 14, 8))
+    poly(d, [(5, 15), (26, 6), (28, 25), (5, 17)], (226, 70, 20))
+    poly(d, [(6, 15), (24, 10), (25, 22), (6, 17)], (255, 150, 40))
+    poly(d, [(7, 16), (20, 13), (21, 19)], (255, 232, 150))
+    for x, y in ((24, 8), (27, 15), (25, 23)):
+        d.point((x, y), fill=(255, 210, 120, 255))
+    return img
+
+
+def i_meteor():
+    img, d = badge(TECH_RIM["disaster_flames"], (30, 12, 10))
+    poly(d, [(9, 15), (25, 4), (28, 7), (17, 23)], (226, 80, 20))           # the flaming tail
+    poly(d, [(11, 16), (24, 7), (26, 9), (16, 21)], (255, 170, 60))
+    d.ellipse((6, 14, 18, 26), fill=(80, 56, 44, 255))                       # the burning mountain
+    d.ellipse((7, 15, 15, 22), fill=(110, 80, 60, 255))
+    line(d, [(9, 19), (12, 21), (15, 19)], (255, 140, 40))
+    line(d, [(12, 16), (11, 18)], (255, 140, 40))
+    return img
+
+
+def i_iron_mountain():
+    img, d = badge(TECH_RIM["disaster_flames"], (40, 14, 8))
+    poly(d, [(4, 26), (12, 13), (20, 13), (28, 26)], (70, 56, 52))
+    poly(d, [(12, 13), (20, 13), (18, 15), (14, 15)], (255, 140, 40))
+    line(d, [(15, 15), (12, 21), (13, 26)], (255, 120, 30))                  # lava running down
+    line(d, [(18, 15), (21, 20), (23, 26)], (255, 120, 30))
+    for x, y in ((14, 9), (17, 6), (19, 10), (12, 5), (21, 7)):
+        d.rectangle((x, y, x + 1, y + 1), fill=(255, 190, 70, 255))
+    return img
+
+
+# --- Idle Transfiguration ----------------------------------------------------
+def i_soul_touch():
+    img, d = badge(TECH_RIM["idle_transfiguration"], (14, 18, 38))
+    d.arc((4, 4, 27, 27), 0, 360, fill=(90, 170, 255, 255))
+    d.rectangle((11, 14, 20, 23), fill=(200, 206, 220, 255))                   # an open hand
+    for x, top in ((11, 9), (13, 7), (16, 7), (19, 9)):
+        d.rectangle((x, top, x + 1, 14), fill=(200, 206, 220, 255))
+    poly(d, [(20, 17), (24, 13), (25, 15), (21, 20)], (200, 206, 220))
+    line(d, [(11, 19), (20, 19)], (60, 60, 80))                                # stitches across the palm
+    for x in (12, 15, 18):
+        line(d, [(x, 18), (x, 20)], (60, 60, 80))
+    return img
+
+
+def i_body_repel():
+    img, d = badge(TECH_RIM["idle_transfiguration"], (14, 18, 38))
+    for k in range(8):
+        a = k * math.pi / 4 + 0.39
+        poly(d, [(16 + math.cos(a - 0.35) * 5, 16 + math.sin(a - 0.35) * 5), (16 + math.cos(a) * 13, 16 + math.sin(a) * 13),
+                 (16 + math.cos(a + 0.35) * 5, 16 + math.sin(a + 0.35) * 5)], (226, 230, 240))
+    d.ellipse((11, 11, 20, 20), fill=(190, 196, 214, 255))
+    line(d, [(12, 15), (19, 16)], (60, 60, 80))
+    return img
+
+
+def i_isomer():
+    img, d = badge(TECH_RIM["idle_transfiguration"], (14, 18, 38))
+    body = (170, 176, 200)
+    d.ellipse((6, 6, 12, 12), fill=body + (255,))                               # a tall one with a lopsided head
+    poly(d, [(7, 12), (12, 12), (13, 24), (6, 24)], body)
+    line(d, [(6, 13), (3, 21)], body)
+    line(d, [(12, 13), (15, 18)], body)
+    d.point([(8, 9), (11, 8)], fill=(20, 20, 30, 255))
+    d.ellipse((18, 11, 26, 18), fill=shade(body, 0.85))                          # a squat one, all mouth
+    poly(d, [(19, 18), (26, 18), (25, 25), (20, 25)], shade(body, 0.85))
+    line(d, [(19, 15), (25, 15)], (30, 10, 20))
+    d.point([(20, 16), (22, 16), (24, 16)], fill=(240, 236, 220, 255))
+    return img
+
+
+def i_perfection():
+    img, d = badge(TECH_RIM["idle_transfiguration"], (12, 14, 34))
+    for k in range(6):                                                           # hands reaching in from every side
+        a = k * math.pi / 3 - math.pi / 2
+        cx, cy = 16 + math.cos(a) * 9, 16 + math.sin(a) * 9
+        d.ellipse((cx - 2, cy - 2, cx + 2, cy + 2), fill=(200, 206, 222, 255))
+        for s in (-0.4, 0, 0.4):
+            line(d, [(cx, cy), (cx + math.cos(a + s) * 4, cy + math.sin(a + s) * 4)], (200, 206, 222))
+    d.ellipse((12, 12, 19, 19), fill=(110, 140, 210, 255))
+    line(d, [(12, 16), (19, 15)], (30, 30, 50))
+    return img
+
+
+# --- Idle Death Gamble --------------------------------------------------------
+def i_rough_energy():
+    img, d = badge(TECH_RIM["idle_death_gamble"], (10, 30, 20))
+    pts, inner = [], []
+    for k in range(16):
+        a = k * math.pi / 8
+        r = 12 if k % 2 == 0 else 5
+        pts.append((16 + math.cos(a) * r, 16 + math.sin(a) * r))
+        inner.append((16 + math.cos(a) * r * 0.55, 16 + math.sin(a) * r * 0.55))
+    poly(d, pts, (110, 236, 150))
+    poly(d, inner, (226, 255, 226))
+    return img
+
+
+def i_shutter_doors():
+    img, d = badge(TECH_RIM["idle_death_gamble"], (10, 30, 20))
+    d.rectangle((5, 6, 26, 7), fill=(90, 96, 106, 255))
+    for x0, x1 in ((5, 14), (17, 26)):
+        d.rectangle((x0, 8, x1, 25), fill=(184, 190, 200, 255))
+        for y in range(10, 25, 3):
+            line(d, [(x0, y), (x1, y)], (120, 126, 136))
+    line(d, [(15, 8), (15, 25)], (130, 255, 170))
+    line(d, [(16, 8), (16, 25)], (60, 200, 110))
+    return img
+
+
+def i_pachinko():
+    img, d = badge(TECH_RIM["idle_death_gamble"], (10, 30, 20))
+    for cx, cy in ((10, 10), (19, 8), (23, 16), (13, 18), (8, 24), (20, 24), (26, 23)):
+        line(d, [(cx - 4, cy - 2), (cx - 2, cy - 1)], (100, 200, 140))
+        ball(d, cx, cy, 3, (110, 116, 130), (232, 236, 244))
+    return img
+
+
+def i_jackpot():
+    img, d = badge(TECH_RIM["idle_death_gamble"], (12, 36, 22))
+    d.rectangle((4, 8, 27, 23), fill=(255, 210, 70, 255))
+    for x0 in (5, 13, 21):
+        d.rectangle((x0, 10, x0 + 5, 21), fill=(244, 242, 232, 255))
+        line(d, [(x0 + 1, 12), (x0 + 4, 12)], (220, 30, 40))                    # a 7 on every reel
+        line(d, [(x0 + 4, 12), (x0 + 2, 19)], (220, 30, 40))
+    for x in range(6, 27, 4):
+        d.point([(x, 25), (x + 2, 6)], fill=(255, 255, 200, 255))
+    return img
+
+
+# --- Cursed Spirit Manipulation -------------------------------------------------
+def i_spirit_release():
+    img, d = badge(TECH_RIM["cursed_spirit"], (14, 10, 20))
+    ball(d, 16, 17, 9, (20, 12, 28), (70, 44, 96), (150, 110, 190))
+    for k in range(22):                                                         # the swirl it unrolls from
+        a = k * 0.5
+        r = 2 + k * 0.32
+        d.point((int(16 + math.cos(a) * r), int(17 + math.sin(a) * r)), fill=(150, 100, 200, 255))
+    d.ellipse((12, 13, 20, 19), fill=(250, 220, 80, 255))
+    line(d, [(16, 13), (16, 19)], (20, 10, 10))
+    for x, y in ((6, 9), (25, 8), (26, 21)):
+        line(d, [(x, y), (16 + (x - 16) // 2, 17 + (y - 17) // 2)], (90, 60, 120))
+    return img
+
+
+def i_spirit_absorb():
+    img, d = badge(TECH_RIM["cursed_spirit"], (14, 10, 20))
+    ball(d, 16, 9, 5, (16, 10, 22), (70, 44, 96), (160, 120, 200))
+    for y in (16, 18):
+        line(d, [(12, y), (16, y + 2), (20, y)], (170, 120, 220))
+    poly(d, [(6, 21), (26, 21), (23, 26), (9, 26)], (236, 200, 170))          # a cupped hand
+    line(d, [(6, 21), (26, 21)], (200, 160, 130))
+    for x in (10, 14, 18, 22):
+        d.point((x, 22), fill=(190, 150, 120, 255))
+    return img
+
+
+def i_spirit_swarm():
+    img, d = badge(TECH_RIM["cursed_spirit"], (14, 10, 20))
+    for (cx, cy), c in (((10, 10), (70, 40, 80)), ((22, 10), (40, 60, 44)), ((10, 21), (60, 50, 34)), ((22, 21), (80, 30, 40))):
+        d.ellipse((cx - 4, cy - 3, cx + 4, cy + 4), fill=c + (255,))
+        poly(d, [(cx - 4, cy - 1), (cx - 3, cy - 6), (cx - 1, cy - 2)], c)
+        poly(d, [(cx + 4, cy - 1), (cx + 3, cy - 6), (cx + 1, cy - 2)], c)
+        d.point([(cx - 2, cy), (cx + 2, cy)], fill=(250, 220, 80, 255))
+        line(d, [(cx - 2, cy + 2), (cx + 2, cy + 2)], (20, 10, 10))
+    return img
+
+
+def i_uzumaki():
+    img, d = badge(TECH_RIM["cursed_spirit"], (10, 6, 16))
+    prev = None
+    for k in range(60):
+        a = k * 0.33
+        r = 12 - k * 0.19
+        pt = (16 + math.cos(a) * r, 16 + math.sin(a) * r)
+        if prev:
+            u = k / 60
+            line(d, [prev, pt], (int(60 + 180 * u), int(30 + 130 * u), int(90 + 160 * u)), 2)
+        prev = pt
+    d.ellipse((14, 14, 18, 18), fill=(250, 236, 255, 255))
+    return img
+
+
+def i_mahoraga():
+    """The eight-handled wheel over the Divine General's head."""
+    img, d = badge(TECH_RIM["ten_shadows"], (10, 6, 16))
+    brass, dark = (214, 182, 102), (120, 92, 44)
+    for k in range(8):
+        a = k * math.pi / 4
+        line(d, [(16, 16), (16 + math.cos(a) * 8, 16 + math.sin(a) * 8)], dark)                  # spokes
+        hx, hy = 16 + math.cos(a) * 11, 16 + math.sin(a) * 11
+        line(d, [(16 + math.cos(a) * 8, 16 + math.sin(a) * 8), (hx, hy)], brass, 2)              # handles
+        d.rectangle((hx - 1, hy - 1, hx + 1, hy + 1), fill=brass + (255,))
+    d.ellipse((8, 8, 24, 24), outline=brass + (255,), width=2)                                   # the rim
+    d.ellipse((13, 13, 19, 19), fill=brass + (255,))                                             # the hub
+    d.ellipse((15, 15, 17, 17), fill=dark + (255,))
+    return img
+
+
 def i_rct():
     img, d = badge(TECH_RIM["universal"], (24, 40, 30))
     poly(d, [(16, 26), (6, 15), (6, 10), (9, 7), (13, 7), (16, 10), (19, 7), (23, 7), (26, 10), (26, 15)], (250, 250, 240))
@@ -544,10 +819,13 @@ def i_womb():
 # What every item is
 # ---------------------------------------------------------------------------
 TECH_COL = {"limitless": "§b", "shrine": "§c", "ten_shadows": "§5", "cursed_speech": "§3", "blood": "§4", "boogie": "§6",
-            "heavenly": "§e", "universal": "§f", "straw_doll": "§6", "ratio": "§9"}
+            "heavenly": "§e", "universal": "§f", "straw_doll": "§6", "ratio": "§9", "projection": "§f", "disaster_flames": "§6",
+            "idle_transfiguration": "§9", "idle_death_gamble": "§a", "cursed_spirit": "§d"}
 TECH_NAME = {"limitless": "Limitless", "shrine": "Shrine", "ten_shadows": "Ten Shadows", "cursed_speech": "Cursed Speech",
              "blood": "Blood Manipulation", "boogie": "Boogie Woogie", "heavenly": "Heavenly Restriction", "universal": "Jujutsu",
-             "straw_doll": "Straw Doll", "ratio": "Ratio"}
+             "straw_doll": "Straw Doll", "ratio": "Ratio", "projection": "Projection Sorcery", "disaster_flames": "Disaster Flames",
+             "idle_transfiguration": "Idle Transfiguration", "idle_death_gamble": "Idle Death Gamble",
+             "cursed_spirit": "Cursed Spirit Manipulation"}
 MOVES = {  # id: (name, technique, line of lore, icon)
     "blue": ("Blue", "limitless", "Pulls everything to a point ahead and crushes it", i_blue),
     "red": ("Red", "limitless", "A blast of repulsion that hurls enemies away", i_red),
@@ -561,6 +839,8 @@ MOVES = {  # id: (name, technique, line of lore, icon)
     "summon_nue": ("Nue", "ten_shadows", "A winged shikigami that strikes from above", i_nue),
     "summon_max_elephant": ("Max Elephant", "ten_shadows", "Drop a colossal elephant from the sky", i_elephant),
     "chimera_shadow_garden": ("Domain Expansion: Chimera Shadow Garden", "ten_shadows", "Flood the ground with shadow", i_garden),
+    "summon_mahoraga": ("Eight-Handled Sword Divergent Sila Divine General Mahoraga", "ten_shadows",
+                        "The ritual: beat it alone and it's yours", i_mahoraga),
     "speech_dont_move": ("\"Don't Move\"", "cursed_speech", "Freezes everyone in front of you in place", i_dont_move),
     "speech_blast_away": ("\"Blast Away\"", "cursed_speech", "Blows enemies back with your voice", i_blast),
     "speech_crush": ("\"Crush\"", "cursed_speech", "Crushes the target with a single word", i_crush),
@@ -581,6 +861,29 @@ MOVES = {  # id: (name, technique, line of lore, icon)
     "ratio_flurry": ("Blunt Sword Flurry", "ratio", "Three blows; the last one finds the weak point", i_flurry),
     "ratio_overtime": ("Overtime", "ratio", "A binding vow: after hours, you hit much harder", i_overtime),
     "ratio_collapse": ("Extension: Collapse", "ratio", "Shatter everything around the point you strike", i_collapse),
+    "projection_rush": ("24 FPS Rush", "projection", "Four frames forward in a blink: all you pass are frozen", i_fps_rush),
+    "projection_freeze": ("Frame Freeze", "projection", "Trap the one in front of you inside a frame", i_frame_freeze),
+    "projection_barrage": ("Accelerated Barrage", "projection", "Speed III and harder blows for 6 s", i_accel_barrage),
+    "time_cell_moon_palace": ("Domain Expansion: Time Cell Moon Palace", "projection", "Whoever moves inside is torn apart", i_moon_palace),
+    "disaster_ember": ("Ember Insects", "disaster_flames", "Three burning insects that burst on contact", i_ember_insects),
+    "disaster_stream": ("Fire Stream", "disaster_flames", "A cone of fire in front of you", i_fire_stream),
+    "disaster_meteor": ("Maximum: Meteor", "disaster_flames", "A burning mountain falls on your enemy", i_meteor),
+    "iron_mountain": ("Domain Expansion: Coffin of the Iron Mountain", "disaster_flames", "The inside of a volcano: everyone burns",
+                      i_iron_mountain),
+    "idle_soul_touch": ("Soul Touch", "idle_transfiguration", "Touch someone and twist the shape of their soul", i_soul_touch),
+    "idle_body_repel": ("Body Repel", "idle_transfiguration", "Spikes burst out of your body", i_body_repel),
+    "idle_isomer": ("Polymorphic Soul Isomer", "idle_transfiguration", "Two transfigured humans fight for you", i_isomer),
+    "self_embodiment": ("Domain Expansion: Self-Embodiment of Perfection", "idle_transfiguration", "Every soul inside is touched",
+                        i_perfection),
+    "gamble_rough": ("Rough Energy", "idle_death_gamble", "Rough cursed energy — and maybe a little luck", i_rough_energy),
+    "gamble_shutter": ("Shutter Doors", "idle_death_gamble", "Two doors slam shut on your target", i_shutter_doors),
+    "gamble_pachinko": ("Pachinko Rush", "idle_death_gamble", "A spray of pachinko balls", i_pachinko),
+    "idle_death_gamble_domain": ("Domain Expansion: Idle Death Gamble", "idle_death_gamble", "Spin for a JACKPOT: 20 s you can't lose",
+                                 i_jackpot),
+    "spirit_release": ("Release", "cursed_spirit", "Release your strongest stored curse to fight", i_spirit_release),
+    "spirit_absorb": ("Absorb", "cursed_spirit", "Swallow a weakened curse on the spot", i_spirit_absorb),
+    "spirit_swarm": ("Cursed Swarm", "cursed_spirit", "Release four stored curses at once", i_spirit_swarm),
+    "uzumaki": ("Maximum: Uzumaki", "cursed_spirit", "Every stored curse in one spiralling blast", i_uzumaki),
     "reverse_cursed_technique": ("Reverse Cursed Technique", "universal", "Turn cursed energy positive and heal", i_rct),
     "simple_domain": ("Simple Domain", "universal", "A small barrier that neutralises a domain's sure-hit", i_simple_domain),
 }

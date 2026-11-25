@@ -45,9 +45,19 @@ function drop(dim, loc, id, n = 1) {
   }
 }
 
+export const deathHooks = []; // (dead entity, killer player or undefined) — e.g. Cursed Spirit Manipulation absorbs curses
+
 function onDeath(dead, src) {
   const t = dead.typeId;
   const p = killer(src);
+  if (getProp(dead, "owner")) return; // someone's servant curse: no XP, no drops
+  for (const f of deathHooks) {
+    try {
+      f(dead, p);
+    } catch {
+      /* ignore */
+    }
+  }
   const at = { ...dead.location };
   const dim = dead.dimension;
   if (t in CURSE_XP) {
@@ -83,7 +93,14 @@ function onDeath(dead, src) {
 // The Finger Bearer
 // ---------------------------------------------------------------------------
 const bossState = new Map(); // entity id -> { roar, spikes, spawn, field, fieldUntil }
-const victims = (boss, r) => foes(boss, boss.location, r).filter((e) => isPlayer(e) || getProp(e, "owner") || sideOf(e) === "ally");
+const minion = (e) => {
+  try {
+    return e.hasTag("jjk_minion"); // a villain's curse
+  } catch {
+    return false;
+  }
+};
+const victims = (boss, r) => foes(boss, boss.location, r).filter((e) => isPlayer(e) || (getProp(e, "owner") && !minion(e)) || sideOf(e) === "ally");
 
 function bossTick(boss) {
   const s = bossState.get(boss.id) ?? { roar: now() + 100, spikes: now() + 60, spawn: now() + 200, field: now() + 300, fieldUntil: 0, idle: 0 };

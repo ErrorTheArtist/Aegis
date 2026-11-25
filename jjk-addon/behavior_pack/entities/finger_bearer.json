@@ -70,6 +70,10 @@
           }
         ]
       },
+      "minecraft:tameable": {
+        "probability": 0.0,
+        "tame_items": "minecraft:barrier"
+      },
       "minecraft:type_family": {
         "family": [
           "curse",

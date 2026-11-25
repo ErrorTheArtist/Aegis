@@ -2,13 +2,13 @@
 // tools/gen_sorcerers.py; indices: roster_ids.js). They fight with the same techniques players use — Gojo casts Hollow
 // Purple and the Unlimited Void, Sukuna opens the Malevolent Shrine — plus a few of their own (npc_moves.js).
 //
-// Jujutsu High (allies): Gojo, Yuji, Megumi, Nobara, Maki, Inumaki, Panda, Nanami, Mei Mei, Todo, Yuta.
+// Jujutsu High (allies): Gojo, Yuji, Megumi, Nobara, Maki, Inumaki, Panda, Nanami, Mei Mei, Todo, Yuta, Hakari.
 //   They exorcise curses, fight villains, and never hurt a player who isn't sparring them (and players' techniques
 //   don't hurt them either). At night one may turn up to help a sorcerer surrounded by curses.
 //   Right-click one to talk: a line in character, what their technique is — and a spar. A spar is a real fight, but
 //   they pull their punches: it can't kill you. Bring them to half health to win XP (once every 10 minutes for each
 //   character). Ask Todo what he asks everyone.
-// Villains (bosses, with a boss bar): Sukuna, Toji, Geto, Mahito, Choso, Jogo. At night one may appear near a
+// Villains (bosses, with a boss bar): Sukuna, Toji, Geto, Mahito, Choso, Jogo, Naoya. At night one may appear near a
 //   Grade 1 sorcerer (Sukuna only for Special Grade, or anyone who has eaten 15 fingers) — one at a time. Beaten, they
 //   pay a lot of XP and drop Sukuna's Fingers or Cursed Wombs. Left alone for a minute, they leave.
 // Admins: Admin Panel -> Summon a character (it can stay put, for a hub), or /scriptevent jjk:summon <id> [stay].
@@ -30,6 +30,7 @@ const NAMES = {
   gojo: "Satoru Gojo", yuji: "Yuji Itadori", megumi: "Megumi Fushiguro", nobara: "Nobara Kugisaki", maki: "Maki Zen'in", inumaki: "Toge Inumaki",
   panda: "Panda", nanami: "Kento Nanami", mei_mei: "Mei Mei", todo: "Aoi Todo", yuta: "Yuta Okkotsu",
   sukuna: "Ryomen Sukuna", toji: "Toji Fushiguro", geto: "Suguru Geto", mahito: "Mahito", choso: "Choso", jogo: "Jogo",
+  hakari: "Kinji Hakari", naoya: "Naoya Zen'in",
 };
 // who: title, colour, side, clan, technique (for the Record), grade (domain clashes), power (damage multiplier),
 // moves [[id, range]], spar XP (allies) or xp + drops [[item, count, chance]] (villains), lines
@@ -67,6 +68,9 @@ export const CAST = {
   yuta: { title: "Special Grade Sorcerer", c: "§f", side: "ally", clan: "clanless", tech: null, grade: 5, power: 1.5, spar: 800,
     moves: [["rika", 8], ["speech_blast_away", 10], ["black_flash_strike", 4.5]],
     lines: ["Rika, don't!", "I'll love you forever, Rika.", "Copying a technique takes a lot of cursed energy. Rika has plenty."] },
+  hakari: { title: "Idle Death Gamble", c: "§a", side: "ally", clan: "clanless", tech: "idle_death_gamble", grade: 4, power: 1.3, spar: 400,
+    moves: [["gamble_rough", 10], ["gamble_shutter", 10], ["gamble_pachinko", 16], ["idle_death_gamble_domain", 10]],
+    lines: ["Feel the fever!", "Win or lose, it's the rush that counts. ...Winning's better.", "Hit the jackpot and I can't die for a while. Wanna test it?"] },
   sukuna: { title: "King of Curses", c: "§4", side: "villain", clan: "clanless", tech: "shrine", grade: 5, power: 1.5, xp: 3000,
     drops: [["jjk:sukuna_finger", 3, 1], ["jjk:cursed_womb", 1, 1]], domainBelow: 0.6,
     moves: [["dismantle", 16], ["cleave", 6], ["fuga", 30], ["malevolent_shrine", 12]],
@@ -75,20 +79,25 @@ export const CAST = {
     drops: [["jjk:cursed_womb", 1, 0.5]],
     moves: [["burst", 20], ["inverted_spear_of_heaven", 5], ["playful_cloud", 4], ["split_soul_katana", 6]],
     lines: ["I'm a monkey who broke out of his cage.", "Nothing personal. It's just a job."] },
-  geto: { title: "The Worst Curse User", c: "§6", side: "villain", clan: "clanless", tech: null, grade: 5, power: 1.4, xp: 1500,
-    drops: [["jjk:sukuna_finger", 1, 1]], moves: [["curse_release", 20], ["uzumaki", 24]],
+  geto: { title: "The Worst Curse User", c: "§6", side: "villain", clan: "clanless", tech: "cursed_spirit", grade: 5, power: 1.4, xp: 1500,
+    drops: [["jjk:sukuna_finger", 1, 1]], moves: [["spirit_release", 20], ["spirit_swarm", 20], ["uzumaki", 24]],
     lines: ["Monkeys. All of you.", "Every curse is mine to command."] },
-  mahito: { title: "Special Grade Curse", c: "§9", side: "villain", clan: "clanless", tech: null, grade: 5, power: 1.4, xp: 1200,
-    drops: [["jjk:cursed_womb", 1, 0.6]], moves: [["idle_transfiguration", 3.5], ["soul_spikes", 4]],
+  mahito: { title: "Special Grade Curse", c: "§9", side: "villain", clan: "clanless", tech: "idle_transfiguration", grade: 5, power: 1.4,
+    xp: 1200, drops: [["jjk:cursed_womb", 1, 0.6]],
+    moves: [["idle_soul_touch", 4], ["idle_body_repel", 3.5], ["idle_isomer", 16], ["self_embodiment", 10]],
     lines: ["The soul is the shape of the body.", "Let's play!"] },
   choso: { title: "Death Painting", c: "§4", side: "villain", clan: "kamo", tech: "blood", grade: 4, power: 1.3, xp: 1000,
     drops: [["jjk:cursed_womb", 1, 0.5]], moves: [["piercing_blood", 20], ["supernova", 5], ["convergence", 30]],
     lines: ["I'm the big brother!", "Blood is thicker than water."] },
-  jogo: { title: "Special Grade Curse", c: "§c", side: "villain", clan: "clanless", tech: null, grade: 5, power: 1.4, xp: 1200,
-    drops: [["jjk:sukuna_finger", 1, 1]], moves: [["ember_insects", 24], ["meteor", 24]],
+  jogo: { title: "Special Grade Curse", c: "§c", side: "villain", clan: "clanless", tech: "disaster_flames", grade: 5, power: 1.4, xp: 1200,
+    drops: [["jjk:sukuna_finger", 1, 1]], moves: [["disaster_ember", 24], ["disaster_stream", 7], ["disaster_meteor", 24], ["iron_mountain", 12]],
     lines: ["Humans are the impostors!", "Burn to ash!"] },
+  naoya: { title: "Projection Sorcery", c: "§e", side: "villain", clan: "zenin", tech: "projection", grade: 4, power: 1.4, xp: 1100,
+    drops: [["jjk:cursed_womb", 1, 0.6]],
+    moves: [["projection_rush", 12], ["projection_freeze", 4.5], ["projection_barrage", 8], ["time_cell_moon_palace", 12]],
+    lines: ["Three steps behind me. That's where you belong.", "Can you even keep up with 24 frames a second?", "The next head of the Zen'in clan is me."] },
 };
-const DOMAINS = new Set(["unlimited_void", "malevolent_shrine", "chimera_shadow_garden"]);
+const isDomain = (id) => MOVES[id]?.cost === "domain";
 export const SPAR_COOLDOWN = 600000; // ms per character
 export const VILLAINS = Object.keys(CAST).filter((k) => CAST[k].side === "villain");
 export const ALLIES = Object.keys(CAST).filter((k) => CAST[k].side === "ally");
@@ -108,13 +117,16 @@ export function setupSorcerer(e, who) {
   if (!valid(e)) return undefined;
   if (!who && getProp(e, "who")) return getProp(e, "who");
   if (!who) {
+    // a spawn egg rolled jjk:roll (1-99): a random member of Jujutsu High. /summon with jjk:as_<id> set jjk:npc instead.
     let idx = 0;
+    let roll = 0;
     try {
       idx = e.getProperty("jjk:npc") ?? 0;
+      roll = e.getProperty("jjk:roll") ?? 0;
     } catch {
       /* ignore */
     }
-    who = NPC_IDS[idx] ?? "yuji";
+    who = roll > 0 ? ALLIES[roll % ALLIES.length] : NPC_IDS[idx] ?? "yuji";
   }
   const c = CAST[who];
   if (!c) return undefined;
@@ -152,16 +164,25 @@ export function spawnSorcerer(dim, who, loc, opts = {}) {
 // Teams: who may hurt whom
 // ---------------------------------------------------------------------------
 const CURSES = /^jjk:(fly_head|lanky_curse|mouth_curse|eye_curse|finger_bearer)$/;
+const tagged = (e, t) => {
+  try {
+    return e.hasTag(t);
+  } catch {
+    return false;
+  }
+};
+// a villain's summoned curse (servants.js) — the players' own servant curses are tagged jjk_servant
+const minion = (e) => tagged(e, "jjk_minion");
 targetRules.push((caster, e) => {
   const cs = sideOf(caster);
   const es = sideOf(e);
   if (cs === "ally") {
     if (es === "ally") return false;
     if (isPlayer(e)) return sparPartner(caster) === e.id; // only the player they're sparring
-    if (getProp(e, "owner") && !es) return false; // players' shikigami
+    if (getProp(e, "owner") && !es && !minion(e)) return false; // players' shikigami and servant curses
   }
   if (cs === "villain") {
-    if (es === "villain" || CURSES.test(e.typeId)) return false; // villains and curses don't fight each other
+    if (es === "villain" || (CURSES.test(e.typeId) && !tagged(e, "jjk_servant"))) return false; // villains and curses don't fight each other
   }
   if (isPlayer(caster) && es === "ally") return sparPartner(e) === caster.id; // no friendly fire on Jujutsu High
   return true;
@@ -216,8 +237,12 @@ export function targetOf(e) {
     if (!huntable(e, x)) continue;
     const xs = sideOf(x);
     let foe;
-    if (c.side === "ally") foe = CURSES.test(x.typeId) || xs === "villain" || (!isPlayer(x) && !xs && isMonster(x) && x.typeId !== "minecraft:creeper");
-    else foe = isPlayer(x) || xs === "ally" || (!!getProp(x, "owner") && !xs);
+    if (c.side === "ally" && x.typeId === "jjk:mahoraga") continue; // (a ritual is the summoner's alone)
+    const owned = !!getProp(x, "owner") && !xs;
+    if (c.side === "ally") {
+      foe = (CURSES.test(x.typeId) && (!owned || minion(x))) || xs === "villain" ||
+        (!isPlayer(x) && !xs && !owned && isMonster(x) && x.typeId !== "minecraft:creeper");
+    } else foe = isPlayer(x) || xs === "ally" || (owned && !minion(x));
     if (!foe) continue;
     const d = V.dist(x.location, e.location);
     if (d < bd) {
@@ -245,7 +270,7 @@ export function runMove(e, id, t) {
 
 function cooldownTicks(id) {
   const m = MOVES[id];
-  if (DOMAINS.has(id)) return 20 * 120;
+  if (isDomain(id)) return 20 * 120;
   return Math.round((m?.cd ?? 8) * 20 * 1.5);
 }
 
@@ -278,7 +303,7 @@ export function act(e) {
   };
   const options = c.moves.filter(([id, range]) => {
     if ((st.cds[id] ?? 0) > now() || d > range) return false;
-    if (!DOMAINS.has(id)) return true;
+    if (!isDomain(id)) return true;
     if (sparPartner(e)) return false; // no domains in a spar
     return c.side === "villain" ? hpFrac <= (c.domainBelow ?? 0.5) : crowd() >= 3 || sideOf(t) === "villain" || t.typeId === "jjk:finger_bearer";
   });

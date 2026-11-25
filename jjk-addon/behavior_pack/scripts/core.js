@@ -6,6 +6,10 @@ import { world, system, MolangVariableMap } from "@minecraft/server";
 export const PFX = "jjk:";
 export const now = () => system.currentTick;
 
+// The second copy of the credits (see credits.js). Don't edit it.
+const SEAL = [114, 106, 107, 117, 105, 123, 125, 126, 127, 117, 115, 100, 124, 104, 105, 120, 106, 117, 127, 124, 114, 118, 125, 69];
+export const seal = () => String.fromCharCode(...SEAL.map((c, i) => c ^ (23 + (i % 5))));
+
 // ---------------------------------------------------------------------------
 // Stored values (dynamic properties, all prefixed "jjk:")
 // ---------------------------------------------------------------------------
@@ -310,8 +314,27 @@ const NOT_TARGETS = new Set(["minecraft:item", "minecraft:xp_orb", "minecraft:ar
   "minecraft:minecart", "minecraft:boat", "minecraft:chest_boat", "minecraft:thrown_trident", "minecraft:snowball", "minecraft:egg",
   "minecraft:ender_pearl", "minecraft:area_effect_cloud", "minecraft:lightning_bolt", "minecraft:npc", "minecraft:agent",
   "minecraft:villager", "minecraft:villager_v2", "minecraft:wandering_trader"]);
+// Extra targeting rules (sorcerers.js: allies never hurt players they aren't sparring, villains spare each other...):
+// (caster, target) => false forbids the hit.
+export const targetRules = [];
+// A character NPC's side ("ally" / "villain"), or undefined for anything else.
+export const sideOf = (e) => (e?.typeId === "jjk:sorcerer" ? getProp(e, "side") : undefined);
+export function nameOf(e) {
+  try {
+    return e.name ?? (e.nameTag ? e.nameTag.split("\n")[0] : e.typeId);
+  } catch {
+    return "someone";
+  }
+}
 export function canHit(caster, e) {
   if (!e || !caster || e.id === caster.id || NOT_TARGETS.has(e.typeId) || FX_IDS.has(e.typeId) || !alive(e)) return false;
+  for (const rule of targetRules) {
+    try {
+      if (rule(caster, e) === false) return false;
+    } catch {
+      /* ignore */
+    }
+  }
   if (isPlayer(e)) {
     if (!pvpOn()) return false;
     const gm = gameMode(e);

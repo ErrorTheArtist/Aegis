@@ -13,7 +13,7 @@
 
 import { world, system, ItemStack } from "@minecraft/server";
 import {
-  getProp, bump, isPlayer, alive, valid, health, fx, sound, mid, V, knock, effect, COLOR, foes, byId, worldProp, tell, ground, now,
+  getProp, bump, isPlayer, alive, valid, health, fx, sound, mid, V, knock, effect, COLOR, foes, byId, worldProp, tell, ground, now, sideOf,
 } from "./core.js";
 import { addXp, gradeOf, G } from "./grades.js";
 import { hurt } from "./combat.js";
@@ -83,7 +83,7 @@ function onDeath(dead, src) {
 // The Finger Bearer
 // ---------------------------------------------------------------------------
 const bossState = new Map(); // entity id -> { roar, spikes, spawn, field, fieldUntil }
-const victims = (boss, r) => foes(boss, boss.location, r).filter((e) => isPlayer(e) || getProp(e, "owner"));
+const victims = (boss, r) => foes(boss, boss.location, r).filter((e) => isPlayer(e) || getProp(e, "owner") || sideOf(e) === "ally");
 
 function bossTick(boss) {
   const s = bossState.get(boss.id) ?? { roar: now() + 100, spikes: now() + 60, spawn: now() + 200, field: now() + 300, fieldUntil: 0, idle: 0 };

@@ -1,0 +1,59 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.jjk.sorcerer_gear.sway": {
+      "loop": true,
+      "bones": {
+        "g_tail": {
+          "rotation": [
+            "math.sin(q.life_time * 200) * 5 - q.modified_move_speed * 14",
+            0,
+            "math.sin(q.life_time * 150) * 4"
+          ]
+        },
+        "g_braid": {
+          "rotation": [
+            "math.sin(q.life_time * 160) * 3 + q.modified_move_speed * 10",
+            0,
+            "math.sin(q.life_time * 120) * 3"
+          ]
+        },
+        "g_hood": {
+          "rotation": [
+            "q.modified_move_speed * 8",
+            0,
+            0
+          ]
+        },
+        "g_arm3": {
+          "rotation": [
+            "math.sin(q.life_time * 140) * 6",
+            0,
+            "-math.sin(q.life_time * 100) * 4"
+          ]
+        },
+        "g_arm4": {
+          "rotation": [
+            "-math.sin(q.life_time * 140) * 6",
+            0,
+            "math.sin(q.life_time * 100) * 4"
+          ]
+        },
+        "g_crow": {
+          "rotation": [
+            0,
+            "math.sin(q.life_time * 90) * 20",
+            0
+          ]
+        },
+        "g_worm": {
+          "rotation": [
+            0,
+            "math.sin(q.life_time * 60) * 6",
+            0
+          ]
+        }
+      }
+    }
+  }
+}

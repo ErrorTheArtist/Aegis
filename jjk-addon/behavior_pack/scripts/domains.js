@@ -14,7 +14,7 @@
 import { world, system } from "@minecraft/server";
 import {
   now, V, valid, alive, isPlayer, fx, sound, title, tell, bar, effect, clearEffect, spawnFx, removeFx, foes, mid, COLOR, look,
-  getProp, health, anim, ground,
+  getProp, health, anim, ground, nameOf,
 } from "./core.js";
 import { gradeOf, fingersOf, maxCE } from "./grades.js";
 import { getCE, isHeavenly, statusHooks } from "./energy.js";
@@ -50,6 +50,7 @@ function protectedFrom(d, e) {
   return active.some((o) => o !== d && o.caster.id === e.id && inside(o, e));
 }
 function power(p) {
+  if (!isPlayer(p)) return getProp(p, "grade", 4) + 1 + Math.random() * 1.5; // a character NPC: its grade, at full strength
   return gradeOf(p) + getCE(p) / Math.max(1, maxCE(p)) + fingersOf(p) * 0.05 + Math.random() * 1.5;
 }
 
@@ -81,10 +82,10 @@ export function expand(p, kind) {
     fx(d.dim, "jjk:shell", V.add(o.center, { x: 0, y: 1, z: 0 }), o.def.color, 1.4, { radius: o.def.radius });
     sound(d.dim, "random.explode", center, 1, 0.5);
     if (mine >= theirs) {
-      tell(o.caster, `§5Your domain was overwhelmed by ${p.name}'s ${def.name}!`);
+      tell(o.caster, `§5Your domain was overwhelmed by ${nameOf(p)}'s ${def.name}!`);
       collapse(o, "§cYour domain shattered in the clash.");
     } else {
-      tell(p, `§5${o.caster.name}'s ${o.def.name} overwhelms yours!`);
+      tell(p, `§5${nameOf(o.caster)}'s ${o.def.name} overwhelms yours!`);
       setBurnout(p, BURNOUT);
       bar(p, `§cYour domain failed to form. §7Burnout: ${BURNOUT / 20}s`, 60);
       return true; // the cost is still paid
@@ -111,7 +112,7 @@ export function expand(p, kind) {
   active.push(d);
   announce(d, "§5§lDOMAIN EXPANSION", `§f${def.name}`);
   try {
-    world.sendMessage(`§5✦ §f${p.name} §7opened their domain: §f${def.name}`);
+    world.sendMessage(`§5✦ §f${nameOf(p)} §7opened their domain: §f${def.name}`);
   } catch {
     /* ignore */
   }
@@ -147,6 +148,7 @@ function tickDomain(d) {
   if (now() >= d.until) return collapse(d);
   const victims = foes(p, d.center, d.def.radius, d.dim).filter((e) => !protectedFrom(d, e));
   const every = (n) => age % n === 0;
+  const k = isPlayer(p) ? 1 : 0.5; // a character NPC's sure-hit lands at half strength
   if (d.kind === "void") {
     for (const e of victims) {
       if (every(10)) {
@@ -154,7 +156,7 @@ function tickDomain(d) {
         suppressInfinity(e, 14);
       }
       if (every(20)) {
-        hurt(p, e, 2, { sure: true });
+        hurt(p, e, 2 * k, { sure: true });
         fx(d.dim, "jjk:aura", e.location, COLOR.white, 1.5);
       }
     }
@@ -162,13 +164,13 @@ function tickDomain(d) {
   } else if (d.kind === "shrine") {
     for (const e of victims) {
       if (every(10)) {
-        hurt(p, e, 4, { sure: true });
+        hurt(p, e, 4 * k, { sure: true });
         fx(d.dim, "jjk:slash", mid(e), COLOR.white, 0.8);
         fx(d.dim, "jjk:blood", mid(e), COLOR.blood, 0.6);
       }
       if (every(30)) {
         const max = health(e)?.effectiveMax ?? 20;
-        hurt(p, e, 6 + Math.min(15, max * 0.05), { sure: true });
+        hurt(p, e, (6 + Math.min(15, max * 0.05)) * k, { sure: true });
         fx(d.dim, "jjk:slash", mid(e), COLOR.red, 1.3);
       }
     }
@@ -185,7 +187,7 @@ function tickDomain(d) {
   } else if (d.kind === "garden") {
     for (const e of victims) {
       if (every(20)) {
-        hurt(p, e, 2, { sure: true });
+        hurt(p, e, 2 * k, { sure: true });
         effect(e, "slowness", 25, 2);
         fx(d.dim, "jjk:smoke", e.location, COLOR.dark, 1);
       }

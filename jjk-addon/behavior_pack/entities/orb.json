@@ -34,6 +34,14 @@
         "minecraft:scale": {
           "value": 5.0
         }
+      },
+      "jjk:v_fire": {
+        "minecraft:variant": {
+          "value": 3
+        },
+        "minecraft:scale": {
+          "value": 3.5
+        }
       }
     },
     "components": {
@@ -92,7 +100,8 @@
         "remove": {
           "component_groups": [
             "jjk:v_red",
-            "jjk:v_purple"
+            "jjk:v_purple",
+            "jjk:v_fire"
           ]
         }
       },
@@ -105,7 +114,8 @@
         "remove": {
           "component_groups": [
             "jjk:v_blue",
-            "jjk:v_purple"
+            "jjk:v_purple",
+            "jjk:v_fire"
           ]
         }
       },
@@ -118,7 +128,22 @@
         "remove": {
           "component_groups": [
             "jjk:v_blue",
-            "jjk:v_red"
+            "jjk:v_red",
+            "jjk:v_fire"
+          ]
+        }
+      },
+      "jjk:as_fire": {
+        "add": {
+          "component_groups": [
+            "jjk:v_fire"
+          ]
+        },
+        "remove": {
+          "component_groups": [
+            "jjk:v_blue",
+            "jjk:v_red",
+            "jjk:v_purple"
           ]
         }
       }

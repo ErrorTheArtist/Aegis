@@ -7,7 +7,7 @@
 
 import {
   V, eye, look, fx, sound, task, spawnFx, removeFx, tp, valid, alive, foes, mid, knock, anim, COLOR, rayEnd, ground, setProp, effect,
-  byId,
+  byId, nameOf, aimed,
 } from "./core.js";
 import { hurt } from "./combat.js";
 import { expand, setDogSummoner } from "./domains.js";
@@ -31,7 +31,7 @@ export function summonDogs(p, extra = false) {
     }
     setProp(dog, "owner", p.id);
     try {
-      dog.nameTag = `§7${p.name}'s ${kind === "white" ? "§fWhite" : "§8Black"} Dog`;
+      dog.nameTag = `§7${nameOf(p)}'s ${kind === "white" ? "§fWhite" : "§8Black"} Dog`;
     } catch {
       /* ignore */
     }
@@ -124,7 +124,8 @@ function nue(p) {
 function maxElephant(p) {
   anim(p, "summon");
   const dim = p.dimension;
-  const spot = ground(dim, rayEnd(dim, eye(p), look(p), 20).at);
+  const target = aimed(p, 20); // it falls on the enemy you aim at — or wherever you're looking
+  const spot = ground(dim, target ? target.location : rayEnd(dim, eye(p), look(p), 20).at);
   const top = V.add(spot, { x: 0, y: 14, z: 0 });
   const ele = spawnFx(dim, "jjk:max_elephant", top);
   sound(dim, "mob.ravager.roar", p.location, 1, 0.6);
@@ -160,7 +161,7 @@ export const TEN_SHADOWS = {
   summon_divine_dogs: { name: "Divine Dogs", cost: 30, cd: 15, grade: 0, run: divineDogs, info: "Two wolves fight for you for 30 s." },
   summon_nue: { name: "Nue", cost: 35, cd: 20, grade: 0, run: nue, info: "For 20 s it dives at your nearest enemy: 6 damage and slowness." },
   summon_max_elephant: { name: "Max Elephant", cost: 60, cd: 25, grade: 2, run: maxElephant,
-    info: "Drops where you look (up to 20 blocks): 20 damage in 5 blocks." },
+    info: "Drops on the enemy you aim at (or where you look, 20 blocks): 20 damage in 5 blocks." },
   chimera_shadow_garden: { name: "Domain Expansion: Chimera Shadow Garden", cost: "domain", cd: 90, grade: 4, run: (p) => expand(p, "garden"),
     info: "Radius 12, 10 s: enemies slowed, 2 damage a second; you're faster and tougher; two more dogs." },
 };

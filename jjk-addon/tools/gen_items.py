@@ -83,7 +83,8 @@ def poly(d, pts, col):
 # Icons
 # ---------------------------------------------------------------------------
 TECH_RIM = {"limitless": (90, 200, 255), "shrine": (200, 30, 40), "ten_shadows": (120, 90, 190), "cursed_speech": (60, 190, 170),
-            "blood": (150, 14, 28), "boogie": (240, 160, 40), "universal": (235, 225, 190)}
+            "blood": (150, 14, 28), "boogie": (240, 160, 40), "universal": (235, 225, 190), "straw_doll": (200, 128, 60),
+            "ratio": (206, 186, 128)}
 
 
 def i_blue():
@@ -337,6 +338,101 @@ def i_black_flash_swap():
     return img
 
 
+def doll(d, cx, cy, col=(214, 182, 108), dark=(150, 118, 60)):
+    """A little straw doll: round head, arms out, a bound waist."""
+    d.ellipse((cx - 3, cy - 9, cx + 3, cy - 3), fill=col + (255,))
+    d.rectangle((cx - 7, cy - 2, cx + 7, cy), fill=col + (255,))
+    poly(d, [(cx - 3, cy - 3), (cx + 3, cy - 3), (cx + 4, cy + 8), (cx - 4, cy + 8)], col)
+    line(d, [(cx - 3, cy + 3), (cx + 3, cy + 3)], dark)
+    for x in (cx - 6, cx + 6):
+        d.point((x, cy - 1), fill=dark + (255,))
+
+
+def nail(d, x0, y0, x1, y1, col=(190, 196, 206)):
+    line(d, [(x0, y0), (x1, y1)], col)
+    d.rectangle((x0 - 1, y0 - 1, x0 + 1, y0 + 1), fill=shade(col, 0.7))
+
+
+def i_hairpin():
+    img, d = badge(TECH_RIM["straw_doll"])
+    for (x0, y0), (x1, y1) in (((8, 22), (14, 9)), ((11, 24), (21, 10)), ((15, 25), (25, 13))):
+        nail(d, x0, y0, x1, y1)
+        d.point([(x1, y1 - 1), (x1 + 1, y1)], fill=(255, 200, 90, 255))
+    return img
+
+
+def i_resonance():
+    img, d = badge(TECH_RIM["straw_doll"], (30, 16, 12))
+    for r in (11, 8):
+        d.arc((16 - r, 16 - r, 16 + r, 16 + r), 0, 360, fill=(200, 40, 40, 255))
+    doll(d, 16, 17)
+    nail(d, 21, 9, 13, 18)
+    return img
+
+
+def i_nail_barrage():
+    img, d = badge(TECH_RIM["straw_doll"])
+    for k in range(8):
+        a = k * math.pi / 4
+        nail(d, int(16 + math.cos(a) * 12), int(16 + math.sin(a) * 12), int(16 + math.cos(a) * 7), int(16 + math.sin(a) * 7))
+    d.rectangle((12, 11, 20, 16), fill=(60, 60, 70, 255))                     # the hammer
+    d.rectangle((12, 11, 20, 12), fill=(120, 120, 130, 255))
+    d.rectangle((15, 16, 17, 24), fill=(130, 84, 44, 255))
+    return img
+
+
+def i_cursed_doll():
+    img, d = badge(TECH_RIM["straw_doll"], (36, 8, 24))
+    d.ellipse((7, 7, 25, 25), fill=(90, 16, 40, 255))
+    doll(d, 16, 17, (230, 170, 120), (140, 60, 40))
+    for x0, y0, x1, y1 in ((22, 8, 15, 16), (9, 9, 15, 15), (24, 20, 18, 19)):
+        nail(d, x0, y0, x1, y1)
+    return img
+
+
+def i_seven_three():
+    img, d = badge(TECH_RIM["ratio"])
+    d.rectangle((8, 6, 23, 25), outline=(230, 220, 190, 255))
+    d.rectangle((9, 7, 22, 24), fill=(54, 48, 40, 255))
+    y = 7 + int(17 * 0.7)
+    line(d, [(6, y), (25, y)], (255, 210, 80))
+    poly(d, [(16, y - 3), (19, y), (16, y + 3), (13, y)], (255, 240, 170))
+    return img
+
+
+def i_flurry():
+    img, d = badge(TECH_RIM["ratio"])
+    poly(d, [(8, 24), (21, 8), (24, 11), (11, 27)], (214, 206, 186))           # a blunt sword wrapped in cloth
+    for x, y in ((12, 21), (16, 16), (20, 11)):
+        d.point((x, y), fill=(40, 40, 50, 255))
+    for k in range(3):
+        line(d, [(18 + k * 3, 24), (26 + k, 18 - k * 2)], (255, 255, 255))
+    return img
+
+
+def i_overtime():
+    img, d = badge(TECH_RIM["ratio"], (24, 20, 16))
+    d.ellipse((7, 7, 24, 24), fill=(236, 230, 214, 255))
+    d.ellipse((7, 7, 24, 24), outline=(90, 80, 60, 255))
+    for k in range(12):
+        a = k * math.pi / 6
+        d.point((int(15.5 + math.cos(a) * 7), int(15.5 + math.sin(a) * 7)), fill=(90, 80, 60, 255))
+    line(d, [(16, 16), (16, 10)], (40, 40, 50))
+    line(d, [(16, 16), (21, 18)], (200, 30, 40))
+    return img
+
+
+def i_collapse():
+    img, d = badge(TECH_RIM["ratio"], (34, 30, 26))
+    d.rectangle((5, 17, 26, 25), fill=(120, 110, 98, 255))
+    for (x0, y0), (x1, y1) in (((16, 17), (10, 25)), ((16, 17), (21, 25)), ((16, 17), (6, 19)), ((16, 17), (26, 20))):
+        line(d, [(x0, y0), (x1, y1)], (40, 34, 30))
+    for x, y in ((9, 12), (21, 10), (14, 8), (25, 14)):
+        d.rectangle((x, y, x + 1, y + 1), fill=(150, 140, 126, 255))
+    poly(d, [(14, 4), (18, 4), (17, 14), (15, 14)], (255, 220, 120))
+    return img
+
+
 def i_rct():
     img, d = badge(TECH_RIM["universal"], (24, 40, 30))
     poly(d, [(16, 26), (6, 15), (6, 10), (9, 7), (13, 7), (16, 10), (19, 7), (23, 7), (26, 10), (26, 15)], (250, 250, 240))
@@ -448,9 +544,10 @@ def i_womb():
 # What every item is
 # ---------------------------------------------------------------------------
 TECH_COL = {"limitless": "§b", "shrine": "§c", "ten_shadows": "§5", "cursed_speech": "§3", "blood": "§4", "boogie": "§6",
-            "heavenly": "§e", "universal": "§f"}
+            "heavenly": "§e", "universal": "§f", "straw_doll": "§6", "ratio": "§9"}
 TECH_NAME = {"limitless": "Limitless", "shrine": "Shrine", "ten_shadows": "Ten Shadows", "cursed_speech": "Cursed Speech",
-             "blood": "Blood Manipulation", "boogie": "Boogie Woogie", "heavenly": "Heavenly Restriction", "universal": "Jujutsu"}
+             "blood": "Blood Manipulation", "boogie": "Boogie Woogie", "heavenly": "Heavenly Restriction", "universal": "Jujutsu",
+             "straw_doll": "Straw Doll", "ratio": "Ratio"}
 MOVES = {  # id: (name, technique, line of lore, icon)
     "blue": ("Blue", "limitless", "Pulls everything to a point ahead and crushes it", i_blue),
     "red": ("Red", "limitless", "A blast of repulsion that hurls enemies away", i_red),
@@ -476,6 +573,14 @@ MOVES = {  # id: (name, technique, line of lore, icon)
     "boogie_feint": ("Feint", "boogie", "Clap without swapping — everyone around flinches", i_feint),
     "clap_barrage": ("Clap Barrage", "boogie", "Swap and strike, swap and strike", i_clap),
     "black_flash_swap": ("Vibe Swap: Black Flash", "boogie", "Swap behind them and land a sure Black Flash", i_black_flash_swap),
+    "straw_hairpin": ("Hairpin", "straw_doll", "Three nails — and every one that sticks bursts", i_hairpin),
+    "straw_resonance": ("Resonance", "straw_doll", "Strike the doll: the last one you hurt feels it", i_resonance),
+    "straw_nail_barrage": ("Nail Barrage", "straw_doll", "Slam the hammer: nails in every direction", i_nail_barrage),
+    "straw_cursed_doll": ("Resonance: Cursed Doll", "straw_doll", "Everyone you've hurt lately takes the blow", i_cursed_doll),
+    "ratio_seven_three": ("7:3", "ratio", "Strike the 7:3 point for a critical hit", i_seven_three),
+    "ratio_flurry": ("Blunt Sword Flurry", "ratio", "Three blows; the last one finds the weak point", i_flurry),
+    "ratio_overtime": ("Overtime", "ratio", "A binding vow: after hours, you hit much harder", i_overtime),
+    "ratio_collapse": ("Extension: Collapse", "ratio", "Shatter everything around the point you strike", i_collapse),
     "reverse_cursed_technique": ("Reverse Cursed Technique", "universal", "Turn cursed energy positive and heal", i_rct),
     "simple_domain": ("Simple Domain", "universal", "A small barrier that neutralises a domain's sure-hit", i_simple_domain),
 }
@@ -486,7 +591,7 @@ TOOLS = {  # Heavenly Restriction: cursed tools (real melee weapons) — id: (na
     "split_soul_katana": ("Split Soul Katana", 11, "Cuts the soul directly, ignoring the body's toughness", i_split_soul),
 }
 MISC = {  # id: (display name, icon, extra components)
-    "jujutsu_record": ("§dJujutsu Record§r\n§7Your technique, grade and moves", i_record, {"minecraft:glint": True}),
+    "jujutsu_record": ("§dJujutsu Record§r\n§7Your clan, technique, grade and moves\n§8Jujutsu Legacy by errorlegend", i_record, {"minecraft:glint": True}),
     "sukuna_finger": ("§4Sukuna's Finger§r\n§7Eat it: more cursed energy, more power", i_finger,
                       {"minecraft:glint": True, "minecraft:max_stack_size": 20}),
     "cursed_womb": ("§5Cursed Womb§r\n§7Reawaken: a new random innate technique", i_womb, {"minecraft:glint": True}),
@@ -545,12 +650,13 @@ def pack_icon():
         d.ellipse((cx - rr, cy - rr, cx + rr, cy + rr), fill=c + (255,))
         d.ellipse((cx - rr + 8, cy - rr + 8, cx - rr + 20, cy - rr + 20), fill=(255, 255, 255, 255))
     font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 30)
-    for text, y in (("JUJUTSU", 182), ("LEGACY", 214)):
-        tw = d.textlength(text, font=font)
-        d.text(((S - tw) / 2 + 2, y + 2), text, font=font, fill=(0, 0, 0, 255))
-        d.text(((S - tw) / 2, y), text, font=font, fill=(236, 230, 255, 255))
+    small_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 15)
+    for text, y, f in (("JUJUTSU", 166, font), ("LEGACY", 197, font), ("by errorlegend", 234, small_font)):
+        tw = d.textlength(text, font=f)
+        d.text(((S - tw) / 2 + 2, y + 2), text, font=f, fill=(0, 0, 0, 255))
+        d.text(((S - tw) / 2, y), text, font=f, fill=(236, 230, 255, 255) if f is font else (210, 160, 255, 255))
     small = img.resize((64, 64), Image.LANCZOS).resize((256, 256), Image.NEAREST)   # a crisp pixel-art finish
-    small.paste(img.crop((0, 176, 256, 256)), (0, 176))
+    small.paste(img.crop((0, 160, 256, 256)), (0, 160))
     return small
 
 

@@ -16,15 +16,24 @@ check("two starting moves (grade 4)", want.length === 2, JSON.stringify(want));
 const items = inv(p);
 check("moves + record in inventory", want.every((id) => items.includes("jjk:" + id)) && items.includes("jjk:jujutsu_record"), JSON.stringify(items));
 check("items locked and kept on death", p._inv._slots.filter(Boolean).every((s) => s.lockMode === "inventory" && s.keepOnDeath));
-check("awakening title shown", p._titles.some((t) => /AWAKENED|awakened/.test(t)), JSON.stringify(p._titles));
+check("awakening title shown (with the clan)", p._titles.some((t) => /Born into/.test(t)), JSON.stringify(p._titles));
 
-// 2. weights: roughly the advertised rarity over many rolls
+// 2. clans and rarity: overall chances over many births
+const Cl = await import("./clans.mjs");
 const counts = {};
-for (let i = 0; i < 20000; i++) { const t = T.pickTechnique(); counts[t] = (counts[t] || 0) + 1; }
-const pct = (k) => (counts[k] / 200).toFixed(1);
-check("limitless ~2%", Math.abs(counts.limitless / 200 - 2) < 0.7, pct("limitless"));
-check("boogie ~28%", Math.abs(counts.boogie / 200 - 28) < 2, pct("boogie"));
-check("reroll never repeats", [...Array(500)].every(() => T.pickTechnique("boogie") !== "boogie"));
+for (let i = 0; i < 40000; i++) { const t = Cl.rollTechnique(Cl.rollClan()); counts[t] = (counts[t] || 0) + 1; }
+const pct = (k) => (counts[k] / 400).toFixed(1);
+check("Limitless ~1.5%", Math.abs(counts.limitless / 400 - 1.5) < 0.5, pct("limitless"));
+check("Shrine ~3.1%", Math.abs(counts.shrine / 400 - 3.1) < 0.6, pct("shrine"));
+check("Boogie Woogie ~22%", Math.abs(counts.boogie / 400 - 21.9) < 1.5, pct("boogie"));
+check("Straw Doll ~19%", Math.abs(counts.straw_doll / 400 - 18.8) < 1.5, pct("straw_doll"));
+check("all nine techniques appear", Object.keys(counts).length === 9, JSON.stringify(counts));
+check("reroll never repeats", [...Array(500)].every(() => Cl.rollTechnique("clanless", "boogie") !== "boogie"));
+check("born into a clan", !!Cl.CLANS[p._props["jjk:clan"]], p._props["jjk:clan"]);
+check("…and the technique is one their blood allows", Cl.canInherit(p._props["jjk:clan"], p._props["jjk:technique"]));
+check("awakening message names the clan and the credits", p._msgs.some((m) => m.includes("Clan:") && m.includes("errorlegend")), p._msgs[0]);
+await tick(40);
+check("the credits on joining (made by errorlegend, Discord errorlegend_)", p._msgs.some((m) => m.includes("made by §derrorlegend") && m.includes("errorlegend_")), JSON.stringify(p._msgs.slice(-2)));
 
 // 3. sync removes foreign moves and duplicates
 T.setTechnique(p, "blood");
@@ -43,12 +52,12 @@ check("HUD on the action bar", p._bars.some((b) => b.includes("CE") && b.include
 const c0 = E.getCE(p);
 await tick(20);
 const regen = E.getCE(p) - c0;
-check("regenerates 2 CE/s at Grade 4", Math.abs(regen - 2) < 0.01, regen);
+check("regenerates 2 CE/s at Grade 4 (x1.2 for the Kamo)", Math.abs(regen - Gr.regenCE(p)) < 0.01 && Math.abs(Gr.regenCE(p) - 2 * (p._props["jjk:clan"] === "kamo" ? 1.2 : 1)) < 1e-9, regen);
 p.isSneaking = true;
 await tick(20);
 const c1 = E.getCE(p);
 await tick(20);
-check("focusing (sneak + still) doubles regen", Math.abs(E.getCE(p) - c1 - 4) < 0.01, E.getCE(p) - c1);
+check("focusing (sneak + still) doubles regen", Math.abs(E.getCE(p) - c1 - 2 * Gr.regenCE(p)) < 0.01, E.getCE(p) - c1);
 p.isSneaking = false;
 check("CE saved to a property", typeof p._props["jjk:ce"] === "number");
 

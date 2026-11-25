@@ -1,0 +1,147 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "jjk:sorcerer",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "s0": "textures/entity/jjk/sorcerer/gojo",
+        "s1": "textures/entity/jjk/sorcerer/yuji",
+        "s2": "textures/entity/jjk/sorcerer/megumi",
+        "s3": "textures/entity/jjk/sorcerer/nobara",
+        "s4": "textures/entity/jjk/sorcerer/maki",
+        "s5": "textures/entity/jjk/sorcerer/inumaki",
+        "s6": "textures/entity/jjk/sorcerer/panda",
+        "s7": "textures/entity/jjk/sorcerer/nanami",
+        "s8": "textures/entity/jjk/sorcerer/mei_mei",
+        "s9": "textures/entity/jjk/sorcerer/todo",
+        "s10": "textures/entity/jjk/sorcerer/yuta",
+        "s11": "textures/entity/jjk/sorcerer/sukuna",
+        "s12": "textures/entity/jjk/sorcerer/toji",
+        "s13": "textures/entity/jjk/sorcerer/geto",
+        "s14": "textures/entity/jjk/sorcerer/mahito",
+        "s15": "textures/entity/jjk/sorcerer/choso",
+        "s16": "textures/entity/jjk/sorcerer/jogo",
+        "gear_gojo": "textures/entity/jjk/sorcerer/gear_gojo",
+        "gear_yuji": "textures/entity/jjk/sorcerer/gear_yuji",
+        "gear_megumi": "textures/entity/jjk/sorcerer/gear_megumi",
+        "gear_nobara": "textures/entity/jjk/sorcerer/gear_nobara",
+        "gear_maki": "textures/entity/jjk/sorcerer/gear_maki",
+        "gear_inumaki": "textures/entity/jjk/sorcerer/gear_inumaki",
+        "gear_panda": "textures/entity/jjk/sorcerer/gear_panda",
+        "gear_nanami": "textures/entity/jjk/sorcerer/gear_nanami",
+        "gear_mei_mei": "textures/entity/jjk/sorcerer/gear_mei_mei",
+        "gear_todo": "textures/entity/jjk/sorcerer/gear_todo",
+        "gear_yuta": "textures/entity/jjk/sorcerer/gear_yuta",
+        "gear_sukuna": "textures/entity/jjk/sorcerer/gear_sukuna",
+        "gear_toji": "textures/entity/jjk/sorcerer/gear_toji",
+        "gear_geto": "textures/entity/jjk/sorcerer/gear_geto",
+        "gear_mahito": "textures/entity/jjk/sorcerer/gear_mahito",
+        "gear_choso": "textures/entity/jjk/sorcerer/gear_choso",
+        "gear_jogo": "textures/entity/jjk/sorcerer/gear_jogo"
+      },
+      "geometry": {
+        "default": "geometry.humanoid.custom",
+        "gear_gojo": "geometry.jjk.sorcerer_gear_gojo",
+        "gear_yuji": "geometry.jjk.sorcerer_gear_yuji",
+        "gear_megumi": "geometry.jjk.sorcerer_gear_megumi",
+        "gear_nobara": "geometry.jjk.sorcerer_gear_nobara",
+        "gear_maki": "geometry.jjk.sorcerer_gear_maki",
+        "gear_inumaki": "geometry.jjk.sorcerer_gear_inumaki",
+        "gear_panda": "geometry.jjk.sorcerer_gear_panda",
+        "gear_nanami": "geometry.jjk.sorcerer_gear_nanami",
+        "gear_mei_mei": "geometry.jjk.sorcerer_gear_mei_mei",
+        "gear_todo": "geometry.jjk.sorcerer_gear_todo",
+        "gear_yuta": "geometry.jjk.sorcerer_gear_yuta",
+        "gear_sukuna": "geometry.jjk.sorcerer_gear_sukuna",
+        "gear_toji": "geometry.jjk.sorcerer_gear_toji",
+        "gear_geto": "geometry.jjk.sorcerer_gear_geto",
+        "gear_mahito": "geometry.jjk.sorcerer_gear_mahito",
+        "gear_choso": "geometry.jjk.sorcerer_gear_choso",
+        "gear_jogo": "geometry.jjk.sorcerer_gear_jogo"
+      },
+      "animations": {
+        "humanoid_base_pose": "animation.humanoid.base_pose",
+        "look_at_target": "animation.humanoid.look_at_target.default",
+        "move": "animation.humanoid.move",
+        "attack.rotations": "animation.humanoid.attack.rotations",
+        "bob": "animation.humanoid.bob",
+        "sway": "animation.jjk.sorcerer_gear.sway"
+      },
+      "scripts": {
+        "pre_animation": [
+          "variable.tcos0 = (math.cos(query.modified_distance_moved * 38.17) * query.modified_move_speed) * 57.3;"
+        ],
+        "animate": [
+          "humanoid_base_pose",
+          "look_at_target",
+          "move",
+          "attack.rotations",
+          "bob",
+          "sway"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.jjk.sorcerer",
+        {
+          "controller.render.jjk.sorcerer_gear_gojo": "q.property('jjk:npc') == 0"
+        },
+        {
+          "controller.render.jjk.sorcerer_gear_yuji": "q.property('jjk:npc') == 1"
+        },
+        {
+          "controller.render.jjk.sorcerer_gear_megumi": "q.property('jjk:npc') == 2"
+        },
+        {
+          "controller.render.jjk.sorcerer_gear_nobara": "q.property('jjk:npc') == 3"
+        },
+        {
+          "controller.render.jjk.sorcerer_gear_maki": "q.property('jjk:npc') == 4"
+        },
+        {
+          "controller.render.jjk.sorcerer_gear_inumaki": "q.property('jjk:npc') == 5"
+        },
+        {
+          "controller.render.jjk.sorcerer_gear_panda": "q.property('jjk:npc') == 6"
+        },
+        {
+          "controller.render.jjk.sorcerer_gear_nanami": "q.property('jjk:npc') == 7"
+        },
+        {
+          "controller.render.jjk.sorcerer_gear_mei_mei": "q.property('jjk:npc') == 8"
+        },
+        {
+          "controller.render.jjk.sorcerer_gear_todo": "q.property('jjk:npc') == 9"
+        },
+        {
+          "controller.render.jjk.sorcerer_gear_yuta": "q.property('jjk:npc') == 10"
+        },
+        {
+          "controller.render.jjk.sorcerer_gear_sukuna": "q.property('jjk:npc') == 11"
+        },
+        {
+          "controller.render.jjk.sorcerer_gear_toji": "q.property('jjk:npc') == 12"
+        },
+        {
+          "controller.render.jjk.sorcerer_gear_geto": "q.property('jjk:npc') == 13"
+        },
+        {
+          "controller.render.jjk.sorcerer_gear_mahito": "q.property('jjk:npc') == 14"
+        },
+        {
+          "controller.render.jjk.sorcerer_gear_choso": "q.property('jjk:npc') == 15"
+        },
+        {
+          "controller.render.jjk.sorcerer_gear_jogo": "q.property('jjk:npc') == 16"
+        }
+      ],
+      "enable_attachables": true,
+      "spawn_egg": {
+        "base_color": "#22253a",
+        "overlay_color": "#e8ecf4"
+      }
+    }
+  }
+}

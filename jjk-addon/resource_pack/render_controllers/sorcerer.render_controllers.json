@@ -1,0 +1,226 @@
+{
+  "format_version": "1.8.0",
+  "render_controllers": {
+    "controller.render.jjk.sorcerer": {
+      "arrays": {
+        "textures": {
+          "Array.skins": [
+            "Texture.s0",
+            "Texture.s1",
+            "Texture.s2",
+            "Texture.s3",
+            "Texture.s4",
+            "Texture.s5",
+            "Texture.s6",
+            "Texture.s7",
+            "Texture.s8",
+            "Texture.s9",
+            "Texture.s10",
+            "Texture.s11",
+            "Texture.s12",
+            "Texture.s13",
+            "Texture.s14",
+            "Texture.s15",
+            "Texture.s16"
+          ]
+        }
+      },
+      "geometry": "Geometry.default",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Array.skins[q.property('jjk:npc')]"
+      ]
+    },
+    "controller.render.jjk.sorcerer_gear_gojo": {
+      "geometry": "Geometry.gear_gojo",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_gojo"
+      ]
+    },
+    "controller.render.jjk.sorcerer_gear_yuji": {
+      "geometry": "Geometry.gear_yuji",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_yuji"
+      ]
+    },
+    "controller.render.jjk.sorcerer_gear_megumi": {
+      "geometry": "Geometry.gear_megumi",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_megumi"
+      ]
+    },
+    "controller.render.jjk.sorcerer_gear_nobara": {
+      "geometry": "Geometry.gear_nobara",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_nobara"
+      ]
+    },
+    "controller.render.jjk.sorcerer_gear_maki": {
+      "geometry": "Geometry.gear_maki",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_maki"
+      ]
+    },
+    "controller.render.jjk.sorcerer_gear_inumaki": {
+      "geometry": "Geometry.gear_inumaki",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_inumaki"
+      ]
+    },
+    "controller.render.jjk.sorcerer_gear_panda": {
+      "geometry": "Geometry.gear_panda",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_panda"
+      ]
+    },
+    "controller.render.jjk.sorcerer_gear_nanami": {
+      "geometry": "Geometry.gear_nanami",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_nanami"
+      ]
+    },
+    "controller.render.jjk.sorcerer_gear_mei_mei": {
+      "geometry": "Geometry.gear_mei_mei",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_mei_mei"
+      ]
+    },
+    "controller.render.jjk.sorcerer_gear_todo": {
+      "geometry": "Geometry.gear_todo",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_todo"
+      ]
+    },
+    "controller.render.jjk.sorcerer_gear_yuta": {
+      "geometry": "Geometry.gear_yuta",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_yuta"
+      ]
+    },
+    "controller.render.jjk.sorcerer_gear_sukuna": {
+      "geometry": "Geometry.gear_sukuna",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_sukuna"
+      ]
+    },
+    "controller.render.jjk.sorcerer_gear_toji": {
+      "geometry": "Geometry.gear_toji",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_toji"
+      ]
+    },
+    "controller.render.jjk.sorcerer_gear_geto": {
+      "geometry": "Geometry.gear_geto",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_geto"
+      ]
+    },
+    "controller.render.jjk.sorcerer_gear_mahito": {
+      "geometry": "Geometry.gear_mahito",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_mahito"
+      ]
+    },
+    "controller.render.jjk.sorcerer_gear_choso": {
+      "geometry": "Geometry.gear_choso",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_choso"
+      ]
+    },
+    "controller.render.jjk.sorcerer_gear_jogo": {
+      "geometry": "Geometry.gear_jogo",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.gear_jogo"
+      ]
+    }
+  }
+}

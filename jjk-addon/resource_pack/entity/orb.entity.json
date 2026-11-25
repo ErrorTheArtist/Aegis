@@ -9,13 +9,14 @@
       "textures": {
         "blue": "textures/entity/jjk/orb_blue",
         "red": "textures/entity/jjk/orb_red",
-        "purple": "textures/entity/jjk/orb_purple"
+        "purple": "textures/entity/jjk/orb_purple",
+        "fire": "textures/entity/jjk/orb_fire"
       },
       "geometry": {
         "default": "geometry.jjk.orb"
       },
       "render_controllers": [
-        "controller.render.jjk.variant3"
+        "controller.render.jjk.variant4"
       ],
       "animations": {
         "spin": "animation.jjk.orb.spin"

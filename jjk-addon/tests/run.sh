@@ -21,7 +21,7 @@ done
 cp "$here"/harness.mjs "$here"/test*.mjs "$tmp/"
 fail=0
 for t in "$tmp"/${1:-test*}.mjs; do
-  out=$(node "$t" 2>&1) || true
+  out=$(JJK_ROOT="$here/.." node "$t" 2>&1) || true
   last=$(echo "$out" | tail -1)
   echo "$(basename "$t" .mjs): $last"
   if [ "$last" != "ALL OK" ]; then echo "$out" | grep -E "FAIL|Error" | head -20; fail=1; fi

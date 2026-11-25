@@ -1,0 +1,1196 @@
+{
+  "format_version": "1.21.0",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "jjk:sorcerer",
+      "is_spawnable": true,
+      "is_summonable": true,
+      "is_experimental": false,
+      "properties": {
+        "jjk:npc": {
+          "type": "int",
+          "range": [
+            0,
+            16
+          ],
+          "default": 0,
+          "client_sync": true
+        }
+      }
+    },
+    "component_groups": {
+      "jjk:ally": {
+        "minecraft:type_family": {
+          "family": [
+            "sorcerer",
+            "jjk_ally",
+            "mob"
+          ]
+        },
+        "minecraft:behavior.hurt_by_target": {
+          "priority": 1,
+          "entity_types": {
+            "filters": {
+              "test": "is_family",
+              "subject": "other",
+              "operator": "!=",
+              "value": "player"
+            }
+          }
+        },
+        "minecraft:behavior.nearest_attackable_target": {
+          "priority": 3,
+          "must_see": false,
+          "reselect_targets": true,
+          "within_radius": 24,
+          "entity_types": [
+            {
+              "filters": {
+                "any_of": [
+                  {
+                    "test": "is_family",
+                    "subject": "other",
+                    "operator": "==",
+                    "value": "curse"
+                  },
+                  {
+                    "test": "is_family",
+                    "subject": "other",
+                    "operator": "==",
+                    "value": "jjk_villain"
+                  },
+                  {
+                    "all_of": [
+                      {
+                        "test": "is_family",
+                        "subject": "other",
+                        "operator": "==",
+                        "value": "monster"
+                      },
+                      {
+                        "test": "is_family",
+                        "subject": "other",
+                        "operator": "!=",
+                        "value": "creeper"
+                      }
+                    ]
+                  },
+                  {
+                    "all_of": [
+                      {
+                        "test": "is_family",
+                        "subject": "other",
+                        "operator": "==",
+                        "value": "player"
+                      },
+                      {
+                        "test": "has_tag",
+                        "subject": "other",
+                        "value": "jjk_spar"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "max_dist": 24
+            }
+          ]
+        },
+        "minecraft:interact": {
+          "interactions": [
+            {
+              "on_interact": {
+                "filters": {
+                  "test": "is_family",
+                  "subject": "other",
+                  "operator": "==",
+                  "value": "player"
+                },
+                "event": "jjk:talked",
+                "target": "self"
+              },
+              "interact_text": "Talk",
+              "swing": true
+            }
+          ]
+        }
+      },
+      "jjk:villain": {
+        "minecraft:type_family": {
+          "family": [
+            "sorcerer",
+            "jjk_villain",
+            "monster",
+            "mob"
+          ]
+        },
+        "minecraft:behavior.hurt_by_target": {
+          "priority": 1
+        },
+        "minecraft:behavior.nearest_attackable_target": {
+          "priority": 3,
+          "must_see": false,
+          "reselect_targets": true,
+          "within_radius": 32,
+          "entity_types": [
+            {
+              "filters": {
+                "any_of": [
+                  {
+                    "test": "is_family",
+                    "subject": "other",
+                    "operator": "==",
+                    "value": "player"
+                  },
+                  {
+                    "test": "is_family",
+                    "subject": "other",
+                    "operator": "==",
+                    "value": "jjk_ally"
+                  },
+                  {
+                    "test": "is_family",
+                    "subject": "other",
+                    "operator": "==",
+                    "value": "shikigami"
+                  }
+                ]
+              },
+              "max_dist": 32
+            }
+          ]
+        },
+        "minecraft:persistent": {},
+        "minecraft:experience_reward": {
+          "on_death": "q.last_hit_by_player ? 120 : 0"
+        }
+      },
+      "jjk:despawn": {
+        "minecraft:instant_despawn": {}
+      },
+      "jjk:wanderer": {
+        "minecraft:despawn": {
+          "despawn_from_distance": {
+            "min_distance": 48,
+            "max_distance": 96
+          }
+        }
+      },
+      "jjk:stay": {
+        "minecraft:movement": {
+          "value": 0.0
+        }
+      },
+      "jjk:c_gojo": {
+        "minecraft:health": {
+          "value": 400,
+          "max": 400
+        },
+        "minecraft:attack": {
+          "damage": 12
+        },
+        "minecraft:movement": {
+          "value": 0.32
+        },
+        "minecraft:scale": {
+          "value": 1.06
+        },
+        "minecraft:collision_box": {
+          "width": 0.636,
+          "height": 1.9080000000000001
+        }
+      },
+      "jjk:c_yuji": {
+        "minecraft:health": {
+          "value": 160,
+          "max": 160
+        },
+        "minecraft:attack": {
+          "damage": 9
+        },
+        "minecraft:movement": {
+          "value": 0.33
+        },
+        "minecraft:scale": {
+          "value": 1.0
+        },
+        "minecraft:collision_box": {
+          "width": 0.6,
+          "height": 1.8
+        }
+      },
+      "jjk:c_megumi": {
+        "minecraft:health": {
+          "value": 130,
+          "max": 130
+        },
+        "minecraft:attack": {
+          "damage": 6
+        },
+        "minecraft:movement": {
+          "value": 0.3
+        },
+        "minecraft:scale": {
+          "value": 1.0
+        },
+        "minecraft:collision_box": {
+          "width": 0.6,
+          "height": 1.8
+        }
+      },
+      "jjk:c_nobara": {
+        "minecraft:health": {
+          "value": 110,
+          "max": 110
+        },
+        "minecraft:attack": {
+          "damage": 6
+        },
+        "minecraft:movement": {
+          "value": 0.3
+        },
+        "minecraft:scale": {
+          "value": 0.95
+        },
+        "minecraft:collision_box": {
+          "width": 0.57,
+          "height": 1.71
+        }
+      },
+      "jjk:c_maki": {
+        "minecraft:health": {
+          "value": 160,
+          "max": 160
+        },
+        "minecraft:attack": {
+          "damage": 10
+        },
+        "minecraft:movement": {
+          "value": 0.34
+        },
+        "minecraft:scale": {
+          "value": 0.98
+        },
+        "minecraft:collision_box": {
+          "width": 0.588,
+          "height": 1.764
+        }
+      },
+      "jjk:c_inumaki": {
+        "minecraft:health": {
+          "value": 100,
+          "max": 100
+        },
+        "minecraft:attack": {
+          "damage": 5
+        },
+        "minecraft:movement": {
+          "value": 0.3
+        },
+        "minecraft:scale": {
+          "value": 0.97
+        },
+        "minecraft:collision_box": {
+          "width": 0.582,
+          "height": 1.746
+        }
+      },
+      "jjk:c_panda": {
+        "minecraft:health": {
+          "value": 200,
+          "max": 200
+        },
+        "minecraft:attack": {
+          "damage": 9
+        },
+        "minecraft:movement": {
+          "value": 0.28
+        },
+        "minecraft:scale": {
+          "value": 1.2
+        },
+        "minecraft:collision_box": {
+          "width": 0.72,
+          "height": 2.16
+        }
+      },
+      "jjk:c_nanami": {
+        "minecraft:health": {
+          "value": 220,
+          "max": 220
+        },
+        "minecraft:attack": {
+          "damage": 10
+        },
+        "minecraft:movement": {
+          "value": 0.3
+        },
+        "minecraft:scale": {
+          "value": 1.05
+        },
+        "minecraft:collision_box": {
+          "width": 0.63,
+          "height": 1.8900000000000001
+        }
+      },
+      "jjk:c_mei_mei": {
+        "minecraft:health": {
+          "value": 200,
+          "max": 200
+        },
+        "minecraft:attack": {
+          "damage": 10
+        },
+        "minecraft:movement": {
+          "value": 0.3
+        },
+        "minecraft:scale": {
+          "value": 1.0
+        },
+        "minecraft:collision_box": {
+          "width": 0.6,
+          "height": 1.8
+        }
+      },
+      "jjk:c_todo": {
+        "minecraft:health": {
+          "value": 240,
+          "max": 240
+        },
+        "minecraft:attack": {
+          "damage": 11
+        },
+        "minecraft:movement": {
+          "value": 0.32
+        },
+        "minecraft:scale": {
+          "value": 1.15
+        },
+        "minecraft:collision_box": {
+          "width": 0.69,
+          "height": 2.07
+        }
+      },
+      "jjk:c_yuta": {
+        "minecraft:health": {
+          "value": 300,
+          "max": 300
+        },
+        "minecraft:attack": {
+          "damage": 11
+        },
+        "minecraft:movement": {
+          "value": 0.32
+        },
+        "minecraft:scale": {
+          "value": 1.0
+        },
+        "minecraft:collision_box": {
+          "width": 0.6,
+          "height": 1.8
+        }
+      },
+      "jjk:c_sukuna": {
+        "minecraft:health": {
+          "value": 3000,
+          "max": 3000
+        },
+        "minecraft:attack": {
+          "damage": 20
+        },
+        "minecraft:movement": {
+          "value": 0.33
+        },
+        "minecraft:scale": {
+          "value": 1.12
+        },
+        "minecraft:collision_box": {
+          "width": 0.672,
+          "height": 2.0160000000000005
+        },
+        "minecraft:boss": {
+          "hud_range": 40,
+          "name": "Ryomen Sukuna",
+          "should_darken_sky": true
+        }
+      },
+      "jjk:c_toji": {
+        "minecraft:health": {
+          "value": 900,
+          "max": 900
+        },
+        "minecraft:attack": {
+          "damage": 16
+        },
+        "minecraft:movement": {
+          "value": 0.38
+        },
+        "minecraft:scale": {
+          "value": 1.05
+        },
+        "minecraft:collision_box": {
+          "width": 0.63,
+          "height": 1.8900000000000001
+        },
+        "minecraft:boss": {
+          "hud_range": 40,
+          "name": "Toji Fushiguro",
+          "should_darken_sky": false
+        }
+      },
+      "jjk:c_geto": {
+        "minecraft:health": {
+          "value": 1400,
+          "max": 1400
+        },
+        "minecraft:attack": {
+          "damage": 12
+        },
+        "minecraft:movement": {
+          "value": 0.3
+        },
+        "minecraft:scale": {
+          "value": 1.05
+        },
+        "minecraft:collision_box": {
+          "width": 0.63,
+          "height": 1.8900000000000001
+        },
+        "minecraft:boss": {
+          "hud_range": 40,
+          "name": "Suguru Geto",
+          "should_darken_sky": false
+        }
+      },
+      "jjk:c_mahito": {
+        "minecraft:health": {
+          "value": 1000,
+          "max": 1000
+        },
+        "minecraft:attack": {
+          "damage": 12
+        },
+        "minecraft:movement": {
+          "value": 0.32
+        },
+        "minecraft:scale": {
+          "value": 1.0
+        },
+        "minecraft:collision_box": {
+          "width": 0.6,
+          "height": 1.8
+        },
+        "minecraft:boss": {
+          "hud_range": 40,
+          "name": "Mahito",
+          "should_darken_sky": false
+        }
+      },
+      "jjk:c_choso": {
+        "minecraft:health": {
+          "value": 800,
+          "max": 800
+        },
+        "minecraft:attack": {
+          "damage": 11
+        },
+        "minecraft:movement": {
+          "value": 0.3
+        },
+        "minecraft:scale": {
+          "value": 1.02
+        },
+        "minecraft:collision_box": {
+          "width": 0.612,
+          "height": 1.836
+        },
+        "minecraft:boss": {
+          "hud_range": 40,
+          "name": "Choso",
+          "should_darken_sky": false
+        }
+      },
+      "jjk:c_jogo": {
+        "minecraft:health": {
+          "value": 1100,
+          "max": 1100
+        },
+        "minecraft:attack": {
+          "damage": 12
+        },
+        "minecraft:movement": {
+          "value": 0.28
+        },
+        "minecraft:scale": {
+          "value": 0.92
+        },
+        "minecraft:collision_box": {
+          "width": 0.552,
+          "height": 1.6560000000000001
+        },
+        "minecraft:boss": {
+          "hud_range": 40,
+          "name": "Jogo",
+          "should_darken_sky": false
+        }
+      }
+    },
+    "components": {
+      "minecraft:type_family": {
+        "family": [
+          "sorcerer",
+          "mob"
+        ]
+      },
+      "minecraft:health": {
+        "value": 100,
+        "max": 100
+      },
+      "minecraft:attack": {
+        "damage": 6
+      },
+      "minecraft:movement": {
+        "value": 0.3
+      },
+      "minecraft:movement.basic": {},
+      "minecraft:jump.static": {},
+      "minecraft:can_climb": {},
+      "minecraft:navigation.walk": {
+        "can_path_over_water": true,
+        "can_open_doors": true,
+        "avoid_damage_blocks": true
+      },
+      "minecraft:physics": {},
+      "minecraft:pushable": {
+        "is_pushable": true,
+        "is_pushable_by_piston": true
+      },
+      "minecraft:collision_box": {
+        "width": 0.6,
+        "height": 1.8
+      },
+      "minecraft:breathable": {
+        "total_supply": 15,
+        "suffocate_time": 0
+      },
+      "minecraft:nameable": {
+        "always_show": true,
+        "allow_name_tag_renaming": false
+      },
+      "minecraft:behavior.float": {
+        "priority": 0
+      },
+      "minecraft:behavior.melee_attack": {
+        "priority": 2,
+        "speed_multiplier": 1.2,
+        "track_target": true
+      },
+      "minecraft:behavior.random_stroll": {
+        "priority": 7,
+        "speed_multiplier": 0.7
+      },
+      "minecraft:behavior.look_at_player": {
+        "priority": 8,
+        "look_distance": 10
+      },
+      "minecraft:behavior.random_look_around": {
+        "priority": 9
+      },
+      "minecraft:damage_sensor": {
+        "triggers": [
+          {
+            "cause": "fall",
+            "deals_damage": "no"
+          }
+        ]
+      },
+      "minecraft:knockback_resistance": {
+        "value": 0.4
+      },
+      "minecraft:follow_range": {
+        "value": 32,
+        "max": 32
+      }
+    },
+    "events": {
+      "jjk:as_gojo": {
+        "set_property": {
+          "jjk:npc": 0
+        },
+        "add": {
+          "component_groups": [
+            "jjk:c_gojo",
+            "jjk:ally"
+          ]
+        },
+        "remove": {
+          "component_groups": [
+            "jjk:c_yuji",
+            "jjk:c_megumi",
+            "jjk:c_nobara",
+            "jjk:c_maki",
+            "jjk:c_inumaki",
+            "jjk:c_panda",
+            "jjk:c_nanami",
+            "jjk:c_mei_mei",
+            "jjk:c_todo",
+            "jjk:c_yuta",
+            "jjk:c_sukuna",
+            "jjk:c_toji",
+            "jjk:c_geto",
+            "jjk:c_mahito",
+            "jjk:c_choso",
+            "jjk:c_jogo",
+            "jjk:villain"
+          ]
+        }
+      },
+      "jjk:as_yuji": {
+        "set_property": {
+          "jjk:npc": 1
+        },
+        "add": {
+          "component_groups": [
+            "jjk:c_yuji",
+            "jjk:ally"
+          ]
+        },
+        "remove": {
+          "component_groups": [
+            "jjk:c_gojo",
+            "jjk:c_megumi",
+            "jjk:c_nobara",
+            "jjk:c_maki",
+            "jjk:c_inumaki",
+            "jjk:c_panda",
+            "jjk:c_nanami",
+            "jjk:c_mei_mei",
+            "jjk:c_todo",
+            "jjk:c_yuta",
+            "jjk:c_sukuna",
+            "jjk:c_toji",
+            "jjk:c_geto",
+            "jjk:c_mahito",
+            "jjk:c_choso",
+            "jjk:c_jogo",
+            "jjk:villain"
+          ]
+        }
+      },
+      "jjk:as_megumi": {
+        "set_property": {
+          "jjk:npc": 2
+        },
+        "add": {
+          "component_groups": [
+            "jjk:c_megumi",
+            "jjk:ally"
+          ]
+        },
+        "remove": {
+          "component_groups": [
+            "jjk:c_gojo",
+            "jjk:c_yuji",
+            "jjk:c_nobara",
+            "jjk:c_maki",
+            "jjk:c_inumaki",
+            "jjk:c_panda",
+            "jjk:c_nanami",
+            "jjk:c_mei_mei",
+            "jjk:c_todo",
+            "jjk:c_yuta",
+            "jjk:c_sukuna",
+            "jjk:c_toji",
+            "jjk:c_geto",
+            "jjk:c_mahito",
+            "jjk:c_choso",
+            "jjk:c_jogo",
+            "jjk:villain"
+          ]
+        }
+      },
+      "jjk:as_nobara": {
+        "set_property": {
+          "jjk:npc": 3
+        },
+        "add": {
+          "component_groups": [
+            "jjk:c_nobara",
+            "jjk:ally"
+          ]
+        },
+        "remove": {
+          "component_groups": [
+            "jjk:c_gojo",
+            "jjk:c_yuji",
+            "jjk:c_megumi",
+            "jjk:c_maki",
+            "jjk:c_inumaki",
+            "jjk:c_panda",
+            "jjk:c_nanami",
+            "jjk:c_mei_mei",
+            "jjk:c_todo",
+            "jjk:c_yuta",
+            "jjk:c_sukuna",
+            "jjk:c_toji",
+            "jjk:c_geto",
+            "jjk:c_mahito",
+            "jjk:c_choso",
+            "jjk:c_jogo",
+            "jjk:villain"
+          ]
+        }
+      },
+      "jjk:as_maki": {
+        "set_property": {
+          "jjk:npc": 4
+        },
+        "add": {
+          "component_groups": [
+            "jjk:c_maki",
+            "jjk:ally"
+          ]
+        },
+        "remove": {
+          "component_groups": [
+            "jjk:c_gojo",
+            "jjk:c_yuji",
+            "jjk:c_megumi",
+            "jjk:c_nobara",
+            "jjk:c_inumaki",
+            "jjk:c_panda",
+            "jjk:c_nanami",
+            "jjk:c_mei_mei",
+            "jjk:c_todo",
+            "jjk:c_yuta",
+            "jjk:c_sukuna",
+            "jjk:c_toji",
+            "jjk:c_geto",
+            "jjk:c_mahito",
+            "jjk:c_choso",
+            "jjk:c_jogo",
+            "jjk:villain"
+          ]
+        }
+      },
+      "jjk:as_inumaki": {
+        "set_property": {
+          "jjk:npc": 5
+        },
+        "add": {
+          "component_groups": [
+            "jjk:c_inumaki",
+            "jjk:ally"
+          ]
+        },
+        "remove": {
+          "component_groups": [
+            "jjk:c_gojo",
+            "jjk:c_yuji",
+            "jjk:c_megumi",
+            "jjk:c_nobara",
+            "jjk:c_maki",
+            "jjk:c_panda",
+            "jjk:c_nanami",
+            "jjk:c_mei_mei",
+            "jjk:c_todo",
+            "jjk:c_yuta",
+            "jjk:c_sukuna",
+            "jjk:c_toji",
+            "jjk:c_geto",
+            "jjk:c_mahito",
+            "jjk:c_choso",
+            "jjk:c_jogo",
+            "jjk:villain"
+          ]
+        }
+      },
+      "jjk:as_panda": {
+        "set_property": {
+          "jjk:npc": 6
+        },
+        "add": {
+          "component_groups": [
+            "jjk:c_panda",
+            "jjk:ally"
+          ]
+        },
+        "remove": {
+          "component_groups": [
+            "jjk:c_gojo",
+            "jjk:c_yuji",
+            "jjk:c_megumi",
+            "jjk:c_nobara",
+            "jjk:c_maki",
+            "jjk:c_inumaki",
+            "jjk:c_nanami",
+            "jjk:c_mei_mei",
+            "jjk:c_todo",
+            "jjk:c_yuta",
+            "jjk:c_sukuna",
+            "jjk:c_toji",
+            "jjk:c_geto",
+            "jjk:c_mahito",
+            "jjk:c_choso",
+            "jjk:c_jogo",
+            "jjk:villain"
+          ]
+        }
+      },
+      "jjk:as_nanami": {
+        "set_property": {
+          "jjk:npc": 7
+        },
+        "add": {
+          "component_groups": [
+            "jjk:c_nanami",
+            "jjk:ally"
+          ]
+        },
+        "remove": {
+          "component_groups": [
+            "jjk:c_gojo",
+            "jjk:c_yuji",
+            "jjk:c_megumi",
+            "jjk:c_nobara",
+            "jjk:c_maki",
+            "jjk:c_inumaki",
+            "jjk:c_panda",
+            "jjk:c_mei_mei",
+            "jjk:c_todo",
+            "jjk:c_yuta",
+            "jjk:c_sukuna",
+            "jjk:c_toji",
+            "jjk:c_geto",
+            "jjk:c_mahito",
+            "jjk:c_choso",
+            "jjk:c_jogo",
+            "jjk:villain"
+          ]
+        }
+      },
+      "jjk:as_mei_mei": {
+        "set_property": {
+          "jjk:npc": 8
+        },
+        "add": {
+          "component_groups": [
+            "jjk:c_mei_mei",
+            "jjk:ally"
+          ]
+        },
+        "remove": {
+          "component_groups": [
+            "jjk:c_gojo",
+            "jjk:c_yuji",
+            "jjk:c_megumi",
+            "jjk:c_nobara",
+            "jjk:c_maki",
+            "jjk:c_inumaki",
+            "jjk:c_panda",
+            "jjk:c_nanami",
+            "jjk:c_todo",
+            "jjk:c_yuta",
+            "jjk:c_sukuna",
+            "jjk:c_toji",
+            "jjk:c_geto",
+            "jjk:c_mahito",
+            "jjk:c_choso",
+            "jjk:c_jogo",
+            "jjk:villain"
+          ]
+        }
+      },
+      "jjk:as_todo": {
+        "set_property": {
+          "jjk:npc": 9
+        },
+        "add": {
+          "component_groups": [
+            "jjk:c_todo",
+            "jjk:ally"
+          ]
+        },
+        "remove": {
+          "component_groups": [
+            "jjk:c_gojo",
+            "jjk:c_yuji",
+            "jjk:c_megumi",
+            "jjk:c_nobara",
+            "jjk:c_maki",
+            "jjk:c_inumaki",
+            "jjk:c_panda",
+            "jjk:c_nanami",
+            "jjk:c_mei_mei",
+            "jjk:c_yuta",
+            "jjk:c_sukuna",
+            "jjk:c_toji",
+            "jjk:c_geto",
+            "jjk:c_mahito",
+            "jjk:c_choso",
+            "jjk:c_jogo",
+            "jjk:villain"
+          ]
+        }
+      },
+      "jjk:as_yuta": {
+        "set_property": {
+          "jjk:npc": 10
+        },
+        "add": {
+          "component_groups": [
+            "jjk:c_yuta",
+            "jjk:ally"
+          ]
+        },
+        "remove": {
+          "component_groups": [
+            "jjk:c_gojo",
+            "jjk:c_yuji",
+            "jjk:c_megumi",
+            "jjk:c_nobara",
+            "jjk:c_maki",
+            "jjk:c_inumaki",
+            "jjk:c_panda",
+            "jjk:c_nanami",
+            "jjk:c_mei_mei",
+            "jjk:c_todo",
+            "jjk:c_sukuna",
+            "jjk:c_toji",
+            "jjk:c_geto",
+            "jjk:c_mahito",
+            "jjk:c_choso",
+            "jjk:c_jogo",
+            "jjk:villain"
+          ]
+        }
+      },
+      "jjk:as_sukuna": {
+        "set_property": {
+          "jjk:npc": 11
+        },
+        "add": {
+          "component_groups": [
+            "jjk:c_sukuna",
+            "jjk:villain"
+          ]
+        },
+        "remove": {
+          "component_groups": [
+            "jjk:c_gojo",
+            "jjk:c_yuji",
+            "jjk:c_megumi",
+            "jjk:c_nobara",
+            "jjk:c_maki",
+            "jjk:c_inumaki",
+            "jjk:c_panda",
+            "jjk:c_nanami",
+            "jjk:c_mei_mei",
+            "jjk:c_todo",
+            "jjk:c_yuta",
+            "jjk:c_toji",
+            "jjk:c_geto",
+            "jjk:c_mahito",
+            "jjk:c_choso",
+            "jjk:c_jogo",
+            "jjk:ally"
+          ]
+        }
+      },
+      "jjk:as_toji": {
+        "set_property": {
+          "jjk:npc": 12
+        },
+        "add": {
+          "component_groups": [
+            "jjk:c_toji",
+            "jjk:villain"
+          ]
+        },
+        "remove": {
+          "component_groups": [
+            "jjk:c_gojo",
+            "jjk:c_yuji",
+            "jjk:c_megumi",
+            "jjk:c_nobara",
+            "jjk:c_maki",
+            "jjk:c_inumaki",
+            "jjk:c_panda",
+            "jjk:c_nanami",
+            "jjk:c_mei_mei",
+            "jjk:c_todo",
+            "jjk:c_yuta",
+            "jjk:c_sukuna",
+            "jjk:c_geto",
+            "jjk:c_mahito",
+            "jjk:c_choso",
+            "jjk:c_jogo",
+            "jjk:ally"
+          ]
+        }
+      },
+      "jjk:as_geto": {
+        "set_property": {
+          "jjk:npc": 13
+        },
+        "add": {
+          "component_groups": [
+            "jjk:c_geto",
+            "jjk:villain"
+          ]
+        },
+        "remove": {
+          "component_groups": [
+            "jjk:c_gojo",
+            "jjk:c_yuji",
+            "jjk:c_megumi",
+            "jjk:c_nobara",
+            "jjk:c_maki",
+            "jjk:c_inumaki",
+            "jjk:c_panda",
+            "jjk:c_nanami",
+            "jjk:c_mei_mei",
+            "jjk:c_todo",
+            "jjk:c_yuta",
+            "jjk:c_sukuna",
+            "jjk:c_toji",
+            "jjk:c_mahito",
+            "jjk:c_choso",
+            "jjk:c_jogo",
+            "jjk:ally"
+          ]
+        }
+      },
+      "jjk:as_mahito": {
+        "set_property": {
+          "jjk:npc": 14
+        },
+        "add": {
+          "component_groups": [
+            "jjk:c_mahito",
+            "jjk:villain"
+          ]
+        },
+        "remove": {
+          "component_groups": [
+            "jjk:c_gojo",
+            "jjk:c_yuji",
+            "jjk:c_megumi",
+            "jjk:c_nobara",
+            "jjk:c_maki",
+            "jjk:c_inumaki",
+            "jjk:c_panda",
+            "jjk:c_nanami",
+            "jjk:c_mei_mei",
+            "jjk:c_todo",
+            "jjk:c_yuta",
+            "jjk:c_sukuna",
+            "jjk:c_toji",
+            "jjk:c_geto",
+            "jjk:c_choso",
+            "jjk:c_jogo",
+            "jjk:ally"
+          ]
+        }
+      },
+      "jjk:as_choso": {
+        "set_property": {
+          "jjk:npc": 15
+        },
+        "add": {
+          "component_groups": [
+            "jjk:c_choso",
+            "jjk:villain"
+          ]
+        },
+        "remove": {
+          "component_groups": [
+            "jjk:c_gojo",
+            "jjk:c_yuji",
+            "jjk:c_megumi",
+            "jjk:c_nobara",
+            "jjk:c_maki",
+            "jjk:c_inumaki",
+            "jjk:c_panda",
+            "jjk:c_nanami",
+            "jjk:c_mei_mei",
+            "jjk:c_todo",
+            "jjk:c_yuta",
+            "jjk:c_sukuna",
+            "jjk:c_toji",
+            "jjk:c_geto",
+            "jjk:c_mahito",
+            "jjk:c_jogo",
+            "jjk:ally"
+          ]
+        }
+      },
+      "jjk:as_jogo": {
+        "set_property": {
+          "jjk:npc": 16
+        },
+        "add": {
+          "component_groups": [
+            "jjk:c_jogo",
+            "jjk:villain"
+          ]
+        },
+        "remove": {
+          "component_groups": [
+            "jjk:c_gojo",
+            "jjk:c_yuji",
+            "jjk:c_megumi",
+            "jjk:c_nobara",
+            "jjk:c_maki",
+            "jjk:c_inumaki",
+            "jjk:c_panda",
+            "jjk:c_nanami",
+            "jjk:c_mei_mei",
+            "jjk:c_todo",
+            "jjk:c_yuta",
+            "jjk:c_sukuna",
+            "jjk:c_toji",
+            "jjk:c_geto",
+            "jjk:c_mahito",
+            "jjk:c_choso",
+            "jjk:ally"
+          ]
+        }
+      },
+      "jjk:despawn": {
+        "add": {
+          "component_groups": [
+            "jjk:despawn"
+          ]
+        }
+      },
+      "jjk:talked": {},
+      "jjk:wanderer": {
+        "add": {
+          "component_groups": [
+            "jjk:wanderer"
+          ]
+        }
+      },
+      "jjk:stay": {
+        "add": {
+          "component_groups": [
+            "jjk:stay"
+          ]
+        }
+      },
+      "jjk:move": {
+        "remove": {
+          "component_groups": [
+            "jjk:stay"
+          ]
+        }
+      },
+      "minecraft:entity_spawned": {
+        "set_property": {
+          "jjk:npc": "math.random_integer(0, 10)"
+        }
+      }
+    }
+  }
+}

@@ -19,6 +19,7 @@ import {
 } from "./core.js";
 import { gradeOf, dmgMult, maxCE, addXp, fingersOf } from "./grades.js";
 import { getCE, setCE, addCE, isHeavenly, statusHooks } from "./energy.js";
+import { clanMelee } from "./clans.js";
 
 export const PVP_SCALE = 0.6; // technique damage against players (fights last longer than one Hollow Purple)
 export const BOSS_CAP = 0.06; // no single hit takes more than 6% of a Special Grade curse's health
@@ -33,6 +34,8 @@ const infinityOff = new Map(); // player id -> tick until which Infinity is swit
 const infinityOn = new Set(); // players whose Resistance currently comes from Infinity
 const taken = new Map(); // player id -> [{ tick, dmg }] hits taken lately (Dragon-Bone stores them)
 export const dmgHooks = []; // (caster, target) => multiplier (domains: +50% inside your Unlimited Void)
+export const hitHooks = []; // (caster, target) => after any technique or melee hit lands (Straw Doll remembers who you hurt)
+export const dmgCaps = []; // (caster, target, damage) => damage (a sparring partner never takes you below 1 health)
 export const infinityBlockers = []; // (player) => true when Infinity can't run (burnout)
 
 export function capBoss(target, amount) {
@@ -56,12 +59,30 @@ export function hurt(caster, target, base, opts = {}) {
   if (isPlayer(target) && isPlayer(caster)) dmg *= PVP_SCALE;
   if (opts.sure || opts.pierce) suppressInfinity(target, opts.pierce ? 120 : 25);
   dmg = capBoss(target, dmg);
+  for (const f of dmgCaps) {
+    try {
+      dmg = f(caster, target, dmg) ?? dmg;
+    } catch {
+      /* ignore */
+    }
+  }
+  if (!(dmg > 0)) return false;
   scripted.set(target.id, now());
   try {
     target.applyDamage(Math.max(0.5, dmg), { cause: "entityAttack", damagingEntity: caster });
-    return true;
   } catch {
     return false;
+  }
+  hit(caster, target);
+  return true;
+}
+function hit(caster, target) {
+  for (const f of hitHooks) {
+    try {
+      f(caster, target);
+    } catch {
+      /* ignore */
+    }
   }
 }
 export const wasScripted = (e) => now() - (scripted.get(e?.id) ?? -99) <= 2;
@@ -132,7 +153,7 @@ export function blackFlashed(p, target) {
 }
 
 function meleeMult(p) {
-  return 1 + gradeOf(p) * (isHeavenly(p) ? 0.1 : 0.08) + fingersOf(p) * 0.01;
+  return (1 + gradeOf(p) * (isHeavenly(p) ? 0.1 : 0.08) + fingersOf(p) * 0.01) * clanMelee(p);
 }
 
 function onMelee(p, target, damage) {
@@ -150,6 +171,7 @@ function onMelee(p, target, damage) {
   total = capBoss(target, total);
   if (total > damage + 0.05) boostHit(target, damage, total, p);
   if (bf) blackFlashed(p, target);
+  hit(p, target);
 }
 
 // ---------------------------------------------------------------------------

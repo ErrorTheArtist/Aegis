@@ -1,12 +1,12 @@
 // Innate techniques: who gets what, the move items, and what happens when you right-click one.
 //
-// Every player awakens a random innate technique on their first join (rarer ones are rarer):
-//   Limitless 2% · Shrine 2% · Ten Shadows 8% · Cursed Speech 14% · Heavenly Restriction 20% · Blood Manipulation 26%
-//   · Boogie Woogie 28%
+// Every player is born into a clan and awakens an innate technique on their first join. The great clans' techniques
+// are inherited by blood (see clans.js): nobody outside the Gojo clan can awaken Limitless, and so on.
+// A technique belongs to whoever awakened it — its moves refuse to work for anyone else.
 // Each technique has four moves: two from the start, the third at Grade 2 and its domain (or Maximum) at Grade 1.
 // Everyone (but Heavenly Restriction) also learns Simple Domain at Grade 2 and Reverse Cursed Technique at
 // Semi-Grade 1. Move items are locked in your inventory and kept when you die; new ones appear as you're promoted.
-// A Cursed Womb rerolls your technique (always into a different one).
+// A Cursed Womb rerolls your technique — always into a different one your clan's blood allows.
 
 import { world, system, ItemStack, ItemLockMode } from "@minecraft/server";
 import {
@@ -23,23 +23,32 @@ import { CURSED_SPEECH } from "./tech_speech.js";
 import { BLOOD } from "./tech_blood.js";
 import { BOOGIE } from "./tech_boogie.js";
 import { HEAVENLY } from "./tech_heavenly.js";
+import { STRAW_DOLL } from "./tech_straw.js";
+import { RATIO } from "./tech_ratio.js";
+import { CLANS, BOUND, clanOf, ensureClan, rollTechnique, clanCooldown } from "./clans.js";
+import { creditsIntact, creditLine, tamperedLine } from "./credits.js";
 
 export const TECHNIQUES = {
-  limitless: { name: "Limitless", c: "§b", weight: 2, rarity: "§6Special", moves: LIMITLESS,
+  limitless: { name: "Limitless", c: "§b", rarity: "§6Special · 1.5%", moves: LIMITLESS,
     blurb: "Infinity itself. Blue pulls, Red repels, Hollow Purple erases — and while you have cursed energy, Infinity turns aside 40% of every blow." },
-  shrine: { name: "Shrine", c: "§c", weight: 2, rarity: "§6Special", moves: SHRINE,
+  shrine: { name: "Shrine", c: "§c", rarity: "§6Special · 3%", moves: SHRINE,
     blurb: "The King of Curses' slashes. Dismantle cuts everything in a line, Cleave adapts to toughness, and Fuga opens into fire." },
-  ten_shadows: { name: "Ten Shadows", c: "§5", weight: 8, rarity: "§dRare", moves: TEN_SHADOWS,
+  ten_shadows: { name: "Ten Shadows", c: "§5", rarity: "§dRare · 5%", moves: TEN_SHADOWS,
     blurb: "Shikigami from your shadow: the Divine Dogs, Nue and Max Elephant fight for you." },
-  cursed_speech: { name: "Cursed Speech", c: "§3", weight: 14, rarity: "§bUncommon", moves: CURSED_SPEECH,
-    blurb: "Your words are commands — Don't Move, Blast Away, Crush. Every word costs your throat a little health." },
-  heavenly: { name: "Heavenly Restriction", c: "§e", weight: 20, rarity: "§aCommon", moves: HEAVENLY,
+  heavenly: { name: "Heavenly Restriction", c: "§e", rarity: "§dRare · 7%", moves: HEAVENLY,
     blurb: "No cursed energy at all — instead a monstrous body, cursed tools, and immunity to every domain's sure-hit." },
-  blood: { name: "Blood Manipulation", c: "§4", weight: 26, rarity: "§aCommon", moves: BLOOD,
+  cursed_speech: { name: "Cursed Speech", c: "§3", rarity: "§bUncommon · 10%", moves: CURSED_SPEECH,
+    blurb: "Your words are commands — Don't Move, Blast Away, Crush. Every word costs your throat a little health." },
+  blood: { name: "Blood Manipulation", c: "§4", rarity: "§bUncommon · 14%", moves: BLOOD,
     blurb: "Your blood is a weapon: Piercing Blood, Supernova, and buffs that push your body past its limits." },
-  boogie: { name: "Boogie Woogie", c: "§6", weight: 28, rarity: "§aCommon", moves: BOOGIE,
+  straw_doll: { name: "Straw Doll", c: "§6", rarity: "§aCommon · 19%", moves: STRAW_DOLL,
+    blurb: "Hammer, nails and a straw doll. Anyone you've hurt has left a piece of themselves behind — and what you do to the doll happens to them." },
+  ratio: { name: "Ratio", c: "§9", rarity: "§aCommon · 19%", moves: RATIO,
+    blurb: "Divide anything along a 7:3 line and strike that point for a critical hit. Work overtime and it only gets worse for them." },
+  boogie: { name: "Boogie Woogie", c: "§6", rarity: "§aCommon · 22%", moves: BOOGIE,
     blurb: "Clap and swap places with anyone you see. Simple, and terrifying in the right hands." },
 };
+for (const [id, t] of Object.entries(TECHNIQUES)) t.clan = BOUND[id] ?? null; // the clan whose blood it runs in (null: any)
 
 const universal = {
   simple_domain: { name: "Simple Domain", cost: 25, cd: 25, grade: G.TWO, universal: true, run: (p) => (startSimpleDomain(p), true),
@@ -136,20 +145,12 @@ export function syncItems(p) {
   return added;
 }
 
-export function pickTechnique(except) {
-  const pool = Object.entries(TECHNIQUES).filter(([id]) => id !== except);
-  const total = pool.reduce((s, [, t]) => s + t.weight, 0);
-  let r = Math.random() * total;
-  for (const [id, t] of pool) {
-    r -= t.weight;
-    if (r < 0) return id;
-  }
-  return pool[pool.length - 1][0];
-}
-
 export function setTechnique(p, id, why = "awaken") {
   const t = TECHNIQUES[id];
   if (!t) return false;
+  // a clan technique runs in its clan's blood: whoever is given it (by an admin) joins that clan
+  if (t.clan && clanOf(p) !== t.clan) setProp(p, "clan", t.clan);
+  if (!clanOf(p)) ensureClan(p);
   setProp(p, "technique", id);
   if (id === "heavenly") {
     try {
@@ -159,11 +160,12 @@ export function setTechnique(p, id, why = "awaken") {
     }
   }
   syncItems(p);
-  title(p, `${t.c}§l${t.name.toUpperCase()}`, why === "reroll" ? "§7Your innate technique has changed" : "§7Your innate technique has awakened", 60);
-  tell(p, `§5✦ §fInnate technique: ${t.c}${t.name} §8(${t.rarity}§8)\n§7${t.blurb}\n§7Your moves are in your inventory — §fright-click§7 to use them. Open the §dJujutsu Record§7 for everything else.`);
+  const clan = CLANS[clanOf(p)];
+  title(p, `${t.c}§l${t.name.toUpperCase()}`, why === "reroll" ? "§7Your innate technique has changed" : `§7Born into ${clan.c}${clan.id === "clanless" ? "no clan" : `the ${clan.name} clan`}`, 60);
+  tell(p, `§5✦ §fClan: ${clan.c}${clan.name} §8(${clan.perk})\n§5✦ §fInnate technique: ${t.c}${t.name} §8(${t.rarity}§8)\n§7${t.blurb}\n§7Your moves are in your inventory — §fright-click§7 to use them. Open the §dJujutsu Record§7 for everything else.\n${creditLine()}`);
   sound(p.dimension, "beacon.activate", p.location, 1, 1.2);
   fx(p.dimension, "jjk:shell", mid(p), COLOR.purple, 1, { radius: 2 });
-  if (t.weight <= 2) {
+  if (id === "limitless" || id === "shrine") {
     try {
       world.sendMessage(`§6✦ §f${p.name} §7was born with ${t.c}${t.name}§7!`);
     } catch {
@@ -175,7 +177,9 @@ export function setTechnique(p, id, why = "awaken") {
 
 export function awaken(p) {
   if (techniqueOf(p)) return false;
-  return setTechnique(p, pickTechnique());
+  if (!creditsIntact()) return tell(p, tamperedLine()), false;
+  const clan = ensureClan(p);
+  return setTechnique(p, rollTechnique(clan));
 }
 
 // ---------------------------------------------------------------------------
@@ -189,6 +193,7 @@ export function resetCooldowns(p) {
 }
 function startCooldown(p, id, secs) {
   const c = cooldowns.get(p.id) ?? {};
+  secs *= clanCooldown(p);
   c[id] = Date.now() + secs * 1000;
   cooldowns.set(p.id, c);
   try {
@@ -207,8 +212,10 @@ function nag(p, text) {
 export function useMove(p, id) {
   const m = MOVES[id];
   if (!m) return false;
+  if (!creditsIntact()) return nag(p, tamperedLine()), false;
   const tech = techniqueOf(p);
-  if (m.tech && m.tech !== tech) return nag(p, "§cThat isn't your technique."), false;
+  // a technique belongs to whoever awakened it: no one else can use its moves
+  if (m.tech && m.tech !== tech) return nag(p, `§cOnly a sorcerer born with ${TECHNIQUES[m.tech].name} can use that.`), false;
   if (!m.tech && isHeavenly(p)) return nag(p, "§eHeavenly Restriction: you have no cursed energy to use that."), false;
   if (gradeOf(p) < m.grade) return nag(p, `§7${m.name} unlocks at ${GRADES[m.grade].c}${GRADES[m.grade].name}§7.`), false;
   if (stunned(p)) return nag(p, "§cYou can't move!"), false;
@@ -279,7 +286,7 @@ export function useWomb(p) {
   if (!techniqueOf(p)) return;
   if (!consumeHeld(p, "jjk:cursed_womb")) return;
   resetCooldowns(p);
-  setTechnique(p, pickTechnique(techniqueOf(p)), "reroll");
+  setTechnique(p, rollTechnique(ensureClan(p), techniqueOf(p)), "reroll");
   applyStats(p);
 }
 

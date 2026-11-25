@@ -5,6 +5,7 @@
 
 import { world } from "@minecraft/server";
 import { getProp, setProp, tell, title, sound, fx, bar, mid, effect, clearEffect, COLOR } from "./core.js";
+import { clanMaxCE, clanRegen, clanXp } from "./clans.js";
 
 export const GRADES = [
   { name: "Grade 4", xp: 0, c: "§7" },
@@ -27,8 +28,8 @@ export function gradeFromXp(xp) {
 export const gradeOf = (p) => gradeFromXp(xpOf(p));
 export const gradeName = (g) => `${GRADES[g].c}${GRADES[g].name}`;
 export const dmgMult = (p) => 1 + gradeOf(p) * 0.2 + fingersOf(p) * 0.02;
-export const maxCE = (p) => 100 + gradeOf(p) * 40 + fingersOf(p) * 10;
-export const regenCE = (p) => 2 + gradeOf(p) * 0.8; // a second
+export const maxCE = (p) => Math.round((100 + gradeOf(p) * 40 + fingersOf(p) * 10) * clanMaxCE(p)); // Gojo clan: +15%
+export const regenCE = (p) => (2 + gradeOf(p) * 0.8) * clanRegen(p); // a second (Kamo clan: +20%)
 
 // XP still needed for the next grade (0 at Special Grade) and progress through the current one (0..1).
 export function nextGrade(p) {
@@ -43,8 +44,9 @@ export function nextGrade(p) {
 const promoteHooks = [];
 export const onPromote = (f) => promoteHooks.push(f);
 
-export function addXp(p, n, why) {
-  n = Math.round(n);
+// XP earned in play (clanless sorcerers get +15%); admins use setXp or pass raw = true.
+export function addXp(p, n, why, raw = false) {
+  n = Math.round(n * (raw ? 1 : clanXp(p)));
   if (!(n > 0)) return;
   const before = gradeOf(p);
   setProp(p, "xp", xpOf(p) + n);

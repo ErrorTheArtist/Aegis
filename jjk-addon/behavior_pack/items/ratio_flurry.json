@@ -1,0 +1,32 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:item": {
+    "description": {
+      "identifier": "jjk:ratio_flurry",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "jjk_ratio_flurry"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "§9Blunt Sword Flurry§r\n§8Ratio\n§7Three blows; the last one finds the weak point"
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:can_destroy_in_creative": false,
+      "minecraft:use_modifiers": {
+        "use_duration": 0.25,
+        "movement_modifier": 1.0
+      },
+      "minecraft:use_animation": "none",
+      "minecraft:cooldown": {
+        "category": "jjk_ratio_flurry",
+        "duration": 0.1
+      }
+    }
+  }
+}

@@ -1,18 +1,23 @@
 // Jujutsu Legacy — entry point. Wires every module together:
+//   credits.js     who made it (shown to everyone; can't be switched off)
 //   core.js        storage, maths, particles, sounds, targeting, the task runner
+//   clans.js       Gojo, Zen'in, Kamo, Inumaki and the clanless: which techniques run in whose blood
 //   grades.js      Grade 4 → Special Grade, XP, Sukuna's Fingers, health
 //   energy.js      cursed energy and the action-bar HUD
 //   combat.js      technique damage, Black Flash, Infinity, stuns
 //   domains.js     Domain Expansion, clashes, burnout, Simple Domain
-//   tech_*.js      the seven innate techniques
+//   tech_*.js      the nine innate techniques
 //   techniques.js  awakening, move items, using a move, fingers, Cursed Wombs
 //   curses.js      exorcism XP and drops, the Finger Bearer, night surges
+//   sorcerers.js   the cast: Jujutsu High allies (talk, spar) and villain bosses; npc_moves.js their own attacks
 //   record.js      the Jujutsu Record and the Admin Panel
 //   commands.js    /scriptevent jjk:… admin commands
 
 import { world, system } from "@minecraft/server";
-import { initTasks, valid, isPlayer, health } from "./core.js";
-import { initEnergy } from "./energy.js";
+import { initTasks, valid, isPlayer, health, tell } from "./core.js";
+import { creditsIntact, creditLine, tamperedLine } from "./credits.js";
+import { ensureClan } from "./clans.js";
+import { initEnergy, statusHooks } from "./energy.js";
 import { initCombat } from "./combat.js";
 import { initDomains } from "./domains.js";
 import { initTechniques, awaken, useMove, MOVES, syncItems, eatFinger, useWomb, techniqueOf } from "./techniques.js";
@@ -20,6 +25,7 @@ import { initHeavenly } from "./tech_heavenly.js";
 import { initCurses } from "./curses.js";
 import { openRecord } from "./record.js";
 import { initCommands } from "./commands.js";
+import { initSorcerers } from "./sorcerers.js";
 import { applyStats } from "./grades.js";
 
 initTasks();
@@ -30,9 +36,11 @@ initTechniques();
 initHeavenly();
 initCurses();
 initCommands();
+initSorcerers();
 
 function ready(p, respawn) {
   if (!valid(p)) return;
+  if (techniqueOf(p)) ensureClan(p); // (players from before clans: the clan their technique came from)
   if (!techniqueOf(p)) awaken(p);
   applyStats(p);
   syncItems(p);
@@ -47,7 +55,19 @@ function ready(p, respawn) {
 
 world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
   system.runTimeout(() => ready(player, !initialSpawn), initialSpawn ? 60 : 5);
+  // the credits, every time someone joins
+  if (initialSpawn) system.runTimeout(() => valid(player) && tell(player, creditsIntact() ? creditLine() : tamperedLine()), 100);
 });
+// a copy with its credits edited out says so, every two minutes, to everyone
+system.runInterval(() => {
+  if (creditsIntact()) return;
+  try {
+    world.sendMessage(tamperedLine());
+  } catch {
+    /* ignore */
+  }
+}, 2400);
+statusHooks.push(() => (creditsIntact() ? "" : "§cMODIFIED COPY"));
 // (players already online when the scripts load: /reload)
 system.runTimeout(() => {
   for (const p of world.getAllPlayers()) ready(p, false);

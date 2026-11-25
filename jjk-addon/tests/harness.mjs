@@ -1,6 +1,7 @@
 // Test world for the mock tests: entities with health, effects, hurt cooldowns and inventories; after-events are
 // queued and delivered at the end of each tick (like the game); tick(n) runs intervals and timeouts.
 import { system, world, __subs, ItemStack } from "@minecraft/server";
+import { readFileSync, existsSync } from "node:fs";
 export { answers } from "@minecraft/server-ui";
 export const H = (globalThis.H = { players: [], entities: [], worldMsgs: [], particles: [], sounds: [], drops: [], blocks: new Map(), time: 1000, dims: {}, queue: [] });
 const BASE = 1_700_000_000_000;
@@ -13,6 +14,21 @@ const FAM = (t) => t === "minecraft:player" ? ["player", "mob"]
 const MAXHP = { "minecraft:player": 20, "jjk:fly_head": 14, "jjk:lanky_curse": 30, "jjk:mouth_curse": 70, "jjk:eye_curse": 180, "jjk:finger_bearer": 1500,
   "minecraft:zombie": 20, "jjk:divine_dog_white": 40, "jjk:divine_dog_black": 40, "minecraft:iron_golem": 100 };
 const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y, a.z - b.z);
+// the real behaviour file of the character NPCs: its "jjk:as_<who>" events apply their component groups here
+const SORC_BP = process.env.JJK_ROOT && existsSync(`${process.env.JJK_ROOT}/behavior_pack/entities/sorcerer.json`)
+  ? JSON.parse(readFileSync(`${process.env.JJK_ROOT}/behavior_pack/entities/sorcerer.json`, "utf8"))["minecraft:entity"] : null;
+function applyEvent(e, x) {
+  if (!SORC_BP || e.typeId !== "jjk:sorcerer") return;
+  const ev = SORC_BP.events[x];
+  if (!ev) return;
+  for (const [k, v] of Object.entries(ev.set_property ?? {})) if (typeof v === "number") e._props["P:" + k] = v;
+  for (const g of ev.add?.component_groups ?? []) {
+    const grp = SORC_BP.component_groups[g] ?? {};
+    if (grp["minecraft:health"]) { e._max = grp["minecraft:health"].max; e._hp = grp["minecraft:health"].value; }
+    if (grp["minecraft:type_family"]) e._families = grp["minecraft:type_family"].family;
+    if (grp["minecraft:movement"]?.value === 0) e._stay = true;
+  }
+}
 let nid = 0;
 const now = () => system.currentTick;
 export function mkEntity(typeId, loc, dimId = "minecraft:overworld") {
@@ -29,6 +45,7 @@ export function mkEntity(typeId, loc, dimId = "minecraft:overworld") {
       }
       if (c === "minecraft:inventory" && e._inv) return { container: e._inv };
       if (c === "minecraft:tameable" && /divine_dog/.test(e.typeId)) return { tame: (p) => { e._owner = p.id; e._events.push("jjk:tamed"); return true; } };
+      if (c === "minecraft:type_family") return { hasTypeFamily: (f) => e._families.includes(f) };
       return undefined;
     },
     getDynamicProperty: (k) => e._props[k],
@@ -55,7 +72,8 @@ export function mkEntity(typeId, loc, dimId = "minecraft:overworld") {
     applyKnockback(dx, dz, h, v) { e._kb.push([dx, dz, h, v]); },
     teleport(l, o) { e.location = { ...l }; if (o?.rotation) e._rot = o.rotation; },
     remove() { e._valid = false; },
-    triggerEvent(x) { e._events.push(x); },
+    triggerEvent(x) { e._events.push(x); applyEvent(e, x); },
+    getProperty(k) { return e._props["P:" + k]; }, setProperty(k, v) { e._props["P:" + k] = v; },
     playAnimation(a) { e._anims.push(a.replace("animation.jjk.", "")); },
     setOnFire(s) { e._fire = s; return true; },
     getViewDirection: () => e._view, getHeadLocation: () => ({ x: e.location.x, y: e.location.y + 1.62, z: e.location.z }), getRotation: () => e._rot,

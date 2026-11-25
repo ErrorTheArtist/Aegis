@@ -17,8 +17,8 @@ function fresh() {
 }
 const DAMAGING = new Set(["blue", "red", "hollow_purple", "unlimited_void", "dismantle", "cleave", "fuga", "malevolent_shrine", "summon_nue",
   "summon_max_elephant", "chimera_shadow_garden", "speech_blast_away", "speech_crush", "speech_twist", "piercing_blood", "supernova", "clap_barrage",
-  "black_flash_swap", "playful_cloud", "dragon_bone", "inverted_spear_of_heaven", "split_soul_katana"]);
-const WAIT = { hollow_purple: 70, fuga: 60, unlimited_void: 60, malevolent_shrine: 60, chimera_shadow_garden: 60, summon_nue: 60, summon_max_elephant: 40, clap_barrage: 50, playful_cloud: 40 };
+  "black_flash_swap", "playful_cloud", "dragon_bone", "straw_hairpin", "straw_nail_barrage", "ratio_seven_three", "ratio_flurry", "ratio_collapse", "inverted_spear_of_heaven", "split_soul_katana"]);
+const WAIT = { straw_hairpin: 30, ratio_flurry: 40, hollow_purple: 70, fuga: 60, unlimited_void: 60, malevolent_shrine: 60, chimera_shadow_garden: 60, summon_nue: 60, summon_max_elephant: 40, clap_barrage: 50, playful_cloud: 40 };
 for (const [techId, t] of Object.entries(T.TECHNIQUES)) {
   T.setTechnique(p, techId);
   Gr.setXp(p, 40000);
@@ -29,6 +29,7 @@ for (const [techId, t] of Object.entries(T.TECHNIQUES)) {
     E.setCE(p, Gr.maxCE(p));
     for (const d of [...D.activeDomains()]) D.collapse(d);
     D._state.burnout.clear();
+    if (id === "straw_resonance" || id === "straw_cursed_doll") C.hurt(p, foes[0], 1); // they need a piece of someone
     const ce0 = E.getCE(p);
     const before = foes.map(hp);
     await use(p, "jjk:" + id);
@@ -64,6 +65,7 @@ await use(p, "jjk:hollow_purple"); await tick(70);
 const orbs = H.entities.filter((e) => e.typeId === "jjk:orb");
 check("Purple: all orbs cleaned up", orbs.every((o) => !o._valid), orbs.filter((o) => o._valid).length);
 check("Purple: one hit per target", foes[0]._dmgLog.length === 1, JSON.stringify(foes[0]._dmgLog));
+(await import("./tech_ratio.mjs"))._state.overtime.clear(); // (the Ratio loop left Overtime running)
 // grade multiplier: Special Grade (x2.0) Dismantle = 20 on a mob
 T.setTechnique(p, "shrine"); fresh(); T.resetCooldowns(p);
 await use(p, "jjk:dismantle"); await tick(2);
@@ -75,7 +77,7 @@ await use(p, "jjk:fuga");
 check("Fuga locked below Grade 2", E.getCE(p) === ce2 && p._bars.at(-1)?.includes("Grade 2"), p._bars.at(-1));
 // not your technique
 await tick(10); await use(p, "jjk:blue");
-check("someone else's move refused", p._bars.at(-1)?.includes("isn't your technique"), p._bars.at(-1));
+check("someone else's move refused: it's bound to its innate", p._bars.at(-1)?.includes("Only a sorcerer born with Limitless"), p._bars.at(-1));
 // not enough CE
 Gr.setXp(p, 40000); E.setCE(p, 5); T.resetCooldowns(p);
 await tick(10); E.setCE(p, 5); await use(p, "jjk:cleave");

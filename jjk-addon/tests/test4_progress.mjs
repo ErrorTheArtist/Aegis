@@ -121,7 +121,7 @@ check("Record opens with stats", formLog[0]?.b.includes("Innate technique") && f
 check("moves page lists costs and cooldowns", /— (\d+ CE · )?\d+(\.\d+)?s/.test(formLog[1]?.b ?? ""), formLog[1]?.b);
 check("no admin button for players", !formLog[0].btns.some((b) => b.includes("Admin")));
 formLog.length = 0;
-answers.push({ selection: 3 }, { formValues: [false] });
+answers.push({ selection: 4 }, { formValues: [false] });
 await use(p, "jjk:jujutsu_record"); await tick(2);
 check("settings: hide the bar", p._props["jjk:hud_off"] === true);
 p._bars.length = 0; await tick(20);
@@ -131,7 +131,7 @@ delete p._props["jjk:hud_off"];
 p.addTag("jjk_admin"); formLog.length = 0;
 const r2 = mkPlayer("Nobara", { x: 9, y: 64, z: 0 }); r2._props["jjk:technique"] = "boogie";
 const others = world.getAllPlayers().sort((x, y) => x.name.localeCompare(y.name));
-answers.push({ selection: 4 }, { selection: 0 }, { selection: others.indexOf(r2) }, { formValues: [1, 4, 5, true, false] });
+answers.push({ selection: 6 }, { selection: 0 }, { selection: others.indexOf(r2) }, { formValues: [4, 1, 4, 5, true, false] });
 await use(p, "jjk:jujutsu_record"); await tick(3);
 check("admin button for admins", formLog[0]?.btns.some((b) => b.includes("Admin")));
 check("admin edit: technique, grade, fingers", r2._props["jjk:technique"] === "shrine" && Gr.gradeOf(r2) === 4 && Gr.fingersOf(r2) === 5,

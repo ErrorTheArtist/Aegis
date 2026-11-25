@@ -74,6 +74,30 @@
     "jjk_black_flash_swap": {
       "textures": "textures/items/jjk/black_flash_swap"
     },
+    "jjk_straw_hairpin": {
+      "textures": "textures/items/jjk/straw_hairpin"
+    },
+    "jjk_straw_resonance": {
+      "textures": "textures/items/jjk/straw_resonance"
+    },
+    "jjk_straw_nail_barrage": {
+      "textures": "textures/items/jjk/straw_nail_barrage"
+    },
+    "jjk_straw_cursed_doll": {
+      "textures": "textures/items/jjk/straw_cursed_doll"
+    },
+    "jjk_ratio_seven_three": {
+      "textures": "textures/items/jjk/ratio_seven_three"
+    },
+    "jjk_ratio_flurry": {
+      "textures": "textures/items/jjk/ratio_flurry"
+    },
+    "jjk_ratio_overtime": {
+      "textures": "textures/items/jjk/ratio_overtime"
+    },
+    "jjk_ratio_collapse": {
+      "textures": "textures/items/jjk/ratio_collapse"
+    },
     "jjk_reverse_cursed_technique": {
       "textures": "textures/items/jjk/reverse_cursed_technique"
     },

@@ -401,7 +401,8 @@ def anim(kind, bones):
 # What each creature is
 # ---------------------------------------------------------------------------
 CURSE_TARGETS = [{"filters": {"any_of": [{"test": "is_family", "subject": "other", "value": "player"},
-                                         {"test": "is_family", "subject": "other", "value": "shikigami"}]}, "max_dist": 28}]
+                                         {"test": "is_family", "subject": "other", "value": "shikigami"},
+                                         {"test": "is_family", "subject": "other", "value": "jjk_ally"}]}, "max_dist": 28}]
 CREATURES = {
     "fly_head": dict(name="Fly Head (Grade 4 Curse)", model=m_fly_head, grade=4, hp=14, dmg=3, speed=0.3, box=(0.7, 0.9), bounds=(2, 2, 0.6),
                      pal=dict(skin=(122, 132, 96), dark=(60, 62, 48), light=(160, 170, 130), under=(90, 96, 70), mouth=(70, 12, 16), teeth=(232, 226, 200),
@@ -577,7 +578,7 @@ def noise_img(size, fn, seed):
 
 # The orb: a rounded voxel ball (core + translucent shell), centred on the entity's position.
 ORBS = {"blue": ((90, 170, 255), (30, 80, 255), (170, 225, 255)), "red": ((255, 80, 70), (200, 20, 30), (255, 190, 160)),
-        "purple": ((190, 90, 255), (110, 30, 220), (240, 200, 255))}
+        "purple": ((190, 90, 255), (110, 30, 220), (240, 200, 255)), "fire": ((255, 150, 40), (220, 70, 10), (255, 230, 150))}
 
 
 def orb_texture(core, deep, hot, seed):
@@ -716,9 +717,9 @@ w(RP / "models" / "entity" / "orb.geo.json", m_orb())
 anims["animation.jjk.orb.spin"] = {"loop": True, "bones": {
     "core": {"rotation": [0, "q.life_time * 360", "q.life_time * 200"], "scale": "1 + math.sin(q.life_time * 900) * 0.06"},
     "shell": {"rotation": ["q.life_time * -300", "q.life_time * -240", 0], "scale": "1.05 + math.sin(q.life_time * 600) * 0.08"}}}
-fx_entity_bp("orb", ["blue", "red", "purple"], [1.3, 1.0, 5.0])
+fx_entity_bp("orb", ["blue", "red", "purple", "fire"], [1.3, 1.0, 5.0, 3.5])
 fx_entity_rp("orb", "geometry.jjk.orb", {k_: f"orb_{k_}" for k_ in ORBS}, "entity_alphablend", {"spin": "animation.jjk.orb.spin"},
-             "controller.render.jjk.variant3")
+             "controller.render.jjk.variant4")
 
 w(RP / "models" / "entity" / "domain_dome.geo.json", m_dome())
 for i, kind in enumerate(("void", "garden")):
@@ -733,7 +734,7 @@ fx_entity_bp("shrine", life=20)
 fx_entity_rp("shrine", "geometry.jjk.shrine", {"default": "shrine"})
 
 w(RP / "render_controllers" / "jjk.render_controllers.json", {"format_version": "1.8.0", "render_controllers": {
-    "controller.render.jjk.variant3": {"arrays": {"textures": {"Array.v": ["Texture.blue", "Texture.red", "Texture.purple"]}},
+    "controller.render.jjk.variant4": {"arrays": {"textures": {"Array.v": ["Texture.blue", "Texture.red", "Texture.purple", "Texture.fire"]}},
                                        "geometry": "Geometry.default", "materials": [{"*": "Material.default"}],
                                        "textures": ["Array.v[q.variant]"], "ignore_lighting": True},
     "controller.render.jjk.variant2": {"arrays": {"textures": {"Array.v": ["Texture.void", "Texture.garden"]}},

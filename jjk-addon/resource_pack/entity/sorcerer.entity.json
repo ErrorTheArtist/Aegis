@@ -47,7 +47,7 @@
         "gear_naoya": "textures/entity/jjk/sorcerer/gear_naoya"
       },
       "geometry": {
-        "default": "geometry.humanoid.custom",
+        "default": "geometry.jjk.sorcerer_body",
         "gear_gojo": "geometry.jjk.sorcerer_gear_gojo",
         "gear_yuji": "geometry.jjk.sorcerer_gear_yuji",
         "gear_megumi": "geometry.jjk.sorcerer_gear_megumi",

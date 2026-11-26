@@ -1,4 +1,4 @@
-# Jujutsu Legacy — v1.2.0
+# Jujutsu Legacy — v1.3.0
 
 **Made by errorlegend.** Questions, ideas or bug reports: DM **errorlegend_** on Discord.
 
@@ -13,6 +13,13 @@ A Jujutsu Kaisen add-on for Minecraft Bedrock (1.21.60+).
 No experimental toggles are needed, and the pack doesn't replace the player file, so it runs next to other add-ons.
 
 **Install:** open `dist/JujutsuLegacy.mcaddon` (build it with `./build.sh`), then turn on both packs in your world.
+
+**New in 1.3: the cast, remade.** Every character has been redone one by one:
+- **Plain hair:** painted on the skin, strand by strand, with a proper fringe. No more spikes.
+- **Faces with twice the detail (16×16):** real anime eyes, brows and expressions, plus each character's marks:
+  Sukuna's second eyes, Todo's scar, Choso's blood line, Mahito's stitches, Kenjaku's stitched brow.
+- **Twice the detail on every outfit:** uniforms with buttons and seams, Nanami's leopard tie, Geto's kesa, Mahito's
+  patchwork.
 
 **New in 1.2:**
 - **Five new innate techniques:** Projection Sorcery (Zen'in), Disaster Flames, Idle Death Gamble, Cursed Spirit
@@ -376,8 +383,8 @@ A Binding Vow is a promise to yourself: give something up and get something back
 
 ## The cast
 
-One entity, `jjk:sorcerer`, wears every character's 3D model: hair, collars, hoods, Sukuna's four arms, the weapons on
-their backs. Each character fights with the same techniques players use, plus a few of their own. A spawn egg gives a
+One entity, `jjk:sorcerer`, wears every character: a 128×128 painted skin (a 16×16 face, plain hair painted on both
+layers) and a 3D model for what sticks out: collars, hoods, coats, Sukuna's four arms, the weapons on their backs. Each character fights with the same techniques players use, plus a few of their own. A spawn egg gives a
 random member of Jujutsu High.
 
 | Character | Side | Clan | Fights with | Health | Spar XP / reward |
@@ -455,7 +462,7 @@ output. Run the generators from this folder:
 | Generator | Makes |
 |---|---|
 | `tools/gen_entities.py` | Curses, shikigami (Mahoraga too) and effect models (orbs, the domain dome and its six barriers, the shrine): geometry, painted textures, idle animations, BP/RP entities, spawn rules, names |
-| `tools/gen_sorcerers.py` | The cast: painted skins + 3D gear for all 19 characters (built with `tools/sorcerer_kit.py`), the `jjk:sorcerer` entity (BP + RP), render controllers, `roster_ids.js`. Preview with `--preview out.png [--only gojo,sukuna]` |
+| `tools/gen_sorcerers.py` | The cast: 128×128 painted skins (16×16 faces, plain painted hair) + 3D gear for all 19 characters (built with `tools/sorcerer_kit.py`), their body geometry, the `jjk:sorcerer` entity (BP + RP), render controllers, `roster_ids.js`. Preview with `--preview out.png [--only gojo,sukuna]` |
 | `tools/gen_items.py` | Every item: 32×32 icons drawn in code, item JSON, `item_texture.json`, both pack icons |
 | `tools/gen_particles.py` | The `jjk:` particles and their textures (tinted per use from script) |
 | `tools/gen_anims.py` | Player animations (point, Hollow Purple, domain hand sign, clap, shout, summon…) |

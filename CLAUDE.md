@@ -241,7 +241,7 @@ tools.
 | Generator | Makes |
 |---|---|
 | `gen_entities.py` | Curses, shikigami (Mahoraga too) and effect models: geometry, textures, idle animations, BP/RP entities, spawn rules, entity names in `en_US.lang` (it keeps the cast's lines) |
-| `gen_sorcerers.py` | The cast (Gojo, Sukuna, Yuji… 19 characters): painted skins + 3D gear, the `jjk:sorcerer` entity, render controllers, `scripts/roster_ids.js`. Its painting and modelling helpers are in `sorcerer_kit.py` |
+| `gen_sorcerers.py` | The cast (Gojo, Sukuna, Yuji… 19 characters): 128×128 painted skins + 3D gear, their body geometry, the `jjk:sorcerer` entity, render controllers, `scripts/roster_ids.js`. Its painting and modelling helpers are in `sorcerer_kit.py` |
 | `gen_items.py` | Every item: 32×32 icons drawn in code, item JSON, `item_texture.json`, pack icons |
 | `gen_particles.py` | `jjk:` particles + their white textures |
 | `gen_anims.py` | Player animations `animation.jjk.*` (the same pose-to-pose rig as `gen_player_anims.py`) |
@@ -286,12 +286,24 @@ tools.
 
 ## The cast (`gen_sorcerers.py`)
 
-- **Two layers, as in the Naruto pack:** a painted 64×64 player skin (`Skin`: `head(s, c, front, side, back, …)`
-  with pixel-art rows, then `outfit(...)` / `jjh_top(...)` for the uniform), plus a 3D **gear** geometry
-  `geometry.jjk.sorcerer_gear_<id>`.
-- **Gear:** built with `Gear`.
-  - Its texture is packed automatically: `g.region(w, h, fn)` and `g.flat(colour)` return UV rectangles.
-  - Helpers: `spikes()`, `hair_cap()`, `collar()`, and `on_back()` for weapons over the shoulder.
+- **Hair is PLAIN, painted on the skin. No spikes and no blocks of hair.** This is the user's rule: 3D spikes looked like
+  "french fries" and a 3D hair shell looked like a helmet. `hair_skin()` paints the hair strand by strand on the head's
+  two layers, with outlines given as rows per column: `front`, `fringe` (the bangs, on the outer layer), `side` and
+  `side_hat`, `back` and `back_hat`, plus `under` (an undercut or dark roots) and `part` (a parting). Long hair down
+  the back is `hair_on(s, c, "body", "back", rows)`. Only small smooth shapes may stick out, where a character needs
+  one: Maki's ponytail, Geto's and Todo's buns, Choso's pigtails, Mei Mei's braid (`plain_tail`, `plain_bun`).
+- **Twice the usual detail:**
+  - The skins are 128×128 on the cast's own body, `geometry.jjk.sorcerer_body` (`body_geometry()` in the kit). It has
+    the vanilla humanoid's bones and per-face UVs, so the vanilla animations work.
+  - A face is 16×16. `face(s, c, eyes=, brows=, mouth=, extra=)` draws it from the `EYES`, `BROWS` and `MOUTHS`
+    templates (left eye mirrored, highlight kept on one side); `extra` adds marks, scars and stitches (`stitches()`).
+  - Painting functions get texel coordinates: the body's front is 16×24, an arm or leg face 8×24.
+- **Gear** (`Gear`, a second geometry for collars, coats, props, extra arms, weapons; 128×128 texture):
+  - `g.plain(name, colour)` / `g.swatch(name, w, h, fn)` paint a patch of texture.
+  - `g.box(bone, origin, size, swatch, faces={face: swatch or None})` samples a fresh window of the swatch for every
+    face at 2 texels per pixel, so nothing is stretched or repeated.
+  - Helpers: `collar`, `high_collar`, `hem`, `cuffs`, `soles`, `muscles`, `glasses`, `coat_skirt`, `wide_legs`,
+    `lapels`, `earrings`, `on_back`.
 - **Cube origins in a geometry are absolute model coordinates.** They are not relative to their bone's pivot.
   `on_back()` shifts its parts onto the spine. Forgetting this hung weapons down to the floor.
 - **One entity for everyone:** `jjk:sorcerer`.
@@ -303,15 +315,14 @@ tools.
 - **Spawn eggs:** `minecraft:entity_spawned` rolls the int property `jjk:roll` (1-99). The script turns it into a random
   ally (`setupSorcerer`). `/summon jjk:sorcerer ~ ~ ~ jjk:as_<id>` skips the roll.
 - **Adding a character:**
-  1. Write `<id>()` returning `(skin image, Gear)`, with the helpers in `sorcerer_kit.py` (`head()`, `jjh_uniform()`,
-     `spikes()` with hand-placed `[(base, length, width, rot)]`, `fringe()`, `collar()`, `on_back()`...) and
-     `gen_sorcerers.py` (`glasses()`, `lapels()`, `coat_skirt()`, `uniform_3d()`...).
+  1. Write `<id>()` returning `(skin image, Gear)`: `head_base()`, `face()`, `hair_skin()`, `outfit()` (with
+     `jjh_uniform()`, `sneakers()`, `sandals()` or `boots()`), `bake()`, then the gear.
   2. Add it to the END of `ROSTER` (an index is stored on every NPC in a world), and to `STATS`; any swaying bones to `SWAY`.
   3. Re-run the generator.
   4. Add a `CAST` entry in `sorcerers.js`: title, side, clan, technique, grade, power, moves `[[id, range]]`, spar XP
      or xp and drops, lines.
-- **Preview:** `python3 tools/gen_sorcerers.py --preview out.png --only gojo,sukuna` (front and back). It imports
-  `cine_preview.py` from `../shinobi-addon/tools`.
+- **Preview:** `python3 tools/gen_sorcerers.py --preview out.png --only gojo,sukuna` (front, back and a close-up of
+  the face). It imports `cine_preview.py` from `../shinobi-addon/tools`. Look at every face close up before shipping.
 
 ## Items (`gen_items.py`)
 

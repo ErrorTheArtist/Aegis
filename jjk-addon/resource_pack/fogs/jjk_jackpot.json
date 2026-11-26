@@ -1,0 +1,22 @@
+{
+  "format_version": "1.16.100",
+  "minecraft:fog_settings": {
+    "description": {
+      "identifier": "jjk:fog_jackpot"
+    },
+    "distance": {
+      "air": {
+        "fog_start": 8.0,
+        "fog_end": 42.0,
+        "fog_color": "#1C5A2C",
+        "render_distance_type": "fixed"
+      },
+      "weather": {
+        "fog_start": 8.0,
+        "fog_end": 42.0,
+        "fog_color": "#1C5A2C",
+        "render_distance_type": "fixed"
+      }
+    }
+  }
+}

@@ -5,7 +5,8 @@
 //   grades.js      Grade 4 → Special Grade, XP, Sukuna's Fingers, health
 //   energy.js      cursed energy and the action-bar HUD
 //   combat.js      technique damage, Black Flash, Infinity, stuns
-//   domains.js     Domain Expansion, clashes, burnout, Simple Domain
+//   domains.js     Domain Expansion, clashes, burnout, Simple Domain, each domain's fog
+//   cinematic.js   the cinematics of Hollow Purple and every domain (their shot lists: cine_shots.js)
 //   tech_*.js      the fourteen innate techniques; servants.js the curses some of them call to fight
 //   vows.js        Binding Vows: one trade-off at a time
 //   mahoraga.js    the Ten Shadows' Divine General: the ritual, adaptation, the wheel
@@ -22,6 +23,7 @@ import { ensureClan } from "./clans.js";
 import { initEnergy, statusHooks } from "./energy.js";
 import { initCombat } from "./combat.js";
 import { initDomains } from "./domains.js";
+import { initCinematics } from "./cinematic.js";
 import { initTechniques, awaken, useMove, MOVES, syncItems, eatFinger, useWomb, techniqueOf } from "./techniques.js";
 import { initHeavenly } from "./tech_heavenly.js";
 import { initCurses } from "./curses.js";
@@ -35,6 +37,7 @@ initTasks();
 initEnergy();
 initCombat();
 initDomains();
+initCinematics();
 initTechniques();
 initHeavenly();
 initCurses();

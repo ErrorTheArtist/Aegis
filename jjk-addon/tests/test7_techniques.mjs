@@ -2,6 +2,7 @@
 // Cursed Spirit Manipulation — what each move really does, their domains, and whose side a servant curse is on.
 import { H, mkPlayer, spawn, tick, fire, use, check, done, world } from "./harness.mjs";
 await import("./main.mjs");
+world.setDynamicProperty("jjk:cinematics", false); // (moves back to back: no cinematics here — test9 plays them)
 const T = await import("./techniques.mjs");
 const E = await import("./energy.mjs");
 const Gr = await import("./grades.mjs");

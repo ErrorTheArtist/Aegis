@@ -13,7 +13,8 @@
 
 import { world, system, ItemStack } from "@minecraft/server";
 import {
-  getProp, bump, isPlayer, alive, valid, health, fx, sound, mid, V, knock, effect, COLOR, foes, byId, worldProp, tell, ground, now, sideOf,
+  getProp, bump, isPlayer, alive, valid, health, fx, fxMust, shake, sound, mid, V, knock, effect, COLOR, foes, byId, worldProp, tell, ground, now,
+  sideOf,
 } from "./core.js";
 import { addXp, gradeOf, G } from "./grades.js";
 import { hurt } from "./combat.js";
@@ -62,7 +63,10 @@ function onDeath(dead, src) {
   const dim = dead.dimension;
   if (t in CURSE_XP) {
     fx(dim, "jjk:smoke", V.add(at, { x: 0, y: 0.8, z: 0 }), COLOR.dark, t === "jjk:finger_bearer" ? 3 : 1.2);
+    fx(dim, "jjk:ember", at, [0.55, 0.3, 0.7], t === "jjk:finger_bearer" ? 1.8 : 0.7); // (its cursed energy coming apart)
     if (t === "jjk:finger_bearer") {
+      fxMust(dim, "jjk:flash", V.add(at, { x: 0, y: 1.5, z: 0 }), COLOR.blood, 2.5);
+      shake(dim, at, 0.4, 0.8, 24);
       drop(dim, at, "jjk:sukuna_finger");
       if (Math.random() < 0.5) drop(dim, at, "jjk:cursed_womb");
       sound(dim, "mob.wither.death", at, 0.8, 1.3);

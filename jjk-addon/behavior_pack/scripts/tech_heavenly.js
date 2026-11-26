@@ -42,6 +42,7 @@ function impactRelease(p) {
   const dir = V.flat(look(p));
   anim(p, "black_flash");
   knock(p, dir.x, dir.z, 1.6, 0.12);
+  fx(p.dimension, "jjk:streak", V.add(p.location, { x: 0, y: 1, z: 0 }), COLOR.white, 1, { dx: dir.x, dy: 0, dz: dir.z });
   task((age) => {
     if (age < 4) return true;
     const ts = inCone(p, 4, 0.4);

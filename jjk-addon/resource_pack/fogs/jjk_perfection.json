@@ -1,0 +1,22 @@
+{
+  "format_version": "1.16.100",
+  "minecraft:fog_settings": {
+    "description": {
+      "identifier": "jjk:fog_perfection"
+    },
+    "distance": {
+      "air": {
+        "fog_start": 4.0,
+        "fog_end": 28.0,
+        "fog_color": "#181440",
+        "render_distance_type": "fixed"
+      },
+      "weather": {
+        "fog_start": 4.0,
+        "fog_end": 28.0,
+        "fog_color": "#181440",
+        "render_distance_type": "fixed"
+      }
+    }
+  }
+}

@@ -7,6 +7,7 @@
 import { world, system } from "@minecraft/server";
 import { getProp, setProp, now, barQuietUntil, health, alive } from "./core.js";
 import { maxCE, regenCE, gradeOf, gradeName } from "./grades.js";
+import { inCinematic } from "./cinematic.js";
 
 const pool = new Map(); // player id -> cursed energy (saved every few seconds)
 const still = new Map(); // player id -> last location (focusing check)
@@ -73,7 +74,7 @@ export function initEnergy() {
   // the bar (twice a second)
   system.runInterval(() => {
     for (const p of world.getAllPlayers()) {
-      if (!getProp(p, "technique") || getProp(p, "hud_off", false) || now() < barQuietUntil(p)) continue;
+      if (!getProp(p, "technique") || getProp(p, "hud_off", false) || now() < barQuietUntil(p) || inCinematic(p)) continue;
       try {
         p.onScreenDisplay.setActionBar(hudLine(p));
       } catch {

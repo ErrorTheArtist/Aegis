@@ -17,7 +17,7 @@
 
 import { world, system, ItemStack } from "@minecraft/server";
 import {
-  getProp, setProp, isPlayer, alive, valid, health, fx, sound, mid, V, knock, effect, COLOR, foes, byId, tell, title, bar, ground, now,
+  getProp, setProp, isPlayer, alive, valid, health, fx, fxMust, shake, sound, mid, V, knock, effect, COLOR, foes, byId, tell, title, bar, ground, now,
   sideOf, look, tp, anim, nameOf, later,
 } from "./core.js";
 import { hurt, lastHit } from "./combat.js";
@@ -132,6 +132,8 @@ function turnWheel(m, st, k) {
   const top = V.add(m.location, { x: 0, y: 4.6, z: 0 });
   fx(dim, "jjk:ring", top, COLOR.gold, 1.4);
   fx(dim, "jjk:spark", top, COLOR.gold, 1.2);
+  fxMust(dim, "jjk:flash", top, COLOR.gold, 1.2); // (the wheel turning: hard to miss)
+  shake(dim, m.location, 0.25, 0.4, 16);
   sound(dim, "random.anvil_land", m.location, 1, 0.55);
   sound(dim, "block.bell.hit", m.location, 1, 0.5);
   const full = k.level >= ADAPT.length - 1;

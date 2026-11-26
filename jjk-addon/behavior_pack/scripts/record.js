@@ -174,7 +174,8 @@ function guidePage(p) {
     "§7Sneak and stand still to focus: CE comes back twice as fast.", "",
     "§l§fBlack Flash", "§7Any punch or weapon hit can distort into a Black Flash: x2.5 damage, 30% of your CE back, and 30 s in the zone (+10% chance).", "",
     "§l§fDomain Expansion", "§7Grade 1. Everyone inside who isn't protected is hit by its sure-hit — Infinity included. Overlapping domains clash: the stronger sorcerer keeps theirs.",
-    "§7Protection: Simple Domain (Grade 2), Heavenly Restriction, or your own domain. The Inverted Spear of Heaven breaks a domain by stabbing its caster.", "",
+    "§7Protection: Simple Domain (Grade 2), Heavenly Restriction, or your own domain. The Inverted Spear of Heaven breaks a domain by stabbing its caster.",
+    "§7Every domain, and Hollow Purple, opens with a cinematic of its own — you can't move or use moves while it plays. Switch it off in Settings.", "",
     "§l§fCurses", "§7Curses gather around sorcerers at night — the higher your grade, the stronger they come. At Grade 1 a Special Grade curse may come for you: the Finger Bearer. Bring friends.", "",
     "§l§fSukuna's Fingers & Cursed Wombs", "§7Eat a finger for permanent power. A Cursed Womb rerolls your innate technique — always into one your clan's blood allows.", "",
     "§l§fBinding Vows", "§7Give something up, get something back: more damage for more risk, faster moves for more CE... One vow at a time (this Record, Binding Vows).", "",
@@ -189,10 +190,14 @@ async function settingsPage(p) {
   const f = new ModalFormData().title("§5Settings").toggle("Show the cursed energy bar", !getProp(p, "hud_off", false));
   const limitless = techniqueOf(p) === "limitless";
   if (limitless) f.toggle("Infinity (40% less damage, 2 CE a hit)", !getProp(p, "infinity_off", false));
+  f.toggle("Cinematics (Hollow Purple and Domain Expansions take the camera)", !getProp(p, "cine_off", false));
   const r = await show(p, f);
   if (r.canceled || !r.formValues) return;
-  setProp(p, "hud_off", !r.formValues[0]);
-  if (limitless) setProp(p, "infinity_off", !r.formValues[1]);
+  const v = r.formValues;
+  setProp(p, "hud_off", !v[0]);
+  if (limitless) setProp(p, "infinity_off", !v[1]);
+  const cine = v[limitless ? 2 : 1];
+  if (cine !== undefined) setProp(p, "cine_off", !cine);
   tell(p, "§7Settings saved.");
 }
 
@@ -285,13 +290,18 @@ async function serverSettings(p) {
     .toggle("The Finger Bearer can appear on its own (Grade 1+)", worldProp("boss_spawns", true))
     .toggle("Hollow Purple destroys terrain", worldProp("terrain", false))
     .toggle("Villains appear at night near Grade 1 sorcerers", worldProp("villains", true))
-    .toggle("Jujutsu High comes to help at night", worldProp("allies", true));
+    .toggle("Jujutsu High comes to help at night", worldProp("allies", true))
+    .toggle("Cinematics for Hollow Purple and Domain Expansions", worldProp("cinematics", true) !== false)
+    .toggle("Light effects (fewer particles, for slower devices)", worldProp("vfx_light", false) === true);
   const r = await show(p, f);
   if (r.canceled || !r.formValues) return;
-  setWorldProp("surges", !!r.formValues[0]);
-  setWorldProp("boss_spawns", !!r.formValues[1]);
-  setWorldProp("terrain", !!r.formValues[2]);
-  setWorldProp("villains", !!r.formValues[3]);
-  setWorldProp("allies", !!r.formValues[4]);
+  const v = r.formValues;
+  setWorldProp("surges", !!v[0]);
+  setWorldProp("boss_spawns", !!v[1]);
+  setWorldProp("terrain", !!v[2]);
+  setWorldProp("villains", !!v[3]);
+  setWorldProp("allies", !!v[4]);
+  if (v[5] !== undefined) setWorldProp("cinematics", !!v[5]);
+  if (v[6] !== undefined) setWorldProp("vfx_light", !!v[6]);
   tell(p, "§7Server settings saved.");
 }

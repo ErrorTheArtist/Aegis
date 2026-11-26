@@ -31,6 +31,8 @@ export function swap(p, t) {
     fx(p.dimension, "jjk:ring", at, COLOR.gold, 0.9);
     fx(p.dimension, "jjk:spark", V.add(at, { x: 0, y: 1, z: 0 }), COLOR.gold, 0.6);
   }
+  const d = V.flat(V.sub(b, a));
+  fx(p.dimension, "jjk:streak", V.add(b, { x: 0, y: 1, z: 0 }), COLOR.gold, 0.8, { dx: d.x, dy: 0, dz: d.z }); // (the clap's after-image)
   sound(p.dimension, "mob.shulker.teleport", b, 0.8, 1.3);
   return true;
 }

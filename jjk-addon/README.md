@@ -1,4 +1,4 @@
-# Jujutsu Legacy — v1.3.0
+# Jujutsu Legacy — v1.4.0
 
 **Made by errorlegend.** Questions, ideas or bug reports: DM **errorlegend_** on Discord.
 
@@ -13,6 +13,26 @@ A Jujutsu Kaisen add-on for Minecraft Bedrock (1.21.60+).
 No experimental toggles are needed, and the pack doesn't replace the player file, so it runs next to other add-ons.
 
 **Install:** open `dist/JujutsuLegacy.mcaddon` (build it with `./build.sh`), then turn on both packs in your world.
+
+**New in 1.4: cinematics and effects.**
+- **A cinematic for Hollow Purple and for every domain, each one different:** the camera takes over for a few seconds
+  and films the moment like the anime. The hand sign, then the domain revealed in a flash of its colour, with its name
+  in English and Japanese:
+  - **Unlimited Void (無量空処):** a push in on Gojo's face, a white-out, then endless stars.
+  - **Malevolent Shrine (伏魔御廚子):** looking up at Sukuna as the shrine rises behind him, then everything is cut.
+  - **Chimera Shadow Garden (嵌合暗翳庭):** the shadow spreads across the ground; the Divine Dogs rise.
+  - **Time Cell Moon Palace (時胞月宮殿):** frame-by-frame cuts around Naoya, then the moonlit palace.
+  - **Coffin of the Iron Mountain (蓋棺鉄囲山):** the ground cracks and smoulders, then the volcano.
+  - **Self-Embodiment of Perfection (自閉円頓裹):** Mahito's hands up close, his smile, then a slow circle round him.
+  - **Idle Death Gamble (坐殺博徒):** the reels spin in four quick cuts, a green flash, then the pachinko parlour.
+  - **Hollow Purple (虚式「茈」):** Blue and Red close in, merge in front of Gojo, and tear away down the path.
+- **Caught inside a domain?** You watch it open around you (from the reveal on), even a villain's.
+- **Each domain has its own fog:** everyone inside sees the world through it until they leave or it closes.
+- **New effects, kept light:** impact flashes and rubble on heavy hits, Black Flash streaks and screen shake, embers
+  as a curse dies, a pillar of light on promotion, a cursed-energy flare when you cast, speed lines on dashes.
+  - No more than 48 effects are spawned a tick (18 with **light effects** on), and nothing is spawned where no player
+    is near enough (64 blocks) to see it.
+- **Off switches:** your own in Record → Settings, everyone's in Admin Panel → Server settings.
 
 **New in 1.3: the cast, remade.** Every character has been redone one by one:
 - **Plain hair:** painted on the skin, strand by strand, with a proper fringe. No more spikes.
@@ -59,7 +79,7 @@ techniques and running moves, and tells everyone who really made it.
 - **The Jujutsu Record** (right-click it) shows:
   - your clan, technique, grade and Binding Vow
   - every move with its cost and cooldown
-  - the clans, Binding Vows, a guide to fighting, and settings
+  - the clans, Binding Vows, a guide to fighting, and settings (the CE bar, Infinity, cinematics)
   - the credits
 
 ## Clans
@@ -299,6 +319,14 @@ It can't land a Black Flash.
   - Heavenly Restriction
   - your own domain
   - the **Inverted Spear of Heaven**, which breaks a domain by stabbing its caster
+- **Cinematics:** every domain opens with a cinematic of its own (about 3 s).
+  - You watch all of it when you cast it; players caught inside watch the domain open around them.
+  - While watching you can't move, turn or use moves, and the caster takes 60% less damage. The domain works from
+    the start all the same.
+  - From the flash on, everyone inside sees the domain's own fog until they leave or it closes.
+  - Hollow Purple has one too (2.5 s), fired where you faced when you cast it. Cast by Gojo the NPC, or with
+    cinematics off, everyone near gets a warning title instead.
+  - Switch yours off in Record → Settings. Dying, leaving or respawning always gives you your camera back.
 
 ## Grades
 
@@ -434,8 +462,8 @@ technique, and they'll offer a **spar**.
   with `/scriptevent jjk:admin`. It lets you:
   - edit any player (clan, technique, grade, fingers, refill)
   - summon the Finger Bearer, Mahoraga or any character (optionally standing still, for a hub)
-  - change server settings: night curse surges, natural Finger Bearer, villains at night, Jujutsu High helping (all on),
-    and Hollow Purple destroying terrain (off)
+  - change server settings: night curse surges, natural Finger Bearer, villains at night, Jujutsu High helping,
+    cinematics (all on), Hollow Purple destroying terrain and light effects (off)
 - **Commands** (the last word can name another player):
 
   | Command | Does |
@@ -451,6 +479,9 @@ technique, and they'll offer a **spar**.
   | `/scriptevent jjk:mahoraga` | summon a wild Mahoraga next to you (no ritual: it can't be tamed) |
   | `/scriptevent jjk:tame_mahoraga [off] [name]` | let a Ten Shadows sorcerer skip the ritual (`off` undoes it) |
   | `/scriptevent jjk:reset [name]` | wipe a player (also their vow, stored curses and Mahoraga); they're born and awaken again |
+  | `/scriptevent jjk:cinematic void` | watch a cinematic without casting anything: `void`, `shrine`, `garden`, `moon`, `volcano`, `perfection`, `jackpot`, `purple` |
+  | `/scriptevent jjk:cinematics off` | cinematics `on`/`off` for everyone |
+  | `/scriptevent jjk:vfx light` | fewer particles for slower devices (`full` to go back) |
   | `/scriptevent jjk:record` | open your Jujutsu Record |
   | `/scriptevent jjk:credits` | who made this add-on |
 
@@ -464,7 +495,8 @@ output. Run the generators from this folder:
 | `tools/gen_entities.py` | Curses, shikigami (Mahoraga too) and effect models (orbs, the domain dome and its six barriers, the shrine): geometry, painted textures, idle animations, BP/RP entities, spawn rules, names |
 | `tools/gen_sorcerers.py` | The cast: 128×128 painted skins (16×16 faces, plain painted hair) + 3D gear for all 19 characters (built with `tools/sorcerer_kit.py`), their body geometry, the `jjk:sorcerer` entity (BP + RP), render controllers, `roster_ids.js`. Preview with `--preview out.png [--only gojo,sukuna]` |
 | `tools/gen_items.py` | Every item: 32×32 icons drawn in code, item JSON, `item_texture.json`, both pack icons |
-| `tools/gen_particles.py` | The `jjk:` particles and their textures (tinted per use from script) |
+| `tools/gen_particles.py` | The `jjk:` particles and their textures (tinted per use from script), and the fogs (each domain's, Hollow Purple's) |
+| `tools/cine_board.py` | Storyboards of the cinematics, rendered offline from `cine_shots.js` with the real models: `-o board.png [--only void,purple]`, or `--gif void` |
 | `tools/gen_anims.py` | Player animations (point, Hollow Purple, domain hand sign, clap, shout, summon…) |
 
 **Gameplay** is in `behavior_pack/scripts/` (`@minecraft/server` 1.16.0, `@minecraft/server-ui` 1.3.0):
@@ -478,7 +510,8 @@ output. Run the generators from this folder:
 | `grades.js` | grades, XP, fingers |
 | `energy.js` | cursed energy and the bar |
 | `combat.js` | damage, Black Flash, Infinity, stuns |
-| `domains.js` | domains, clashes, Simple Domain (`registerDomain` lets a technique add its own) |
+| `domains.js` | domains, clashes, Simple Domain, each domain's fog (`registerDomain` lets a technique add its own) |
+| `cinematic.js` + `cine_shots.js` | the cinematics: the engine (camera, lock, cleanup) and the shot lists (pure data) |
 | `tech_*.js` | the fourteen techniques |
 | `servants.js` | curses that fight for someone (Geto's, Mahito's) |
 | `mahoraga.js` | Mahoraga: the ritual, adaptation, the wheel |
@@ -497,6 +530,7 @@ output. Run the generators from this folder:
 - clans and their perks
 - sparring, encounters and rewards
 - the Record, the commands
+- the cinematics (who watches, the camera, fog, early ends, cleanup, the off switches) and the effect budget
 - the credits, including a copy with them edited out
 
 **Release:**

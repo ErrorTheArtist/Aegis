@@ -3,15 +3,20 @@
 //                  Sneak: Blue pulls YOU there instead.
 //   Red            a bolt of repulsion: it explodes on the first thing it touches and hurls everyone away.
 //   Hollow Purple  (Grade 2) Blue and Red meet in front of you and the imaginary mass erases a 40-block path.
+//                  It has its own cinematic (cinematic.js, "purple" in cine_shots.js): fired where you faced when you
+//                  cast it. Cast by Gojo the NPC (or with cinematics off), everyone near gets a warning title instead.
 //   Unlimited Void (Grade 1) Domain Expansion.
 // Passive — Infinity: 40% less damage while you have cursed energy (see combat.js).
 
+import { world } from "@minecraft/server";
 import {
-  V, eye, look, fx, sound, task, spawnFx, removeFx, tp, valid, foes, mid, knock, anim, COLOR, rayEnd, effect, worldProp, alive, aimed,
+  V, eye, look, fx, fxMust, sound, task, spawnFx, removeFx, tp, valid, foes, mid, knock, anim, COLOR, rayEnd, effect, worldProp, alive, aimed,
+  title, shake,
 } from "./core.js";
 import { hurt } from "./combat.js";
 import { expand } from "./domains.js";
 import { projectile } from "./projectile.js";
+import { play, inCinematic } from "./cinematic.js";
 
 const UNBREAKABLE = /bedrock|barrier|command_block|structure_block|structure_void|jigsaw|end_portal|end_gateway|portal|light_block|allow|deny|border_block|reinforced_deepslate/;
 
@@ -85,13 +90,26 @@ function red(p) {
 function purple(p) {
   anim(p, "purple");
   const dim = p.dimension;
+  const aim = look(p);
   effect(p, "slowness", 22, 3);
   sound(dim, "mob.warden.sonic_charge", p.location, 1, 1.2);
+  let filmed = false;
+  try {
+    filmed = play("purple", p, { until: () => alive(p) });
+  } catch {
+    /* (it fires whatever happens to its cinematic) */
+  }
+  if (!filmed) { // a warning for everyone near
+    for (const q of world.getAllPlayers()) {
+      if (q.dimension?.id === dim.id && V.dist(q.location, p.location) <= 32 && !inCinematic(q)) title(q, "§5§lHOLLOW PURPLE", "§d虚式「茈」", 20);
+    }
+  }
+  const facing = () => (filmed ? aim : look(p)); // (watching, you can't turn: it all happens where you faced)
   const side = () => {
-    const f = V.flat(look(p));
+    const f = V.flat(facing());
     return { x: -f.z, y: 0, z: f.x };
   };
-  const front = () => V.add(eye(p), V.mul(look(p), 1.6));
+  const front = () => V.add(eye(p), V.mul(facing(), 1.6));
   const left = spawnFx(dim, "jjk:orb", front(), "jjk:as_blue");
   const right = spawnFx(dim, "jjk:orb", front(), "jjk:as_red");
   task((age) => {
@@ -109,7 +127,7 @@ function purple(p) {
     if (age < 20) return true;
     removeFx(left);
     removeFx(right);
-    launchPurple(p, c, look(p));
+    launchPurple(p, c, facing());
     return false;
   }, 30);
   return true;
@@ -122,6 +140,7 @@ function launchPurple(p, from, dir) {
   const terrain = worldProp("terrain", false);
   sound(dim, "mob.warden.sonic_boom", from, 1.5, 0.7);
   sound(dim, "random.explode", from, 1, 0.5);
+  fxMust(dim, "jjk:streak", from, COLOR.purple, 1.4, { dx: dir.x, dy: dir.y, dz: dir.z });
   let pos = { ...from };
   task((age) => {
     pos = V.add(pos, V.mul(dir, 1.1));
@@ -149,10 +168,14 @@ function launchPurple(p, from, dir) {
       }
     }
     if (age % 2 === 0) fx(dim, "jjk:burst", pos, COLOR.purple, 0.8);
+    if (age % 4 === 2) fx(dim, "jjk:debris", { x: pos.x, y: pos.y - 1.2, z: pos.z }, COLOR.grey, 1.2); // the ground it tears up
     if (age < 36) return true;
     removeFx(orb);
-    fx(dim, "jjk:burst", pos, COLOR.purple, 2.5);
-    fx(dim, "jjk:shell", pos, COLOR.purple, 1, { radius: 3 });
+    fxMust(dim, "jjk:burst", pos, COLOR.purple, 2.5);
+    fxMust(dim, "jjk:flash", pos, COLOR.purple, 2.2);
+    fxMust(dim, "jjk:shell", pos, COLOR.purple, 1, { radius: 3 });
+    fx(dim, "jjk:debris", pos, COLOR.grey, 2);
+    shake(dim, pos, 0.45, 0.6, 24);
     sound(dim, "random.explode", pos, 1.2, 0.7);
     return false;
   }, 45);

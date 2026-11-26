@@ -194,7 +194,30 @@ export const COLOR = {
   blood: [0.78, 0.03, 0.08], gold: [1, 0.8, 0.3], fire: [1, 0.5, 0.12], shadow: [0.45, 0.25, 0.75], teal: [0.3, 0.9, 0.8],
   ce: [0.45, 0.6, 1], green: [0.4, 1, 0.55], grey: [0.35, 0.33, 0.38], dark: [0.12, 0.1, 0.14], water: [0.35, 0.65, 1],
 };
-export function fx(dim, id, loc, color = COLOR.white, size = 1, vars) {
+// The VFX budget: every effect is ONE emitter, and no more than 48 are spawned a tick (18 with the server's "light
+// effects", Admin Panel -> Server settings); an effect no player is near enough to see (64 blocks) isn't spawned at all.
+// fxMust() skips the budget (a cinematic's beats, a domain opening) but not the distance check.
+const VIEW2 = 64 * 64;
+const fxState = { spent: 0, light: false, viewers: [] };
+export const fxLight = () => fxState.light;
+function refreshViewers() {
+  fxState.spent = 0;
+  fxState.light = worldProp("vfx_light", false);
+  const v = [];
+  try {
+    for (const p of world.getAllPlayers()) v.push([p.dimension.id, p.location.x, p.location.y, p.location.z]);
+  } catch {
+    /* ignore */
+  }
+  fxState.viewers = v;
+}
+function seen(dim, loc) {
+  for (const v of fxState.viewers) {
+    if (v[0] === dim.id && (v[1] - loc.x) ** 2 + (v[2] - loc.y) ** 2 + (v[3] - loc.z) ** 2 < VIEW2) return true;
+  }
+  return false;
+}
+function spawn(dim, id, loc, color, size, vars) {
   try {
     const m = new MolangVariableMap();
     m.setColorRGB("variable.color", { red: color[0], green: color[1], blue: color[2] });
@@ -204,6 +227,40 @@ export function fx(dim, id, loc, color = COLOR.white, size = 1, vars) {
   } catch {
     /* chunk not loaded */
   }
+}
+export function fx(dim, id, loc, color = COLOR.white, size = 1, vars) {
+  if (fxState.spent >= (fxState.light ? 18 : 48) || !seen(dim, loc)) return;
+  fxState.spent++;
+  spawn(dim, id, loc, color, size, vars);
+}
+export function fxMust(dim, id, loc, color = COLOR.white, size = 1, vars) {
+  if (!seen(dim, loc)) return;
+  fxState.spent++;
+  spawn(dim, id, loc, color, size, vars);
+}
+// A command run as an entity (/camera, /camerashake, /fog, /inputpermission, /hud: no cheats needed from script).
+export function cmd(e, c) {
+  try {
+    e.runCommand(c);
+    return true;
+  } catch {
+    try {
+      e.runCommandAsync(c);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+}
+// A camera shake for every player within r blocks (one command each).
+export function shake(dim, loc, power = 0.3, secs = 0.4, r = 16) {
+  let list = [];
+  try {
+    list = dim.getPlayers({ location: loc, maxDistance: r });
+  } catch {
+    return;
+  }
+  for (const p of list) cmd(p, `camerashake add @s ${Math.min(4, power).toFixed(2)} ${secs.toFixed(2)} positional`);
 }
 export function beam(dim, from, dir, len, color, size = 1) {
   fx(dim, "jjk:beam", from, color, size, { dx: dir.x, dy: dir.y, dz: dir.z, len });
@@ -291,6 +348,7 @@ export function later(fn, ticks) {
 }
 export function initTasks() {
   system.runInterval(() => {
+    refreshViewers();
     for (let i = tasks.length - 1; i >= 0; i--) {
       const t = tasks[i];
       let keep = false;
@@ -305,6 +363,7 @@ export function initTasks() {
   }, 1);
 }
 export const taskCount = () => tasks.length;
+export const _fx = fxState;
 
 // ---------------------------------------------------------------------------
 // Targets: everything a sorcerer may hurt

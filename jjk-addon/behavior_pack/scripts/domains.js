@@ -17,18 +17,24 @@
 // theirs, the other one collapses and burns out.
 // Simple Domain (Grade 2): 8 s in which no sure-hit can touch you — at the cost of moving slowly.
 // Heavenly Restriction has no cursed energy for a domain to lock on to: sure-hits never touch them.
+// Every domain opens with its own cinematic (cinematic.js, shot lists in cine_shots.js): the caster watches it all,
+// players caught inside watch the domain revealed around them. From the reveal on, everyone inside sees the world
+// through the domain's own fog (resource_pack/fogs/jjk_<kind>.json) until they leave or it closes.
 
 import { world, system } from "@minecraft/server";
 import {
-  now, V, valid, alive, isPlayer, fx, sound, title, tell, bar, effect, clearEffect, spawnFx, removeFx, foes, mid, COLOR, look,
-  getProp, health, anim, ground, nameOf,
+  now, V, valid, alive, isPlayer, fx, fxMust, sound, title, tell, bar, effect, clearEffect, spawnFx, removeFx, foes, mid, COLOR, look,
+  getProp, health, anim, ground, nameOf, cmd,
 } from "./core.js";
+import { CINE } from "./cine_shots.js";
+import { play } from "./cinematic.js";
 import { gradeOf, fingersOf, maxCE } from "./grades.js";
 import { getCE, isHeavenly, statusHooks } from "./energy.js";
 import { hurt, stun, dmgHooks, infinityBlockers, suppressInfinity, capBoss } from "./combat.js";
 
 export const DOMAIN_COST = 0.7; // of max CE
 export const BURNOUT = 300; // ticks
+export const REVEAL = 22; // ticks after it opens: the flash in its cinematic, when its fog rolls in
 export const KINDS = {
   void: { name: "Unlimited Void", tech: "limitless", radius: 12, ticks: 160, color: COLOR.blue, dome: "void" },
   shrine: { name: "Malevolent Shrine", tech: "shrine", radius: 14, ticks: 200, color: COLOR.red, dome: null },
@@ -70,10 +76,28 @@ function power(p) {
   return gradeOf(p) + getCE(p) / Math.max(1, maxCE(p)) + fingersOf(p) * 0.05 + Math.random() * 1.5;
 }
 
-function announce(d, text, sub) {
+function announce(d, text, sub, skip) {
   for (const p of world.getAllPlayers()) {
-    if (inside(d, p) || p.id === d.caster.id) title(p, text, sub, 40);
+    if (p.id !== skip?.id && (inside(d, p) || p.id === d.caster.id)) title(p, text, sub, 40);
   }
+}
+
+// The domain's atmosphere: its fog for everyone inside, from the reveal until they leave or it closes.
+const fogged = new Map(); // player id -> the domain whose fog they see
+function atmosphere(d) {
+  if (now() - d.start < REVEAL) return;
+  for (const p of world.getAllPlayers()) {
+    const isIn = inside(d, p);
+    const cur = fogged.get(p.id);
+    if (isIn && !cur) {
+      cmd(p, `fog @s push jjk:fog_${d.kind} jjk_domain`);
+      fogged.set(p.id, d);
+    } else if (!isIn && cur === d) clearFog(p);
+  }
+}
+function clearFog(p) {
+  fogged.delete(p.id);
+  cmd(p, "fog @s remove jjk_domain");
 }
 
 // Called by the technique's domain move after its cost is paid. Returns false if it fails to form.
@@ -86,9 +110,11 @@ export function expand(p, kind) {
   const center = { ...p.location };
   const d = { kind, def, caster: p, center, dim: p.dimension, start: now(), until: now() + def.ticks, fx: [] };
   anim(p, "domain_sign");
-  sound(d.dim, "mob.wither.spawn", center, 0.5, 1.4);
-  sound(d.dim, "beacon.activate", center, 1, 0.6);
-  fx(d.dim, "jjk:shell", V.add(center, { x: 0, y: 1, z: 0 }), def.color, 1.4, { radius: def.radius });
+  if (!CINE[kind]) { // (a domain with no cinematic of its own)
+    sound(d.dim, "mob.wither.spawn", center, 0.5, 1.4);
+    sound(d.dim, "beacon.activate", center, 1, 0.6);
+    fx(d.dim, "jjk:shell", V.add(center, { x: 0, y: 1, z: 0 }), def.color, 1.4, { radius: def.radius });
+  }
   // clash with any domain that overlaps this one
   for (const o of [...active]) {
     if (o.dim.id !== d.dim.id || V.dist(o.center, center) > o.def.radius + def.radius) continue;
@@ -126,7 +152,17 @@ export function expand(p, kind) {
   }
   if (kind === "garden") summonDogs(p, true);
   active.push(d);
-  announce(d, "§5§lDOMAIN EXPANSION", `§f${def.name}`);
+  let filmed = false;
+  try {
+    filmed = play(kind, p, {
+      radius: def.radius + 4,
+      until: () => active.includes(d),
+      victims: () => world.getAllPlayers().filter((q) => q.id !== p.id && inside(d, q)),
+    });
+  } catch {
+    /* (a domain opens whatever happens to its cinematic) */
+  }
+  announce(d, "§5§lDOMAIN EXPANSION", `§f${def.name}`, filmed ? p : null);
   try {
     world.sendMessage(`§5✦ §f${nameOf(p)} §7opened their domain: §f${def.name}`);
   } catch {
@@ -145,7 +181,14 @@ export function collapse(d, why) {
     /* ignore */
   }
   for (const e of d.fx) removeFx(e);
-  fx(d.dim, "jjk:shell", V.add(d.center, { x: 0, y: 1, z: 0 }), COLOR.grey, 1, { radius: d.def.radius });
+  for (const [id, o] of [...fogged]) {
+    if (o !== d) continue;
+    const q = world.getAllPlayers().find((x) => x.id === id);
+    if (q) clearFog(q);
+    else fogged.delete(id);
+  }
+  fxMust(d.dim, "jjk:shell", V.add(d.center, { x: 0, y: 1, z: 0 }), COLOR.grey, 1, { radius: d.def.radius });
+  fxMust(d.dim, "jjk:flash", V.add(d.center, { x: 0, y: 1.5, z: 0 }), d.def.color, 1.6);
   sound(d.dim, "random.glass", d.center, 1, 0.6);
   if (valid(d.caster) && d.noBurnout) {
     bar(d.caster, why ?? "§7Your domain closes.", 50);
@@ -171,6 +214,7 @@ function tickDomain(d) {
   if (now() >= d.until) return collapse(d);
   const victims = foes(p, d.center, d.def.radius, d.dim).filter((e) => !protectedFrom(d, e));
   const every = (n) => age % n === 0;
+  if (every(10)) atmosphere(d);
   const k = isPlayer(p) ? 1 : 0.5; // a character NPC's sure-hit lands at half strength
   if (d.kind === "void") {
     for (const e of victims) {
@@ -255,7 +299,11 @@ export function initDomains() {
   });
   world.afterEvents.playerLeave?.subscribe?.(({ playerId }) => {
     for (const d of [...active]) if (d.caster.id === playerId) collapse(d);
+    fogged.delete(playerId);
   });
+  // (a domain's fog never outlives it: not after a respawn, nor in a world reopened while one was open — whoever is
+  // still inside gets it back at the next check)
+  world.afterEvents.playerSpawn.subscribe(({ player }) => clearFog(player));
 }
 
 export function startSimpleDomain(p, ticks = 160) {
@@ -265,4 +313,4 @@ export function startSimpleDomain(p, ticks = 160) {
   sound(p.dimension, "item.shield.block", p.location, 1, 0.7);
   anim(p, "stance");
 }
-export const _state = { active, burnout, simple, capBoss };
+export const _state = { active, burnout, simple, capBoss, fogged };

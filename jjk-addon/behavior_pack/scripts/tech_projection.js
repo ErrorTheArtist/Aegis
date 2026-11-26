@@ -42,6 +42,7 @@ function rush(p) {
       frame(e);
     }
     fx(dim, "jjk:smoke", pos, COLOR.white, 0.5);
+    fx(dim, "jjk:streak", V.add(pos, { x: 0, y: 1, z: 0 }), COLOR.white, 1, { dx: dir.x, dy: dir.y, dz: dir.z });
     pos = next;
     tp(p, pos, { facingLocation: V.add(pos, V.add(dir, { x: 0, y: 1.6, z: 0 })) });
     return age < 3;

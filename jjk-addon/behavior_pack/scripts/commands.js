@@ -15,10 +15,16 @@
 //   /scriptevent jjk:tame_mahoraga [name]        let a Ten Shadows sorcerer skip the ritual (or "off" to undo it)
 //   /scriptevent jjk:summon gojo [stay]          summon a character next to you (stay: they don't move — for a hub)
 //   /scriptevent jjk:reset [name]                wipe a player (they're born and awaken again)
+//   /scriptevent jjk:cinematics off              cinematics on/off for everyone (each player can also switch theirs off)
+//   /scriptevent jjk:vfx light                   fewer particles for slower devices ("full" to go back)
+//   /scriptevent jjk:cinematic void              watch a cinematic without casting anything (void, shrine, garden, moon,
+//                                                volcano, perfection, jackpot, purple)
 //   /scriptevent jjk:credits                     who made this add-on
 
 import { world, system } from "@minecraft/server";
-import { setProp, tell, isPlayer } from "./core.js";
+import { setProp, setWorldProp, tell, isPlayer } from "./core.js";
+import { CINE } from "./cine_shots.js";
+import { play, inCinematic } from "./cinematic.js";
 import { GRADES, setXp, addXp, MAX_FINGERS, maxCE, applyStats } from "./grades.js";
 import { setCE } from "./energy.js";
 import { TECHNIQUES, setTechnique, techniqueOf, resetCooldowns, syncItems, awaken } from "./techniques.js";
@@ -80,6 +86,24 @@ export function runCommand(id, message, src) {
     setProp(who, "mahoraga", off ? undefined : true);
     return say(src, off ? `§7${who.name} no longer commands Mahoraga.` : `§7${who.name} has tamed Mahoraga (the Ten Shadows' ritual now calls it to fight for them).`);
   }
+  if (cmd === "cinematics" || cmd === "vfx") {
+    const v = String(message ?? "").trim().toLowerCase();
+    if (cmd === "cinematics") {
+      if (v !== "on" && v !== "off") return say(src, "§7Use: jjk:cinematics on|off");
+      setWorldProp("cinematics", v === "on");
+      return say(src, `§7Cinematics are ${v === "on" ? "on" : "off"} for everyone.`);
+    }
+    if (v !== "light" && v !== "full") return say(src, "§7Use: jjk:vfx light|full");
+    setWorldProp("vfx_light", v === "light");
+    return say(src, v === "light" ? "§7Light effects: fewer particles." : "§7Full effects.");
+  }
+  if (cmd === "cinematic") {
+    if (!isPlayer(src)) return say(src, "§7Run it as a player.");
+    const kind = String(message ?? "").trim().toLowerCase();
+    if (!CINE[kind]) return say(src, `§cWhich one? Use: ${Object.keys(CINE).join(", ")}`);
+    if (inCinematic(src)) return say(src, "§7You're already watching one.");
+    return play(kind, src) || say(src, "§7Cinematics are switched off (Record -> Settings, or the server's).");
+  }
   const [value, q, name] = parse(src, message);
   const needsValue = ["technique", "grade", "xp", "finger", "clan"].includes(cmd);
   const target = needsValue ? q : parse(src, `x ${message ?? ""}`)[1];
@@ -129,7 +153,7 @@ export function runCommand(id, message, src) {
       awaken(target);
       return say(src, `§7${target.name} was reset and awakened again.`);
     default:
-      return say(src, "§7Commands: jjk:record, admin, technique, clan, grade, xp, finger, ce, boss, mahoraga, tame_mahoraga, summon, reset, credits");
+      return say(src, "§7Commands: jjk:record, admin, technique, clan, grade, xp, finger, ce, boss, mahoraga, tame_mahoraga, summon, reset, cinematics, vfx, cinematic, credits");
   }
 }
 

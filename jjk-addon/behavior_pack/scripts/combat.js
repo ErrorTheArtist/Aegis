@@ -15,7 +15,7 @@
 
 import { world, system } from "@minecraft/server";
 import {
-  getProp, bump, now, isPlayer, alive, health, canHit, fx, sound, effect, clearEffect, mid, title, COLOR,
+  getProp, bump, now, isPlayer, alive, health, canHit, fx, sound, effect, clearEffect, mid, title, COLOR, V, shake,
 } from "./core.js";
 import { gradeOf, dmgMult, maxCE, addXp, fingersOf } from "./grades.js";
 import { getCE, setCE, addCE, isHeavenly, statusHooks } from "./energy.js";
@@ -77,8 +77,22 @@ export function hurt(caster, target, base, opts = {}) {
   } catch {
     return false;
   }
+  impact(target, dmg);
   hit(caster, target);
   return true;
+}
+// A heavy technique hit shows: a flash (not in a player's own face), and for the heaviest rubble and a camera shake.
+// At most once every 10 ticks for each target, however many hits land.
+const impacts = new Map(); // target id -> tick
+function impact(target, dmg) {
+  if (dmg < 9 || now() - (impacts.get(target.id) ?? -99) < 10) return;
+  impacts.set(target.id, now());
+  const dim = target.dimension;
+  if (!isPlayer(target)) fx(dim, "jjk:flash", mid(target), COLOR.white, Math.min(0.9, 0.3 + dmg / 40));
+  if (dmg >= 14) {
+    fx(dim, "jjk:debris", target.location, COLOR.grey, Math.min(1.5, dmg / 16));
+    shake(dim, target.location, Math.min(0.5, dmg / 60), 0.3, 10);
+  }
 }
 function hit(caster, target) {
   for (const f of hitHooks) {
@@ -143,6 +157,10 @@ export function blackFlashFx(p, target) {
   fx(dim, "jjk:bolt", at, COLOR.black, 0.9);
   fx(dim, "jjk:spark", at, COLOR.red, 1.6);
   fx(dim, "jjk:ring", target.location, COLOR.red, 1.2);
+  const dir = V.flat(V.sub(target.location, p.location));
+  fx(dim, "jjk:streak", at, COLOR.red, 1.2, { dx: -dir.x, dy: 0, dz: -dir.z }); // (bursting out through them)
+  if (!isPlayer(target)) fx(dim, "jjk:flash", at, COLOR.red, 0.8);
+  shake(dim, at, 0.35, 0.3, 10);
   sound(dim, "ambient.weather.thunder", at, 0.5, 1.7);
   sound(dim, "random.explode", at, 0.45, 1.6);
 }
@@ -255,6 +273,7 @@ export function initCombat() {
   // (forget old hits now and then)
   system.runInterval(() => {
     for (const [id, h] of lastHit) if (now() - h.tick > 40) lastHit.delete(id);
+    for (const [id, t] of impacts) if (now() - t > 40) impacts.delete(id);
   }, 200);
 }
 // (exported for tests and the Record)

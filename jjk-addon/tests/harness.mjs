@@ -3,7 +3,7 @@
 import { system, world, __subs, ItemStack } from "@minecraft/server";
 import { readFileSync, existsSync } from "node:fs";
 export { answers } from "@minecraft/server-ui";
-export const H = (globalThis.H = { players: [], entities: [], worldMsgs: [], particles: [], sounds: [], drops: [], blocks: new Map(), time: 1000, dims: {}, queue: [] });
+export const H = (globalThis.H = { players: [], entities: [], worldMsgs: [], particles: [], sounds: [], drops: [], blocks: new Map(), time: 1000, dims: {}, queue: [], cmds: [] });
 const BASE = 1_700_000_000_000;
 Date.now = () => BASE + system.currentTick * 50;
 const FAM = (t) => t === "minecraft:player" ? ["player", "mob"]
@@ -36,7 +36,7 @@ export function mkEntity(typeId, loc, dimId = "minecraft:overworld") {
   const e = {
     id: "e" + ++nid, typeId, location: { ...loc }, _valid: true, _props: {}, _tags: new Set(), _effects: {}, _families: FAM(typeId), nameTag: "",
     _hp: MAXHP[typeId] ?? 20, _max: MAXHP[typeId] ?? 20, _rot: { x: 0, y: 0 }, _view: { x: 0, y: 0, z: 1 }, _anims: [], _events: [], _kb: [], _dmgLog: [],
-    _lastHurt: -99, _lastDmg: 0, _dim: dimId, _fire: 0,
+    _lastHurt: -99, _lastDmg: 0, _dim: dimId, _fire: 0, _cmds: [],
     get dimension() { return H.dim(this._dim); },
     isValid() { return this._valid; },
     getComponent(c) {
@@ -78,6 +78,7 @@ export function mkEntity(typeId, loc, dimId = "minecraft:overworld") {
     getProperty(k) { return e._props["P:" + k]; }, setProperty(k, v) { e._props["P:" + k] = v; },
     playAnimation(a) { e._anims.push(a.replace("animation.jjk.", "")); },
     setOnFire(s) { e._fire = s; return true; },
+    runCommand(c) { e._cmds.push(c); H.cmds.push([e.id, c, now()]); return { successCount: 1 }; },
     getViewDirection: () => e._view, getHeadLocation: () => ({ x: e.location.x, y: e.location.y + 1.62, z: e.location.z }), getRotation: () => e._rot,
     getEntitiesFromViewDirection(o = {}) {
       const from = e.getHeadLocation(); const d = e._view; const out = [];
@@ -114,7 +115,7 @@ H.dim = (id = "minecraft:overworld") => (H.dims[id] ||= {
       && (!o.type || o.type === e.typeId) && (!o.families || o.families.every((f) => e._families.includes(f)))
       && (!o.excludeFamilies || !o.excludeFamilies.some((f) => e._families.includes(f))) && (!o.tags || o.tags.every((t) => e._tags.has(t))));
   },
-  getPlayers: () => H.players.filter((p) => p._valid && p._dim === id),
+  getPlayers: (o = {}) => H.players.filter((p) => p._valid && p._dim === id && (!o.location || o.maxDistance === undefined || dist(p.location, o.location) <= o.maxDistance)),
   spawnEntity(t, l) { const e = mkEntity(t, l, id); H.entities.push(e); return e; },
   spawnParticle(pid, l, m) { H.particles.push({ id: pid, l, v: m?.v }); },
   playSound(s) { H.sounds.push(s); },

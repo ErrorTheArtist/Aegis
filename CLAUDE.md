@@ -243,7 +243,8 @@ tools.
 | `gen_entities.py` | Curses, shikigami (Mahoraga too) and effect models: geometry, textures, idle animations, BP/RP entities, spawn rules, entity names in `en_US.lang` (it keeps the cast's lines) |
 | `gen_sorcerers.py` | The cast (Gojo, Sukuna, Yuji… 19 characters): 128×128 painted skins + 3D gear, their body geometry, the `jjk:sorcerer` entity, render controllers, `scripts/roster_ids.js`. Its painting and modelling helpers are in `sorcerer_kit.py` |
 | `gen_items.py` | Every item: 32×32 icons drawn in code, item JSON, `item_texture.json`, pack icons |
-| `gen_particles.py` | `jjk:` particles + their white textures |
+| `gen_particles.py` | `jjk:` particles + their white textures, and the fogs (`resource_pack/fogs/jjk_<name>.json`, ids `jjk:fog_<name>`) |
+| `cine_board.py` | Not a generator: storyboards of the cinematics, rendered from `cine_shots.js` (see Cinematics below) |
 | `gen_anims.py` | Player animations `animation.jjk.*` (the same pose-to-pose rig as `gen_player_anims.py`) |
 
 ## Models (`gen_entities.py`)
@@ -370,7 +371,33 @@ tools.
 - **Timers:** per-tick work uses `task(fn, maxTicks)` from `core.js` (one runner for everything). Return `false`
   to stop.
 - **Particles:** `fx(dim, "jjk:<id>", loc, COLOR.x, size, vars)` passes the colour and size, which every particle
-  needs. The beam, shell and implode particles also read `dx/dy/dz/len` or `radius`.
+  needs. The beam, shell, implode, vortex and stars particles also read `dx/dy/dz/len` or `radius`; streak reads
+  `dx/dy/dz` (its lines fly the other way, behind a dash).
+  - **Budget (keep lag low):** each effect is ONE emitter with capped counts, and `fx()` spawns at most 48 a tick
+    (18 with the server's "light effects"), never where no player is within 64 blocks. `fxMust()` skips the budget
+    (a cinematic's beats, a domain opening or closing) but not the distance. Don't spawn particles in loops of loops.
+  - `shake(dim, loc, power, secs, r)` shakes the camera of every player within r blocks; `cmd(e, "...")` runs a
+    command as an entity (camera, fog, hud, inputpermission need no cheats from script).
+  - Never put a flash right in a player's own face: `combat.js` skips it when the target is a player.
+- **Cinematics** (`cinematic.js` plays them; `cine_shots.js` is the pure data, one per domain kind + `purple`):
+  - Shots are `[f, r, h]` relative to the caster at the cast (in front, to the right, above the feet; framed on a
+    player's eyes at 1.62 — an NPC's heights are scaled to its own). `t` in ticks; `ease: 0` cuts, `ease > 0` glides
+    (put a glide at least a tick after the cut it starts from). Also `text`, `fades`, `shakes`, `fx`, `sounds`,
+    `fog`/`fogAt`, and `victim` (the tick players caught inside a domain join).
+  - `play(kind, subject, { until, victims, radius, dir })`: the caster watches from 0, victims from `victim`; it locks
+    movement and camera input, hides the HUD, pushes the fog (tag `jjk_cine`) and releases everything at the end, when
+    `until()` fails, on death, on respawn (the `jjk:cine` player property survives leaving the game) and from a
+    watchdog. Players in creative/spectator and anyone already watching are skipped. `useMove` refuses moves
+    while you watch. The world's side (fx, sounds, shakes) plays once for everyone.
+  - A domain's fog for everyone inside (tag `jjk_domain`) is pushed by `domains.js` from `REVEAL` until they leave or
+    it closes. A new domain kind needs a `CINE` entry and a fog (`FOGS` in `gen_particles.py`).
+  - Never put the camera where something big is: Hollow Purple's orbs are 1.6 blocks in front of the caster's eyes;
+    the hand sign covers the face head-on (frame it three-quarters).
+  - **Preview every change:** `python3 tools/cine_board.py -o board.png [--only void,purple]` renders every shot with
+    the real models, barrier, fog, fades, titles and a sketch of the particles; `--gif void` animates one.
+  - Off switches: player property `cine_off` (Record → Settings), world property `cinematics` (Server settings,
+    `/scriptevent jjk:cinematics off`). `/scriptevent jjk:cinematic <kind>` plays one without casting.
+  - Tests that fire moves back to back (test2, test7) switch cinematics off; test9 tests them.
 - **Coexisting with other add-ons:**
   - No `player.json`. Extra health is an endless Health Boost effect.
   - The CE bar uses the action bar and pauses whenever `bar()` shows a message there.

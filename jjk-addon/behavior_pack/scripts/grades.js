@@ -4,7 +4,7 @@
 // Sukuna's Fingers add on top: +10 max cursed energy and +2% damage each, up to 20.
 
 import { world } from "@minecraft/server";
-import { getProp, setProp, tell, title, sound, fx, bar, mid, effect, clearEffect, COLOR } from "./core.js";
+import { getProp, setProp, tell, title, sound, fx, fxMust, bar, mid, effect, clearEffect, COLOR } from "./core.js";
 import { clanMaxCE, clanRegen, clanXp } from "./clans.js";
 import { vowMult } from "./vows.js";
 
@@ -73,6 +73,8 @@ function promote(p, from, to) {
   sound(p.dimension, "random.totem", p.location, 0.6, 1.3);
   fx(p.dimension, "jjk:shell", mid(p), COLOR.gold, 1, { radius: 2.2 });
   fx(p.dimension, "jjk:aura", p.location, COLOR.gold, 2);
+  fxMust(p.dimension, "jjk:pillar", p.location, COLOR.gold, 1.2);
+  fxMust(p.dimension, "jjk:ring", p.location, COLOR.gold, 1.6);
   if (to >= G.ONE) {
     try {
       world.sendMessage(`§6✦ §f${p.name} §7has been promoted to ${g.c}${g.name}§7.`);

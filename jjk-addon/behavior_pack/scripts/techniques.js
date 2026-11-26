@@ -34,6 +34,7 @@ import { CLANS, BOUND, clanOf, ensureClan, rollTechnique, clanCooldown, rarityOf
 import { creditsIntact, creditLine, tamperedLine } from "./credits.js";
 import { vowMult, vowInfo } from "./vows.js";
 import { nameKinds } from "./mahoraga.js";
+import { inCinematic } from "./cinematic.js";
 
 export const TECHNIQUES = {
   limitless: { name: "Limitless", c: "§b", moves: LIMITLESS,
@@ -66,6 +67,13 @@ export const TECHNIQUES = {
     blurb: "Clap and swap places with anyone you see. Simple, and terrifying in the right hands." },
 };
 for (const [id, t] of Object.entries(TECHNIQUES)) t.rarity = rarityOf(id); // from the clan tables (clans.js)
+// each technique's cursed energy colour (the flare when you cast one of its moves)
+const RGB = {
+  limitless: COLOR.blue, shrine: COLOR.red, ten_shadows: COLOR.shadow, heavenly: COLOR.gold, projection: COLOR.white, cursed_speech: COLOR.teal,
+  blood: COLOR.blood, disaster_flames: COLOR.fire, idle_death_gamble: COLOR.green, cursed_spirit: [0.85, 0.4, 0.9],
+  idle_transfiguration: [0.42, 0.5, 0.95], straw_doll: COLOR.gold, ratio: [0.42, 0.5, 0.95], boogie: COLOR.gold,
+};
+for (const [id, t] of Object.entries(TECHNIQUES)) t.rgb = RGB[id] ?? COLOR.ce;
 nameKinds(Object.fromEntries(Object.entries(TECHNIQUES).map(([id, t]) => [id, `${t.c}${t.name}`]))); // (what Mahoraga adapts to)
 for (const [id, t] of Object.entries(TECHNIQUES)) t.clan = BOUND[id] ?? null; // the clan whose blood it runs in (null: any)
 
@@ -238,6 +246,7 @@ export function useMove(p, id) {
   if (!m.tech && isHeavenly(p)) return nag(p, "§eHeavenly Restriction: you have no cursed energy to use that."), false;
   if (gradeOf(p) < m.grade) return nag(p, `§7${m.name} unlocks at ${GRADES[m.grade].c}${GRADES[m.grade].name}§7.`), false;
   if (stunned(p)) return nag(p, "§cYou can't move!"), false;
+  if (inCinematic(p)) return false; // (the camera isn't yours until it ends)
   if (m.tech && m.tech !== "heavenly" && burnedOut(p)) return nag(p, `§cBurnout: your technique is spent for ${Math.ceil(burnedOut(p) / 20)}s more.`), false;
   const left = cooldownLeft(p, id);
   if (left > 0) return nag(p, `§7${m.name} §8— ready in §f${left.toFixed(1)}s`), false;
@@ -260,6 +269,8 @@ export function useMove(p, id) {
   if (vow?.reveal) reveal(p, m);
   startCooldown(p, id, m.cd);
   bump(p, "moves_used");
+  // the flare of cursed energy at your feet (domains and Hollow Purple have cinematics of their own)
+  if (m.cost !== "domain" && id !== "hollow_purple") fx(p.dimension, "jjk:ring", p.location, TECHNIQUES[tech]?.rgb ?? COLOR.ce, 0.55);
   return true;
 }
 

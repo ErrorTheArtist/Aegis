@@ -1,5 +1,6 @@
-import { H, mkPlayer, spawn, tick, fire, use, inv, check, done, system, hp } from "./harness.mjs";
+import { H, mkPlayer, spawn, tick, fire, use, inv, check, done, system, hp, world } from "./harness.mjs";
 await import("./main.mjs");
+world.setDynamicProperty("jjk:cinematics", false); // (moves back to back: no cinematics here — test9 plays them)
 const T = await import("./techniques.mjs");
 const E = await import("./energy.mjs");
 const Gr = await import("./grades.mjs");

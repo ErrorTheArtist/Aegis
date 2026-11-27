@@ -17,6 +17,7 @@ import {
   sideOf, isSafe, isSafeSpot,
 } from "./core.js";
 import { addXp, gradeOf, G } from "./grades.js";
+import { isCurse } from "./clans.js";
 import { hurt } from "./combat.js";
 import { projectile } from "./projectile.js";
 
@@ -60,6 +61,22 @@ function xpMult(p, dead) {
   return m;
 }
 
+// A curse player ate this curse (Devour, curse_powers.js): it counts as exorcised — XP and every death hook — but it
+// leaves no body and drops nothing.
+export function devoured(dead, p) {
+  for (const f of deathHooks) {
+    try {
+      f(dead, p);
+    } catch {
+      /* ignore */
+    }
+  }
+  const xp = Math.round((CURSE_XP[dead.typeId] ?? 0) * xpMult(p, dead));
+  if (xp) addXp(p, xp, `devoured a ${CURSE_NAME[dead.typeId] ?? "curse"}`);
+  bump(p, "exorcised");
+  return xp;
+}
+
 function onDeath(dead, src) {
   const t = dead.typeId;
   const p = killer(src);
@@ -92,7 +109,7 @@ function onDeath(dead, src) {
       if (Math.random() < 0.04) drop(dim, at, "jjk:cursed_womb");
     }
     if (p) {
-      addXp(p, Math.round(CURSE_XP[t] * xpMult(p, dead)), `exorcised a ${CURSE_NAME[t]}`);
+      addXp(p, Math.round(CURSE_XP[t] * xpMult(p, dead)), `${isCurse(p) ? "consumed" : "exorcised"} a ${CURSE_NAME[t]}`);
       bump(p, "exorcised");
     }
     return;

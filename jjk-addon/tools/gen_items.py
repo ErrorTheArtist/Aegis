@@ -85,7 +85,8 @@ def poly(d, pts, col):
 TECH_RIM = {"limitless": (90, 200, 255), "shrine": (200, 30, 40), "ten_shadows": (120, 90, 190), "cursed_speech": (60, 190, 170),
             "blood": (150, 14, 28), "boogie": (240, 160, 40), "universal": (235, 225, 190), "straw_doll": (200, 128, 60),
             "ratio": (206, 186, 128), "projection": (196, 222, 240), "disaster_flames": (236, 104, 30),
-            "idle_transfiguration": (96, 130, 200), "idle_death_gamble": (60, 196, 104), "cursed_spirit": (150, 100, 170)}
+            "idle_transfiguration": (96, 130, 200), "idle_death_gamble": (60, 196, 104), "cursed_spirit": (150, 100, 170),
+            "disaster_plants": (96, 176, 72), "disaster_tides": (40, 140, 210), "curse": (150, 30, 60)}
 
 
 def i_blue():
@@ -815,17 +816,137 @@ def i_womb():
     return outline(img)
 
 
+# --- Disaster Plants (Cursed Spirits) ------------------------------------------
+def i_cursed_buds():
+    img, d = badge(TECH_RIM["disaster_plants"], (14, 30, 14))
+    for cx, cy in ((10, 19), (16, 11), (22, 19)):                                  # three buds on short stems
+        line(d, [(cx, cy + 3), (cx, cy + 7)], (70, 130, 50))
+        d.ellipse((cx - 3, cy - 3, cx + 3, cy + 3), fill=(150, 210, 90, 255))
+        d.ellipse((cx - 1, cy - 4, cx + 1, cy - 1), fill=(255, 150, 200, 255))        # a pink tip about to open
+        poly(d, [(cx, cy + 5), (cx + 4, cy + 3), (cx + 1, cy + 6)], (90, 170, 60))   # a leaf
+    return img
+
+
+def i_wooden_roots():
+    img, d = badge(TECH_RIM["disaster_plants"], (26, 20, 12))
+    for x0, lean in ((9, -2), (16, 0), (23, 2)):                                   # roots bursting up out of the ground
+        line(d, [(x0, 27), (x0 + lean, 17), (x0 + lean * 2, 8)], (120, 82, 46), 3)
+        line(d, [(x0 + lean, 17), (x0 + lean + 3, 13)], (120, 82, 46), 2)
+        d.point((x0 + lean * 2, 7), fill=(140, 220, 90, 255))
+    poly(d, [(4, 25), (28, 25), (27, 28), (5, 28)], (70, 52, 34))                    # the ground cracking
+    return img
+
+
+def i_flower_field():
+    img, d = badge(TECH_RIM["disaster_plants"], (18, 34, 18))
+    for cx, cy, col in ((10, 12, (255, 170, 210)), (20, 10, (255, 240, 240)), (15, 19, (255, 200, 90)), (23, 20, (255, 170, 210)), (9, 22, (255, 240, 240))):
+        for a in range(5):                                                         # five petals round a yellow heart
+            ang = a * 2 * math.pi / 5
+            px_, py = cx + math.cos(ang) * 2.4, cy + math.sin(ang) * 2.4
+            d.ellipse((px_ - 1.6, py - 1.6, px_ + 1.6, py + 1.6), fill=col + (255,))
+        d.point((cx, cy), fill=(255, 220, 60, 255))
+    return img
+
+
+def i_sea_of_light():
+    img, d = badge(TECH_RIM["disaster_plants"], (20, 26, 12))
+    poly(d, [(7, 24), (27, 6), (29, 9), (10, 27)], (255, 236, 150))                   # the beam
+    poly(d, [(9, 24), (27, 8), (28, 9), (10, 25)], (255, 255, 230))
+    for a in range(6):                                                             # the flower it grows from
+        ang = a * math.pi / 3
+        d.ellipse((8 + math.cos(ang) * 3 - 2, 24 + math.sin(ang) * 3 - 2, 8 + math.cos(ang) * 3 + 2, 24 + math.sin(ang) * 3 + 2), fill=(255, 170, 210, 255))
+    d.ellipse((6, 22, 10, 26), fill=(255, 220, 60, 255))
+    return img
+
+
+# --- Disaster Tides (Cursed Spirits) -------------------------------------------
+def fish_shape(d, cx, cy, s, col):
+    d.ellipse((cx - 3 * s, cy - 1.6 * s, cx + 2 * s, cy + 1.6 * s), fill=col + (255,))
+    poly(d, [(cx + 1.5 * s, cy), (cx + 4 * s, cy - 2 * s), (cx + 4 * s, cy + 2 * s)], col)
+    d.point((round(cx - 2 * s), round(cy - 0.5 * s)), fill=(240, 250, 255, 255))
+
+
+def i_death_swarm():
+    img, d = badge(TECH_RIM["disaster_tides"], (10, 26, 44))
+    for cx, cy, s in ((11, 10, 1.3), (20, 15, 1.6), (10, 21, 1.2), (22, 24, 1.0)):
+        fish_shape(d, cx, cy, s, (120, 200, 240))
+    return img
+
+
+def i_tidal_wave():
+    img, d = badge(TECH_RIM["disaster_tides"], (10, 26, 44))
+    d.pieslice((6, 6, 28, 28), 180, 360, fill=(50, 130, 210, 255))                  # the wave curling over
+    d.pieslice((10, 10, 24, 24), 180, 360, fill=(10, 26, 44, 255))
+    d.chord((4, 5, 28, 29), 0, 180, fill=(50, 130, 210, 255))                       # the sea (inside the seal)
+    line(d, [(5, 17), (10, 15), (16, 17), (22, 15), (27, 17)], (225, 245, 255))       # foam
+    d.ellipse((22, 8, 26, 12), fill=(225, 245, 255, 255))
+    return img
+
+
+def i_undertow():
+    img, d = badge(TECH_RIM["disaster_tides"], (8, 22, 40))
+    pts = []
+    for k in range(60):                                                            # a whirlpool spiral
+        a = k * 0.33
+        r = 12 - k * 0.19
+        pts.append((16 + math.cos(a) * r, 16 + math.sin(a) * r))
+    line(d, pts, (120, 200, 240), 2)
+    d.ellipse((14, 14, 18, 18), fill=(10, 30, 60, 255))
+    return img
+
+
+def i_skandha():
+    img, d = badge(TECH_RIM["disaster_tides"], (120, 190, 235))
+    d.pieslice((3, 3, 29, 29), 0, 180, fill=(40, 120, 200, 255))                   # the sea below the horizon
+    line(d, [(4, 16), (28, 16)], (230, 245, 255))
+    d.ellipse((18, 6, 24, 12), fill=(255, 236, 150, 255))                           # a summer sun
+    fish_shape(d, 11, 21, 1.1, (20, 60, 110))
+    fish_shape(d, 19, 24, 0.9, (20, 60, 110))
+    return img
+
+
+# --- a Cursed Spirit's own powers ----------------------------------------------
+def i_devour():
+    img, d = badge(TECH_RIM["curse"], (24, 6, 12))
+    d.ellipse((6, 9, 26, 25), fill=(90, 10, 30, 255))                               # a gaping maw
+    for x in range(8, 25, 3):                                                      # teeth, top and bottom
+        poly(d, [(x, 10), (x + 2, 10), (x + 1, 14)], (236, 226, 200))
+        poly(d, [(x, 24), (x + 2, 24), (x + 1, 20)], (236, 226, 200))
+    d.ellipse((12, 15, 20, 19), fill=(30, 2, 8, 255))
+    return img
+
+
+def i_terror():
+    img, d = badge(TECH_RIM["curse"], (20, 6, 10))
+    d.ellipse((5, 10, 27, 22), fill=(236, 226, 210, 255))                           # a staring eye
+    for a in (0.3, 1.2, 2.2, 3.5, 4.4, 5.6):                                       # bloodshot
+        line(d, [(16 + math.cos(a) * 10, 16 + math.sin(a) * 5), (16 + math.cos(a) * 6, 16 + math.sin(a) * 3)], (200, 40, 50))
+    d.ellipse((12, 12, 20, 20), fill=(160, 20, 40, 255))
+    d.ellipse((14, 14, 18, 18), fill=(10, 0, 4, 255))
+    return img
+
+
+def i_unleash():
+    img, d = badge(TECH_RIM["curse"], (16, 4, 10))
+    poly(d, [(16, 4), (22, 13), (26, 10), (24, 22), (16, 28), (8, 22), (6, 10), (10, 13)], (120, 20, 60))   # dark flame
+    poly(d, [(16, 9), (20, 16), (22, 14), (21, 22), (16, 25), (11, 22), (10, 14), (12, 16)], (200, 40, 90))
+    poly(d, [(16, 15), (18, 20), (16, 23), (14, 20)], (255, 140, 180))
+    return img
+
+
 # ---------------------------------------------------------------------------
 # What every item is
 # ---------------------------------------------------------------------------
 TECH_COL = {"limitless": "§b", "shrine": "§c", "ten_shadows": "§5", "cursed_speech": "§3", "blood": "§4", "boogie": "§6",
             "heavenly": "§e", "universal": "§f", "straw_doll": "§6", "ratio": "§9", "projection": "§f", "disaster_flames": "§6",
-            "idle_transfiguration": "§9", "idle_death_gamble": "§a", "cursed_spirit": "§d"}
+            "idle_transfiguration": "§9", "idle_death_gamble": "§a", "cursed_spirit": "§d", "disaster_plants": "§2", "disaster_tides": "§3",
+            "curse": "§4"}
 TECH_NAME = {"limitless": "Limitless", "shrine": "Shrine", "ten_shadows": "Ten Shadows", "cursed_speech": "Cursed Speech",
              "blood": "Blood Manipulation", "boogie": "Boogie Woogie", "heavenly": "Heavenly Restriction", "universal": "Jujutsu",
              "straw_doll": "Straw Doll", "ratio": "Ratio", "projection": "Projection Sorcery", "disaster_flames": "Disaster Flames",
              "idle_transfiguration": "Idle Transfiguration", "idle_death_gamble": "Idle Death Gamble",
-             "cursed_spirit": "Cursed Spirit Manipulation"}
+             "cursed_spirit": "Cursed Spirit Manipulation", "disaster_plants": "Disaster Plants", "disaster_tides": "Disaster Tides",
+             "curse": "Cursed Spirit"}
 MOVES = {  # id: (name, technique, line of lore, icon)
     "blue": ("Blue", "limitless", "Pulls everything to a point ahead and crushes it", i_blue),
     "red": ("Red", "limitless", "A blast of repulsion that hurls enemies away", i_red),
@@ -886,6 +1007,18 @@ MOVES = {  # id: (name, technique, line of lore, icon)
     "uzumaki": ("Maximum: Uzumaki", "cursed_spirit", "Every stored curse in one spiralling blast", i_uzumaki),
     "reverse_cursed_technique": ("Reverse Cursed Technique", "universal", "Turn cursed energy positive and heal", i_rct),
     "simple_domain": ("Simple Domain", "universal", "A small barrier that neutralises a domain's sure-hit", i_simple_domain),
+    "plant_buds": ("Cursed Buds", "disaster_plants", "Seeds that take root and drain whoever they hit", i_cursed_buds),
+    "plant_roots": ("Wooden Roots", "disaster_plants", "Roots burst from the ground and hold them", i_wooden_roots),
+    "plant_field": ("Flower Field", "disaster_plants", "Flowers that take away the will to fight", i_flower_field),
+    "sea_of_light": ("Maximum: Ceremonial Sea of Light", "disaster_plants", "The flowers' life, as a beam of light", i_sea_of_light),
+    "tide_swarm": ("Death Swarm", "disaster_tides", "A school of shikigami fish surges at your enemy", i_death_swarm),
+    "tide_wave": ("Tidal Wave", "disaster_tides", "A wave that sweeps them away", i_tidal_wave),
+    "tide_undertow": ("Undertow", "disaster_tides", "The tide drags everyone near to you", i_undertow),
+    "horizon_skandha": ("Domain Expansion: Horizon of the Captivating Skandha", "disaster_tides", "A beach without end, and its fish",
+                        i_skandha),
+    "curse_devour": ("Devour", "curse", "Eat a weakened curse and grow", i_devour),
+    "curse_terror": ("Terror", "curse", "Let loose the fear you're made of", i_terror),
+    "curse_unleash": ("Curse Unleashed", "curse", "Strength, speed and a body of cursed energy", i_unleash),
 }
 TOOLS = {  # Heavenly Restriction: cursed tools (real melee weapons) — id: (name, damage, lore, icon)
     "playful_cloud": ("Playful Cloud", 9, "A three-section staff: pure physical force", i_playful_cloud),

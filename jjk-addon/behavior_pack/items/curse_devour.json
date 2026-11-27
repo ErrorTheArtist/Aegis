@@ -1,0 +1,32 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:item": {
+    "description": {
+      "identifier": "jjk:curse_devour",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "jjk_curse_devour"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "§4Devour§r\n§8Cursed Spirit\n§7Eat a weakened curse and grow"
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:can_destroy_in_creative": false,
+      "minecraft:use_modifiers": {
+        "use_duration": 0.25,
+        "movement_modifier": 1.0
+      },
+      "minecraft:use_animation": "none",
+      "minecraft:cooldown": {
+        "category": "jjk_curse_devour",
+        "duration": 0.1
+      }
+    }
+  }
+}

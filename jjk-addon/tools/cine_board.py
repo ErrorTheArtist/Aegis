@@ -30,7 +30,7 @@ import cine_preview as CP  # noqa: E402
 # who casts each one: drawn as a player (scale 0.9375, eyes 1.62 blocks up) in that character's skin and gear — in the
 # game it's the player's own model (an NPC caster is the character, a little taller)
 PLAYER_SCALE = 0.9375
-CASTER = {"void": "gojo", "shrine": "sukuna", "garden": "megumi", "moon": "naoya", "volcano": "jogo", "perfection": "mahito",
+CASTER = {"void": "gojo", "shrine": "sukuna", "garden": "megumi", "moon": "naoya", "volcano": "jogo", "perfection": "mahito", "tides": "jogo",
           "jackpot": "hakari", "purple": "gojo"}
 FONT_PATHS = ["/usr/share/fonts/opentype/ipafont-gothic/ipag.ttf", "/usr/share/fonts/truetype/fonts-japanese-gothic.ttf",
               "/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc"]
@@ -132,7 +132,7 @@ def static(assets, kind):
     if key in assets.cache:
         return assets.cache[key]
     q = []
-    if kind in ("void", "garden", "moon", "volcano", "perfection", "jackpot"):
+    if kind in ("void", "garden", "moon", "volcano", "perfection", "jackpot", "tides"):
         q += quads(assets.geo("domain_dome", f"dome_{kind}"), None, 0, CP.placer(0, 0, 0), maxdiv=3)
     if kind == "shrine":
         q += quads(assets.geo("shrine", "shrine"), None, 0, CP.placer(-7, 0, 0), maxdiv=4)
@@ -148,7 +148,7 @@ def static(assets, kind):
 # ---------------------------------------------------------------------------
 LIFE = {"flash": 0.22, "glyph": 1.4, "pillar": 0.6, "shell": 1.3, "stars": 1.7, "slash": 0.28, "ring": 0.5, "debris": 1.0,
         "ember": 1.4, "burst": 0.6, "spark": 0.3, "smoke": 1.2, "aura": 0.7, "vortex": 0.6, "streak": 0.25, "blood": 0.8,
-        "implode": 0.45, "orb": 0.35, "bolt": 0.25, "beam": 0.35}
+        "implode": 0.45, "orb": 0.35, "bolt": 0.25, "beam": 0.35, "fish": 0.9}
 
 
 def octagon(c, a, b, n=8):
@@ -223,6 +223,12 @@ def particles(cam, beat, at_scene, age, default_col):
                  p[1] + (cam.right[1] * math.cos(th) + cam.up[1] * math.sin(th)) * s,
                  p[2] + (cam.right[2] * math.cos(th) + cam.up[2] * math.sin(th)) * s)
             out.append(sprite(cam, q, 0.09 * size * (1 - abs(n - 4) / 5), col, 230 * (1 - k)))
+    elif pid == "fish":   # fish circling the point
+        for n in range(10):
+            th = 2 * math.pi * n / 10 + age * math.radians(420)
+            rr = (0.6 + rnd.random() * 0.9) * size
+            out.append(sprite(cam, (p[0] + math.cos(th) * rr, p[1] + (rnd.random() - 0.5) * 1.2 * size, p[2] + math.sin(th) * rr), 0.11 * size,
+                              (30, 80, 140), 230 * (1 - k)))
     elif pid == "vortex":
         rad = vars_.get("radius", 2)
         for n in range(18):

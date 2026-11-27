@@ -12,6 +12,9 @@
 //   Grade 1 sorcerer (Sukuna only for Special Grade, or anyone who has eaten 15 fingers) — one at a time. Beaten, they
 //   pay a lot of XP and drop Sukuna's Fingers or Cursed Wombs. Left alone for a minute, they leave.
 // Admins: Admin Panel -> Summon a character (it can stay put, for a hub), or /scriptevent jjk:summon <id> [stay].
+// Cursed Spirit players (paths.js) are curses to Jujutsu High: allies attack them, won't talk or spar with them, and at
+// night one may come to exorcise them (a hunter — stronger for a stronger curse; Gojo only for a Special Grade one).
+// Beating one gives a curse twice that ally's spar XP. Mahito, Jogo, Geto and Choso (kin) spare Cursed Spirits.
 
 import { world, system, ItemStack } from "@minecraft/server";
 import { ActionFormData } from "@minecraft/server-ui";
@@ -24,7 +27,7 @@ import { hurt, dmgHooks, dmgCaps } from "./combat.js";
 import { MOVES, TECHNIQUES } from "./techniques.js";
 import { NPC_MOVES } from "./npc_moves.js";
 import { addXp, gradeOf, fingersOf, G } from "./grades.js";
-import { CLANS } from "./clans.js";
+import { CLANS, isCurse } from "./clans.js";
 
 const NAMES = {
   gojo: "Satoru Gojo", yuji: "Yuji Itadori", megumi: "Megumi Fushiguro", nobara: "Nobara Kugisaki", maki: "Maki Zen'in", inumaki: "Toge Inumaki",
@@ -99,6 +102,7 @@ export const CAST = {
 };
 const isDomain = (id) => MOVES[id]?.cost === "domain";
 export const SPAR_COOLDOWN = 600000; // ms per character
+for (const k of ["mahito", "jogo", "geto", "choso"]) CAST[k].kin = true; // (curses, or on their side: they spare Cursed Spirits)
 export const VILLAINS = Object.keys(CAST).filter((k) => CAST[k].side === "villain");
 export const ALLIES = Object.keys(CAST).filter((k) => CAST[k].side === "ally");
 
@@ -178,13 +182,14 @@ targetRules.push((caster, e) => {
   const es = sideOf(e);
   if (cs === "ally") {
     if (es === "ally") return false;
-    if (isPlayer(e)) return sparPartner(caster) === e.id; // only the player they're sparring
+    if (isPlayer(e)) return sparPartner(caster) === e.id || isCurse(e); // only the player they're sparring — or a curse
     if (getProp(e, "owner") && !es && !minion(e)) return false; // players' shikigami and servant curses
   }
   if (cs === "villain") {
     if (es === "villain" || (CURSES.test(e.typeId) && !tagged(e, "jjk_servant"))) return false; // villains and curses don't fight each other
+    if (isPlayer(e) && isCurse(e) && CAST[whoIs(caster)]?.kin) return false; // kin spare Cursed Spirits
   }
-  if (isPlayer(caster) && es === "ally") return sparPartner(e) === caster.id; // no friendly fire on Jujutsu High
+  if (isPlayer(caster) && es === "ally") return sparPartner(e) === caster.id || isCurse(caster); // no friendly fire on Jujutsu High (curses fight them)
   return true;
 });
 // their strength
@@ -240,9 +245,9 @@ export function targetOf(e) {
     if (c.side === "ally" && x.typeId === "jjk:mahoraga") continue; // (a ritual is the summoner's alone)
     const owned = !!getProp(x, "owner") && !xs;
     if (c.side === "ally") {
-      foe = (CURSES.test(x.typeId) && (!owned || minion(x))) || xs === "villain" ||
+      foe = (CURSES.test(x.typeId) && (!owned || minion(x))) || xs === "villain" || (isPlayer(x) && isCurse(x)) ||
         (!isPlayer(x) && !xs && !owned && isMonster(x) && x.typeId !== "minecraft:creeper");
-    } else foe = isPlayer(x) || xs === "ally" || (owned && !minion(x));
+    } else foe = (isPlayer(x) && !(c.kin && isCurse(x))) || xs === "ally" || (owned && !minion(x));
     if (!foe) continue;
     const d = V.dist(x.location, e.location);
     if (d < bd) {
@@ -340,6 +345,7 @@ export function startSpar(npc, p) {
   const who = whoIs(npc);
   const c = CAST[who];
   if (!c || c.side !== "ally") return false;
+  if (isCurse(p)) return tell(p, `${c.c}${nameOfCast(who)}: §fSpar? With a curse? §7(Jujutsu High exorcises curses.)`), false;
   if (sparOf(p)) return tell(p, "§7You're already in a spar."), false;
   if (sparPartner(npc)) return tell(p, `§7${nameOfCast(who)} is sparring someone else.`), false;
   const wait = sparReadyIn(p, who);
@@ -424,8 +430,9 @@ export async function talk(p, npc) {
   const who = whoIs(npc) ?? setupSorcerer(npc);
   const c = CAST[who];
   if (!c) return;
-  if (c.side === "villain") return tell(p, `${c.c}${nameOfCast(who)}: §f${c.lines[0]}`);
+  if (c.side === "villain") return tell(p, `${c.c}${nameOfCast(who)}: §f${c.kin && isCurse(p) ? "One of us. Go on — the sorcerers won't hunt themselves." : c.lines[0]}`);
   if (sparPartner(npc)) return;
+  if (isCurse(p)) return tell(p, `${c.c}${nameOfCast(who)}: §fA curse that talks... I'll exorcise you.`);
   if (who === "todo") return todoQuestion(p, npc);
   const line = c.lines[Math.floor(Math.random() * c.lines.length)];
   const wait = sparReadyIn(p, who);
@@ -495,7 +502,7 @@ export function villainNight(force) {
   const dim = world.getDimension("minecraft:overworld");
   if (count(dim, { x: 0, y: 0, z: 0 }, 1e9, (e) => getProp(e, "side") === "villain")) return undefined; // one at a time
   for (const p of world.getAllPlayers()) {
-    if (!alive(p) || p.dimension?.id !== "minecraft:overworld" || gradeOf(p) < G.ONE || isSafe(p)) continue; // (never at the sanctuary)
+    if (!alive(p) || p.dimension?.id !== "minecraft:overworld" || gradeOf(p) < G.ONE || isSafe(p) || isCurse(p)) continue; // (never at the sanctuary; curses get hunters)
     if (!force && Math.random() >= 0.02) continue;
     const pool = VILLAINS.filter((v) => v !== "sukuna" || gradeOf(p) >= G.SPECIAL || fingersOf(p) >= 15);
     const who = pool[Math.floor(Math.random() * pool.length)];
@@ -512,10 +519,32 @@ export function villainNight(force) {
   return undefined;
 }
 
+// At night Jujutsu High may come for a Cursed Spirit player: one hunter at a time, as strong as the curse is.
+const HUNTERS = ["yuji", "megumi", "nobara", "panda", "maki", "inumaki"];
+const STRONG_HUNTERS = [...HUNTERS, "nanami", "todo", "mei_mei", "hakari", "yuta"];
+export function hunterNight(force) {
+  if (!force && (!worldProp("allies", true) || !isNight())) return undefined;
+  for (const p of world.getAllPlayers()) {
+    if (!alive(p) || !isCurse(p) || !getProp(p, "technique") || p.dimension?.id !== "minecraft:overworld" || isSafe(p)) continue;
+    if (!force && Math.random() >= 0.06) continue;
+    if (count(p.dimension, p.location, 64, (e) => getProp(e, "side") === "ally")) continue; // (one at a time)
+    const g = gradeOf(p);
+    const pool = g >= G.SPECIAL ? [...STRONG_HUNTERS, "gojo"] : g >= G.TWO ? STRONG_HUNTERS : HUNTERS;
+    const who = pool[Math.floor(Math.random() * pool.length)];
+    const e = spawnSorcerer(p.dimension, who, around(p, 12, 18), { wanderer: true });
+    if (!e) continue;
+    setProp(e, "hunting", p.id);
+    tell(p, `§4✦ ${CAST[who].c}${nameOfCast(who)}§f of Jujutsu High has come to exorcise you!`);
+    title(p, `${CAST[who].c}§l${nameOfCast(who).toUpperCase()}`, "§fhas come to exorcise you", 40);
+    return e;
+  }
+  return undefined;
+}
+
 export function allyNight(force) {
   if (!force && (!worldProp("allies", true) || !isNight())) return undefined;
   for (const p of world.getAllPlayers()) {
-    if (!alive(p) || !getProp(p, "technique") || isSafe(p)) continue;
+    if (!alive(p) || !getProp(p, "technique") || isSafe(p) || isCurse(p)) continue;
     if (!force && Math.random() >= 0.08) continue;
     let curses = 0;
     try {
@@ -542,14 +571,24 @@ function onDeath(dead, src) {
   if (!c) return;
   const spar = [...sparring].find(([id]) => id === dead.id);
   if (spar) endSpar(dead.id, "over");
+  let k = src?.damagingEntity;
+  if (k && !isPlayer(k) && getProp(k, "owner")) k = byId(getProp(k, "owner"));
   if (c.side !== "villain") {
+    if (isPlayer(k) && isCurse(k)) { // a Cursed Spirit beat a sorcerer of Jujutsu High
+      addXp(k, (c.spar ?? 100) * 2, `defeated ${nameOfCast(who)}`);
+      bump(k, "sorcerers_beaten");
+      try {
+        world.sendMessage(`§4✦ §f${k.name}§7, a Cursed Spirit, has defeated ${c.c}${nameOfCast(who)}§7.`);
+      } catch {
+        /* ignore */
+      }
+      return;
+    }
     for (const p of world.getAllPlayers()) {
       if (p.dimension?.id === dead.dimension?.id && V.dist(p.location, dead.location) < 48) tell(p, `§7${nameOfCast(who)} has fallen.`);
     }
     return;
   }
-  let k = src?.damagingEntity;
-  if (k && !isPlayer(k) && getProp(k, "owner")) k = byId(getProp(k, "owner"));
   const at = { ...dead.location };
   for (const [item, n, chance] of c.drops ?? []) {
     if (Math.random() < chance) {
@@ -642,6 +681,7 @@ export function initSorcerers() {
     try {
       allyNight();
       villainNight();
+      hunterNight();
     } catch {
       /* ignore */
     }

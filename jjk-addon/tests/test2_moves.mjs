@@ -2,6 +2,7 @@ import { H, mkPlayer, spawn, tick, fire, use, inv, check, done, system, hp, worl
 await import("./main.mjs");
 world.setDynamicProperty("jjk:cinematics", false); // (moves back to back: no cinematics here — test9 plays them)
 world.setDynamicProperty("jjk:auto_newcomer", false); // (players fight each other here; newcomer protection is test10's)
+world.setDynamicProperty("jjk:curse_path", false); // (everyone a sorcerer here: the path choice is test11's)
 const T = await import("./techniques.mjs");
 const E = await import("./energy.mjs");
 const Gr = await import("./grades.mjs");
@@ -22,7 +23,8 @@ const DAMAGING = new Set(["blue", "red", "hollow_purple", "unlimited_void", "dis
   "summon_max_elephant", "chimera_shadow_garden", "speech_blast_away", "speech_crush", "speech_twist", "piercing_blood", "supernova", "clap_barrage",
   "black_flash_swap", "playful_cloud", "dragon_bone", "straw_hairpin", "straw_nail_barrage", "ratio_seven_three", "ratio_flurry", "ratio_collapse", "inverted_spear_of_heaven", "split_soul_katana",
   "projection_rush", "projection_freeze", "disaster_ember", "disaster_stream", "disaster_meteor", "iron_mountain", "idle_soul_touch", "idle_body_repel",
-  "self_embodiment", "gamble_rough", "gamble_shutter", "gamble_pachinko", "uzumaki"]);
+  "self_embodiment", "gamble_rough", "gamble_shutter", "gamble_pachinko", "uzumaki", "plant_buds", "plant_roots", "sea_of_light", "tide_swarm",
+  "tide_wave", "tide_undertow", "horizon_skandha"]);
 const WAIT = { straw_hairpin: 30, ratio_flurry: 40, hollow_purple: 70, fuga: 60, unlimited_void: 60, malevolent_shrine: 60, chimera_shadow_garden: 60, summon_nue: 60, summon_max_elephant: 40, clap_barrage: 50, playful_cloud: 40,
   disaster_meteor: 30, iron_mountain: 50, self_embodiment: 50, uzumaki: 20, gamble_pachinko: 20 };
 const CLOSE = new Set(["projection_freeze", "idle_soul_touch"]); // touch range: bring the first one in close
@@ -58,6 +60,7 @@ for (const [techId, t] of Object.entries(T.TECHNIQUES)) {
   }
 }
 // specific behaviours -----------------------------------------------------------------------------
+D._state.burnout.clear(); // (the last technique in the loop ends with a domain)
 // Blue pulls; Red knocks back
 const home = () => { p.location = { x: 0, y: 64, z: 0 }; p._view = { x: 0, y: 0, z: 1 }; };
 T.setTechnique(p, "limitless"); home(); fresh(); T.resetCooldowns(p); E.setCE(p, 999);

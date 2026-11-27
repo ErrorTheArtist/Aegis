@@ -5,11 +5,13 @@
 
 import { world, system } from "@minecraft/server";
 import { ActionFormData, ModalFormData } from "@minecraft/server-ui";
+import { show } from "./ui.js";
 import { getProp, setProp, worldProp, setWorldProp, tell, valid } from "./core.js";
-import { GRADES, gradeOf, xpOf, nextGrade, fingersOf, maxCE, regenCE, setXp, MAX_FINGERS, dmgMult, applyStats } from "./grades.js";
+import { GRADES, gradeOf, gradeLabel, xpOf, nextGrade, fingersOf, maxCE, regenCE, setXp, MAX_FINGERS, dmgMult, applyStats } from "./grades.js";
 import { getCE, setCE, isHeavenly } from "./energy.js";
-import { TECHNIQUES, UNIVERSAL, techniqueOf, moveCost, setTechnique, resetCooldowns, syncItems, cooldownLeft } from "./techniques.js";
-import { CLANS, OPEN, clanOf, clanInfo, ensureClan, rollTechnique, canInherit } from "./clans.js";
+import { TECHNIQUES, UNIVERSAL, CURSE_MOVES, rarityFor, techniqueOf, moveCost, setTechnique, resetCooldowns, syncItems, cooldownLeft } from "./techniques.js";
+import { CLANS, OPEN, CURSE_POOL, clanOf, clanInfo, ensureClan, rollTechnique, canInherit, isCurse, syncPathTag } from "./clans.js";
+import { confirmStartOver } from "./paths.js";
 import { creditLine, creditPage } from "./credits.js";
 import { bfChance } from "./combat.js";
 import { spawnFingerBearer } from "./curses.js";
@@ -21,20 +23,6 @@ import { GROUPS, groupOn, setGroup, bansLine, extraBans } from "./bans.js";
 import { topSorcerers, eventInfo } from "./upkeep.js";
 
 export { ADMIN_TAG, isAdmin };
-
-async function show(p, form) {
-  for (let i = 0; i < 30; i++) {
-    let r;
-    try {
-      r = await form.show(p);
-    } catch {
-      return { canceled: true };
-    }
-    if (!r.canceled || r.cancelationReason !== "UserBusy") return r;
-    await new Promise((res) => system.runTimeout(res, 10));
-  }
-  return { canceled: true };
-}
 
 function progress(frac, n = 20) {
   const k = Math.round(Math.max(0, Math.min(1, frac)) * n);
@@ -48,9 +36,9 @@ export async function openRecord(p) {
   const nx = nextGrade(p);
   const clan = clanInfo(p);
   const lines = [
-    `§fClan: ${clan.c}§l${clan.name}§r §8(${clan.perk})`,
-    `§fInnate technique: ${tech.c}§l${tech.name}§r §8(${tech.rarity}§8)`,
-    `§fGrade: ${GRADES[g].c}${GRADES[g].name} §7· ${xpOf(p)} XP`,
+    isCurse(p) ? `§fYou are a §4§lCursed Spirit§r §8(${clan.perk})` : `§fClan: ${clan.c}§l${clan.name}§r §8(${clan.perk})`,
+    `§f${isCurse(p) ? "Disaster" : "Innate technique"}: ${tech.c}§l${tech.name}§r §8(${rarityFor(p, techniqueOf(p))}§8)`,
+    `§fGrade: ${gradeLabel(p)} §7· ${xpOf(p)} XP`,
     nx.need ? `${progress(nx.frac)} §7${nx.need} XP to ${GRADES[g + 1].c}${GRADES[g + 1].name}` : "§6The strongest there is.",
     isHeavenly(p)
       ? "§fCursed energy: §enone §7(Heavenly Restriction)"
@@ -58,7 +46,8 @@ export async function openRecord(p) {
     `§fTechnique damage: §cx${dmgMult(p).toFixed(2)}`,
     `§fSukuna's Fingers: §4${fingersOf(p)}/${MAX_FINGERS}`,
     isHeavenly(p) ? "" : `§fBlack Flash chance: §c${Math.round(bfChance(p) * 100)}%§7 · landed ${getProp(p, "black_flashes", 0)}`,
-    `§fCurses exorcised: §a${getProp(p, "exorcised", 0)} §7· sorcerers beaten: §a${getProp(p, "sorcerers_beaten", 0)}`,
+    isCurse(p) ? `§fCurses consumed: §a${getProp(p, "exorcised", 0)} §7(devoured ${getProp(p, "devoured", 0)}) · sorcerers beaten: §a${getProp(p, "sorcerers_beaten", 0)}`
+      : `§fCurses exorcised: §a${getProp(p, "exorcised", 0)} §7· sorcerers beaten: §a${getProp(p, "sorcerers_beaten", 0)}`,
     vowInfo(p) ? `§fBinding Vow: ${vowInfo(p).c}${vowInfo(p).name} §7(${vowInfo(p).gain}; ${vowInfo(p).cost})` : "§fBinding Vow: §7none",
     techniqueOf(p) === "ten_shadows" ? `§fMahoraga: ${getProp(p, "mahoraga", false) ? "§6tamed — it answers your call" : "§7untamed (the ritual is a Special Grade move)"}` : false,
     "",
@@ -103,7 +92,12 @@ function movesPage(p) {
   const tech = TECHNIQUES[techniqueOf(p)];
   const lines = [`${tech.c}§l${tech.name}§r`, `§7${tech.blurb}`, ""];
   for (const [id, m] of Object.entries(tech.moves)) lines.push(moveLine(p, id, m));
-  if (!isHeavenly(p)) {
+  if (isCurse(p)) {
+    lines.push("", "§4§lEvery curse");
+    for (const [id, m] of Object.entries(CURSE_MOVES)) lines.push(moveLine(p, id, m));
+    lines.push("§fRegeneration§7 — passive: your body heals itself, 0.5 health a second (+0.25 a grade) for 2 CE.",
+      "§fBlack Flash§7 — passive: a melee hit can land as a Black Flash (x2.5, refills 30% CE).");
+  } else if (!isHeavenly(p)) {
     lines.push("", "§d§lEvery sorcerer");
     for (const [id, m] of Object.entries(UNIVERSAL)) lines.push(moveLine(p, id, m));
     lines.push("§fBlack Flash§7 — passive: a melee hit can land as a Black Flash (x2.5, refills 30% CE).");
@@ -129,12 +123,15 @@ function clansPage(p) {
   const mine = clanOf(p);
   const lines = ["§7Your clan decides which techniques can awaken in you. The great clans' techniques run in their blood: no one born outside the clan can ever have them — and a technique's moves only work for the one who awakened it.", ""];
   for (const [id, c] of Object.entries(CLANS)) {
+    if (c.curse) continue; // (the cursed aren't a clan: below)
     const techs = Object.entries(c.techniques).map(([t, pct]) => `${TECHNIQUES[t].c}${TECHNIQUES[t].name} §7${pct}%`).join("§7, ");
     lines.push(`${id === mine ? "§l» " : ""}${c.c}${c.name}§r §8— born into: ${c.weight}%`);
     lines.push(`§7  ${techs || "§7no clan technique"} · §fperk: §7${c.perk}`);
   }
   const open = Object.entries(OPEN).map(([t, w]) => `${TECHNIQUES[t].c}${TECHNIQUES[t].name}§7 ${w}`).join("§7, ");
   lines.push("", `§fOtherwise (and for the clanless): §7a technique of no clan — ${open}.`);
+  const disasters = Object.entries(CURSE_POOL).map(([t, w]) => `${TECHNIQUES[t].c}${TECHNIQUES[t].name}§7 ${w}`).join("§7, ");
+  lines.push("", `§4Cursed Spirits§r §7(chosen on the first join, not born into) awaken a disaster — ${disasters}. Disaster Plants and Disaster Tides are theirs alone.`);
   return back(p, "§5Clans", lines.join("\n"), () => openRecord(p));
 }
 
@@ -173,6 +170,7 @@ function guidePage(p) {
     "§l§fBlack Flash", "§7Any punch or weapon hit can distort into a Black Flash: x2.5 damage, 30% of your CE back, and 30 s in the zone (+10% chance).", "",
     "§l§fDomain Expansion", "§7Grade 1. Everyone inside who isn't protected is hit by its sure-hit — Infinity included. Overlapping domains clash: the stronger sorcerer keeps theirs.",
     "§7Protection: Simple Domain (Grade 2), Heavenly Restriction, or your own domain. The Inverted Spear of Heaven breaks a domain by stabbing its caster.",
+    "", "§l§4Cursed Spirits", "§7Players who chose the curse's path. Curses leave them alone — they grow by devouring them (Devour) and by beating sorcerers. Jujutsu High hunts them at night; Mahito, Jogo, Geto and Choso treat them as kin. Their body heals itself while it has cursed energy.",
     "§7Every domain, and Hollow Purple, opens with a cinematic of its own — you can't move or use moves while it plays. Switch it off in Settings.", "",
     "§l§fCurses", "§7Curses gather around sorcerers at night — the higher your grade, the stronger they come. At Grade 1 a Special Grade curse may come for you: the Finger Bearer. Bring friends.", "",
     "§l§fSukuna's Fingers & Cursed Wombs", "§7Eat a finger for permanent power. A Cursed Womb rerolls your innate technique — always into one your clan's blood allows.", "",
@@ -189,6 +187,7 @@ async function settingsPage(p) {
   const limitless = techniqueOf(p) === "limitless";
   if (limitless) f.toggle("Infinity (40% less damage, 2 CE a hit)", !getProp(p, "infinity_off", false));
   f.toggle("Cinematics (Hollow Purple and Domain Expansions take the camera)", !getProp(p, "cine_off", false));
+  f.toggle(isCurse(p) ? "§bStart over as a Jujutsu Sorcerer§r (wipes your progress)" : "§4Start over as a Cursed Spirit§r (wipes your progress)", false);
   const r = await show(p, f);
   if (r.canceled || !r.formValues) return;
   const v = r.formValues;
@@ -197,6 +196,7 @@ async function settingsPage(p) {
   const cine = v[limitless ? 2 : 1];
   if (cine !== undefined) setProp(p, "cine_off", !cine);
   tell(p, "§7Settings saved.");
+  if (v[limitless ? 3 : 2] === true) await confirmStartOver(p);
 }
 
 // This server: what a player needs to know to play on it.
@@ -296,6 +296,7 @@ export async function editPlayer(p, q) {
   if (!canInherit(clan, tech) && tech === techniqueOf(q) && !reroll) tech = rollTechnique(clan, tech);
   if (tech !== techniqueOf(q)) setTechnique(q, tech, "reroll");
   else if (TECHNIQUES[tech].clan) setProp(q, "clan", TECHNIQUES[tech].clan);
+  syncPathTag(q); // (a curse, or not)
   if (gi !== gradeOf(q)) setXp(q, GRADES[gi].xp);
   setProp(q, "fingers", Math.max(0, Math.min(MAX_FINGERS, Math.round(fingers))));
   if (refill) {
@@ -313,9 +314,10 @@ async function serverSettings(p) {
     .toggle("The Finger Bearer can appear on its own (Grade 1+)", worldProp("boss_spawns", true))
     .toggle("Hollow Purple destroys terrain", worldProp("terrain", false))
     .toggle("Villains appear at night near Grade 1 sorcerers", worldProp("villains", true))
-    .toggle("Jujutsu High comes to help at night", worldProp("allies", true))
+    .toggle("Jujutsu High comes out at night (helps sorcerers, hunts Cursed Spirits)", worldProp("allies", true))
     .toggle("Cinematics for Hollow Purple and Domain Expansions", worldProp("cinematics", true) !== false)
-    .toggle("Light effects (fewer particles, for slower devices)", worldProp("vfx_light", false) === true);
+    .toggle("Light effects (fewer particles, for slower devices)", worldProp("vfx_light", false) === true)
+    .toggle("New players choose: Jujutsu Sorcerer or Cursed Spirit", worldProp("curse_path", true) !== false);
   const r = await show(p, f);
   if (r.canceled || !r.formValues) return;
   const v = r.formValues;
@@ -326,6 +328,7 @@ async function serverSettings(p) {
   setWorldProp("allies", !!v[4]);
   if (v[5] !== undefined) setWorldProp("cinematics", !!v[5]);
   if (v[6] !== undefined) setWorldProp("vfx_light", !!v[6]);
+  if (v[7] !== undefined) setWorldProp("curse_path", !!v[7]);
   tell(p, "§7Server settings saved.");
 }
 

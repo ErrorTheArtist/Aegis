@@ -767,28 +767,35 @@ def base_components():
     }
 
 
+CURSE_PLAYER = {"test": "has_tag", "subject": "other", "value": "jjk_curse"}  # a player who chose the curse's path
+KIN = {"mahito", "jogo", "geto", "choso"}  # villains who are curses, or on their side: they spare Cursed Spirit players
+
+
 def ally_group():
-    """Jujutsu High: fights curses, villains and monsters (never creepers), never players on its own (the script runs
-    spars); right-click to talk."""
+    """Jujutsu High: fights curses (Cursed Spirit players too), villains and monsters (never creepers), never other players
+    on its own (the script runs spars); right-click to talk."""
     return {
         "minecraft:type_family": {"family": ["sorcerer", "jjk_ally", "mob"]},
-        "minecraft:behavior.hurt_by_target": {"priority": 1, "entity_types": {"filters": fam("player", "!=")}},
+        "minecraft:behavior.hurt_by_target": {"priority": 1, "entity_types": {"filters": {"any_of": [fam("player", "!="), CURSE_PLAYER]}}},
         "minecraft:behavior.nearest_attackable_target": {"priority": 3, "must_see": False, "reselect_targets": True, "within_radius": 24,
             "entity_types": [{"filters": {"any_of": [fam("curse"), fam("jjk_villain"), {"all_of": [fam("monster"), fam("creeper", "!=")]},
-                                                     {"all_of": [fam("player"), {"test": "has_tag", "subject": "other", "value": "jjk_spar"}]}]},
+                                                     {"all_of": [fam("player"), {"test": "has_tag", "subject": "other", "value": "jjk_spar"}]},
+                                                     {"all_of": [fam("player"), CURSE_PLAYER]}]},
                               "max_dist": 24}]},
         "minecraft:interact": {"interactions": [{"on_interact": {"filters": fam("player"), "event": "jjk:talked", "target": "self"},
                                                  "interact_text": "Talk", "swing": True}]},
     }
 
 
-def villain_group():
-    """A villain: hunts players, Jujutsu High and shikigami; stays until it's beaten (or left alone, see sorcerers.js)."""
+def villain_group(kin=False):
+    """A villain: hunts players, Jujutsu High and shikigami; stays until it's beaten (or left alone, see sorcerers.js).
+    A kin villain (KIN) spares Cursed Spirit players — unless they attack it."""
+    players = {"all_of": [fam("player"), {**CURSE_PLAYER, "operator": "!="}]} if kin else fam("player")
     return {
         "minecraft:type_family": {"family": ["sorcerer", "jjk_villain", "monster", "mob"]},
         "minecraft:behavior.hurt_by_target": {"priority": 1},
         "minecraft:behavior.nearest_attackable_target": {"priority": 3, "must_see": False, "reselect_targets": True, "within_radius": 32,
-            "entity_types": [{"filters": {"any_of": [fam("player"), fam("jjk_ally"), fam("shikigami")]}, "max_dist": 32}]},
+            "entity_types": [{"filters": {"any_of": [players, fam("jjk_ally"), fam("shikigami")]}, "max_dist": 32}]},
         "minecraft:persistent": {},
         "minecraft:experience_reward": {"on_death": "q.last_hit_by_player ? 120 : 0"},
     }
@@ -846,6 +853,7 @@ def build():
     groups, events = {}, {}
     groups["jjk:ally"] = ally_group()
     groups["jjk:villain"] = villain_group()
+    groups["jjk:villain_kin"] = villain_group(kin=True)
     groups["jjk:despawn"] = {"minecraft:instant_despawn": {}}
     groups["jjk:wanderer"] = {"minecraft:despawn": {"despawn_from_distance": {"min_distance": 48, "max_distance": 96}}}  # came to help: leaves again
     groups["jjk:stay"] = {"minecraft:movement": {"value": 0.0}}                                                         # an admin's hub NPC
@@ -857,9 +865,11 @@ def build():
         if side == "villain":
             grp["minecraft:boss"] = {"hud_range": 40, "name": name, "should_darken_sky": n == "sukuna"}
         groups[f"jjk:c_{n}"] = grp
+        side_grp = "jjk:villain_kin" if side == "villain" and n in KIN else f"jjk:{side}"
         events[f"jjk:as_{n}"] = {"set_property": {"jjk:npc": i},
-                                 "add": {"component_groups": [f"jjk:c_{n}", f"jjk:{side}"]},
-                                 "remove": {"component_groups": [f"jjk:c_{o}" for o in names if o != n] + [f"jjk:{'ally' if side == 'villain' else 'villain'}"]}}
+                                 "add": {"component_groups": [f"jjk:c_{n}", side_grp]},
+                                 "remove": {"component_groups": [f"jjk:c_{o}" for o in names if o != n]
+                                            + [g for g in ("jjk:ally", "jjk:villain", "jjk:villain_kin") if g != side_grp]}}
     events["jjk:despawn"] = {"add": {"component_groups": ["jjk:despawn"]}}
     events["jjk:talked"] = {}
     events["jjk:wanderer"] = {"add": {"component_groups": ["jjk:wanderer"]}}

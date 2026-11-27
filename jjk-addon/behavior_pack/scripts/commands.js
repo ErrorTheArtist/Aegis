@@ -3,7 +3,8 @@
 //   /scriptevent jjk:admin                       open the Admin Panel
 //   /scriptevent jjk:technique limitless [name]  set an innate technique (limitless, shrine, ten_shadows, heavenly,
 //                                                projection, cursed_speech, blood, disaster_flames, idle_death_gamble,
-//                                                cursed_spirit, idle_transfiguration, straw_doll, ratio, boogie, random)
+//                                                cursed_spirit, idle_transfiguration, straw_doll, ratio, boogie, random;
+//                                                a curse's own: disaster_plants, disaster_tides — they make them a curse)
 //   /scriptevent jjk:grade 4 [name]              set a grade (0 = Grade 4 … 5 = Special Grade)
 //   /scriptevent jjk:xp 500 [name]               give XP
 //   /scriptevent jjk:finger 20 [name]            set Sukuna's Fingers eaten
@@ -14,7 +15,9 @@
 //   /scriptevent jjk:mahoraga                    summon a wild Mahoraga next to you (no ritual: nobody can tame it)
 //   /scriptevent jjk:tame_mahoraga [name]        let a Ten Shadows sorcerer skip the ritual (or "off" to undo it)
 //   /scriptevent jjk:summon gojo [stay]          summon a character next to you (stay: they don't move — for a hub)
-//   /scriptevent jjk:reset [name]                wipe a player (they're born and awaken again)
+//   /scriptevent jjk:reset [name]                wipe a player (they choose their path again and awaken again)
+//   /scriptevent jjk:path curse [name]           make a player a Cursed Spirit (or "sorcerer"), keeping their grade;
+//                                                a technique their new path doesn't allow is rerolled
 //   /scriptevent jjk:cinematics off              cinematics on/off for everyone (each player can also switch theirs off)
 //   /scriptevent jjk:vfx light                   fewer particles for slower devices ("full" to go back)
 //   /scriptevent jjk:cinematic void              watch a cinematic without casting anything (void, shrine, garden, moon,
@@ -38,6 +41,8 @@ import { world, system } from "@minecraft/server";
 import { setProp, setWorldProp, worldProp, tell, isPlayer } from "./core.js";
 import { CINE } from "./cine_shots.js";
 import { play, inCinematic } from "./cinematic.js";
+import { setPath, needsPath, askPath, WIPE } from "./paths.js";
+import { isCurse } from "./clans.js";
 import { AUTO, on, setOn, sanctuary, setSanctuary, setSanctuaryRadius, setProtection, protectedLeft } from "./server.js";
 import { GROUPS, groupOn, setGroup, banItem, extraBans } from "./bans.js";
 import { startEvent, clearItems, EVENTS } from "./upkeep.js";
@@ -172,7 +177,7 @@ export function runCommand(id, message, src) {
     return say(src, protectedLeft(who) > 0 ? `§7${who.name} is protected from other players for ${Math.ceil(protectedLeft(who) / 60)} min.` : `§7${who.name} has no newcomer protection now.`);
   }
   const [value, q, name] = parse(src, message);
-  const needsValue = ["technique", "grade", "xp", "finger", "clan"].includes(cmd);
+  const needsValue = ["technique", "grade", "xp", "finger", "clan", "path"].includes(cmd);
   const target = needsValue ? q : parse(src, `x ${message ?? ""}`)[1];
   if (!target) return say(src, name ? `§cNo player called ${name}.` : "§cName a player.");
   switch (cmd) {
@@ -213,14 +218,19 @@ export function runCommand(id, message, src) {
       resetCooldowns(target);
       return say(src, `§7Refilled ${target.name}.`);
     case "reset":
-      for (const k of ["technique", "clan", "xp", "fingers", "ce", "black_flashes", "exorcised", "sorcerers_beaten", "moves_used", "hb", "vow", "vow_at",
-        "mahoraga", "spirits"]) setProp(target, k, undefined);
+      for (const k of WIPE) setProp(target, k, undefined);
       resetCooldowns(target);
       applyStats(target);
-      awaken(target);
-      return say(src, `§7${target.name} was reset and awakened again.`);
+      if (needsPath(target)) askPath(target);
+      else awaken(target);
+      return say(src, `§7${target.name} was reset ${needsPath(target) ? "and is choosing their path again" : "and awakened again"}.`);
+    case "path": {
+      if (value !== "curse" && value !== "sorcerer") return say(src, "§7Use: jjk:path curse|sorcerer [name]");
+      setPath(target, value);
+      return say(src, `§7${target.name} is now a ${isCurse(target) ? "§4Cursed Spirit" : "§bJujutsu Sorcerer"}§7 (${TECHNIQUES[techniqueOf(target)]?.name ?? "awakening"}).`);
+    }
     default:
-      return say(src, "§7Commands: jjk:record, admin, technique, clan, grade, xp, finger, ce, boss, mahoraga, tame_mahoraga, summon, reset, cinematics, vfx, cinematic, auto, bans, ban, unban, sanctuary, motd, event, clear, protection, credits");
+      return say(src, "§7Commands: jjk:record, admin, technique, clan, grade, xp, finger, ce, boss, mahoraga, tame_mahoraga, summon, reset, path, cinematics, vfx, cinematic, auto, bans, ban, unban, sanctuary, motd, event, clear, protection, credits");
   }
 }
 

@@ -1,0 +1,32 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:item": {
+    "description": {
+      "identifier": "jjk:sea_of_light",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "jjk_sea_of_light"
+        }
+      },
+      "minecraft:display_name": {
+        "value": "§2Maximum: Ceremonial Sea of Light§r\n§8Disaster Plants\n§7The flowers' life, as a beam of light"
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:can_destroy_in_creative": false,
+      "minecraft:use_modifiers": {
+        "use_duration": 0.25,
+        "movement_modifier": 1.0
+      },
+      "minecraft:use_animation": "none",
+      "minecraft:cooldown": {
+        "category": "jjk_sea_of_light",
+        "duration": 0.1
+      }
+    }
+  }
+}

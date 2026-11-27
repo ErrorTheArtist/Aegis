@@ -1,7 +1,9 @@
 // Jujutsu Legacy — entry point. Wires every module together:
 //   credits.js     who made it (shown to everyone; can't be switched off)
 //   core.js        storage, maths, particles, sounds, targeting, the task runner
-//   clans.js       Gojo, Zen'in, Kamo, Inumaki and the clanless: which techniques run in whose blood
+//   clans.js       Gojo, Zen'in, Kamo, Inumaki and the clanless: which techniques run in whose blood (and the cursed)
+//   paths.js       the first join's choice: Jujutsu Sorcerer or Cursed Spirit; starting over on the other path
+//   curse_powers.js  a Cursed Spirit's own powers: Devour, Terror, Curse Unleashed, regeneration
 //   grades.js      Grade 4 → Special Grade, XP, Sukuna's Fingers, health
 //   energy.js      cursed energy and the action-bar HUD
 //   combat.js      technique damage, Black Flash, Infinity, stuns
@@ -22,7 +24,6 @@
 import { world, system } from "@minecraft/server";
 import { initTasks, valid, isPlayer, health, tell } from "./core.js";
 import { creditsIntact, creditLine, tamperedLine } from "./credits.js";
-import { ensureClan } from "./clans.js";
 import { initEnergy, statusHooks } from "./energy.js";
 import { initCombat } from "./combat.js";
 import { initDomains } from "./domains.js";
@@ -35,6 +36,9 @@ import { initCommands } from "./commands.js";
 import { initSorcerers } from "./sorcerers.js";
 import { applyStats } from "./grades.js";
 import { initMahoraga } from "./mahoraga.js";
+import { needsPath, askPath } from "./paths.js";
+import { syncPathTag, ensureClan } from "./clans.js";
+import { initCursePowers } from "./curse_powers.js";
 import { initBans } from "./bans.js";
 import { initServer, joined, dailyBlessing } from "./server.js";
 import { initUpkeep } from "./upkeep.js";
@@ -50,6 +54,7 @@ initCurses();
 initCommands();
 initSorcerers();
 initMahoraga();
+initCursePowers();
 initBans();
 initServer();
 initUpkeep();
@@ -57,7 +62,11 @@ initUpkeep();
 function ready(p, respawn) {
   if (!valid(p)) return;
   if (techniqueOf(p)) ensureClan(p); // (players from before clans: the clan their technique came from)
-  if (!techniqueOf(p)) awaken(p);
+  syncPathTag(p);
+  if (!techniqueOf(p)) {
+    if (needsPath(p)) askPath(p); // a brand-new player chooses: sorcerer or curse (it awakens them)
+    else awaken(p);
+  }
   applyStats(p);
   syncItems(p);
   if (respawn) {

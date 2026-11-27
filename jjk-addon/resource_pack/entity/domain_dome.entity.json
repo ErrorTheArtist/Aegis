@@ -12,7 +12,8 @@
         "moon": "textures/entity/jjk/dome_moon",
         "volcano": "textures/entity/jjk/dome_volcano",
         "perfection": "textures/entity/jjk/dome_perfection",
-        "jackpot": "textures/entity/jjk/dome_jackpot"
+        "jackpot": "textures/entity/jjk/dome_jackpot",
+        "tides": "textures/entity/jjk/dome_tides"
       },
       "geometry": {
         "default": "geometry.jjk.domain_dome"

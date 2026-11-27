@@ -593,7 +593,9 @@ def anim(kind, bones):
 # ---------------------------------------------------------------------------
 # What each creature is
 # ---------------------------------------------------------------------------
-CURSE_TARGETS = [{"filters": {"any_of": [{"test": "is_family", "subject": "other", "value": "player"},
+# (players carrying jjk_curse are Cursed Spirits themselves: curses leave them alone unless attacked — hurt_by_target)
+CURSE_TARGETS = [{"filters": {"any_of": [{"all_of": [{"test": "is_family", "subject": "other", "value": "player"},
+                                                     {"test": "has_tag", "subject": "other", "operator": "!=", "value": "jjk_curse"}]},
                                          {"test": "is_family", "subject": "other", "value": "shikigami"},
                                          {"test": "is_family", "subject": "other", "value": "jjk_ally"}]}, "max_dist": 28}]
 CREATURES = {
@@ -969,6 +971,13 @@ def dome_texture(kind, seed):
                     base = (150, 150, 170)
                 elif (y + x // 3) % 21 in (20, 1) and x % 4 == 0:
                     base = (110, 110, 130)
+            elif kind == "tides":  # Horizon of the Captivating Skandha: the sea and a summer sky, foam, fish in the deep
+                swell = 0.5 + 0.5 * math.sin(y * 0.09 + math.sin(x * 0.05) * 1.6)
+                base = (40 + 80 * swell + n * 5, 130 + 70 * swell + n * 5, 190 + 50 * swell + n * 4)
+                if math.sin(x * 0.21 + math.sin(y * 0.13) * 2.4 + y * 0.31) > 0.95:  # lines of foam
+                    base = (225, 242, 255)
+                elif rnd.random() < 0.006:
+                    base = (250, 250, 255)
             else:                  # Idle Death Gamble: a pachinko parlour's green, with rows of lights
                 glow = 0.5 + 0.5 * math.sin(y * 0.2 + math.sin(x * 0.09) * 1.5)
                 base = (20 + 16 * glow + n * 3, 90 + 50 * glow + n * 6, 50 + 26 * glow + n * 4)
@@ -984,6 +993,17 @@ def dome_texture(kind, seed):
                 r = math.hypot(x - 64, y - 60)
                 if 14 < r < 17:
                     px[x, y] = (238, 238, 246, 255)
+    if kind == "tides":   # shikigami fish in the deep: dark little shapes, all swimming one way
+        for _ in range(14):
+            cx, cy = rnd.randint(6, 120), rnd.randint(6, 122)
+            for x in range(cx - 4, cx + 4):
+                for y in range(cy - 2, cy + 3):
+                    if 0 <= x < 128 and 0 <= y < 128 and (x - cx) ** 2 / 12 + (y - cy) ** 2 / 3 <= 1:
+                        px[x, y] = (20, 60, 110, 255)
+            for k in range(3):                                   # the tail
+                for y in range(cy - k, cy + k + 1):
+                    if 0 <= cx + 4 + k < 128 and 0 <= y < 128:
+                        px[cx + 4 + k, y] = (20, 60, 110, 255)
     if kind == "perfection":   # pale hands reaching out of the dark
         for _ in range(9):
             cx, cy = rnd.randint(10, 118), rnd.randint(14, 118)
@@ -1062,7 +1082,7 @@ fx_entity_rp("orb", "geometry.jjk.orb", {k_: f"orb_{k_}" for k_ in ORBS}, "entit
              "controller.render.jjk.variant4")
 
 w(RP / "models" / "entity" / "domain_dome.geo.json", m_dome())
-DOMES = ("void", "garden", "moon", "volcano", "perfection", "jackpot")
+DOMES = ("void", "garden", "moon", "volcano", "perfection", "jackpot", "tides")  # (new ones at the END: the index is the variant)
 for i, kind in enumerate(DOMES):
     dome_texture(kind, 40 + i).save(RP / "textures" / "entity" / "jjk" / f"dome_{kind}.png")
 fx_entity_bp("domain_dome", list(DOMES), life=20)

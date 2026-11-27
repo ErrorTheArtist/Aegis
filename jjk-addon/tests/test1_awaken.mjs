@@ -1,6 +1,7 @@
 import { H, mkPlayer, spawn, tick, fire, use, inv, check, done, system, world } from "./harness.mjs";
 await import("./main.mjs");
 world.setDynamicProperty("jjk:auto_daily", false); // (the Daily Blessing would take over the bar — test10 tests it)
+world.setDynamicProperty("jjk:curse_path", false); // (everyone a sorcerer here: the path choice is test11's)
 const T = await import("./techniques.mjs");
 const E = await import("./energy.mjs");
 const Gr = await import("./grades.mjs");
@@ -29,9 +30,10 @@ check("Shrine ~2.4%", Math.abs(counts.shrine / 400 - 2.4) < 0.5, pct("shrine"));
 check("Boogie Woogie ~17%", Math.abs(counts.boogie / 400 - 16.9) < 1.2, pct("boogie"));
 check("Projection Sorcery ~4%", Math.abs(counts.projection / 400 - 4) < 0.7, pct("projection"));
 const T0 = await import("./techniques.mjs");
-check("all 14 techniques appear", Object.keys(counts).length === 14 && Object.keys(T0.TECHNIQUES).length === 14, JSON.stringify(counts));
+const SORCERY = Object.keys(T0.TECHNIQUES).filter((t) => Cl.techChance(t) > 0); // (a curse's own two are never rolled by a sorcerer)
+check("all 14 sorcerer techniques appear", Object.keys(counts).length === 14 && SORCERY.length === 14 && Object.keys(T0.TECHNIQUES).length === 16, JSON.stringify(counts));
 check("techChance adds up to 100%", Math.abs(Object.keys(T0.TECHNIQUES).reduce((s, t) => s + Cl.techChance(t), 0) - 100) < 1e-6);
-for (const t of Object.keys(T0.TECHNIQUES)) check(`${t}: rolled as often as techChance says`, Math.abs(counts[t] / 400 - Cl.techChance(t)) < 1.3, `${pct(t)} vs ${Cl.techChance(t).toFixed(2)}`);
+for (const t of SORCERY) check(`${t}: rolled as often as techChance says`, Math.abs(counts[t] / 400 - Cl.techChance(t)) < 1.3, `${pct(t)} vs ${Cl.techChance(t).toFixed(2)}`);
 check("rarity text comes from the tables", T0.TECHNIQUES.limitless.rarity.includes("1.5%") && T0.TECHNIQUES.boogie.rarity.includes("Common"), T0.TECHNIQUES.boogie.rarity);
 check("reroll never repeats", [...Array(500)].every(() => Cl.rollTechnique("clanless", "boogie") !== "boogie"));
 check("born into a clan", !!Cl.CLANS[p._props["jjk:clan"]], p._props["jjk:clan"]);

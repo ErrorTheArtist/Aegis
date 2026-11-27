@@ -344,10 +344,28 @@ tools.
   given. Moves refuse anyone who didn't awaken their technique.
   - A technique's rarity text is worked out from the tables (`techChance`, `rarityOf`): change the weights, not the text.
 - **A new technique:** a `tech_<id>.js` move table, an entry in `TECHNIQUES` (`techniques.js`), a weight in a clan or
-  `OPEN` (`clans.js`), its icons in `gen_items.py` (`TECH_RIM`, `TECH_COL`, `TECH_NAME`, `MOVES`), and a test.
+  `OPEN` (`clans.js`) — or, for a curse's disaster, in `CURSE_POOL` (and `CLANS.cursed.techniques` if it's curses'
+  alone) — its icons in `gen_items.py` (`TECH_RIM`, `TECH_COL`, `TECH_NAME`, `MOVES`), and a test.
+  - A new domain barrier goes at the END of `DOMES` in `gen_entities.py` (its index is the variant), with a fog
+    (`FOGS`) and a cinematic (`CINE`).
   - Its domain: `registerDomain(kind, def, tick, end)` from `domains.js`. `tick(d, victims, every, k, age)` runs each
     tick (`k` is 0.5 for an NPC caster); `end(d, why)` runs when it closes (`why` is empty when it ran its full course).
     Set `d.noBurnout` to close it without burnout. `shielded(d, e)` says who a sure-hit can't touch.
+- **The two paths** (`paths.js`): a brand-new player (no clan, no technique) chooses **Jujutsu Sorcerer** or **Cursed
+  Spirit** before anything awakens (`needsPath` / `askPath` from `ready()` in `main.js`; world prop `curse_path` off =
+  everyone a sorcerer). Tests that don't test the choice set `jjk:curse_path` false; test11 tests it.
+  - A curse's "clan" is the origin `cursed` (`CLANS.cursed`, weight 0: never rolled). `isCurse(p)` is
+    `clanOf(p) === "cursed"`. Its disasters and weights are `CURSE_POOL`; `rollTechnique("cursed")` draws from it, and
+    `canInherit("cursed", t)` allows only those. Disaster Plants and Disaster Tides are bound to it
+    (`CLANS.cursed.techniques`), so giving one to anyone makes them a curse, like a clan technique.
+  - Curse players carry the tag `jjk_curse` (`syncPathTag`): the entity files filter on it — curse mobs skip them
+    (`CURSE_TARGETS` in `gen_entities.py`), Jujutsu High targets them (`ally_group`), and kin villains
+    (`KIN` in `gen_sorcerers.py`: their events add `jjk:villain_kin`) skip them. The scripts mirror this in
+    `sorcerers.js` (`targetRules`, `targetOf`, `CAST[...].kin`, `hunterNight`).
+  - A curse gets `CURSE_MOVES` (`curse_powers.js`, `curse: true`) instead of the sorcerer's universal moves
+    (`universal: true`); `useMove` refuses the other side's. Show grades with `gradeLabel(p)` ("Grade 2 Curse").
+  - Starting over (`startOver`, Record → Settings' last toggle) wipes the `WIPE` keys; `/scriptevent jjk:path` keeps
+    the grade (`setPath`).
 - **Servant curses** (`servants.js`, `spawnServant(owner, typeId, loc, secs)`):
   - A player's or ally's: the curse's `jjk:servant` event tames it, tag `jjk_servant`.
   - A villain's stays hostile, tag `jjk_minion`; it spares its master (owner property).

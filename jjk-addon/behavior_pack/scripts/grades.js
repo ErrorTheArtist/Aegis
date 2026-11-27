@@ -5,7 +5,7 @@
 
 import { world } from "@minecraft/server";
 import { getProp, setProp, tell, title, sound, fx, fxMust, bar, mid, effect, clearEffect, COLOR } from "./core.js";
-import { clanMaxCE, clanRegen, clanXp } from "./clans.js";
+import { clanMaxCE, clanRegen, clanXp, isCurse } from "./clans.js";
 import { vowMult } from "./vows.js";
 
 export const GRADES = [
@@ -28,6 +28,8 @@ export function gradeFromXp(xp) {
 }
 export const gradeOf = (p) => gradeFromXp(xpOf(p));
 export const gradeName = (g) => `${GRADES[g].c}${GRADES[g].name}`;
+// A player's grade as shown to everyone: a curse's says so ("Grade 2 Curse").
+export const gradeLabel = (p, g = gradeOf(p)) => `${GRADES[g].c}${GRADES[g].name}${isCurse(p) ? " Curse" : ""}`;
 export const dmgMult = (p) => 1 + gradeOf(p) * 0.2 + fingersOf(p) * 0.02;
 export const maxCE = (p) => Math.round((100 + gradeOf(p) * 40 + fingersOf(p) * 10) * clanMaxCE(p)); // Gojo clan: +15%
 export const regenCE = (p) => (2 + gradeOf(p) * 0.8) * clanRegen(p) * vowMult(p, "regen"); // a second (Kamo clan: +20%; Deep Reserves: +50%)
@@ -67,8 +69,9 @@ export function setXp(p, xp) {
 
 function promote(p, from, to) {
   const g = GRADES[to];
-  title(p, `${g.c}§l${g.name.toUpperCase()}`, "§7You have been promoted", 50);
-  tell(p, `§6✦ §fYou are now ${g.c}${g.name}§f. More cursed energy, more power, more health.`);
+  const curse = isCurse(p);
+  title(p, `${g.c}§l${g.name.toUpperCase()}${curse ? " CURSE" : ""}`, curse ? "§7You have grown stronger" : "§7You have been promoted", 50);
+  tell(p, `§6✦ §fYou are now ${gradeLabel(p, to)}§f. More cursed energy, more power, more health.`);
   sound(p.dimension, "random.levelup", p.location, 1, 0.8);
   sound(p.dimension, "random.totem", p.location, 0.6, 1.3);
   fx(p.dimension, "jjk:shell", mid(p), COLOR.gold, 1, { radius: 2.2 });
@@ -77,7 +80,7 @@ function promote(p, from, to) {
   fxMust(p.dimension, "jjk:ring", p.location, COLOR.gold, 1.6);
   if (to >= G.ONE) {
     try {
-      world.sendMessage(`§6✦ §f${p.name} §7has been promoted to ${g.c}${g.name}§7.`);
+      world.sendMessage(curse ? `§4✦ §f${p.name} §7has grown into a ${gradeLabel(p, to)}§7.` : `§6✦ §f${p.name} §7has been promoted to ${g.c}${g.name}§7.`);
     } catch {
       /* ignore */
     }

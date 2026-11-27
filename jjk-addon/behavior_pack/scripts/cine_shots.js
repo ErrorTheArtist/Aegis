@@ -201,6 +201,34 @@ export const CINE = {
       { t: 22, id: "random.click", pitch: 1.5 }, { t: 24, id: "random.levelup", pitch: 1.4 }, { t: 30, id: "random.orb", pitch: 1.8 }],
   },
 
+  // Dagon (a Cursed Spirit of the sea) — Horizon of the Captivating Skandha: the sign from the left, the tide rising round
+  // their feet at ground level, a flash of sea-blue, then from behind them out to a horizon without end, and the swarm.
+  tides: {
+    name: "Horizon of the Captivating Skandha", length: 62, victim: 24, fog: "tides", fogAt: 22, color: [0.35, 0.65, 1],
+    shots: [
+      { t: 0, name: "1 the sign", pos: [1.3, -0.95, 1.2], look: [0.1, 0, 1.6] },
+      { t: 1, pos: [1.1, -0.72, 1.32], look: [0.05, 0, 1.62], ease: 0.6 },
+      { t: 12, name: "2 the tide rises", pos: [3.6, 0.6, 0.3], look: [0, 0, 0.8] },
+      { t: 13, pos: [3.0, 1.3, 0.5], look: [0, 0, 0.9], ease: 0.8 },
+      { t: 26, name: "3 the horizon", pos: [-4, 1.5, 2.5], look: [12, 0, 3] },
+      { t: 27, pos: [-2.5, 2.6, 2.2], look: [12, -1, 2.6], ease: 1.3 },
+      { t: 46, name: "4 the swarm", pos: [1.7, 0.9, 1.4], look: [0, 0, 1.55] },
+      { t: 47, pos: [1.4, 0.6, 1.5], look: [0, 0, 1.58], ease: 0.8 },
+    ],
+    text: [SIGN("§3", "§b領域展開"), { t: 40, title: "§3§lHORIZON OF THE CAPTIVATING SKANDHA", sub: "§b蕩蘊平線", stay: 22 }],
+    fades: [{ t: 21, in: 0.1, hold: 0.2, out: 0.6, color: [0.55, 0.85, 1] }],
+    shakes: [{ t: 24, power: 0.3, secs: 0.6 }],
+    fx: [
+      { t: 0, id: "glyph", at: [0, 0, 0.05] }, { t: 12, id: "ring", at: [0, 0, 0.1], size: 2 }, { t: 12, id: "fish", at: [0.5, 0, 0.8] },
+      { t: 16, id: "vortex", at: [0, 0, 1], vars: { radius: 3 } }, { t: 22, id: "flash", at: [1, 0, 1.6], size: 2 },
+      { t: 24, id: "shell", at: [0, 0, 1], vars: { radius: 12 } }, { t: 28, id: "fish", at: [3, 2, 1.5], size: 1.4 },
+      { t: 30, id: "smoke", at: [5, 0, 0.3], size: 1.6, color: [0.85, 0.95, 1] }, { t: 32, id: "fish", at: [-2, -3, 1.2], size: 1.4 },
+      { t: 36, id: "fish", at: [4, -2, 1.8], size: 1.4 }, { t: 44, id: "fish", at: [1, 1, 1.5], size: 1.2 }, { t: 50, id: "fish", at: [2, -1, 1.4] },
+    ],
+    sounds: [{ t: 0, id: "random.splash", pitch: 0.6 }, { t: 12, id: "bucket.empty_water", pitch: 0.8 },
+      { t: 21, id: "ambient.underwater.enter", pitch: 0.8, volume: 1.4 }, { t: 26, id: "random.splash", pitch: 0.5 }, { t: 34, id: "mob.fish.flop" }],
+  },
+
   // Gojo — Hollow Purple: from behind as Blue and Red close in, face to face between them, from the side as they merge
   // in front of him, a purple flash, alongside it as it tears away, and back behind him down the empty path.
   purple: {

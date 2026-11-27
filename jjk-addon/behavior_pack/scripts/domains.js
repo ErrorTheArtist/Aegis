@@ -10,7 +10,9 @@
 //                                       and a final 12 to whoever is still inside at the end
 //   Idle Death Gamble     (Idle Death Gamble)  barrier, radius 12, 10 s: hurts no one; spins for a JACKPOT
 //                                       (1 in 4 every 2 s) — a jackpot closes it with no burnout
-// Those four live in their technique's own module (registerDomain).
+//   Horizon of the Captivating Skandha  (Disaster Tides, Cursed Spirits only)  barrier, radius 12, 9 s: shikigami fish
+//                                       bite everyone inside for 3 a second and slow them
+// Those five live in their technique's own module (registerDomain).
 // It costs 70% of your maximum cursed energy. When it ends your technique burns out for 15 s (Reverse Cursed
 // Technique and Simple Domain still work).
 // Two domains that overlap CLASH: the stronger sorcerer (grade, cursed energy left, fingers, a little luck) keeps

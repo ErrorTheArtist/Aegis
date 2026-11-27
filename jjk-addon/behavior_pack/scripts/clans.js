@@ -13,6 +13,10 @@
 // Cursed Spirit Manipulation 7, Idle Transfiguration 5, Shrine 4 (Sukuna's own).
 // The overall chance of each technique is worked out from these tables by techChance() — the Record shows it.
 // A technique belongs to whoever awakened it: its moves refuse to work for anyone else.
+//
+// Cursed Spirits (players who chose the curse's path when they first joined, see paths.js) have no family: their
+// origin is "cursed". They awaken a disaster (weights in CURSE_POOL): Disaster Flames 30, Disaster Plants 25,
+// Disaster Tides 25, Idle Transfiguration 20. Disaster Plants and Disaster Tides belong to curses alone.
 
 import { getProp, setProp } from "./core.js";
 
@@ -27,7 +31,14 @@ export const CLANS = {
     blurb: "A family whose words are curses, marked with the snake and fangs." },
   clanless: { name: "Clanless", c: "§7", weight: 40, techniques: {}, perk: "+15% XP (self-made)",
     blurb: "No great family behind you — everything you become, you earn yourself." },
+  // (never rolled: only those who choose to be a curse; its own techniques are bound to it)
+  cursed: { name: "Cursed Spirit", c: "§4", weight: 0, curse: true, techniques: { disaster_plants: 0, disaster_tides: 0 },
+    perk: "your body heals itself while you have cursed energy",
+    blurb: "No family at all: a curse, born from humanity's fear. You grow by devouring other curses — and Jujutsu High hunts you." },
 };
+// The disasters a Cursed Spirit can awaken, and their weights.
+export const CURSE_POOL = { disaster_flames: 30, disaster_plants: 25, disaster_tides: 25, idle_transfiguration: 20 };
+export const CURSE_TAG = "jjk_curse"; // (every curse player carries it: curse mobs leave them alone, Jujutsu High doesn't)
 // Techniques of no clan, for the clanless and for clan members who don't inherit their clan's technique.
 export const OPEN = {
   boogie: 28, straw_doll: 18, ratio: 18, disaster_flames: 11, idle_death_gamble: 9, cursed_spirit: 7, idle_transfiguration: 5, shrine: 4,
@@ -41,7 +52,17 @@ for (const [clan, c] of Object.entries(CLANS)) {
 
 export const clanOf = (p) => getProp(p, "clan");
 export const clanInfo = (p) => CLANS[clanOf(p)] ?? CLANS.clanless;
-export const canInherit = (clan, tech) => !BOUND[tech] || BOUND[tech] === clan;
+export const isCurse = (p) => clanOf(p) === "cursed";
+export const canInherit = (clan, tech) => (clan === "cursed" ? tech in CURSE_POOL : !BOUND[tech] || BOUND[tech] === clan);
+// A curse player carries CURSE_TAG (for the entity files' target filters); nobody else does.
+export function syncPathTag(p) {
+  try {
+    if (isCurse(p)) p.addTag(CURSE_TAG);
+    else p.removeTag(CURSE_TAG);
+  } catch {
+    /* ignore */
+  }
+}
 
 function weighted(entries) {
   const total = entries.reduce((s, [, w]) => s + w, 0);
@@ -64,7 +85,13 @@ export function techChance(tech) {
   }
   return total * 100;
 }
+// The chance (in %) that a newborn curse awakens this disaster.
+export function curseChance(tech) {
+  const total = Object.values(CURSE_POOL).reduce((s, w) => s + w, 0);
+  return ((CURSE_POOL[tech] ?? 0) / total) * 100;
+}
 export function rarityOf(tech) {
+  if (BOUND[tech] === "cursed") return `§4Cursed Spirits only · ${Math.round(curseChance(tech))}%`;
   const pct = techChance(tech);
   const tier = pct < 4 ? "§6Special" : pct < 8 ? "§dRare" : pct < 15 ? "§bUncommon" : "§aCommon";
   return `${tier} · ${pct < 10 ? pct.toFixed(1) : Math.round(pct)}%`;
@@ -74,8 +101,9 @@ export function rollClan() {
   return weighted(Object.entries(CLANS).map(([id, c]) => [id, c.weight]));
 }
 
-// A technique for someone of this clan (never `except`, for rerolls).
+// A technique for someone of this clan (never `except`, for rerolls). A curse awakens a disaster.
 export function rollTechnique(clan, except) {
+  if (clan === "cursed") return weighted(Object.entries(CURSE_POOL).filter(([t]) => t !== except));
   const own = CLANS[clan]?.techniques ?? {};
   let r = Math.random() * 100;
   for (const [t, pct] of Object.entries(own)) {

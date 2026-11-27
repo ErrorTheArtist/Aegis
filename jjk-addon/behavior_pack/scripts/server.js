@@ -19,7 +19,7 @@ import {
   getProp, setProp, worldProp, setWorldProp, isPlayer, alive, valid, gameMode, effect, tell, title, bar, now, V, fx, COLOR,
   safeSpots, pvpBlocks, pvpBlocked, isSafe, tp, cmd, health, ground, give,
 } from "./core.js";
-import { GRADES, gradeOf, xpOf, addXp } from "./grades.js";
+import { gradeOf, gradeLabel, xpOf, addXp } from "./grades.js";
 import { statusHooks } from "./energy.js";
 import { bansLine } from "./bans.js";
 
@@ -253,7 +253,7 @@ export function dailyBlessing(p) {
 // ---------------------------------------------------------------------------
 // Grade tags, tips
 // ---------------------------------------------------------------------------
-export const tagOf = (p) => `${GRADES[gradeOf(p)].c}${GRADES[gradeOf(p)].name}§r\n§f${p.name}`;
+export const tagOf = (p) => `${gradeLabel(p)}§r\n§f${p.name}`;
 function tags() {
   const want = on("tags");
   for (const p of world.getAllPlayers()) {

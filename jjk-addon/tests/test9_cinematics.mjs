@@ -17,11 +17,11 @@ const ROOT = process.env.JJK_ROOT;
 // --- the data: one cinematic for each domain, and Hollow Purple's ---------------------------------------------------
 const MOVE = { void: ["limitless", "unlimited_void"], shrine: ["shrine", "malevolent_shrine"], garden: ["ten_shadows", "chimera_shadow_garden"],
   moon: ["projection", "time_cell_moon_palace"], volcano: ["disaster_flames", "iron_mountain"], perfection: ["idle_transfiguration", "self_embodiment"],
-  jackpot: ["idle_death_gamble", "idle_death_gamble_domain"] };
-check("seven domains, each with a cinematic of its own", Object.keys(D.KINDS).length === 7 && Object.keys(D.KINDS).every((k) => CINE[k] && MOVE[k]), Object.keys(D.KINDS));
+  jackpot: ["idle_death_gamble", "idle_death_gamble_domain"], tides: ["disaster_tides", "horizon_skandha"] };
+check("eight domains, each with a cinematic of its own", Object.keys(D.KINDS).length === 8 && Object.keys(D.KINDS).every((k) => CINE[k] && MOVE[k]), Object.keys(D.KINDS));
 check("…and one for Hollow Purple", !!CINE.purple);
 check("no two cinematics share a shot list", new Set(Object.values(CINE).map((c) => JSON.stringify(c.shots.map((s) => s.pos)))).size === Object.keys(CINE).length);
-const PARTICLES = new Set(["aura", "beam", "blood", "bolt", "burst", "debris", "ember", "flash", "glyph", "implode", "orb", "pillar", "ring", "shell", "slash",
+const PARTICLES = new Set(["aura", "beam", "blood", "bolt", "burst", "debris", "ember", "fish", "flash", "glyph", "implode", "orb", "pillar", "ring", "shell", "slash",
   "smoke", "spark", "stars", "streak", "vortex"]);
 for (const [k, c] of Object.entries(CINE)) {
   const ts = c.shots.map((s) => s.t);
@@ -179,7 +179,7 @@ await tick(70);
 globalThis.formLog = [];
 answers.push({ selection: 5 }, { formValues: [true, true, false] }); // (Gojo: the bar, Infinity, cinematics)
 await use(g, "jjk:jujutsu_record"); await tick(2);
-check("Record -> Settings: switch your cinematics off", g._props["jjk:cine_off"] === true && formLog[1]?.ctl.at(-1)?.l.startsWith("Cinematics"));
+check("Record -> Settings: switch your cinematics off", g._props["jjk:cine_off"] === true && formLog[1]?.ctl.some((c) => c.l.startsWith("Cinematics")));
 g.addTag("jjk_admin");
 answers.push({ selection: 8 }, { selection: 3 }, { formValues: [true, true, false, true, true, false, true] }); // (Admin Panel: after This Server)
 await use(g, "jjk:jujutsu_record"); await tick(3);

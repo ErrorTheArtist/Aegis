@@ -11,6 +11,7 @@ Line and sphere effects also read:
   jjk:vortex      variable.radius: motes spiralling into the centre (Hollow Purple forming)
   jjk:stars       variable.radius: twinkling stars inside a sphere (the Unlimited Void)
   jjk:streak      variable.dx / dy / dz: speed lines trailing behind a dash
+  jjk:fish        shikigami fish circling a point (Disaster Tides)
 Every effect is ONE emitter with a capped number of particles (cheap to spawn); scripts budget how many they spawn a
 tick (core.js fx()).
 It also writes the fogs (resource_pack/fogs/jjk_<name>.json, ids jjk:fog_<name>): each domain's atmosphere and the
@@ -89,6 +90,16 @@ def glyph(x, y):
 
 save_tex("glyph", 64, glyph)
 save_tex("pillar", 32, lambda x, y: max(0.0, 1 - abs(x) * 1.6) ** 1.4 * (1 - abs(y) ** 6))
+
+
+def fish(x, y):    # a shikigami fish from the side: a fat body, a forked tail, an eye
+    body = 1 - ((x + 0.1) / 0.62) ** 2 - (y / 0.34) ** 2
+    tail = 1.0 if 0.48 < x < 0.95 and abs(y) < (x - 0.48) * 1.1 + 0.05 else 0.0
+    eye = math.hypot(x + 0.42, y + 0.06) < 0.09
+    return 0.0 if eye else max(body * 4, tail)
+
+
+save_tex("fish", 16, fish)
 
 SIZE = "(variable.size > 0 ? variable.size : 1)"
 TINT = ["variable.color.r", "variable.color.g", "variable.color.b"]
@@ -256,6 +267,16 @@ effect("stars", "spark", 16, "particles_add", {
     "minecraft:particle_motion_dynamic": {}, "minecraft:particle_initial_spin": {"rotation": 45},
     **billboard([f"0.12 * {SIZE}", f"0.12 * {SIZE}"], 16), **tint("math.sin(v.particle_age / v.particle_lifetime * 180)")})
 
+# shikigami fish circling a point (Disaster Tides)
+effect("fish", "fish", 16, "particles_alpha", {
+    "minecraft:emitter_rate_instant": {"num_particles": f"math.min(14, 8 * {SIZE})"}, "minecraft:emitter_shape_point": {},
+    "minecraft:particle_lifetime_expression": {"max_lifetime": "math.random(0.7, 1.1)"}, "minecraft:particle_initial_speed": 0,
+    "minecraft:particle_motion_parametric": {"relative_position": [
+        f"math.cos(v.particle_random_1 * 360 + v.particle_age * 420) * (0.6 + v.particle_random_2 * 0.9) * {SIZE}",
+        f"(v.particle_random_3 - 0.5) * 1.2 * {SIZE}",
+        f"math.sin(v.particle_random_1 * 360 + v.particle_age * 420) * (0.6 + v.particle_random_2 * 0.9) * {SIZE}"]},
+    **billboard([f"0.26 * {SIZE}", f"0.26 * {SIZE}"], 16), **tint("math.min(1, (1 - v.particle_age / v.particle_lifetime) * 3)")})
+
 # --- fogs: each domain's atmosphere (everyone inside sees it from the reveal) and Hollow Purple's cinematic ----------
 # name: (colour, where the fog starts, where it is total), in blocks
 FOGS = {
@@ -266,6 +287,7 @@ FOGS = {
     "volcano": ("#7A2406", 4, 30),      # the Coffin of the Iron Mountain: smoke and heat
     "perfection": ("#181440", 4, 28),   # the Self-Embodiment of Perfection: indigo dark
     "jackpot": ("#1C5A2C", 8, 42),      # Idle Death Gamble: the parlour's green glow
+    "tides": ("#6FBEE0", 10, 54),       # Horizon of the Captivating Skandha: sea haze over a beach without end
     "purple": ("#2C0C50", 10, 64),      # Hollow Purple's cinematic
 }
 FOG_DIR = RP / "fogs"

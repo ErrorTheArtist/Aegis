@@ -6,7 +6,7 @@
 
 import { world, system } from "@minecraft/server";
 import { getProp, setProp, now, barQuietUntil, health, alive } from "./core.js";
-import { maxCE, regenCE, gradeOf, gradeName } from "./grades.js";
+import { maxCE, regenCE, gradeOf, gradeLabel } from "./grades.js";
 import { inCinematic } from "./cinematic.js";
 
 const pool = new Map(); // player id -> cursed energy (saved every few seconds)
@@ -44,7 +44,7 @@ export function hudLine(p) {
   const h = health(p);
   const parts = [`§c❤ ${Math.ceil(h?.currentValue ?? 0)}/${Math.round(h?.effectiveMax ?? 20)}`];
   parts.push(isHeavenly(p) ? "§eHeavenly Restriction" : ceBar(getCE(p), maxCE(p)));
-  parts.push(gradeName(gradeOf(p)));
+  parts.push(gradeLabel(p));
   for (const f of statusHooks) {
     try {
       const s = f(p);

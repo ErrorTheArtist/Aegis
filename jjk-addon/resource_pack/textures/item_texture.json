@@ -167,6 +167,39 @@
     "jjk_simple_domain": {
       "textures": "textures/items/jjk/simple_domain"
     },
+    "jjk_plant_buds": {
+      "textures": "textures/items/jjk/plant_buds"
+    },
+    "jjk_plant_roots": {
+      "textures": "textures/items/jjk/plant_roots"
+    },
+    "jjk_plant_field": {
+      "textures": "textures/items/jjk/plant_field"
+    },
+    "jjk_sea_of_light": {
+      "textures": "textures/items/jjk/sea_of_light"
+    },
+    "jjk_tide_swarm": {
+      "textures": "textures/items/jjk/tide_swarm"
+    },
+    "jjk_tide_wave": {
+      "textures": "textures/items/jjk/tide_wave"
+    },
+    "jjk_tide_undertow": {
+      "textures": "textures/items/jjk/tide_undertow"
+    },
+    "jjk_horizon_skandha": {
+      "textures": "textures/items/jjk/horizon_skandha"
+    },
+    "jjk_curse_devour": {
+      "textures": "textures/items/jjk/curse_devour"
+    },
+    "jjk_curse_terror": {
+      "textures": "textures/items/jjk/curse_terror"
+    },
+    "jjk_curse_unleash": {
+      "textures": "textures/items/jjk/curse_unleash"
+    },
     "jjk_playful_cloud": {
       "textures": "textures/items/jjk/playful_cloud"
     },

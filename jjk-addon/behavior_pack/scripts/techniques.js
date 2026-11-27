@@ -7,6 +7,8 @@
 // Everyone (but Heavenly Restriction) also learns Simple Domain at Grade 2 and Reverse Cursed Technique at
 // Semi-Grade 1. Move items are locked in your inventory and kept when you die; new ones appear as you're promoted.
 // A Cursed Womb rerolls your technique — always into a different one your clan's blood allows.
+// Cursed Spirits (paths.js) awaken a disaster instead, and get the curse's own powers (curse_powers.js) in place of
+// Simple Domain and Reverse Cursed Technique.
 
 import { world, system, ItemStack, ItemLockMode } from "@minecraft/server";
 import {
@@ -30,7 +32,10 @@ import { DISASTER_FLAMES } from "./tech_disaster.js";
 import { IDLE_TRANSFIGURATION } from "./tech_transfiguration.js";
 import { IDLE_DEATH_GAMBLE } from "./tech_gamble.js";
 import { CURSED_SPIRITS } from "./tech_spirits.js";
-import { CLANS, BOUND, clanOf, ensureClan, rollTechnique, clanCooldown, rarityOf } from "./clans.js";
+import { DISASTER_PLANTS } from "./tech_plants.js";
+import { DISASTER_TIDES } from "./tech_tides.js";
+import { CURSE_MOVES } from "./curse_powers.js";
+import { CLANS, BOUND, clanOf, ensureClan, rollTechnique, clanCooldown, rarityOf, isCurse, syncPathTag, CURSE_POOL, curseChance } from "./clans.js";
 import { creditsIntact, creditLine, tamperedLine } from "./credits.js";
 import { vowMult, vowInfo } from "./vows.js";
 import { nameKinds } from "./mahoraga.js";
@@ -65,13 +70,21 @@ export const TECHNIQUES = {
     blurb: "Divide anything along a 7:3 line and strike that point for a critical hit. Work overtime and it only gets worse for them." },
   boogie: { name: "Boogie Woogie", c: "§6", moves: BOOGIE,
     blurb: "Clap and swap places with anyone you see. Simple, and terrifying in the right hands." },
+  disaster_plants: { name: "Disaster Plants", c: "§2", moves: DISASTER_PLANTS,
+    blurb: "The rage of the forests: buds that drain whoever they take root in, roots from the ground, a field of flowers — and a sea of light." },
+  disaster_tides: { name: "Disaster Tides", c: "§3", moves: DISASTER_TIDES,
+    blurb: "The sea and all that lives in it: swarms of shikigami fish, waves, an undertow — and a domain on a beach without end." },
 };
-for (const [id, t] of Object.entries(TECHNIQUES)) t.rarity = rarityOf(id); // from the clan tables (clans.js)
+for (const [id, t] of Object.entries(TECHNIQUES)) {
+  t.rarity = rarityOf(id); // from the clan tables (clans.js)
+  t.curseRarity = id in CURSE_POOL ? `§4Cursed Spirits · ${Math.round(curseChance(id))}%` : null; // (what a curse sees)
+}
 // each technique's cursed energy colour (the flare when you cast one of its moves)
 const RGB = {
   limitless: COLOR.blue, shrine: COLOR.red, ten_shadows: COLOR.shadow, heavenly: COLOR.gold, projection: COLOR.white, cursed_speech: COLOR.teal,
   blood: COLOR.blood, disaster_flames: COLOR.fire, idle_death_gamble: COLOR.green, cursed_spirit: [0.85, 0.4, 0.9],
   idle_transfiguration: [0.42, 0.5, 0.95], straw_doll: COLOR.gold, ratio: [0.42, 0.5, 0.95], boogie: COLOR.gold,
+  disaster_plants: [0.45, 0.85, 0.35], disaster_tides: COLOR.water,
 };
 for (const [id, t] of Object.entries(TECHNIQUES)) t.rgb = RGB[id] ?? COLOR.ce;
 nameKinds(Object.fromEntries(Object.entries(TECHNIQUES).map(([id, t]) => [id, `${t.c}${t.name}`]))); // (what Mahoraga adapts to)
@@ -109,7 +122,11 @@ function rct(p) {
 export const MOVES = {};
 for (const [tech, t] of Object.entries(TECHNIQUES)) for (const [id, m] of Object.entries(t.moves)) MOVES[id] = { ...m, tech };
 for (const [id, m] of Object.entries(universal)) MOVES[id] = { ...m, tech: null };
+for (const [id, m] of Object.entries(CURSE_MOVES)) MOVES[id] = { ...m, tech: null };
 export const UNIVERSAL = universal;
+export { CURSE_MOVES };
+// The rarity a player sees for their technique (a curse sees the curse odds).
+export const rarityFor = (p, id) => (isCurse(p) && TECHNIQUES[id]?.curseRarity) || TECHNIQUES[id]?.rarity || "";
 
 export const techniqueOf = (p) => getProp(p, "technique");
 export const moveCost = (p, m) => Math.round((m.cost === "domain" ? maxCE(p) * DOMAIN_COST : m.cost) * vowMult(p, "ce"));
@@ -120,7 +137,9 @@ export function itemsFor(p) {
   if (!tech) return [];
   const g = gradeOf(p);
   const ids = Object.entries(tech.moves).filter(([, m]) => g >= m.grade).map(([id]) => id);
-  if (!isHeavenly(p)) for (const [id, m] of Object.entries(universal)) if (g >= m.grade) ids.push(id);
+  if (isCurse(p)) for (const [id, m] of Object.entries(CURSE_MOVES)) {
+    if (g >= m.grade) ids.push(id);
+  } else if (!isHeavenly(p)) for (const [id, m] of Object.entries(universal)) if (g >= m.grade) ids.push(id);
   return ids;
 }
 
@@ -179,6 +198,7 @@ export function setTechnique(p, id, why = "awaken") {
   if (t.clan && clanOf(p) !== t.clan) setProp(p, "clan", t.clan);
   if (!clanOf(p)) ensureClan(p);
   setProp(p, "technique", id);
+  syncPathTag(p);
   if (id === "heavenly") {
     try {
       p.removeEffect("resistance");
@@ -188,8 +208,13 @@ export function setTechnique(p, id, why = "awaken") {
   }
   syncItems(p);
   const clan = CLANS[clanOf(p)];
-  title(p, `${t.c}§l${t.name.toUpperCase()}`, why === "reroll" ? "§7Your innate technique has changed" : `§7Born into ${clan.c}${clan.id === "clanless" ? "no clan" : `the ${clan.name} clan`}`, 60);
-  tell(p, `§5✦ §fClan: ${clan.c}${clan.name} §8(${clan.perk})\n§5✦ §fInnate technique: ${t.c}${t.name} §8(${t.rarity}§8)\n§7${t.blurb}\n§7Your moves are in your inventory — §fright-click§7 to use them. Open the §dJujutsu Record§7 for everything else.\n${creditLine()}`);
+  if (isCurse(p)) {
+    title(p, `${t.c}§l${t.name.toUpperCase()}`, why === "reroll" ? "§7Your disaster has changed" : "§4Born from humanity's fear", 60);
+    tell(p, `§4✦ §fYou are a §4Cursed Spirit§f §8(${clan.perk})\n§4✦ §fYour disaster: ${t.c}${t.name} §8(${rarityFor(p, id)}§8)\n§7${t.blurb}\n§7Curses won't attack you: devour them to grow (§fDevour§7). Jujutsu High will hunt you.\n§7Your moves are in your inventory — §fright-click§7 to use them. Open the §dJujutsu Record§7 for everything else.\n${creditLine()}`);
+  } else {
+    title(p, `${t.c}§l${t.name.toUpperCase()}`, why === "reroll" ? "§7Your innate technique has changed" : `§7Born into ${clan.c}${clan.id === "clanless" ? "no clan" : `the ${clan.name} clan`}`, 60);
+    tell(p, `§5✦ §fClan: ${clan.c}${clan.name} §8(${clan.perk})\n§5✦ §fInnate technique: ${t.c}${t.name} §8(${t.rarity}§8)\n§7${t.blurb}\n§7Your moves are in your inventory — §fright-click§7 to use them. Open the §dJujutsu Record§7 for everything else.\n${creditLine()}`);
+  }
   sound(p.dimension, "beacon.activate", p.location, 1, 1.2);
   fx(p.dimension, "jjk:shell", mid(p), COLOR.purple, 1, { radius: 2 });
   if (id === "limitless" || id === "shrine") {
@@ -244,6 +269,8 @@ export function useMove(p, id) {
   // a technique belongs to whoever awakened it: no one else can use its moves
   if (m.tech && m.tech !== tech) return nag(p, `§cOnly a sorcerer born with ${TECHNIQUES[m.tech].name} can use that.`), false;
   if (!m.tech && isHeavenly(p)) return nag(p, "§eHeavenly Restriction: you have no cursed energy to use that."), false;
+  if (m.curse && !isCurse(p)) return nag(p, "§cOnly a Cursed Spirit can do that."), false;
+  if (m.universal && isCurse(p)) return nag(p, "§cThat's a sorcerer's technique — curses heal on their own."), false;
   if (gradeOf(p) < m.grade) return nag(p, `§7${m.name} unlocks at ${GRADES[m.grade].c}${GRADES[m.grade].name}§7.`), false;
   if (stunned(p)) return nag(p, "§cYou can't move!"), false;
   if (inCinematic(p)) return false; // (the camera isn't yours until it ends)

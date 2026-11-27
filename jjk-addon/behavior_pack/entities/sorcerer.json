@@ -40,10 +40,19 @@
           "priority": 1,
           "entity_types": {
             "filters": {
-              "test": "is_family",
-              "subject": "other",
-              "operator": "!=",
-              "value": "player"
+              "any_of": [
+                {
+                  "test": "is_family",
+                  "subject": "other",
+                  "operator": "!=",
+                  "value": "player"
+                },
+                {
+                  "test": "has_tag",
+                  "subject": "other",
+                  "value": "jjk_curse"
+                }
+              ]
             }
           }
         },
@@ -98,6 +107,21 @@
                         "value": "jjk_spar"
                       }
                     ]
+                  },
+                  {
+                    "all_of": [
+                      {
+                        "test": "is_family",
+                        "subject": "other",
+                        "operator": "==",
+                        "value": "player"
+                      },
+                      {
+                        "test": "has_tag",
+                        "subject": "other",
+                        "value": "jjk_curse"
+                      }
+                    ]
                   }
                 ]
               },
@@ -150,6 +174,66 @@
                     "subject": "other",
                     "operator": "==",
                     "value": "player"
+                  },
+                  {
+                    "test": "is_family",
+                    "subject": "other",
+                    "operator": "==",
+                    "value": "jjk_ally"
+                  },
+                  {
+                    "test": "is_family",
+                    "subject": "other",
+                    "operator": "==",
+                    "value": "shikigami"
+                  }
+                ]
+              },
+              "max_dist": 32
+            }
+          ]
+        },
+        "minecraft:persistent": {},
+        "minecraft:experience_reward": {
+          "on_death": "q.last_hit_by_player ? 120 : 0"
+        }
+      },
+      "jjk:villain_kin": {
+        "minecraft:type_family": {
+          "family": [
+            "sorcerer",
+            "jjk_villain",
+            "monster",
+            "mob"
+          ]
+        },
+        "minecraft:behavior.hurt_by_target": {
+          "priority": 1
+        },
+        "minecraft:behavior.nearest_attackable_target": {
+          "priority": 3,
+          "must_see": false,
+          "reselect_targets": true,
+          "within_radius": 32,
+          "entity_types": [
+            {
+              "filters": {
+                "any_of": [
+                  {
+                    "all_of": [
+                      {
+                        "test": "is_family",
+                        "subject": "other",
+                        "operator": "==",
+                        "value": "player"
+                      },
+                      {
+                        "test": "has_tag",
+                        "subject": "other",
+                        "value": "jjk_curse",
+                        "operator": "!="
+                      }
+                    ]
                   },
                   {
                     "test": "is_family",
@@ -695,7 +779,8 @@
             "jjk:c_jogo",
             "jjk:c_hakari",
             "jjk:c_naoya",
-            "jjk:villain"
+            "jjk:villain",
+            "jjk:villain_kin"
           ]
         }
       },
@@ -729,7 +814,8 @@
             "jjk:c_jogo",
             "jjk:c_hakari",
             "jjk:c_naoya",
-            "jjk:villain"
+            "jjk:villain",
+            "jjk:villain_kin"
           ]
         }
       },
@@ -763,7 +849,8 @@
             "jjk:c_jogo",
             "jjk:c_hakari",
             "jjk:c_naoya",
-            "jjk:villain"
+            "jjk:villain",
+            "jjk:villain_kin"
           ]
         }
       },
@@ -797,7 +884,8 @@
             "jjk:c_jogo",
             "jjk:c_hakari",
             "jjk:c_naoya",
-            "jjk:villain"
+            "jjk:villain",
+            "jjk:villain_kin"
           ]
         }
       },
@@ -831,7 +919,8 @@
             "jjk:c_jogo",
             "jjk:c_hakari",
             "jjk:c_naoya",
-            "jjk:villain"
+            "jjk:villain",
+            "jjk:villain_kin"
           ]
         }
       },
@@ -865,7 +954,8 @@
             "jjk:c_jogo",
             "jjk:c_hakari",
             "jjk:c_naoya",
-            "jjk:villain"
+            "jjk:villain",
+            "jjk:villain_kin"
           ]
         }
       },
@@ -899,7 +989,8 @@
             "jjk:c_jogo",
             "jjk:c_hakari",
             "jjk:c_naoya",
-            "jjk:villain"
+            "jjk:villain",
+            "jjk:villain_kin"
           ]
         }
       },
@@ -933,7 +1024,8 @@
             "jjk:c_jogo",
             "jjk:c_hakari",
             "jjk:c_naoya",
-            "jjk:villain"
+            "jjk:villain",
+            "jjk:villain_kin"
           ]
         }
       },
@@ -967,7 +1059,8 @@
             "jjk:c_jogo",
             "jjk:c_hakari",
             "jjk:c_naoya",
-            "jjk:villain"
+            "jjk:villain",
+            "jjk:villain_kin"
           ]
         }
       },
@@ -1001,7 +1094,8 @@
             "jjk:c_jogo",
             "jjk:c_hakari",
             "jjk:c_naoya",
-            "jjk:villain"
+            "jjk:villain",
+            "jjk:villain_kin"
           ]
         }
       },
@@ -1035,7 +1129,8 @@
             "jjk:c_jogo",
             "jjk:c_hakari",
             "jjk:c_naoya",
-            "jjk:villain"
+            "jjk:villain",
+            "jjk:villain_kin"
           ]
         }
       },
@@ -1069,7 +1164,8 @@
             "jjk:c_jogo",
             "jjk:c_hakari",
             "jjk:c_naoya",
-            "jjk:ally"
+            "jjk:ally",
+            "jjk:villain_kin"
           ]
         }
       },
@@ -1103,7 +1199,8 @@
             "jjk:c_jogo",
             "jjk:c_hakari",
             "jjk:c_naoya",
-            "jjk:ally"
+            "jjk:ally",
+            "jjk:villain_kin"
           ]
         }
       },
@@ -1114,7 +1211,7 @@
         "add": {
           "component_groups": [
             "jjk:c_geto",
-            "jjk:villain"
+            "jjk:villain_kin"
           ]
         },
         "remove": {
@@ -1137,7 +1234,8 @@
             "jjk:c_jogo",
             "jjk:c_hakari",
             "jjk:c_naoya",
-            "jjk:ally"
+            "jjk:ally",
+            "jjk:villain"
           ]
         }
       },
@@ -1148,7 +1246,7 @@
         "add": {
           "component_groups": [
             "jjk:c_mahito",
-            "jjk:villain"
+            "jjk:villain_kin"
           ]
         },
         "remove": {
@@ -1171,7 +1269,8 @@
             "jjk:c_jogo",
             "jjk:c_hakari",
             "jjk:c_naoya",
-            "jjk:ally"
+            "jjk:ally",
+            "jjk:villain"
           ]
         }
       },
@@ -1182,7 +1281,7 @@
         "add": {
           "component_groups": [
             "jjk:c_choso",
-            "jjk:villain"
+            "jjk:villain_kin"
           ]
         },
         "remove": {
@@ -1205,7 +1304,8 @@
             "jjk:c_jogo",
             "jjk:c_hakari",
             "jjk:c_naoya",
-            "jjk:ally"
+            "jjk:ally",
+            "jjk:villain"
           ]
         }
       },
@@ -1216,7 +1316,7 @@
         "add": {
           "component_groups": [
             "jjk:c_jogo",
-            "jjk:villain"
+            "jjk:villain_kin"
           ]
         },
         "remove": {
@@ -1239,7 +1339,8 @@
             "jjk:c_choso",
             "jjk:c_hakari",
             "jjk:c_naoya",
-            "jjk:ally"
+            "jjk:ally",
+            "jjk:villain"
           ]
         }
       },
@@ -1273,7 +1374,8 @@
             "jjk:c_choso",
             "jjk:c_jogo",
             "jjk:c_naoya",
-            "jjk:villain"
+            "jjk:villain",
+            "jjk:villain_kin"
           ]
         }
       },
@@ -1307,7 +1409,8 @@
             "jjk:c_choso",
             "jjk:c_jogo",
             "jjk:c_hakari",
-            "jjk:ally"
+            "jjk:ally",
+            "jjk:villain_kin"
           ]
         }
       },

@@ -5,6 +5,7 @@ import { H, mkPlayer, spawn, tick, fire, use, check, done, world, system, answer
 import { ItemStack } from "@minecraft/server";
 await import("./main.mjs");
 world.setDynamicProperty("jjk:cinematics", false);
+world.setDynamicProperty("jjk:curse_path", false); // (everyone a sorcerer here: the path choice is test11's)
 const E = await import("./energy.mjs");
 const Gr = await import("./grades.mjs");
 const C = await import("./combat.mjs");

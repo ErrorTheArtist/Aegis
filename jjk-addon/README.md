@@ -1,4 +1,4 @@
-# Jujutsu Legacy — v1.5.0
+# Jujutsu Legacy — v1.6.0
 
 **Made by errorlegend.** Questions, ideas or bug reports: DM **errorlegend_** on Discord.
 
@@ -13,6 +13,15 @@ A Jujutsu Kaisen add-on for Minecraft Bedrock (1.21.60+).
 No experimental toggles are needed, and the pack doesn't replace the player file, so it runs next to other add-ons.
 
 **Install:** open `dist/JujutsuLegacy.mcaddon` (build it with `./build.sh`), then turn on both packs in your world.
+
+**New in 1.6: choose your side — Jujutsu Sorcerer or Cursed Spirit.** Every new player picks when they first join.
+- **Cursed Spirits** awaken a disaster instead of a clan's technique, and have powers of their own: **Devour** (eat
+  weakened curses to grow), **Terror**, **Curse Unleashed**, and a body that heals itself.
+- **Two new disasters, for curses only:** **Disaster Plants** (Hanami's buds, roots, flower field and Ceremonial Sea of
+  Light) and **Disaster Tides** (Dagon's fish swarms, waves, undertow — and the domain **Horizon of the Captivating
+  Skandha**, with its own cinematic, barrier and fog). Curses can also awaken Disaster Flames or Idle Transfiguration.
+- **Sides:** curses leave Cursed Spirits alone; Jujutsu High hunts them (and comes looking at night); Mahito, Jogo,
+  Geto and Choso treat them as kin. See **Cursed Spirits** below.
 
 **New in 1.5: built to run a multiplayer server by itself.** Install it and play: everything below is automatic and on
 by default (an admin can switch any part off). See **Running a server** below.
@@ -81,8 +90,12 @@ techniques and running moves, and tells everyone who really made it.
 
 ## Getting started
 
-- **Born into a clan, then awakened.** About three seconds after your first join you're born into a clan, and your
-  innate technique awakens. Which techniques you can awaken depends on your clan (below).
+- **Choose your path.** About three seconds after your first join you choose: **Jujutsu Sorcerer** or **Cursed
+  Spirit** (close the choice three times and you walk the sorcerer's path).
+  - A sorcerer is born into a clan, and their innate technique awakens. Which techniques they can awaken depends on
+    the clan (below).
+  - A Cursed Spirit awakens a disaster and plays by different rules (see **Cursed Spirits**).
+  - You can start over on the other path later (Record → Settings). That wipes your grade and technique.
 - **Moves are items.** Your moves appear in your inventory. **Right-click** one to use it.
   - They're locked in your inventory and kept when you die.
   - New ones appear when you're promoted.
@@ -156,7 +169,7 @@ The King of Curses' slashes. Dismantle cuts everything in a line, Cleave adapts 
 | Fuga | Grade 2 | 60 CE | 20 s | A flame arrow: 25 damage in a 5-block blast, and sets them alight. |
 | Domain Expansion: Malevolent Shrine | Grade 1 | 70% of max CE | 90 s | Radius 14, 10 s, no barrier: 4 damage every half second, and a Cleave every 1.5 s. |
 
-### Idle Transfiguration — Special · 3.0% · any clan
+### Idle Transfiguration — Special · 3.0% · any clan (and 20% of Cursed Spirits)
 
 You touch the soul, and the body follows: twist the ones you touch, grow spikes, and make transfigured humans fight for you.
 
@@ -223,7 +236,7 @@ No cursed energy at all — instead a monstrous body, cursed tools, and immunity
 | Inverted Spear of Heaven | Grade 2 | — | 20 s | Nullify: 10 damage through Infinity; breaks their domain and strips their buffs. |
 | Split Soul Katana | Grade 1 | — | 16 s | Soul Split: 12 + 10% of their max health (up to +25). |
 
-### Disaster Flames — Rare · 6.6% · any clan
+### Disaster Flames — Rare · 6.6% · any clan (and 30% of Cursed Spirits)
 
 Volcanic heat as a technique: burning insects, a stream of fire, a falling meteor — and a domain inside a volcano.
 
@@ -315,6 +328,56 @@ A domain's sure-hit, the Inverted Spear of Heaven and burnout switch it off.
 
 It can't land a Black Flash.
 
+## Cursed Spirits
+
+Choose the curse's path on your first join and you're a **Cursed Spirit**: born from humanity's fear, not into a clan.
+
+- **Your disaster:** Disaster Flames (30%), Disaster Plants (25%), Disaster Tides (25%) or Idle Transfiguration (20%).
+  A Cursed Womb rerolls it into another disaster.
+- **Grades:** the same ladder, as a curse: Grade 4 Curse up to Special Grade Curse (it shows above your name).
+- **Growing:** devour weakened curses (or just beat them: same XP as an exorcism), beat sorcerers, eat Sukuna's
+  Fingers.
+- **Your own powers** instead of Simple Domain and Reverse Cursed Technique (below), and **regeneration**: your body
+  heals itself, 0.5 health a second (+0.25 a grade) for 2 CE. You can land Black Flashes too.
+- **Who fights whom:**
+  - Curses leave you alone, unless you attack them.
+  - Jujutsu High attacks you on sight, won't talk or spar, and at night may come to exorcise you. Weaker sorcerers
+    hunt weak curses; Gojo only comes for a Special Grade one. Beat one for **twice their spar XP**.
+  - Mahito, Jogo, Geto and Choso treat you as kin. Sukuna, Toji and Naoya don't.
+  - No villain comes for a curse at night: Jujutsu High does.
+  - Sorcerer players are your enemies (if the world allows PvP). The sanctuary is safe for everyone.
+- Admins can switch the choice off: then every new player is a sorcerer (Admin Panel → Server settings).
+
+### Disaster Plants — Cursed Spirits only · 25% of curses
+
+The rage of the forests: buds that drain whoever they take root in, roots from the ground, a field of flowers — and a sea of light.
+
+| Move | Unlocks | Cost | Cooldown | What it does |
+|---|---|---|---|---|
+| Cursed Buds | Grade 4 | 20 CE | 7 s | Three seeds: 4 damage, then the bud takes root — 2 a second for 5 s (and 4 CE a second from a player); you heal from it. |
+| Wooden Roots | Grade 4 | 25 CE | 9 s | Roots burst along a 12-block line: 9 damage, and they're held for 2 s. |
+| Flower Field | Grade 2 | 45 CE | 25 s | 8 s, radius 7: enemies in the flowers are weakened and slowed; you heal 1 a second in them. |
+| Maximum: Ceremonial Sea of Light | Grade 1 | 90 CE | 60 s | 1 s to gather, then a 24-block beam of light: 26 damage to all in it; you heal 15% of what it does. |
+
+### Disaster Tides — Cursed Spirits only · 25% of curses
+
+The sea and all that lives in it: swarms of shikigami fish, waves, an undertow — and a domain on a beach without end.
+
+| Move | Unlocks | Cost | Cooldown | What it does |
+|---|---|---|---|---|
+| Death Swarm | Grade 4 | 22 CE | 7 s | A school of shikigami fish surges at who you aim at (or 10 blocks ahead): three bites of 4. |
+| Tidal Wave | Grade 4 | 25 CE | 9 s | A wave rolls 8 blocks out in front of you: 7 damage, swept away, fires put out. |
+| Undertow | Grade 2 | 40 CE | 18 s | Everyone within 10 blocks is dragged to you: 6 damage, slowed and heavy for 3 s. |
+| Domain Expansion: Horizon of the Captivating Skandha | Grade 1 | 70% of max CE | 90 s | Radius 12, 9 s: shikigami fish bite everyone inside for 3 a second and slow them; you move fast and breathe water. |
+
+### Every curse (Cursed Spirits)
+
+| Move | Unlocks | Cost | Cooldown | What it does |
+|---|---|---|---|---|
+| Devour | Grade 4 | 10 CE | 4 s | Eat a weakened curse within 4 blocks (a third of its health or less): its XP, a quarter of your health back and 20 CE. |
+| Terror | Grade 3 | 30 CE | 18 s | Everyone within 8 blocks takes 5 and is weakened, slowed and sickened for 6 s. |
+| Curse Unleashed | Grade 2 | 50 CE | 45 s | 15 s: Strength II, Speed and Resistance. |
+
 ## Domain Expansion
 
 - **Unlocks at Grade 1.** It costs 70% of your maximum CE.
@@ -327,6 +390,8 @@ It can't land a Black Flash.
   - **Coffin of the Iron Mountain:** the inside of a volcano. Everyone burns.
   - **Self-Embodiment of Perfection:** a dark dome of stitches and hands. A last touch for whoever stays to the end.
   - **Idle Death Gamble:** a pachinko parlour that hurts no one, but can hit the JACKPOT.
+  - **Horizon of the Captivating Skandha** (Disaster Tides, Cursed Spirits only): a beach without end. Shikigami fish
+    bite everyone inside.
 - **Burnout:** when it ends, your technique burns out for 15 s. Reverse Cursed Technique and Simple Domain still work.
 - **Clash:** if two domains overlap, the stronger sorcerer keeps theirs.
 - **Protection:**
@@ -456,6 +521,8 @@ random member of Jujutsu High.
 - They exorcise curses and fight villains.
 - They never hurt a player who isn't sparring them, and players' techniques don't hurt them.
 - At night one may come to help a sorcerer surrounded by curses.
+- **Cursed Spirit players are curses to them:** they attack them on sight, won't talk or spar with them, and at night
+  one may come to exorcise them.
 
 **Talking and sparring:** right-click an ally to talk. You'll get a line in character, they'll tell you about their
 technique, and they'll offer a **spar**.
@@ -465,6 +532,7 @@ technique, and they'll offer a **spar**.
 - Ask **Todo** what he asks everyone.
 
 **Villains (bosses):**
+- **Kin:** Mahito, Jogo, Geto and Choso spare Cursed Spirit players (unless attacked).
 - **How they appear:** at night, one may come for a Grade 1 sorcerer (one villain at a time). Sukuna only comes for
   the Special Grade, or for whoever has eaten 15 of his fingers.
 - **Fighting them:** they use their techniques for real. Sukuna opens the Malevolent Shrine when he's hurt; an NPC's
@@ -526,7 +594,8 @@ set anything up. Each part can be switched off in **Admin Panel → Server autom
   - edit any player (clan, technique, grade, fingers, refill)
   - summon the Finger Bearer, Mahoraga or any character (optionally standing still, for a hub)
   - change server settings: night curse surges, natural Finger Bearer, villains at night, Jujutsu High helping,
-    cinematics (all on), Hollow Purple destroying terrain and light effects (off)
+    cinematics, new players choosing sorcerer or curse (all on), Hollow Purple destroying terrain and light effects
+    (off)
   - **server automation:** each ban group, the sanctuary and its radius, newcomer protection, the welcome, Daily
     Blessings, grade tags, tips, item clears, the Top Sorcerers and the server events (and how often)
 - **Commands** (the last word can name another player):
@@ -543,7 +612,8 @@ set anything up. Each part can be switched off in **Admin Panel → Server autom
   | `/scriptevent jjk:boss` | summon the Finger Bearer next to you |
   | `/scriptevent jjk:mahoraga` | summon a wild Mahoraga next to you (no ritual: it can't be tamed) |
   | `/scriptevent jjk:tame_mahoraga [off] [name]` | let a Ten Shadows sorcerer skip the ritual (`off` undoes it) |
-  | `/scriptevent jjk:reset [name]` | wipe a player (also their vow, stored curses and Mahoraga); they're born and awaken again |
+  | `/scriptevent jjk:reset [name]` | wipe a player (also their vow, stored curses and Mahoraga); they choose their path and awaken again |
+  | `/scriptevent jjk:path curse [name]` | make a player a Cursed Spirit (or `sorcerer`), keeping their grade; a technique the new path doesn't allow is rerolled |
   | `/scriptevent jjk:cinematic void` | watch a cinematic without casting anything: `void`, `shrine`, `garden`, `moon`, `volcano`, `perfection`, `jackpot`, `purple` |
   | `/scriptevent jjk:cinematics off` | cinematics `on`/`off` for everyone |
   | `/scriptevent jjk:vfx light` | fewer particles for slower devices (`full` to go back) |
@@ -585,7 +655,7 @@ output. Run the generators from this folder:
 | `combat.js` | damage, Black Flash, Infinity, stuns |
 | `domains.js` | domains, clashes, Simple Domain, each domain's fog (`registerDomain` lets a technique add its own) |
 | `cinematic.js` + `cine_shots.js` | the cinematics: the engine (camera, lock, cleanup) and the shot lists (pure data) |
-| `tech_*.js` | the fourteen techniques |
+| `tech_*.js` | the sixteen techniques (Disaster Plants and Disaster Tides are curses' alone) |
 | `servants.js` | curses that fight for someone (Geto's, Mahito's) |
 | `mahoraga.js` | Mahoraga: the ritual, adaptation, the wheel |
 | `vows.js` | Binding Vows |
@@ -595,7 +665,9 @@ output. Run the generators from this folder:
 | `bans.js` | the vanilla bans: armour, redstone, bundles, and items banned by hand |
 | `server.js` | server automation: the welcome, the sanctuary, newcomer and respawn protection, Daily Blessings, grade tags, tips |
 | `upkeep.js` | dropped-item clears, the Top Sorcerers board, server events |
-| `record.js` | the Record (with its This Server page) and the Admin Panel |
+| `paths.js` | the first join's choice (Jujutsu Sorcerer or Cursed Spirit), starting over, the admin's path command |
+| `curse_powers.js` | a Cursed Spirit's own powers: Devour, Terror, Curse Unleashed, regeneration |
+| `record.js` | the Record (with its This Server page) and the Admin Panel; `ui.js` shows its forms |
 | `commands.js` | admin commands |
 
 **Tests:** `./tests/run.sh` runs the mock tests (no Minecraft needed). They cover:
@@ -609,6 +681,8 @@ output. Run the generators from this folder:
 - the cinematics (who watches, the camera, fog, early ends, cleanup, the off switches) and the effect budget
 - running a server: the bans, the sanctuary, newcomer protection, the welcome, Daily Blessings, grade tags, item
   clears, the Top Sorcerers, server events, and their pages and commands
+- the two paths: the choice, awakening as a curse, the curse's powers and disasters, the new domain, who fights whom,
+  starting over and the admin's tools
 - the credits, including a copy with them edited out
 
 **Release:**

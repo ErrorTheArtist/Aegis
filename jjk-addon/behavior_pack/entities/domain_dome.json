@@ -40,6 +40,11 @@
         "minecraft:variant": {
           "value": 5
         }
+      },
+      "jjk:v_tides": {
+        "minecraft:variant": {
+          "value": 6
+        }
       }
     },
     "components": {
@@ -101,7 +106,8 @@
             "jjk:v_moon",
             "jjk:v_volcano",
             "jjk:v_perfection",
-            "jjk:v_jackpot"
+            "jjk:v_jackpot",
+            "jjk:v_tides"
           ]
         }
       },
@@ -117,7 +123,8 @@
             "jjk:v_moon",
             "jjk:v_volcano",
             "jjk:v_perfection",
-            "jjk:v_jackpot"
+            "jjk:v_jackpot",
+            "jjk:v_tides"
           ]
         }
       },
@@ -133,7 +140,8 @@
             "jjk:v_garden",
             "jjk:v_volcano",
             "jjk:v_perfection",
-            "jjk:v_jackpot"
+            "jjk:v_jackpot",
+            "jjk:v_tides"
           ]
         }
       },
@@ -149,7 +157,8 @@
             "jjk:v_garden",
             "jjk:v_moon",
             "jjk:v_perfection",
-            "jjk:v_jackpot"
+            "jjk:v_jackpot",
+            "jjk:v_tides"
           ]
         }
       },
@@ -165,7 +174,8 @@
             "jjk:v_garden",
             "jjk:v_moon",
             "jjk:v_volcano",
-            "jjk:v_jackpot"
+            "jjk:v_jackpot",
+            "jjk:v_tides"
           ]
         }
       },
@@ -181,7 +191,25 @@
             "jjk:v_garden",
             "jjk:v_moon",
             "jjk:v_volcano",
-            "jjk:v_perfection"
+            "jjk:v_perfection",
+            "jjk:v_tides"
+          ]
+        }
+      },
+      "jjk:as_tides": {
+        "add": {
+          "component_groups": [
+            "jjk:v_tides"
+          ]
+        },
+        "remove": {
+          "component_groups": [
+            "jjk:v_void",
+            "jjk:v_garden",
+            "jjk:v_moon",
+            "jjk:v_volcano",
+            "jjk:v_perfection",
+            "jjk:v_jackpot"
           ]
         }
       }

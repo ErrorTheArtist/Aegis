@@ -47,6 +47,8 @@ export function mkEntity(typeId, loc, dimId = "minecraft:overworld") {
       if (c === "minecraft:inventory" && e._inv) return { container: e._inv };
       if (c === "minecraft:tameable" && /divine_dog/.test(e.typeId)) return { tame: (p) => { e._owner = p.id; e._events.push("jjk:tamed"); return true; } };
       if (c === "minecraft:type_family") return { hasTypeFamily: (f) => e._families.includes(f) };
+      if (c === "minecraft:equippable" && e._equip) return { getEquipment: (s) => e._equip[s], setEquipment: (s, it) => { if (it) e._equip[s] = it; else delete e._equip[s]; return true; } };
+      if (c === "minecraft:item" && e._item) return { itemStack: e._item };
       return undefined;
     },
     getDynamicProperty: (k) => e._props[k],
@@ -103,7 +105,8 @@ export function mkPlayer(name, loc = { x: 0, y: 64, z: 0 }) {
   p._inv = { size: 36, getItem: (i) => slots[i], setItem: (i, v) => { slots[i] = v; }, addItem: (s) => { const i = slots.indexOf(undefined); if (i < 0) return s; slots[i] = s; return undefined; }, _slots: slots };
   p.sendMessage = (m) => p._msgs.push(String(m));
   p.onScreenDisplay = { setActionBar: (t) => p._bars.push(String(t)), setTitle: (t, o) => p._titles.push(`${t} | ${o?.subtitle ?? ""}`) };
-  p.getGameMode = () => p._mode; p.startItemCooldown = (c, t) => { p._cds[c] = t; }; p.isOp = () => false;
+  p.getGameMode = () => p._mode; p.setGameMode = (m) => { p._mode = m; }; p.startItemCooldown = (c, t) => { p._cds[c] = t; }; p.isOp = () => false;
+  p._equip = {};
   H.players.push(p); H.entities.push(p);
   return p;
 }

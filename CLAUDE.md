@@ -398,6 +398,27 @@ tools.
   - Off switches: player property `cine_off` (Record → Settings), world property `cinematics` (Server settings,
     `/scriptevent jjk:cinematics off`). `/scriptevent jjk:cinematic <kind>` plays one without casting.
   - Tests that fire moves back to back (test2, test7) switch cinematics off; test9 tests them.
+- **Running a server** (all automatic, all on by default; each part switches off in Admin Panel → Server automation):
+  - `bans.js`: vanilla armour, redstone and bundles (`GROUPS`, world props `ban_<group>`) plus items banned by hand
+    (`bans_extra`). Swept from survival inventories and armour slots every 2 s, use/placement cancelled, dropped ones
+    removed on spawn. Never ban `jjk:` items. Rules are read once a tick (`rules()`).
+  - `server.js`: `AUTO` lists every part; `on(k)` / `setOn(k)` (world props `auto_<k>`). The welcome + starter kit +
+    MOTD (`joined()` on first join), the spawn **sanctuary** (`sanctuary()`, `inSanctuary()`), newcomer protection
+    (player prop `newcomer`, seconds of play left), 5 s respawn protection, the Daily Blessing (`dailyBlessing()`),
+    grade tags (player `nameTag`), tips.
+  - `upkeep.js`: dropped-item clears, the Top Sorcerers sidebar (scoreboard objective `jjk_top`, fake-player names),
+    server events (`startEvent(kind)`: outbreak, hunt, raid; `xpHooks` / `deathHooks` in `curses.js` for outbreaks).
+    It reads the scoreboard enums through `import * as MC` — a named import that the game's API lacks would stop the
+    whole pack from loading.
+  - **The sanctuary is a safe spot** (`core.safeSpots`, `isSafeSpot(loc, dim)`, `isSafe(player)`): `canHit` refuses
+    hits on a player in it, `useMove` refuses moves in it, curses/bosses never spawn into it (`spawnAround`,
+    `findBossSpot`), domains don't take its players as victims, Hollow Purple never carves it. Anything new that hurts
+    players, spawns hostiles near them or changes blocks must respect it too.
+  - `core.pvpBlocks` / `pvpBlocked(a, b)`: players who may not fight (the sanctuary, newcomers). `canHit` and the melee
+    bonus check it; `server.js` undoes a blocked melee hit. Melee bonuses never apply to your own summons.
+  - Record pages: This Server is index 7, the Admin Panel 8; the Admin Panel's Server automation button is 5.
+  - Tests: the mock world spawn is at (5000, 64, 5000), far from the other tests; tests that would trip over the
+    Daily Blessing or newcomer protection switch them off (`auto_daily`, `auto_newcomer`). test10 tests all of it.
 - **Coexisting with other add-ons:**
   - No `player.json`. Extra health is an endless Health Boost effect.
   - The CE bar uses the action bar and pauses whenever `bar()` shows a message there.

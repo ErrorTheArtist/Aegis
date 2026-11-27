@@ -19,12 +19,28 @@
 //   /scriptevent jjk:vfx light                   fewer particles for slower devices ("full" to go back)
 //   /scriptevent jjk:cinematic void              watch a cinematic without casting anything (void, shrine, garden, moon,
 //                                                volcano, perfection, jackpot, purple)
+// Running the server (all of it is automatic; these change it):
+//   /scriptevent jjk:auto                        what's on (welcome, sanctuary, newcomer, daily, tags, tips, clears,
+//                                                board, events)
+//   /scriptevent jjk:auto tips off               switch one part off (or on)
+//   /scriptevent jjk:bans                        what's banned; jjk:bans armour off switches a group (armour, redstone,
+//                                                bundles) off or on
+//   /scriptevent jjk:ban totem_of_undying        ban any item by hand (jjk:unban <item> allows it again)
+//   /scriptevent jjk:sanctuary here 32           move the spawn sanctuary to where you stand (and its radius); "spawn"
+//                                                puts it back on the world spawn, a number alone sets the radius
+//   /scriptevent jjk:motd Be nice!               the message everyone sees when they join ("off" removes it)
+//   /scriptevent jjk:event outbreak              start a server event now: outbreak, hunt or raid
+//   /scriptevent jjk:clear                       clear every dropped item now
+//   /scriptevent jjk:protection off [name]       end a player's newcomer protection (or give minutes: jjk:protection 20)
 //   /scriptevent jjk:credits                     who made this add-on
 
 import { world, system } from "@minecraft/server";
-import { setProp, setWorldProp, tell, isPlayer } from "./core.js";
+import { setProp, setWorldProp, worldProp, tell, isPlayer } from "./core.js";
 import { CINE } from "./cine_shots.js";
 import { play, inCinematic } from "./cinematic.js";
+import { AUTO, on, setOn, sanctuary, setSanctuary, setSanctuaryRadius, setProtection, protectedLeft } from "./server.js";
+import { GROUPS, groupOn, setGroup, banItem, extraBans } from "./bans.js";
+import { startEvent, clearItems, EVENTS } from "./upkeep.js";
 import { GRADES, setXp, addXp, MAX_FINGERS, maxCE, applyStats } from "./grades.js";
 import { setCE } from "./energy.js";
 import { TECHNIQUES, setTechnique, techniqueOf, resetCooldowns, syncItems, awaken } from "./techniques.js";
@@ -104,6 +120,57 @@ export function runCommand(id, message, src) {
     if (inCinematic(src)) return say(src, "§7You're already watching one.");
     return play(kind, src) || say(src, "§7Cinematics are switched off (Record -> Settings, or the server's).");
   }
+  const words = String(message ?? "").trim().split(/\s+/).filter(Boolean);
+  if (cmd === "auto") {
+    const [part, state] = words;
+    if (part && !AUTO[part]) return say(src, `§cWhich part? ${Object.keys(AUTO).join(", ")}`);
+    if (part && state) {
+      setOn(part, state !== "off");
+      return say(src, `§7${AUTO[part]}: ${on(part) ? "§aon" : "§coff"}`);
+    }
+    return say(src, Object.keys(AUTO).map((k) => `§7${k}: ${on(k) ? "§aon" : "§coff"}`).join("\n"));
+  }
+  if (cmd === "bans") {
+    const [group, state] = words;
+    if (group && !GROUPS[group]) return say(src, `§cWhich group? ${Object.keys(GROUPS).join(", ")}`);
+    if (group && state) setGroup(group, state !== "off");
+    const list = Object.keys(GROUPS).map((k) => `§7${k}: ${groupOn(k) ? "§cbanned" : "§aallowed"}`);
+    if (extraBans().length) list.push(`§7by hand: §c${extraBans().join(", ")}`);
+    return say(src, list.join("\n"));
+  }
+  if (cmd === "ban" || cmd === "unban") return say(src, banItem(words[0], cmd === "ban"));
+  if (cmd === "sanctuary") {
+    const [a, b] = words;
+    if (a === "off" || a === "on") setOn("sanctuary", a === "on");
+    else if (a === "spawn") setSanctuary(undefined);
+    else if (a === "here") {
+      if (!isPlayer(src)) return say(src, "§7Run it as a player.");
+      setSanctuary({ x: src.location.x, y: src.location.y, z: src.location.z }, src.dimension.id);
+      if (Number(b) > 0) setSanctuaryRadius(Number(b));
+    } else if (Number(a) > 0) setSanctuaryRadius(Number(a));
+    const s = sanctuary();
+    return say(src, s ? `§7The sanctuary: §a${s.r} blocks around ${Math.round(s.x)}, ${Math.round(s.y > 30000 ? 0 : s.y)}, ${Math.round(s.z)}§7 (${s.dim.replace("minecraft:", "")}).`
+      : "§7The sanctuary is §coff§7.");
+  }
+  if (cmd === "motd") {
+    const text = String(message ?? "").trim();
+    setWorldProp("motd", text && text !== "off" ? text.slice(0, 200) : undefined);
+    return say(src, text && text !== "off" ? `§7Everyone joining will see: §d✦ ${worldProp("motd", "")}` : "§7The join message is off.");
+  }
+  if (cmd === "event") {
+    const kind = words[0];
+    if (!EVENTS[kind]) return say(src, `§7Use: jjk:event ${Object.keys(EVENTS).join("|")}`);
+    const started = startEvent(kind);
+    return say(src, started ? `§7Started: ${EVENTS[started]}.` : "§7Nothing started: an event is already on, or nobody it could happen to (outside the sanctuary, awakened).");
+  }
+  if (cmd === "clear") return clearItems(true);
+  if (cmd === "protection") {
+    const [v, ...rest] = words;
+    const who = rest.length ? world.getAllPlayers().find((x) => x.name.toLowerCase() === rest.join(" ").toLowerCase()) : isPlayer(src) ? src : undefined;
+    if (!who) return say(src, "§cName a player.");
+    setProtection(who, v === "off" ? 0 : Math.max(0, Number(v) || 20) * 60);
+    return say(src, protectedLeft(who) > 0 ? `§7${who.name} is protected from other players for ${Math.ceil(protectedLeft(who) / 60)} min.` : `§7${who.name} has no newcomer protection now.`);
+  }
   const [value, q, name] = parse(src, message);
   const needsValue = ["technique", "grade", "xp", "finger", "clan"].includes(cmd);
   const target = needsValue ? q : parse(src, `x ${message ?? ""}`)[1];
@@ -153,7 +220,7 @@ export function runCommand(id, message, src) {
       awaken(target);
       return say(src, `§7${target.name} was reset and awakened again.`);
     default:
-      return say(src, "§7Commands: jjk:record, admin, technique, clan, grade, xp, finger, ce, boss, mahoraga, tame_mahoraga, summon, reset, cinematics, vfx, cinematic, credits");
+      return say(src, "§7Commands: jjk:record, admin, technique, clan, grade, xp, finger, ce, boss, mahoraga, tame_mahoraga, summon, reset, cinematics, vfx, cinematic, auto, bans, ban, unban, sanctuary, motd, event, clear, protection, credits");
   }
 }
 

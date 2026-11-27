@@ -14,7 +14,27 @@ export const world = {
   getDimension: (id) => globalThis.H?.dim(id),
   getTimeOfDay: () => globalThis.H?.time ?? 1000,
   gameRules: { pvp: true },
+  // (the world spawn is far from where the tests stand, unless a test moves it)
+  getDefaultSpawnLocation: () => ({ ...(globalThis.H?.spawnPoint ?? { x: 5000, y: 64, z: 5000 }) }),
+  scoreboard: {
+    _objs: new Map(), _slots: {},
+    getObjective(id) { return this._objs.get(id); },
+    addObjective(id, displayName) {
+      const scores = new Map();
+      const o = { id, displayName, _scores: scores,
+        setScore(part, v) { scores.set(typeof part === "string" ? part : part.name ?? part.id, v); return true; },
+        getScore(part) { return scores.get(typeof part === "string" ? part : part.name ?? part.id); },
+        getScores() { return [...scores].map(([n, v]) => ({ participant: { displayName: n }, score: v })); } };
+      this._objs.set(id, o);
+      return o;
+    },
+    setObjectiveAtDisplaySlot(slot, opts) { this._slots[slot] = opts; },
+    getObjectiveAtDisplaySlot(slot) { return this._slots[slot]; },
+    clearObjectiveAtDisplaySlot(slot) { delete this._slots[slot]; },
+  },
 };
+export const DisplaySlotId = { BelowName: "BelowName", List: "List", Sidebar: "Sidebar" };
+export const ObjectiveSortOrder = { Ascending: 0, Descending: 1 };
 export const system = {
   currentTick: 0, afterEvents: proxy("s."), beforeEvents: proxy("sb."), _intervals: [], _timeouts: [], _nextId: 1,
   runInterval(f, per = 1) { const id = this._nextId++; this._intervals.push({ id, f, per: Math.max(1, per || 1) }); return id; },

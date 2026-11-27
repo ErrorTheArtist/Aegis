@@ -1,4 +1,4 @@
-# Jujutsu Legacy — v1.4.0
+# Jujutsu Legacy — v1.5.0
 
 **Made by errorlegend.** Questions, ideas or bug reports: DM **errorlegend_** on Discord.
 
@@ -13,6 +13,19 @@ A Jujutsu Kaisen add-on for Minecraft Bedrock (1.21.60+).
 No experimental toggles are needed, and the pack doesn't replace the player file, so it runs next to other add-ons.
 
 **Install:** open `dist/JujutsuLegacy.mcaddon` (build it with `./build.sh`), then turn on both packs in your world.
+
+**New in 1.5: built to run a multiplayer server by itself.** Install it and play: everything below is automatic and on
+by default (an admin can switch any part off). See **Running a server** below.
+- **Vanilla armour, redstone and bundles are banned:** they're taken out of inventories, can't be used, placed or
+  switched, and vanish when dropped. Your cursed energy is your armour.
+- **A sanctuary around spawn:** nobody can be hurt or use a technique there, curses stay out, you heal, and only admins
+  can build.
+- **New players are looked after:** a welcome with how to play and the server's rules, a starter kit, and 20 minutes
+  in which no player can hurt them.
+- **Something to come back for:** a Daily Blessing (XP, a streak, a Cursed Womb every 7th day), grade tags above
+  everyone's name, the Top Sorcerers on the sidebar, and a server event every half hour: curse outbreaks, Special
+  Grade hunts and villain raids.
+- **It cleans up after itself:** dropped items are cleared every 10 minutes (with a warning first).
 
 **New in 1.4: cinematics and effects.**
 - **A cinematic for Hollow Purple and for every domain, each one different:** the camera takes over for a few seconds
@@ -80,6 +93,8 @@ techniques and running moves, and tells everyone who really made it.
   - your clan, technique, grade and Binding Vow
   - every move with its cost and cooldown
   - the clans, Binding Vows, a guide to fighting, and settings (the CE bar, Infinity, cinematics)
+  - **This Server:** its rules, the sanctuary, what's banned, the next server event, your Daily Blessing streak and
+    the Top Sorcerers
   - the credits
 
 ## Clans
@@ -456,6 +471,54 @@ technique, and they'll offer a **spar**.
   sure-hit lands at half strength. Geto's released curses and Mahito's transfigured humans fight for them.
 - **If nobody comes:** they leave when no one is near for a minute.
 
+## Running a server
+
+Everything here runs by itself. Install the add-on, turn on both packs, and players can join and play: nobody needs to
+set anything up. Each part can be switched off in **Admin Panel → Server automation** (or with
+`/scriptevent jjk:auto <part> off`).
+
+- **Vanilla bans** (armour, redstone, bundles; each group on its own switch):
+  - **Armour:** every vanilla helmet, chestplate, leggings and boots, and the turtle shell.
+  - **Redstone:** redstone dust, blocks and ore, and every contraption part (torches, repeaters, comparators,
+    observers, pistons, dispensers, droppers, hoppers, levers, lamps, detectors, targets, sculk sensors, crafters,
+    powered rails, TNT). Redstone already in the world can't be switched either.
+  - **Bundles** of every colour.
+  - How: banned items leave survival players' inventories and armour slots within 2 seconds (they're told what went),
+    using or placing one is cancelled, and one dropped on the ground vanishes. Creative and spectator players keep
+    theirs. Weapons, tools, food and blocks are all allowed.
+  - Ban anything else by hand: `/scriptevent jjk:ban totem_of_undying` (`jjk:unban` allows it again).
+- **The sanctuary** (24 blocks around the world spawn):
+  - Nobody can be hurt there, and nobody can use a technique (or hit a player inside from outside).
+  - Curses and monsters that wander in are exorcised; bosses and villains are pushed back out. Night surges and
+    server events never pick a player standing in it.
+  - You heal and stay fed while you rest there.
+  - Survival players are in adventure mode inside it (no building or breaking), and back in survival when they leave.
+    **Admins (tag `jjk_admin`) and creative players can build there.** Explosions can't touch it.
+  - Move it with `/scriptevent jjk:sanctuary here 32` (to where you stand, 32 blocks), or change its size in the Admin
+    Panel.
+- **New players:**
+  - A welcome in chat: how to play, the sanctuary, what's banned and the server's message (set it with
+    `/scriptevent jjk:motd <text>`; everyone sees it each time they join).
+  - A starter kit: 16 bread and 16 torches.
+  - **Newcomer protection:** for their first 20 minutes of play, no player can hurt them and they can't hurt players
+    (curses still can). The CE bar shows how long is left.
+  - Anyone who respawns gets 5 seconds in which nothing can hurt them.
+- **Daily Blessing:** the first join of each day gives XP for your grade, +10% for every day in a row (up to +60%), and
+  a **Cursed Womb** on every 7th day in a row.
+- **Grade tags:** every player's grade shows above their name.
+- **Tips:** a tip in chat every 10 minutes.
+- **Item clears:** every 10 minutes, dropped items and arrows that have lain there for 2 minutes are cleared. Chat
+  warns 30 and 10 seconds before.
+- **Top Sorcerers:** the sidebar ranks everyone who has played by XP (the Record's This Server page shows the top 5).
+- **Server events** every 30 minutes (announced a minute before), in turn:
+  - **Curse Outbreak:** for 3 minutes curses pour out around every sorcerer and exorcisms give 1.5x XP. The top
+    exorcist wins a Cursed Womb.
+  - **Special Grade Hunt:** a Finger Bearer appears near a Grade 2+ sorcerer, announced with its location. Whoever
+    exorcises it takes one of Sukuna's Fingers.
+  - **Villain Raid:** a villain comes for a Grade 1+ sorcerer.
+  - If an event has nobody to happen to, it becomes an outbreak or waits 5 minutes.
+  - Change how often in the Admin Panel, or start one now: `/scriptevent jjk:event outbreak`.
+
 ## Admins
 
 - **Admin Panel:** tag yourself (`/tag @s add jjk_admin`) and it appears in your Jujutsu Record. You can also open it
@@ -464,6 +527,8 @@ technique, and they'll offer a **spar**.
   - summon the Finger Bearer, Mahoraga or any character (optionally standing still, for a hub)
   - change server settings: night curse surges, natural Finger Bearer, villains at night, Jujutsu High helping,
     cinematics (all on), Hollow Purple destroying terrain and light effects (off)
+  - **server automation:** each ban group, the sanctuary and its radius, newcomer protection, the welcome, Daily
+    Blessings, grade tags, tips, item clears, the Top Sorcerers and the server events (and how often)
 - **Commands** (the last word can name another player):
 
   | Command | Does |
@@ -482,6 +547,14 @@ technique, and they'll offer a **spar**.
   | `/scriptevent jjk:cinematic void` | watch a cinematic without casting anything: `void`, `shrine`, `garden`, `moon`, `volcano`, `perfection`, `jackpot`, `purple` |
   | `/scriptevent jjk:cinematics off` | cinematics `on`/`off` for everyone |
   | `/scriptevent jjk:vfx light` | fewer particles for slower devices (`full` to go back) |
+  | `/scriptevent jjk:auto` | what's automated and what's on; `jjk:auto tips off` switches a part (`welcome`, `sanctuary`, `newcomer`, `daily`, `tags`, `tips`, `clears`, `board`, `events`) |
+  | `/scriptevent jjk:bans` | what's banned; `jjk:bans armour off` switches a group (`armour`, `redstone`, `bundles`) |
+  | `/scriptevent jjk:ban totem_of_undying` | ban any item by hand (`jjk:unban <item>` allows it again) |
+  | `/scriptevent jjk:sanctuary here 32` | move the sanctuary to where you stand (and its radius); `spawn` puts it back, a number alone sets the radius, `off`/`on` |
+  | `/scriptevent jjk:motd Be nice!` | the message everyone sees when they join (`off` removes it) |
+  | `/scriptevent jjk:event outbreak` | start a server event now: `outbreak`, `hunt` or `raid` |
+  | `/scriptevent jjk:clear` | clear every dropped item now |
+  | `/scriptevent jjk:protection off [name]` | end a player's newcomer protection (or give minutes: `jjk:protection 20 [name]`) |
   | `/scriptevent jjk:record` | open your Jujutsu Record |
   | `/scriptevent jjk:credits` | who made this add-on |
 
@@ -519,7 +592,10 @@ output. Run the generators from this folder:
 | `techniques.js` | awakening, items, using moves |
 | `curses.js` | curses, the Finger Bearer, night surges |
 | `sorcerers.js` + `npc_moves.js` | the cast |
-| `record.js` | the Record and the Admin Panel |
+| `bans.js` | the vanilla bans: armour, redstone, bundles, and items banned by hand |
+| `server.js` | server automation: the welcome, the sanctuary, newcomer and respawn protection, Daily Blessings, grade tags, tips |
+| `upkeep.js` | dropped-item clears, the Top Sorcerers board, server events |
+| `record.js` | the Record (with its This Server page) and the Admin Panel |
 | `commands.js` | admin commands |
 
 **Tests:** `./tests/run.sh` runs the mock tests (no Minecraft needed). They cover:
@@ -531,6 +607,8 @@ output. Run the generators from this folder:
 - sparring, encounters and rewards
 - the Record, the commands
 - the cinematics (who watches, the camera, fog, early ends, cleanup, the off switches) and the effect budget
+- running a server: the bans, the sanctuary, newcomer protection, the welcome, Daily Blessings, grade tags, item
+  clears, the Top Sorcerers, server events, and their pages and commands
 - the credits, including a copy with them edited out
 
 **Release:**

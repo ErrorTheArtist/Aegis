@@ -13,6 +13,9 @@
 //   techniques.js  awakening, move items, using a move, fingers, Cursed Wombs
 //   curses.js      exorcism XP and drops, the Finger Bearer, night surges
 //   sorcerers.js   the cast: Jujutsu High allies (talk, spar) and villain bosses; npc_moves.js their own attacks
+//   bans.js        vanilla bans: armour, redstone, bundles
+//   server.js      server automation: welcome, the spawn sanctuary, newcomer protection, Daily Blessings, grade tags, tips
+//   upkeep.js      dropped-item clears, the Top Sorcerers sidebar, server events
 //   record.js      the Jujutsu Record and the Admin Panel
 //   commands.js    /scriptevent jjk:… admin commands
 
@@ -32,6 +35,9 @@ import { initCommands } from "./commands.js";
 import { initSorcerers } from "./sorcerers.js";
 import { applyStats } from "./grades.js";
 import { initMahoraga } from "./mahoraga.js";
+import { initBans } from "./bans.js";
+import { initServer, joined, dailyBlessing } from "./server.js";
+import { initUpkeep } from "./upkeep.js";
 
 initTasks();
 initEnergy();
@@ -44,6 +50,9 @@ initCurses();
 initCommands();
 initSorcerers();
 initMahoraga();
+initBans();
+initServer();
+initUpkeep();
 
 function ready(p, respawn) {
   if (!valid(p)) return;
@@ -62,6 +71,10 @@ function ready(p, respawn) {
 
 world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
   system.runTimeout(() => ready(player, !initialSpawn), initialSpawn ? 60 : 5);
+  if (initialSpawn) {
+    joined(player); // (a first join: the welcome and newcomer protection; otherwise the MOTD)
+    system.runTimeout(() => valid(player) && dailyBlessing(player), 220);
+  }
   // the credits, every time someone joins
   if (initialSpawn) system.runTimeout(() => valid(player) && tell(player, creditsIntact() ? creditLine() : tamperedLine()), 100);
 });

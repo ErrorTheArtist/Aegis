@@ -1,7 +1,7 @@
 // Shared helpers for every Jujutsu Legacy module: stored values, maths, particles, sounds, messages, animations,
 // effect entities, targeting and one per-tick task runner. No game rules live here.
 
-import { world, system, MolangVariableMap } from "@minecraft/server";
+import { world, system, MolangVariableMap, ItemStack } from "@minecraft/server";
 
 export const PFX = "jjk:";
 export const now = () => system.currentTick;
@@ -289,6 +289,27 @@ export function tell(p, text) {
     /* ignore */
   }
 }
+// Puts an item in a player's inventory (at their feet if it's full). Returns false if it couldn't be made.
+export function give(p, id, n = 1) {
+  let stack;
+  try {
+    stack = new ItemStack(id, n);
+  } catch {
+    return false;
+  }
+  try {
+    const left = p.getComponent("minecraft:inventory")?.container?.addItem(stack);
+    if (left) p.dimension.spawnItem(left, p.location);
+    return true;
+  } catch {
+    try {
+      p.dimension.spawnItem(stack, p.location);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+}
 export function title(p, text, sub = "", stay = 40) {
   try {
     p.onScreenDisplay.setTitle(text, { subtitle: sub, fadeInDuration: 4, stayDuration: stay, fadeOutDuration: 12 });
@@ -376,6 +397,26 @@ const NOT_TARGETS = new Set(["minecraft:item", "minecraft:xp_orb", "minecraft:ar
 // Extra targeting rules (sorcerers.js: allies never hurt players they aren't sparring, villains spare each other...):
 // (caster, target) => false forbids the hit.
 export const targetRules = [];
+// Server rules (server.js): where nobody can be hurt, and which players may not fight each other.
+export const safeSpots = []; // (location, dimension id) => true where no one may be hurt (the spawn sanctuary)
+export const pvpBlocks = []; // (player, player) => true when these two may not fight (newcomer protection)
+const anyOf = (list, a, b) => list.some((f) => {
+  try {
+    return f(a, b) === true;
+  } catch {
+    return false;
+  }
+});
+export const isSafeSpot = (loc, dimId) => anyOf(safeSpots, loc, dimId);
+export function isSafe(e) {
+  if (!isPlayer(e)) return false;
+  try {
+    return isSafeSpot(e.location, e.dimension.id);
+  } catch {
+    return false;
+  }
+}
+export const pvpBlocked = (a, b) => isPlayer(a) && isPlayer(b) && (isSafe(a) || isSafe(b) || anyOf(pvpBlocks, a, b));
 // A character NPC's side ("ally" / "villain"), or undefined for anything else.
 export const sideOf = (e) => (e?.typeId === "jjk:sorcerer" ? getProp(e, "side") : undefined);
 export function nameOf(e) {
@@ -396,6 +437,7 @@ export function canHit(caster, e) {
   }
   if (isPlayer(e)) {
     if (isPlayer(caster) && !pvpOn()) return false; // (PvP off stops players' techniques — not curses, villains or Mahoraga)
+    if (isSafe(e) || pvpBlocked(caster, e)) return false; // nobody hurts a player in the sanctuary; newcomers can't duel
     const gm = gameMode(e);
     if (gm === "creative" || gm === "spectator") return false;
   }

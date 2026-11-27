@@ -1,5 +1,6 @@
-import { H, mkPlayer, spawn, tick, fire, use, inv, check, done, system } from "./harness.mjs";
+import { H, mkPlayer, spawn, tick, fire, use, inv, check, done, system, world } from "./harness.mjs";
 await import("./main.mjs");
+world.setDynamicProperty("jjk:auto_daily", false); // (the Daily Blessing would take over the bar — test10 tests it)
 const T = await import("./techniques.mjs");
 const E = await import("./energy.mjs");
 const Gr = await import("./grades.mjs");

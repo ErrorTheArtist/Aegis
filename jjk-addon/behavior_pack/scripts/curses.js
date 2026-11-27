@@ -14,7 +14,7 @@
 import { world, system, ItemStack } from "@minecraft/server";
 import {
   getProp, bump, isPlayer, alive, valid, health, fx, fxMust, shake, sound, mid, V, knock, effect, COLOR, foes, byId, worldProp, tell, ground, now,
-  sideOf,
+  sideOf, isSafe, isSafeSpot,
 } from "./core.js";
 import { addXp, gradeOf, G } from "./grades.js";
 import { hurt } from "./combat.js";
@@ -47,6 +47,18 @@ function drop(dim, loc, id, n = 1) {
 }
 
 export const deathHooks = []; // (dead entity, killer player or undefined) — e.g. Cursed Spirit Manipulation absorbs curses
+export const xpHooks = []; // (player, dead curse) => an XP multiplier for exorcising it (a curse outbreak: 1.5)
+function xpMult(p, dead) {
+  let m = 1;
+  for (const f of xpHooks) {
+    try {
+      m *= f(p, dead) ?? 1;
+    } catch {
+      /* ignore */
+    }
+  }
+  return m;
+}
 
 function onDeath(dead, src) {
   const t = dead.typeId;
@@ -80,7 +92,7 @@ function onDeath(dead, src) {
       if (Math.random() < 0.04) drop(dim, at, "jjk:cursed_womb");
     }
     if (p) {
-      addXp(p, CURSE_XP[t], `exorcised a ${CURSE_NAME[t]}`);
+      addXp(p, Math.round(CURSE_XP[t] * xpMult(p, dead)), `exorcised a ${CURSE_NAME[t]}`);
       bump(p, "exorcised");
     }
     return;
@@ -182,9 +194,14 @@ function bossTick(boss) {
 }
 
 function findBossSpot(p) {
-  const a = Math.random() * Math.PI * 2;
-  const r = 20 + Math.random() * 8;
-  return ground(p.dimension, { x: p.location.x + Math.cos(a) * r, y: p.location.y + 8, z: p.location.z + Math.sin(a) * r }, 30);
+  let at;
+  for (let i = 0; i < 6; i++) { // (never inside the sanctuary)
+    const a = Math.random() * Math.PI * 2;
+    const r = 20 + Math.random() * 8;
+    at = ground(p.dimension, { x: p.location.x + Math.cos(a) * r, y: p.location.y + 8, z: p.location.z + Math.sin(a) * r }, 30);
+    if (!isSafeSpot(at, p.dimension.id)) break;
+  }
+  return at;
 }
 
 export function spawnFingerBearer(p, quiet = false) {
@@ -225,30 +242,38 @@ function isNight() {
     return false;
   }
 }
+// Curses near a sorcerer (how many within 40 blocks), and n more 16-28 blocks away, as strong as their grade calls for.
+export function cursesNear(p, r = 40) {
+  try {
+    return p.dimension.getEntities({ location: p.location, maxDistance: r, families: ["curse"] }).length;
+  } catch {
+    return 0;
+  }
+}
+export function spawnAround(p, n) {
+  const pool = SURGE[gradeOf(p)];
+  let made = 0;
+  for (let i = 0; i < n; i++) {
+    const a = Math.random() * Math.PI * 2;
+    const r = 16 + Math.random() * 12;
+    const at = ground(p.dimension, { x: p.location.x + Math.cos(a) * r, y: p.location.y + 10, z: p.location.z + Math.sin(a) * r }, 30);
+    if (isSafeSpot(at, p.dimension.id)) continue; // (never inside the sanctuary)
+    try {
+      p.dimension.spawnEntity(pool[Math.floor(Math.random() * pool.length)], at);
+      made++;
+    } catch {
+      /* unloaded */
+    }
+  }
+  return made;
+}
 function surge() {
   if (!worldProp("surges", true) || !isNight()) return;
   for (const p of world.getAllPlayers()) {
-    if (!alive(p) || !getProp(p, "technique") || p.dimension?.id !== "minecraft:overworld") continue;
-    let near = 0;
-    try {
-      near = p.dimension.getEntities({ location: p.location, maxDistance: 40, families: ["curse"] }).length;
-    } catch {
-      /* ignore */
-    }
-    if (near >= 4) continue;
+    if (!alive(p) || !getProp(p, "technique") || p.dimension?.id !== "minecraft:overworld" || isSafe(p)) continue; // (never into the sanctuary)
+    if (cursesNear(p) >= 4) continue;
     const g = gradeOf(p);
-    const pool = SURGE[g];
-    const n = 1 + (Math.random() < 0.4 ? 1 : 0);
-    for (let i = 0; i < n; i++) {
-      const a = Math.random() * Math.PI * 2;
-      const r = 16 + Math.random() * 12;
-      const at = ground(p.dimension, { x: p.location.x + Math.cos(a) * r, y: p.location.y + 10, z: p.location.z + Math.sin(a) * r }, 30);
-      try {
-        p.dimension.spawnEntity(pool[Math.floor(Math.random() * pool.length)], at);
-      } catch {
-        /* unloaded */
-      }
-    }
+    spawnAround(p, 1 + (Math.random() < 0.4 ? 1 : 0));
     // the Finger Bearer itself (Grade 1+, one at a time in the world)
     if (g >= G.ONE && worldProp("boss_spawns", true) && Math.random() < 0.03) {
       let bosses = 0;

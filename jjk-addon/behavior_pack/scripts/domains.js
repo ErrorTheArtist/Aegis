@@ -24,7 +24,7 @@
 import { world, system } from "@minecraft/server";
 import {
   now, V, valid, alive, isPlayer, fx, fxMust, sound, title, tell, bar, effect, clearEffect, spawnFx, removeFx, foes, mid, COLOR, look,
-  getProp, health, anim, ground, nameOf, cmd,
+  getProp, health, anim, ground, nameOf, cmd, isSafe,
 } from "./core.js";
 import { CINE } from "./cine_shots.js";
 import { play } from "./cinematic.js";
@@ -157,7 +157,7 @@ export function expand(p, kind) {
     filmed = play(kind, p, {
       radius: def.radius + 4,
       until: () => active.includes(d),
-      victims: () => world.getAllPlayers().filter((q) => q.id !== p.id && inside(d, q)),
+      victims: () => world.getAllPlayers().filter((q) => q.id !== p.id && inside(d, q) && !isSafe(q)),
     });
   } catch {
     /* (a domain opens whatever happens to its cinematic) */

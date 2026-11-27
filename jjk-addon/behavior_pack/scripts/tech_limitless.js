@@ -11,7 +11,7 @@
 import { world } from "@minecraft/server";
 import {
   V, eye, look, fx, fxMust, sound, task, spawnFx, removeFx, tp, valid, foes, mid, knock, anim, COLOR, rayEnd, effect, worldProp, alive, aimed,
-  title, shake,
+  title, shake, isSafeSpot,
 } from "./core.js";
 import { hurt } from "./combat.js";
 import { expand } from "./domains.js";
@@ -158,7 +158,9 @@ function launchPurple(p, from, dir) {
           for (let z = -2; z <= 2; z++) {
             if (x * x + y * y + z * z > 5) continue;
             try {
-              const b = dim.getBlock({ x: pos.x + x, y: pos.y + y, z: pos.z + z });
+              const at = { x: pos.x + x, y: pos.y + y, z: pos.z + z };
+              if (isSafeSpot(at, dim.id)) continue; // (the sanctuary is never carved)
+              const b = dim.getBlock(at);
               if (b && !b.isAir && !UNBREAKABLE.test(b.typeId)) b.setType("minecraft:air");
             } catch {
               /* unloaded */

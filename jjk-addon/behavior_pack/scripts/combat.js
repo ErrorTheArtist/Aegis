@@ -15,7 +15,7 @@
 
 import { world, system } from "@minecraft/server";
 import {
-  getProp, bump, now, isPlayer, alive, health, canHit, fx, sound, effect, clearEffect, mid, title, COLOR, V, shake,
+  getProp, bump, now, isPlayer, alive, health, canHit, fx, sound, effect, clearEffect, mid, title, COLOR, V, shake, pvpBlocked,
 } from "./core.js";
 import { gradeOf, dmgMult, maxCE, addXp, fingersOf } from "./grades.js";
 import { getCE, setCE, addCE, isHeavenly, statusHooks } from "./energy.js";
@@ -179,7 +179,8 @@ function meleeMult(p) {
 }
 
 function onMelee(p, target, damage) {
-  if (!getProp(p, "technique")) return;
+  // (no bonus and no Black Flash where players may not fight — nor on your own shikigami and servants: no farming them)
+  if (!getProp(p, "technique") || pvpBlocked(p, target) || getProp(target, "owner") === p.id) return;
   let total = damage * meleeMult(p);
   for (const f of dmgHooks) {
     try {

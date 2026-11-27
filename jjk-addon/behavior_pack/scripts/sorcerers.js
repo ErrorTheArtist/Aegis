@@ -18,7 +18,7 @@ import { ActionFormData } from "@minecraft/server-ui";
 import { NPC_IDS } from "./roster_ids.js";
 import {
   getProp, setProp, bump, now, V, valid, alive, isPlayer, health, gameMode, fx, sound, tell, title, effect, clearEffect, mid, tp, COLOR,
-  byId, ground, worldProp, targetRules, sideOf,
+  byId, ground, worldProp, targetRules, sideOf, isSafe,
 } from "./core.js";
 import { hurt, dmgHooks, dmgCaps } from "./combat.js";
 import { MOVES, TECHNIQUES } from "./techniques.js";
@@ -495,7 +495,7 @@ export function villainNight(force) {
   const dim = world.getDimension("minecraft:overworld");
   if (count(dim, { x: 0, y: 0, z: 0 }, 1e9, (e) => getProp(e, "side") === "villain")) return undefined; // one at a time
   for (const p of world.getAllPlayers()) {
-    if (!alive(p) || p.dimension?.id !== "minecraft:overworld" || gradeOf(p) < G.ONE) continue;
+    if (!alive(p) || p.dimension?.id !== "minecraft:overworld" || gradeOf(p) < G.ONE || isSafe(p)) continue; // (never at the sanctuary)
     if (!force && Math.random() >= 0.02) continue;
     const pool = VILLAINS.filter((v) => v !== "sukuna" || gradeOf(p) >= G.SPECIAL || fingersOf(p) >= 15);
     const who = pool[Math.floor(Math.random() * pool.length)];
@@ -515,7 +515,7 @@ export function villainNight(force) {
 export function allyNight(force) {
   if (!force && (!worldProp("allies", true) || !isNight())) return undefined;
   for (const p of world.getAllPlayers()) {
-    if (!alive(p) || !getProp(p, "technique")) continue;
+    if (!alive(p) || !getProp(p, "technique") || isSafe(p)) continue;
     if (!force && Math.random() >= 0.08) continue;
     let curses = 0;
     try {

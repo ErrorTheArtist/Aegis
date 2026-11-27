@@ -181,7 +181,7 @@ answers.push({ selection: 5 }, { formValues: [true, true, false] }); // (Gojo: t
 await use(g, "jjk:jujutsu_record"); await tick(2);
 check("Record -> Settings: switch your cinematics off", g._props["jjk:cine_off"] === true && formLog[1]?.ctl.at(-1)?.l.startsWith("Cinematics"));
 g.addTag("jjk_admin");
-answers.push({ selection: 7 }, { selection: 3 }, { formValues: [true, true, false, true, true, false, true] });
+answers.push({ selection: 8 }, { selection: 3 }, { formValues: [true, true, false, true, true, false, true] }); // (Admin Panel: after This Server)
 await use(g, "jjk:jujutsu_record"); await tick(3);
 check("Admin -> Server settings: cinematics off for everyone, light effects on", world.getDynamicProperty("jjk:cinematics") === false && world.getDynamicProperty("jjk:vfx_light") === true);
 world.setDynamicProperty("jjk:cinematics", undefined); world.setDynamicProperty("jjk:vfx_light", undefined);

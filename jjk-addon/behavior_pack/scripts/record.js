@@ -1,6 +1,7 @@
 // The Jujutsu Record (right-click it): your clan, technique, grade, cursed energy and fingers; every move with its cost,
-// cooldown and unlock; the grade ladder; the clans; your Binding Vow; a short guide to fighting; settings; the credits —
-// and, for admins (tag jjk_admin), the Admin Panel. The credit line on its first page can't be switched off.
+// cooldown and unlock; the grade ladder; the clans; your Binding Vow; a short guide to fighting; settings; the credits;
+// this server (its rules, the sanctuary, what's banned, the next event, your Daily Blessing, the Top Sorcerers) — and,
+// for admins (tag jjk_admin), the Admin Panel. The credit line on its first page can't be switched off.
 
 import { world, system } from "@minecraft/server";
 import { ActionFormData, ModalFormData } from "@minecraft/server-ui";
@@ -15,15 +16,11 @@ import { spawnFingerBearer } from "./curses.js";
 import { CAST, spawnSorcerer, nameOfCast } from "./sorcerers.js";
 import { VOWS, vowOf, vowInfo, vowReadyIn, setVow } from "./vows.js";
 import { spawnMahoraga } from "./mahoraga.js";
+import { ADMIN_TAG, isAdmin, AUTO, on, setOn, sanctuary, setSanctuaryRadius, SANCT_R, protectedLeft, motd, nextDailyIn } from "./server.js";
+import { GROUPS, groupOn, setGroup, bansLine, extraBans } from "./bans.js";
+import { topSorcerers, eventInfo } from "./upkeep.js";
 
-export const ADMIN_TAG = "jjk_admin";
-export const isAdmin = (p) => {
-  try {
-    return p.hasTag(ADMIN_TAG) || p.isOp?.() === true;
-  } catch {
-    return false;
-  }
-};
+export { ADMIN_TAG, isAdmin };
 
 async function show(p, form) {
   for (let i = 0; i < 30; i++) {
@@ -75,6 +72,7 @@ export async function openRecord(p) {
     ["§lHow to Fight\n§r§7Black Flash, domains, curses", () => guidePage(p)],
     ["§lSettings", () => settingsPage(p)],
     ["§d§lCredits\n§r§7who made Jujutsu Legacy", () => back(p, "§dCredits", creditPage(), () => openRecord(p))],
+    ["§lThis Server\n§r§7rules · sanctuary · events · top sorcerers", () => serverPage(p)],
   ];
   if (isAdmin(p)) pages.push(["§4§lAdmin Panel\n§r§7players · curses · server", () => adminMenu(p)]);
   const f = new ActionFormData().title("§5Jujutsu Record").body(lines.join("\n"));
@@ -201,6 +199,29 @@ async function settingsPage(p) {
   tell(p, "§7Settings saved.");
 }
 
+// This server: what a player needs to know to play on it.
+const span = (ms) => {
+  const m = Math.ceil(ms / 60000);
+  return m >= 60 ? `${Math.floor(m / 60)}h ${m % 60}m` : `${m}m`;
+};
+async function serverPage(p) {
+  const lines = [];
+  if (motd()) lines.push(`§d✦ ${motd()}`, "");
+  const s = sanctuary();
+  lines.push(s ? `§fSanctuary: §a${s.r} blocks around ${Math.round(s.x)}, ${Math.round(s.z)}§7 — nobody can be hurt or use a technique there, curses stay out, and you heal.`
+    : "§fSanctuary: §7none");
+  const b = bansLine();
+  lines.push(`§fBanned: ${b ? `§c${b}` : "§anothing"}`);
+  const left = protectedLeft(p);
+  if (left > 0) lines.push(`§fYour newcomer protection: §a${Math.ceil(left / 60)} min left §7(no player can hurt you, or be hurt by you)`);
+  if (on("daily")) lines.push(`§fDaily Blessing: §6day ${getProp(p, "daily_streak", 0)} in a row§7 · the next one in ${span(nextDailyIn())}`);
+  const e = eventInfo();
+  if (e) lines.push(`§fServer events: ${e}`);
+  const top = topSorcerers(5);
+  if (top.length) lines.push("", "§fTop Sorcerers:", ...top.map(([n, xp], i) => `§7${i + 1}. §f${n} §8· ${xp} XP`));
+  return back(p, "§5This Server", lines.join("\n"), () => openRecord(p));
+}
+
 // ---------------------------------------------------------------------------
 // Admin Panel
 // ---------------------------------------------------------------------------
@@ -212,6 +233,7 @@ export async function adminMenu(p) {
     .button("§lSummon a character\n§r§7Gojo, Sukuna, Yuji...")
     .button("§lServer settings\n§r§7curses · villains · terrain")
     .button("§lSummon Mahoraga\n§r§7a wild one (no ritual: it can't be tamed)")
+    .button("§lServer automation\n§r§7bans · sanctuary · events · rewards")
     .button("§l« Back");
   const r = await show(p, f);
   if (r.canceled) return;
@@ -226,6 +248,7 @@ export async function adminMenu(p) {
     spawnMahoraga(p.dimension, { x: p.location.x + 4, y: p.location.y, z: p.location.z + 4 });
     return tell(p, "§6Mahoraga has been summoned.");
   }
+  if (r.selection === 5) return automationPage(p);
   return openRecord(p);
 }
 
@@ -304,4 +327,30 @@ async function serverSettings(p) {
   if (v[5] !== undefined) setWorldProp("cinematics", !!v[5]);
   if (v[6] !== undefined) setWorldProp("vfx_light", !!v[6]);
   tell(p, "§7Server settings saved.");
+}
+
+// Server automation: everything that runs the server by itself (bans.js, server.js, upkeep.js).
+const AUTO_KEYS = Object.keys(AUTO);
+async function automationPage(p) {
+  if (!isAdmin(p)) return;
+  const f = new ModalFormData().title("§4Server automation");
+  for (const k of Object.keys(GROUPS)) f.toggle(`Ban ${GROUPS[k].name.toLowerCase()}`, groupOn(k));
+  for (const k of AUTO_KEYS) f.toggle(AUTO[k], on(k));
+  f.slider("Sanctuary radius (blocks)", 8, 64, 4, Math.max(8, Math.min(64, Number(worldProp("sanct_r", SANCT_R)) || SANCT_R)));
+  f.slider("Minutes between server events", 10, 120, 5, Math.max(10, Math.min(120, Number(worldProp("events_every", 30)) || 30)));
+  const r = await show(p, f);
+  if (r.canceled || !r.formValues) return;
+  const v = r.formValues;
+  let i = 0;
+  for (const k of Object.keys(GROUPS)) {
+    if (v[i] !== undefined) setGroup(k, !!v[i]);
+    i++;
+  }
+  for (const k of AUTO_KEYS) {
+    if (v[i] !== undefined) setOn(k, !!v[i]);
+    i++;
+  }
+  if (typeof v[i] === "number") setSanctuaryRadius(v[i]);
+  if (typeof v[i + 1] === "number") setWorldProp("events_every", Math.round(v[i + 1]));
+  tell(p, `§7Server automation saved. ${bansLine() ? `§c${bansLine()}§7.` : "§7Nothing is banned."}${extraBans().length ? ` §8(by hand: ${extraBans().join(", ")})` : ""}`);
 }

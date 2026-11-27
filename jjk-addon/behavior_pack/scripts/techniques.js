@@ -10,7 +10,7 @@
 
 import { world, system, ItemStack, ItemLockMode } from "@minecraft/server";
 import {
-  getProp, setProp, bump, bar, tell, title, sound, fx, mid, anim, COLOR, health, alive, effect, gameMode,
+  getProp, setProp, bump, bar, tell, title, sound, fx, mid, anim, COLOR, health, alive, effect, gameMode, isSafe,
 } from "./core.js";
 import { gradeOf, GRADES, G, addFinger, fingersOf, MAX_FINGERS, onPromote, applyStats, maxCE } from "./grades.js";
 import { getCE, spendCE, isHeavenly } from "./energy.js";
@@ -247,6 +247,7 @@ export function useMove(p, id) {
   if (gradeOf(p) < m.grade) return nag(p, `§7${m.name} unlocks at ${GRADES[m.grade].c}${GRADES[m.grade].name}§7.`), false;
   if (stunned(p)) return nag(p, "§cYou can't move!"), false;
   if (inCinematic(p)) return false; // (the camera isn't yours until it ends)
+  if (isSafe(p)) return nag(p, "§aThe sanctuary holds your technique back §7— step outside it to fight."), false;
   if (m.tech && m.tech !== "heavenly" && burnedOut(p)) return nag(p, `§cBurnout: your technique is spent for ${Math.ceil(burnedOut(p) / 20)}s more.`), false;
   const left = cooldownLeft(p, id);
   if (left > 0) return nag(p, `§7${m.name} §8— ready in §f${left.toFixed(1)}s`), false;

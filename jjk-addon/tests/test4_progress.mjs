@@ -131,7 +131,7 @@ delete p._props["jjk:hud_off"];
 p.addTag("jjk_admin"); formLog.length = 0;
 const r2 = mkPlayer("Nobara", { x: 9, y: 64, z: 0 }); r2._props["jjk:technique"] = "boogie";
 const others = world.getAllPlayers().sort((x, y) => x.name.localeCompare(y.name));
-answers.push({ selection: 7 }, { selection: 0 }, { selection: others.indexOf(r2) }, { formValues: [Object.keys(T.TECHNIQUES).indexOf("shrine"), 1, 4, 5, true, false] });
+answers.push({ selection: 8 }, { selection: 0 }, { selection: others.indexOf(r2) }, { formValues: [Object.keys(T.TECHNIQUES).indexOf("shrine"), 1, 4, 5, true, false] });
 await use(p, "jjk:jujutsu_record"); await tick(3);
 check("admin button for admins", formLog[0]?.btns.some((b) => b.includes("Admin")));
 check("admin edit: technique, grade, fingers", r2._props["jjk:technique"] === "shrine" && Gr.gradeOf(r2) === 4 && Gr.fingersOf(r2) === 5,

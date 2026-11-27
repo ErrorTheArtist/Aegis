@@ -1,6 +1,7 @@
 import { H, mkPlayer, spawn, tick, fire, use, inv, check, done, system, hp, world } from "./harness.mjs";
 await import("./main.mjs");
 world.setDynamicProperty("jjk:cinematics", false); // (moves back to back: no cinematics here — test9 plays them)
+world.setDynamicProperty("jjk:auto_newcomer", false); // (players fight each other here; newcomer protection is test10's)
 const T = await import("./techniques.mjs");
 const E = await import("./energy.mjs");
 const Gr = await import("./grades.mjs");
